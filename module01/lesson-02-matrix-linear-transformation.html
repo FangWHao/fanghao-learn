@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块1 · 第2课 · 矩阵即线性变换——把空间“掰弯”</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue-bg:#eff6ff;
+--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--pink:#db2777;
+--red:#dc2626;--red-bg:#fef2f2;--bg:#ffffff;--soft:#f8fafc;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);
+font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.85;font-size:17px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:840px;margin:0 auto;padding:0 22px 100px;}
+header.top{background:#fff;border-bottom:1px solid var(--line);padding:26px 22px 22px;margin-bottom:14px;}
+header.top .inner{max-width:840px;margin:0 auto;}
+.crumb{color:var(--muted);font-size:14px;letter-spacing:.3px;margin-bottom:6px;}
+h1{font-size:30px;line-height:1.3;margin:.1em 0 .2em;}
+.sub{color:var(--muted);font-size:15px;}
+article{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:30px 34px;margin-top:18px;}
+h2{font-size:23px;margin:1.7em 0 .6em;padding-bottom:.25em;border-bottom:2px solid var(--line);}
+h2:first-child{margin-top:.2em;}
+h3{font-size:19px;margin:1.3em 0 .4em;color:#0f172a;}
+h4{margin:.2em 0 .5em;font-size:16px;}
+p{margin:.7em 0;}
+ul,ol{padding-left:1.3em;margin:.6em 0;}
+li{margin:.32em 0;}
+code{background:#f1f5f9;padding:.12em .4em;border-radius:5px;font-size:.9em;
+font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a;}
+pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 18px;overflow:auto;font-size:14px;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0;}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:15.5px;}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+thead th{background:var(--soft);}
+figure.fig{margin:1.4em 0;text-align:center;}
+figure.fig svg{max-width:100%;height:auto;}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
+.note,.ml,.key,.pitfall,.example{border-radius:10px;padding:14px 18px;margin:1.2em 0;border:1px solid var(--line);}
+.note{background:var(--soft);border-left:4px solid #94a3b8;}
+.example{background:#fff;border-left:4px solid var(--blue);}
+.ml{background:var(--green-bg);border-left:4px solid var(--green);}
+.key{background:var(--amber-bg);border-left:4px solid var(--amber);}
+.pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
+.toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
+.toc h3{margin:.1em 0 .7em;}
+.toc ol{list-style:none;padding:0;}
+.toc li{padding:7px 10px;border-radius:8px;color:#334155;border:1px solid transparent;}
+.toc li a{color:inherit;text-decoration:none;display:block;}
+.toc li .ln{display:inline-block;min-width:54px;color:var(--muted);font-size:13px;}
+.toc li.cur{background:var(--blue-bg);border-color:#bfdbfe;font-weight:600;color:#1e3a8a;}
+.toc li:not(.cur):hover{background:var(--soft);}
+.navbtns{display:flex;justify-content:space-between;margin-top:22px;gap:12px;}
+.navbtns a{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--ink);}
+.navbtns a:hover{border-color:var(--blue);}
+.navbtns .nlabel{color:var(--muted);font-size:13px;}
+.navbtns .ntitle{font-weight:600;margin-top:3px;}
+.navbtns .next{text-align:right;}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
+.card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
+.card:hover{border-color:var(--blue);}
+.card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
+.card .ct{font-size:18px;font-weight:600;}
+.card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+</style>
+</head>
+<body>
+<header class="top"><div class="inner">
+<div class="crumb"><a href="index.html" style="color:inherit">模块 1 · 线性代数与微积分</a>　/　第 2 课（共 10 课）</div>
+<h1>矩阵即线性变换——把空间“掰弯”</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　第一阶段：数学与工具基础</div>
+</div></header>
+<div class="wrap">
+<article>
+<p>上一课我们确立了"万物皆向量"，并用点积衡量两个向量的关系。这一课，我们让<strong>整个空间</strong>动起来：矩阵不再是一张死板的数表，而是一台<strong>变换空间的机器</strong>——它把每个向量搬到新位置，让网格被缩放、旋转、剪切、压扁。理解了这一点，你就拿到了打开线性代数（以及神经网络）的钥匙。</p>
+
+<div class="note">
+<p><strong>记号衔接：</strong>沿用上一课的约定，向量记作斜体 \(v\)（默认是列向量），矩阵记作大写 \(A\)。零向量特别记作粗体 \(\mathbf{0}\)，以便和标量 \(0\) 区分开——本课里只有零向量加粗，普通向量都用斜体。</p>
+</div>
+
+<h2>一、矩阵的双重身份</h2>
+
+<p>一个矩阵 \(A\) 同时是两样东西：</p>
+<ul>
+<li><strong>静态视角：一张数表</strong>。比如 \(A=\begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix}\)，就是排成方阵的四个数。</li>
+<li><strong>动态视角：一个线性变换 linear transformation</strong>。它是一个<em>函数</em>，吃进一个向量 \(v\)，吐出另一个向量 \(Av\)。它作用在整个平面的<em>每一个</em>点上，把空间"掰弯"成新形状。这里的"线性"是有严格含义的——它指变换<strong>保持加法和数乘</strong>（精确的三条性质我们第三节就给出）。</li>
+</ul>
+
+<div class="note">
+<p>这门课最重要的心态转变：不要把 \(Av\) 看成"一堆乘加运算的结果"，而要看成"<strong>把向量 \(v\) 搬到了哪里</strong>"。整张数表，编码的是"空间该怎么动"。</p>
+</div>
+
+<h2>二、矩阵的列 = 基向量变换后的落点</h2>
+
+<p>这是全课最重要的一句话，值得你停下来反复咀嚼。</p>
+
+<p>回忆平面里的两个<strong>基向量 basis vector</strong>：</p>
+\[
+\hat{\imath}=\begin{bmatrix}1\\0\end{bmatrix},\qquad \hat{\jmath}=\begin{bmatrix}0\\1\end{bmatrix}.
+\]
+<p>任何向量都是它们的线性组合，例如 \(v=\begin{bmatrix}x\\y\end{bmatrix}=x\,\hat{\imath}+y\,\hat{\jmath}\)。</p>
+
+<p>线性变换有个关键性质：<strong>只要知道 \(\hat{\imath}\) 和 \(\hat{\jmath}\) 被搬到哪里，就知道所有向量被搬到哪里</strong>。这一步用到下一节会正式讲的两条性质——把和拆开（<strong>可加性</strong>）、把标量提到前面（<strong>齐次性</strong>）。我们一步步展开，看清楚它不是黑魔法而是机械的两步：</p>
+\[
+A\,v = A(x\,\hat{\imath}+y\,\hat{\jmath})
+\underset{\text{可加性}}{=} A(x\,\hat{\imath})+A(y\,\hat{\jmath})
+\underset{\text{齐次性}}{=} x\,(A\hat{\imath}) + y\,(A\hat{\jmath}).
+\]
+
+<p>现在看 \(A=\begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix}\) 怎么作用在基向量上：</p>
+\[
+A\hat{\imath}=\begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix}\begin{bmatrix}1\\0\end{bmatrix}=\begin{bmatrix}2\\0\end{bmatrix},\qquad
+A\hat{\jmath}=\begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix}\begin{bmatrix}0\\1\end{bmatrix}=\begin{bmatrix}1\\3\end{bmatrix}.
+\]
+
+<p>看出来了吗？\(A\hat{\imath}\) 恰好是 \(A\) 的<strong>第一列</strong>，\(A\hat{\jmath}\) 恰好是 \(A\) 的<strong>第二列</strong>。这不是巧合——这就是矩阵的定义方式。</p>
+
+<div class="key">
+<h4>要点</h4>
+<p>矩阵的<strong>每一列</strong>，就是<strong>对应基向量变换后的落点</strong>。于是矩阵-向量乘法 \(Av\) 等于"用 \(v\) 的分量去加权矩阵的各列"：</p>
+\[
+\begin{bmatrix} a & b \\ c & d \end{bmatrix}\begin{bmatrix}x\\y\end{bmatrix}
+= x\begin{bmatrix}a\\c\end{bmatrix}+y\begin{bmatrix}b\\d\end{bmatrix}.
+\]
+<p>这叫"列视角"，是理解一切矩阵运算的根基。</p>
+</div>
+
+<figure class="fig"><svg viewBox="0 0 560 340" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif">
+  <title>矩阵的列是基向量变换后的落点</title>
+  <defs>
+    <marker id="arrRed" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#db2777"/>
+    </marker>
+    <marker id="arrBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrAxis" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/>
+    </marker>
+    <marker id="arrBig" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1f2937"/>
+    </marker>
+  </defs>
+
+  <!-- ============ LEFT PANEL ============ -->
+  <!-- origin at (50,250), unit = 34px. mathX -> 50+34*x ; mathY -> 250-34*y. range x,y in [-1,4] -->
+  <g>
+    <!-- light grid lines -->
+    <!-- vertical lines x=-1..4 -->
+    <line x1="16" y1="284" x2="16" y2="80" stroke="#e2e8f0" stroke-width="0.75"/>
+    <line x1="84" y1="284" x2="84" y2="80" stroke="#e2e8f0" stroke-width="0.75"/>
+    <line x1="118" y1="284" x2="118" y2="80" stroke="#e2e8f0" stroke-width="0.75"/>
+    <line x1="152" y1="284" x2="152" y2="80" stroke="#e2e8f0" stroke-width="0.75"/>
+    <line x1="186" y1="284" x2="186" y2="80" stroke="#e2e8f0" stroke-width="0.75"/>
+    <!-- horizontal lines y=-1..4 -->
+    <line x1="16" y1="284" x2="186" y2="284" stroke="#e2e8f0" stroke-width="0.75"/>
+    <line x1="16" y1="216" x2="186" y2="216" stroke="#e2e8f0" stroke-width="0.75"/>
+    <line x1="16" y1="182" x2="186" y2="182" stroke="#e2e8f0" stroke-width="0.75"/>
+    <line x1="16" y1="148" x2="186" y2="148" stroke="#e2e8f0" stroke-width="0.75"/>
+    <line x1="16" y1="114" x2="186" y2="114" stroke="#e2e8f0" stroke-width="0.75"/>
+    <line x1="16" y1="80" x2="186" y2="80" stroke="#e2e8f0" stroke-width="0.75"/>
+
+    <!-- unit square (0,0)-(1,0)-(1,1)-(0,1) -> px (50,250)(84,250)(84,216)(50,216) -->
+    <polygon points="50,250 84,250 84,216 50,216" fill="#d97706" fill-opacity="0.12" stroke="none"/>
+
+    <!-- axes -->
+    <line x1="16" y1="250" x2="196" y2="250" stroke="#94a3b8" stroke-width="1" marker-end="url(#arrAxis)"/>
+    <line x1="50" y1="284" x2="50" y2="72" stroke="#94a3b8" stroke-width="1" marker-end="url(#arrAxis)"/>
+    <!-- tick labels -->
+    <text x="84" y="264" font-size="11" fill="#94a3b8" text-anchor="middle">1</text>
+    <text x="118" y="264" font-size="11" fill="#94a3b8" text-anchor="middle">2</text>
+    <text x="152" y="264" font-size="11" fill="#94a3b8" text-anchor="middle">3</text>
+    <text x="42" y="220" font-size="11" fill="#94a3b8" text-anchor="end">1</text>
+    <text x="42" y="118" font-size="11" fill="#94a3b8" text-anchor="end">3</text>
+
+    <!-- i_hat (0,0)->(1,0) -->
+    <line x1="50" y1="250" x2="82" y2="250" stroke="#db2777" stroke-width="2" marker-end="url(#arrRed)"/>
+    <text x="70" y="242" font-size="12" fill="#db2777" text-anchor="middle">î</text>
+    <!-- j_hat (0,0)->(0,1) -->
+    <line x1="50" y1="250" x2="50" y2="218" stroke="#2563eb" stroke-width="2" marker-end="url(#arrBlue)"/>
+    <text x="40" y="234" font-size="12" fill="#2563eb" text-anchor="end">ĵ</text>
+
+    <!-- origin dot -->
+    <circle cx="50" cy="250" r="3" fill="#1f2937"/>
+
+    <text x="105" y="305" font-size="12" fill="#1f2937" text-anchor="middle">变换前（标准基）</text>
+  </g>
+
+  <!-- ============ MIDDLE BIG ARROW ============ -->
+  <line x1="206" y1="170" x2="262" y2="170" stroke="#1f2937" stroke-width="2.5" marker-end="url(#arrBig)"/>
+  <text x="234" y="160" font-size="13" fill="#1f2937" text-anchor="middle">A 作用</text>
+  <text x="234" y="187" font-size="11" fill="#1f2937" text-anchor="middle">[[2,1],[0,3]]</text>
+
+  <!-- ============ RIGHT PANEL ============ -->
+  <!-- origin at (320,250), scale 28px/unit. mapped point (2x+y, 3y).
+       pxX = 320 + 28*(2x+y) ; pxY = 250 - 28*(3y) -->
+  <g>
+    <!-- transformed grid: images of lines x=const and y=const -->
+    <!-- vertical originals x=c (c=0..3), y from 0..4 -> a sheared family.
+         endpoints: (c, 0)->(2c, 0); (c,4)->(2c+4, 12). Keep within bounds; clip to y in [0,3] for compactness -->
+    <!-- We draw grid for x in 0..3, y in 0..3 (image parallelogram region) -->
+    <!-- lines of constant x (c=0..3): from (2c,0) to (2c+3,9)... too tall. Use y range 0..3 -->
+    <!-- constant-x lines: param y 0..3 : start (2c, 0)px, end (2c+3, 9)px in math -->
+    <!-- c=0: (0,0)->(3,9) -->
+    <line x1="320" y1="250" x2="404" y2="-2" stroke="#e2e8f0" stroke-width="0.75"/>
+    <!-- c=1: (2,0)->(5,9) -->
+    <line x1="376" y1="250" x2="460" y2="-2" stroke="#e2e8f0" stroke-width="0.75"/>
+    <!-- c=2: (4,0)->(7,9) -->
+    <line x1="432" y1="250" x2="516" y2="-2" stroke="#e2e8f0" stroke-width="0.75"/>
+    <!-- c=3: (6,0)->(9,9) -->
+    <line x1="488" y1="250" x2="544" y2="82" stroke="#e2e8f0" stroke-width="0.75"/>
+
+    <!-- constant-y lines: param x 0..3 : (0,c)->(3,c) image (c, 3c)->(6+c, 3c) -->
+    <!-- c=0: (0,0)->(6,0) px (320,250)->(488,250) -->
+    <line x1="320" y1="250" x2="488" y2="250" stroke="#e2e8f0" stroke-width="0.75"/>
+    <!-- c=1: (1,3)->(7,3) px (348,166)->(516,166) -->
+    <line x1="348" y1="166" x2="516" y2="166" stroke="#e2e8f0" stroke-width="0.75"/>
+    <!-- c=2: (2,6)->(8,6) px (376,82)->(544,82) -->
+    <line x1="376" y1="82" x2="544" y2="82" stroke="#e2e8f0" stroke-width="0.75"/>
+    <!-- c=3: (3,9)->(9,9) px (404,-2)->(572,-2) out of top; draw partial -->
+    <line x1="404" y1="-2" x2="544" y2="-2" stroke="#e2e8f0" stroke-width="0.75"/>
+
+    <!-- transformed unit square -> parallelogram (0,0)(2,0)(3,3)(1,3)
+         px: (320,250)(376,250)(404,166)(348,166) -->
+    <polygon points="320,250 376,250 404,166 348,166" fill="#d97706" fill-opacity="0.14" stroke="none"/>
+
+    <!-- axes (image axes coincide with original axes directions for reference) -->
+    <line x1="300" y1="250" x2="556" y2="250" stroke="#94a3b8" stroke-width="1" marker-end="url(#arrAxis)"/>
+    <line x1="320" y1="284" x2="320" y2="60" stroke="#94a3b8" stroke-width="1" marker-end="url(#arrAxis)"/>
+    <!-- ticks on x axis: 2 at (376), 3 at (404) base; label key landing -->
+    <text x="376" y="264" font-size="11" fill="#94a3b8" text-anchor="middle">2</text>
+    <text x="312" y="170" font-size="11" fill="#94a3b8" text-anchor="end">3</text>
+
+    <!-- i_hat -> (2,0) px (376,250) RED  = A first column -->
+    <line x1="320" y1="250" x2="374" y2="250" stroke="#db2777" stroke-width="2" marker-end="url(#arrRed)"/>
+    <text x="350" y="270" font-size="11" fill="#db2777" text-anchor="middle">î→(2,0)</text>
+    <text x="356" y="282" font-size="11" fill="#db2777" text-anchor="middle">A 的第1列</text>
+
+    <!-- j_hat -> (1,3) px (348,166) BLUE = A second column -->
+    <line x1="320" y1="250" x2="347" y2="167" stroke="#2563eb" stroke-width="2" marker-end="url(#arrBlue)"/>
+    <text x="338" y="150" font-size="11" fill="#2563eb" text-anchor="middle">ĵ→(1,3)</text>
+    <text x="346" y="138" font-size="11" fill="#2563eb" text-anchor="middle">A 的第2列</text>
+
+    <!-- origin dot + 原点不动 -->
+    <circle cx="320" cy="250" r="3" fill="#1f2937"/>
+    <text x="320" y="305" font-size="12" fill="#1f2937" text-anchor="middle">变换后（网格仍平行等距）</text>
+  </g>
+
+  <!-- 原点不动 annotation spanning -->
+  <text x="280" y="323" font-size="11" fill="#059669" text-anchor="middle">● 原点不动；矩阵的列 = 基向量的像</text>
+</svg><figcaption>矩阵的列 = 基向量变换后的落点。左图为原始坐标网格，标出单位基向量 i 帽=(1,0)（红）与 j 帽=(0,1)（蓝）。右图为经 A=[[2,1],[0,3]] 变换后：i 帽落到 (2,0)（红，恰是 A 的第一列），j 帽落到 (1,3)（蓝，恰是 A 的第二列）。两图都画淡灰网格线，变换后网格线仍保持平行且等距、原点不动，直观展示&#x27;矩阵的列就是基向量的像&#x27;。</figcaption></figure>
+
+<div class="example">
+<h4>例题</h4>
+<p>用 \(A=\begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix}\) 作用在 \(v=\begin{bmatrix}1\\1\end{bmatrix}\)。</p>
+<p><strong>用列视角：</strong>\(Av = 1\cdot\begin{bmatrix}2\\0\end{bmatrix}+1\cdot\begin{bmatrix}1\\3\end{bmatrix}=\begin{bmatrix}2+1\\0+3\end{bmatrix}=\begin{bmatrix}3\\3\end{bmatrix}.\)</p>
+<p><strong>验算（逐行点积）：</strong>第一行 \(2\cdot1+1\cdot1=3\)；第二行 \(0\cdot1+3\cdot1=3\)。两种算法一致，得 \(\begin{bmatrix}3\\3\end{bmatrix}\)。</p>
+</div>
+
+<h2>三、什么样的变换才算"线性"</h2>
+
+<p>上一节我们已经反复用到"线性变换"这个词，现在给它一个精确的定义。不是任何把向量搬来搬去的规则都叫线性变换——线性变换必须满足三条性质：</p>
+<ol>
+<li><strong>保持加法（可加性）：</strong>\(A(u+v)=Au+Av\)。</li>
+<li><strong>保持数乘（齐次性）：</strong>\(A(c\,v)=c\,(Av)\)。</li>
+<li><strong>原点不动：</strong>\(A\,\mathbf{0}=\mathbf{0}\)（这其实是齐次性取 \(c=0\) 的推论）。</li>
+</ol>
+
+<p>回头看第二节那个把 \(Av\) 拆成 \(x(A\hat{\imath})+y(A\hat{\jmath})\) 的等式：第一步"把和拆开"正是性质 1，第二步"把标量提出来"正是性质 2。所以"列视角"不是凭空的魔法，而是这两条性质的直接推论。</p>
+
+<div class="note">
+<p>用 3Blue1Brown 的直觉说：线性变换就是那种"<strong>网格线始终保持平行且等距，原点钉死不动</strong>"的变形。允许拉伸、旋转、斜切；但不允许把直网格弯成曲线，也不允许整体平移让原点跑掉。</p>
+<p>这解释了一个常见困惑：神经网络里的 \(Wx+b\)，那个 \(+b\)（平移）<strong>不是</strong>线性变换（它让原点动了），严格说是"<strong>仿射 affine</strong>"变换。这里先给仿射一个正面定义记住：<strong>仿射变换 = 一个线性变换再加一个平移，即 \(x\mapsto Ax+b\)；当 \(b=\mathbf{0}\) 时它就退化成线性变换。</strong>后面讲神经网络层时还会回到这点。</p>
+</div>
+
+<h2>四、五种最常见的 2D 变换</h2>
+
+<p>下表把几何动作翻译成矩阵。建议你对每个矩阵都心算一下它把 \(\hat{\imath},\hat{\jmath}\)（即两列）搬到了哪里。</p>
+
+<table>
+<thead>
+<tr><th>变换</th><th>矩阵</th><th>几何效果</th></tr>
+</thead>
+<tbody>
+<tr><td>缩放 scaling</td><td>\(\begin{bmatrix} s_x & 0 \\ 0 & s_y \end{bmatrix}\)</td><td>横向拉 \(s_x\) 倍、纵向拉 \(s_y\) 倍</td></tr>
+<tr><td>旋转 rotation</td><td>\(\begin{bmatrix} \cos\theta & -\sin\theta \\ \sin\theta & \cos\theta \end{bmatrix}\)</td><td>绕原点逆时针转 \(\theta\)</td></tr>
+<tr><td>剪切 shear</td><td>\(\begin{bmatrix} 1 & k \\ 0 & 1 \end{bmatrix}\)</td><td>把竖直网格斜推成平行四边形</td></tr>
+<tr><td>反射 reflection</td><td>\(\begin{bmatrix} 1 & 0 \\ 0 & -1 \end{bmatrix}\)</td><td>沿 \(x\) 轴镜像翻转</td></tr>
+<tr><td>投影 projection</td><td>\(\begin{bmatrix} 1 & 0 \\ 0 & 0 \end{bmatrix}\)</td><td>把整个平面压扁到 \(x\) 轴上</td></tr>
+</tbody>
+</table>
+
+<figure class="fig"><svg viewBox="0 0 520 540" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>单位正方形在缩放、旋转、剪切、反射四种变换下的形变</title><desc>2x2四宫格，每格以淡灰虚线单位正方形为参照，展示变换后的淡黄实线形状，并标注对应的2x2矩阵。</desc><defs><marker id="ax" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker></defs><g transform="translate(20,28)"><text x="0" y="0" font-size="14" font-weight="600" fill="#1f2937">缩放</text><text x="55" y="0" font-size="12" fill="#2563eb">[[2,0],[0,1]]</text><g transform="translate(0,18)"><line x1="6" y1="118" x2="180" y2="118" stroke="#94a3b8" stroke-width="1" marker-end="url(#ax)"/><line x1="14" y1="126" x2="14" y2="6" stroke="#94a3b8" stroke-width="1" marker-end="url(#ax)"/><line x1="70" y1="62" x2="70" y2="118" stroke="#e2e8f0" stroke-width="0.75"/><line x1="126" y1="62" x2="126" y2="118" stroke="#e2e8f0" stroke-width="0.75"/><line x1="14" y1="90" x2="126" y2="90" stroke="#e2e8f0" stroke-width="0.75"/><rect x="14" y="62" width="56" height="56" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/><rect x="14" y="62" width="112" height="56" fill="#fde68a" fill-opacity="0.45" stroke="#d97706" stroke-width="2"/><text x="14" y="132" font-size="11" fill="#1f2937">0</text><text x="64" y="132" font-size="11" fill="#1f2937">1</text><text x="120" y="132" font-size="11" fill="#1f2937">2</text></g></g><g transform="translate(280,28)"><text x="0" y="0" font-size="14" font-weight="600" fill="#1f2937">旋转 45°</text><text x="78" y="0" font-size="12" fill="#2563eb">[[c,−s],[s,c]]</text><g transform="translate(0,18)"><line x1="6" y1="118" x2="180" y2="118" stroke="#94a3b8" stroke-width="1" marker-end="url(#ax)"/><line x1="60" y1="126" x2="60" y2="6" stroke="#94a3b8" stroke-width="1" marker-end="url(#ax)"/><rect x="60" y="62" width="56" height="56" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/><path d="M60,118 L99.6,78.4 L139.2,118 L99.6,157.6 Z" fill="#fde68a" fill-opacity="0.45" stroke="#d97706" stroke-width="2"/><path d="M76,118 A16,16 0 0 0 71.7,106.7" fill="none" stroke="#2563eb" stroke-width="1.2"/><text x="80" y="110" font-size="11" fill="#2563eb">45°</text><text x="60" y="132" font-size="11" fill="#1f2937">0</text><text x="113" y="132" font-size="11" fill="#1f2937">1</text></g></g><g transform="translate(20,300)"><text x="0" y="0" font-size="14" font-weight="600" fill="#1f2937">剪切</text><text x="55" y="0" font-size="12" fill="#2563eb">[[1,1],[0,1]]</text><g transform="translate(0,18)"><line x1="6" y1="118" x2="180" y2="118" stroke="#94a3b8" stroke-width="1" marker-end="url(#ax)"/><line x1="14" y1="126" x2="14" y2="6" stroke="#94a3b8" stroke-width="1" marker-end="url(#ax)"/><line x1="42" y1="90" x2="98" y2="90" stroke="#e2e8f0" stroke-width="0.75"/><line x1="42" y1="62" x2="70" y2="62" stroke="#e2e8f0" stroke-width="0.75"/><rect x="14" y="62" width="56" height="56" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/><path d="M14,118 L70,118 L126,62 L70,62 Z" fill="#fde68a" fill-opacity="0.45" stroke="#d97706" stroke-width="2"/><text x="14" y="132" font-size="11" fill="#1f2937">0</text><text x="64" y="132" font-size="11" fill="#1f2937">1</text><text x="120" y="132" font-size="11" fill="#1f2937">2</text></g></g><g transform="translate(280,300)"><text x="0" y="0" font-size="14" font-weight="600" fill="#1f2937">反射</text><text x="55" y="0" font-size="12" fill="#2563eb">[[1,0],[0,−1]]</text><g transform="translate(0,18)"><line x1="6" y1="90" x2="180" y2="90" stroke="#94a3b8" stroke-width="1" marker-end="url(#ax)"/><line x1="60" y1="150" x2="60" y2="6" stroke="#94a3b8" stroke-width="1" marker-end="url(#ax)"/><rect x="60" y="34" width="56" height="56" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/><rect x="60" y="90" width="56" height="56" fill="#fde68a" fill-opacity="0.45" stroke="#d97706" stroke-width="2"/><text x="74" y="62" font-size="20" font-weight="700" fill="#94a3b8">F</text><text x="74" y="124" font-size="20" font-weight="700" fill="#d97706" transform="scale(1,-1) translate(0,-228)">F</text><text x="60" y="84" font-size="11" fill="#1f2937">0</text></g></g></svg><figcaption>单位正方形在四种基本变换下的形变。以淡黄单位正方形为基准，分别展示缩放（横向拉长成矩形）、旋转（整体逆时针转 45° 仍是正方形）、剪切（顶边右推成平行四边形）、反射（沿 x 轴翻到下方）。每格标注对应矩阵，网格线在前三种保持平行等距，帮助读者把矩阵和几何动作绑定记忆。</figcaption></figure>
+
+<h3>旋转矩阵从哪来？</h3>
+<p>用列视角秒推：逆时针转 \(\theta\) 后，\(\hat{\imath}=(1,0)\) 落到 \((\cos\theta,\sin\theta)\)，\(\hat{\jmath}=(0,1)\) 落到 \((-\sin\theta,\cos\theta)\)。把这两个落点当列拼起来，就是旋转矩阵：</p>
+\[
+R(\theta)=\begin{bmatrix} \cos\theta & -\sin\theta \\ \sin\theta & \cos\theta \end{bmatrix}.
+\]
+
+<div class="example">
+<h4>例题：旋转 90°</h4>
+<p>取 \(\theta=90^\circ\)，\(\cos90^\circ=0,\ \sin90^\circ=1\)，于是 \(R=\begin{bmatrix} 0 & -1 \\ 1 & 0 \end{bmatrix}\)。</p>
+<p>作用在 \(\begin{bmatrix}3\\2\end{bmatrix}\) 上：\(R\begin{bmatrix}3\\2\end{bmatrix}=\begin{bmatrix}0\cdot3+(-1)\cdot2\\ 1\cdot3+0\cdot2\end{bmatrix}=\begin{bmatrix}-2\\3\end{bmatrix}.\)</p>
+<p>几何检验：\((3,2)\) 在第一象限，逆时针转 90° 应进入第二象限（\(x\) 变负、\(y\) 变正），\((-2,3)\) 正符合。口诀：旋转 90° 就是 \((x,y)\mapsto(-y,x)\)。</p>
+</div>
+
+<h2>五、行列式：面积的缩放因子</h2>
+
+<p>变换把空间拉伸或压缩，那"被放大了多少倍"？答案就是<strong>行列式 determinant</strong>，记作 \(\det A\) 或 \(|A|\)。对 \(2\times2\)：</p>
+\[
+\det\begin{bmatrix} a & b \\ c & d \end{bmatrix}=ad-bc.
+\]
+
+<div class="key">
+<h4>要点：行列式的三层含义</h4>
+<ul>
+<li><strong>大小：</strong>\(|\det A|\) = 面积（三维则是体积）的缩放倍数。变换前面积为 1 的单位正方形，变换后面积变成 \(|\det A|\)。</li>
+<li><strong>符号：</strong>\(\det A>0\) 保持定向；\(\det A<0\) 说明空间被<strong>翻转</strong>了（像照镜子，左右手互换）。还记得第四节的反射 \(\begin{bmatrix}1&0\\0&-1\end{bmatrix}\) 吗？它的 \(\det=1\cdot(-1)-0\cdot0=-1<0\)，正是它把右手系翻成左手系——这就是符号为负最干净的几何实例。</li>
+<li><strong>为零：</strong>\(\det A=0\) 意味着空间被<strong>压扁、降维</strong>——面积塌成 0，变换<strong>不可逆 non-invertible</strong>（信息丢失，搬不回来）。</li>
+</ul>
+</div>
+
+<figure class="fig"><svg viewBox="0 0 540 430" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>行列式作为带符号的面积缩放因子</title><defs><marker id="ahB" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#2563eb"/></marker><marker id="ahP" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#059669"/></marker><marker id="ahR" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#db2777"/></marker><marker id="ahD" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#94a3b8"/></marker></defs>
+
+<!-- ============ ① 左：单位正方形 ============ -->
+<g>
+<!-- 网格 -->
+<line x1="20" y1="40" x2="20" y2="160" stroke="#e2e8f0" stroke-width="0.75"/>
+<line x1="50" y1="40" x2="50" y2="160" stroke="#e2e8f0" stroke-width="0.75"/>
+<line x1="20" y1="100" x2="80" y2="100" stroke="#e2e8f0" stroke-width="0.75"/>
+<line x1="20" y1="70" x2="80" y2="70" stroke="#e2e8f0" stroke-width="0.75"/>
+<!-- 坐标轴 -->
+<line x1="20" y1="160" x2="100" y2="160" stroke="#94a3b8" stroke-width="1"/>
+<line x1="20" y1="160" x2="20" y2="40" stroke="#94a3b8" stroke-width="1"/>
+<!-- 单位正方形 (边长30px = 1单位) -->
+<polygon points="20,160 50,160 50,130 20,130" fill="#2563eb" fill-opacity="0.12" stroke="#2563eb" stroke-width="2"/>
+<!-- 角点 1234 逆时针: (0,0)->(1,0)->(1,1)->(0,1) -->
+<circle cx="20" cy="160" r="2.4" fill="#2563eb"/><text x="14" y="173" font-size="11" fill="#1f2937">1</text>
+<circle cx="50" cy="160" r="2.4" fill="#2563eb"/><text x="52" y="173" font-size="11" fill="#1f2937">2</text>
+<circle cx="50" cy="130" r="2.4" fill="#2563eb"/><text x="53" y="128" font-size="11" fill="#1f2937">3</text>
+<circle cx="20" cy="130" r="2.4" fill="#2563eb"/><text x="10" y="128" font-size="11" fill="#1f2937">4</text>
+<!-- 逆时针定向弧箭头 -->
+<path d="M40 152 A8 8 0 1 1 38 138" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#ahP)"/>
+<text x="35" y="146" font-size="11" fill="#059669" text-anchor="middle">逆</text>
+<text x="60" y="32" font-size="14" fill="#1f2937" text-anchor="middle" font-weight="600">单位正方形</text>
+<text x="60" y="195" font-size="12" fill="#2563eb" text-anchor="middle">面积 = 1, det = 1</text>
+</g>
+
+<!-- ============ ② 中：A=[[2,1],[0,3]] 变换 ============ -->
+<g>
+<!-- 网格 -->
+<line x1="200" y1="40" x2="200" y2="160" stroke="#e2e8f0" stroke-width="0.75"/>
+<line x1="200" y1="160" x2="320" y2="160" stroke="#e2e8f0" stroke-width="0.75"/>
+<line x1="200" y1="100" x2="320" y2="100" stroke="#e2e8f0" stroke-width="0.75"/>
+<!-- 坐标轴 (原点 200,160; 比例 15px/单位) -->
+<line x1="200" y1="160" x2="330" y2="160" stroke="#94a3b8" stroke-width="1"/>
+<line x1="200" y1="160" x2="200" y2="40" stroke="#94a3b8" stroke-width="1"/>
+<!-- 平行四边形 (0,0)(2,0)(3,3)(1,3) -> 屏幕: x=200+15x, y=160-15y -->
+<polygon points="200,160 230,160 245,115 215,115" fill="#2563eb" fill-opacity="0.18" stroke="#2563eb" stroke-width="2"/>
+<!-- 角点 1234 逆时针保持 -->
+<circle cx="200" cy="160" r="2.4" fill="#2563eb"/><text x="194" y="173" font-size="11" fill="#1f2937">1</text>
+<circle cx="230" cy="160" r="2.4" fill="#2563eb"/><text x="232" y="173" font-size="11" fill="#1f2937">2</text>
+<circle cx="245" cy="115" r="2.4" fill="#2563eb"/><text x="249" y="114" font-size="11" fill="#1f2937">3</text>
+<circle cx="215" cy="115" r="2.4" fill="#2563eb"/><text x="205" y="112" font-size="11" fill="#1f2937">4</text>
+<!-- 逆时针弧箭头 -->
+<path d="M227 145 A9 9 0 1 1 222 128" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#ahP)"/>
+<text x="221" y="142" font-size="11" fill="#059669" text-anchor="middle">逆</text>
+<text x="252" y="32" font-size="14" fill="#1f2937" text-anchor="middle" font-weight="600">A = [[2,1],[0,3]]</text>
+<text x="252" y="195" font-size="12" fill="#2563eb" text-anchor="middle">面积 = 6 = det A</text>
+<text x="252" y="211" font-size="12" fill="#059669" text-anchor="middle">det &gt; 0, 定向保持</text>
+</g>
+
+<!-- ============ ③ 右：含反射的变换 det<0 ============ -->
+<g>
+<!-- 坐标轴 (原点 400,100; 上下都有空间) -->
+<line x1="400" y1="40" x2="400" y2="160" stroke="#e2e8f0" stroke-width="0.75"/>
+<line x1="400" y1="40" x2="400" y2="170" stroke="#94a3b8" stroke-width="1"/>
+<line x1="392" y1="100" x2="520" y2="100" stroke="#94a3b8" stroke-width="1"/>
+<line x1="392" y1="70" x2="520" y2="70" stroke="#e2e8f0" stroke-width="0.75"/>
+<line x1="392" y1="130" x2="520" y2="130" stroke="#e2e8f0" stroke-width="0.75"/>
+<!-- B=[[2,1],[0,-3]] 顶点 (0,0)(2,0)(3,-3)(1,-3); 屏幕 x=400+15x, y=100-15y -->
+<polygon points="400,100 430,100 445,145 415,145" fill="#db2777" fill-opacity="0.15" stroke="#db2777" stroke-width="2"/>
+<!-- 角点顺序翻面: 现在 1->2->3->4 在屏幕上呈顺时针 -->
+<circle cx="400" cy="100" r="2.4" fill="#db2777"/><text x="389" y="97" font-size="11" fill="#1f2937">1</text>
+<circle cx="430" cy="100" r="2.4" fill="#db2777"/><text x="432" y="97" font-size="11" fill="#1f2937">2</text>
+<circle cx="445" cy="145" r="2.4" fill="#db2777"/><text x="449" y="150" font-size="11" fill="#1f2937">3</text>
+<circle cx="415" cy="145" r="2.4" fill="#db2777"/><text x="405" y="158" font-size="11" fill="#1f2937">4</text>
+<!-- 顺时针弧箭头 (翻转后) -->
+<path d="M422 118 A9 9 0 1 0 428 134" fill="none" stroke="#db2777" stroke-width="2" marker-end="url(#ahR)"/>
+<text x="424" y="132" font-size="11" fill="#db2777" text-anchor="middle">顺</text>
+<text x="455" y="32" font-size="14" fill="#1f2937" text-anchor="middle" font-weight="600">含反射变换</text>
+<text x="455" y="185" font-size="12" fill="#db2777" text-anchor="middle">det &lt; 0, 定向翻转</text>
+</g>
+
+<!-- ============ ④ 最右下角：det=0 退化 ============ -->
+<g>
+<line x1="40" y1="280" x2="180" y2="280" stroke="#94a3b8" stroke-width="1"/>
+<line x1="40" y1="280" x2="40" y2="240" stroke="#94a3b8" stroke-width="1"/>
+<!-- 粗线段 (压扁成一维) -->
+<line x1="55" y1="275" x2="175" y2="305" stroke="#d97706" stroke-width="5" stroke-linecap="round"/>
+<circle cx="55" cy="275" r="2.6" fill="#d97706"/>
+<circle cx="175" cy="305" r="2.6" fill="#d97706"/>
+<text x="115" y="232" font-size="14" fill="#1f2937" text-anchor="middle" font-weight="600">退化变换</text>
+<text x="115" y="335" font-size="12" fill="#d97706" text-anchor="middle">det = 0, 压扁成一维</text>
+<text x="115" y="351" font-size="12" fill="#d97706" text-anchor="middle">面积 = 0, 不可逆</text>
+</g>
+
+<!-- ============ 总标题/说明 ============ -->
+<text x="270" y="392" font-size="12" fill="#1f2937" text-anchor="middle">行列式 = 带符号的面积缩放因子：|det| 是面积放大倍数，符号记录定向是否翻转</text>
+</svg><figcaption>行列式 = 带符号的面积缩放因子。左：单位正方形面积为 1。中：经 A=[[2,1],[0,3]] 变换成平行四边形，面积变为 6 = det A &gt; 0，定向保持（角点逆时针顺序不变）。右：经含反射的变换 det &lt; 0，平行四边形被翻面，定向反转，用顺/逆时针小箭头标注定向翻转。det=0 的情形单独画成一条线段，表示空间被压扁、面积归零。</figcaption></figure>
+
+<div class="example">
+<h4>例题：验证面积缩放</h4>
+<p>仍用 \(A=\begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix}\)，先算 \(\det A=2\cdot3-1\cdot0=6\)。</p>
+<p>把单位正方形的四个角 \((0,0),(1,0),(1,1),(0,1)\) 逐个变换（用列视角，\(A\) 的两列是 \((2,0)\) 和 \((1,3)\)）：</p>
+<ul>
+<li>\((0,0)\mapsto(0,0)\)（原点不动）</li>
+<li>\((1,0)\mapsto(2,0)\)（即第一列）</li>
+<li>\((1,1)\mapsto(2,0)+(1,3)=(3,3)\)（两列之和）</li>
+<li>\((0,1)\mapsto(1,3)\)（即第二列）</li>
+</ul>
+<p>变换后是顶点为 \((0,0),(2,0),(3,3),(1,3)\) 的平行四边形。它由两条边向量 \((2,0)\) 与 \((1,3)\) 张成，面积 = \(|2\cdot3-0\cdot1|=6\)，正好等于 \(\det A=6\)。单位正方形（面积 1）被放大成面积 6，缩放因子 = 行列式。验证成功。</p>
+</div>
+
+<div class="pitfall">
+<h4>易错</h4>
+<p>\(\det\) 只对<strong>方阵</strong>有定义（输入输出维数相同才谈得上"面积/体积缩放"）。另外别把"\(\det A=0\) 不可逆"忘了：它等价于"两列线性相关、把空间压扁"。一旦压扁，多个不同向量会被搬到同一点，再也分不开——这正是下面"零空间"的来源。</p>
+</div>
+
+<h2>六、矩阵乘法 = 变换的复合</h2>
+
+<p>如果先做变换 \(B\)、再做变换 \(A\)，整体效果是什么？把它作用在 \(x\) 上就是 \(A(Bx)\)。我们定义矩阵乘积 \(AB\)，使得</p>
+\[
+(AB)\,x = A\,(B\,x)\quad\text{对所有 } x \text{ 成立}.
+\]
+<p>也就是说，<strong>矩阵乘法 \(AB\) 就是"先 \(B\) 后 \(A\)"这个复合变换对应的那个矩阵</strong>。注意书写顺序：靠近 \(x\) 的先作用，所以要从右往左读。（记个口诀：<strong>谁挨着 \(x\)，谁先上场</strong>。）</p>
+
+<figure class="fig"><svg viewBox="0 0 540 300" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>复合变换：先 B 后 A 等于 AB，从右往左读</title><defs><marker id="cArrBlue" markerWidth="9" markerHeight="9" refX="7" refY="3.2" orient="auto"><path d="M0,0 L7,3.2 L0,6.4 Z" fill="#2563eb"/></marker><marker id="cArrGray" markerWidth="8" markerHeight="8" refX="6.5" refY="3" orient="auto"><path d="M0,0 L6.5,3 L0,6 Z" fill="#94a3b8"/></marker><marker id="cFlow" markerWidth="11" markerHeight="11" refX="8" refY="4" orient="auto"><path d="M0,0 L9,4 L0,8 Z" fill="#94a3b8"/></marker></defs><!-- ===== Panel 1: original ===== --><g transform="translate(20,40)"><g stroke="#e2e8f0" stroke-width="0.75"><line x1="0" y1="0" x2="0" y2="120"/><line x1="20" y1="0" x2="20" y2="120"/><line x1="40" y1="0" x2="40" y2="120"/><line x1="60" y1="0" x2="60" y2="120"/><line x1="80" y1="0" x2="80" y2="120"/><line x1="100" y1="0" x2="100" y2="120"/><line x1="0" y1="0" x2="100" y2="0"/><line x1="0" y1="20" x2="100" y2="20"/><line x1="0" y1="40" x2="100" y2="40"/><line x1="0" y1="60" x2="100" y2="60"/><line x1="0" y1="80" x2="100" y2="80"/><line x1="0" y1="100" x2="100" y2="100"/></g><!-- origin at (0,100) --><line x1="0" y1="100" x2="100" y2="100" stroke="#94a3b8" stroke-width="1" marker-end="url(#cArrGray)"/><line x1="0" y1="100" x2="0" y2="0" stroke="#94a3b8" stroke-width="1" marker-end="url(#cArrGray)"/><circle cx="0" cy="100" r="2" fill="#94a3b8"/><!-- unit square (0,0)-(1,0)-(1,1)-(0,1) => px --><polygon points="0,100 20,100 20,80 0,80" fill="#2563eb" fill-opacity="0.10" stroke="#2563eb" stroke-width="1.5"/><!-- vector x=(2,1) => (40,-20) --><line x1="0" y1="100" x2="40" y2="80" stroke="#2563eb" stroke-width="2" marker-end="url(#cArrBlue)"/><text x="46" y="74" fill="#2563eb" font-size="13" font-weight="600">x=(2,1)</text></g><text x="70" y="30" fill="#1f2937" font-size="12" text-anchor="middle">① 原始</text><!-- ===== Flow arrow 1 ===== --><g transform="translate(143,100)"><line x1="0" y1="0" x2="44" y2="0" stroke="#94a3b8" stroke-width="2" marker-end="url(#cFlow)"/><text x="24" y="-12" fill="#1f2937" font-size="12" text-anchor="middle">先做 B</text><text x="24" y="18" fill="#db2777" font-size="11" text-anchor="middle">(剪切)</text></g><!-- ===== Panel 2: after B ===== --><g transform="translate(200,40)"><g stroke="#e2e8f0" stroke-width="0.75"><line x1="0" y1="0" x2="0" y2="120"/><line x1="20" y1="0" x2="20" y2="120"/><line x1="40" y1="0" x2="40" y2="120"/><line x1="60" y1="0" x2="60" y2="120"/><line x1="80" y1="0" x2="80" y2="120"/><line x1="100" y1="0" x2="100" y2="120"/><line x1="0" y1="0" x2="100" y2="0"/><line x1="0" y1="20" x2="100" y2="20"/><line x1="0" y1="40" x2="100" y2="40"/><line x1="0" y1="60" x2="100" y2="60"/><line x1="0" y1="80" x2="100" y2="80"/><line x1="0" y1="100" x2="100" y2="100"/></g><line x1="0" y1="100" x2="100" y2="100" stroke="#94a3b8" stroke-width="1" marker-end="url(#cArrGray)"/><line x1="0" y1="100" x2="0" y2="0" stroke="#94a3b8" stroke-width="1" marker-end="url(#cArrGray)"/><circle cx="0" cy="100" r="2" fill="#94a3b8"/><!-- parallelogram: (0,0)(1,0)(2,1)(1,1) => px (0,100)(20,100)(40,80)(20,80) --><polygon points="0,100 20,100 40,80 20,80" fill="#db2777" fill-opacity="0.10" stroke="#db2777" stroke-width="1.5"/><!-- Bx=(3,1) => (60,-20) --><line x1="0" y1="100" x2="60" y2="80" stroke="#2563eb" stroke-width="2" marker-end="url(#cArrBlue)"/><text x="40" y="72" fill="#2563eb" font-size="13" font-weight="600">Bx=(3,1)</text></g><text x="250" y="30" fill="#1f2937" font-size="12" text-anchor="middle">② 经 B 后</text><!-- ===== Flow arrow 2 ===== --><g transform="translate(323,100)"><line x1="0" y1="0" x2="44" y2="0" stroke="#94a3b8" stroke-width="2" marker-end="url(#cFlow)"/><text x="24" y="-12" fill="#1f2937" font-size="12" text-anchor="middle">再做 A</text><text x="24" y="18" fill="#d97706" font-size="11" text-anchor="middle">(拉伸)</text></g><!-- ===== Panel 3: after A ===== --><g transform="translate(380,40)"><g stroke="#e2e8f0" stroke-width="0.75"><line x1="0" y1="-20" x2="0" y2="120"/><line x1="20" y1="-20" x2="20" y2="120"/><line x1="40" y1="-20" x2="40" y2="120"/><line x1="60" y1="-20" x2="60" y2="120"/><line x1="80" y1="-20" x2="80" y2="120"/><line x1="100" y1="-20" x2="100" y2="120"/><line x1="120" y1="-20" x2="120" y2="120"/><line x1="0" y1="-20" x2="120" y2="-20"/><line x1="0" y1="0" x2="120" y2="0"/><line x1="0" y1="20" x2="120" y2="20"/><line x1="0" y1="40" x2="120" y2="40"/><line x1="0" y1="60" x2="120" y2="60"/><line x1="0" y1="80" x2="120" y2="80"/><line x1="0" y1="100" x2="120" y2="100"/></g><line x1="0" y1="100" x2="120" y2="100" stroke="#94a3b8" stroke-width="1" marker-end="url(#cArrGray)"/><line x1="0" y1="100" x2="0" y2="-20" stroke="#94a3b8" stroke-width="1" marker-end="url(#cArrGray)"/><circle cx="0" cy="100" r="2" fill="#94a3b8"/><!-- A applied: (0,0)(2,0)(5,3)(3,3) => px (0,100)(40,100)(100,40)(60,40) --><polygon points="0,100 40,100 100,40 60,40" fill="#d97706" fill-opacity="0.12" stroke="#d97706" stroke-width="1.5"/><!-- A(Bx)=(7,3) => (140,-60) clipped within panel: draw to (140,? ) but panel max x=120 -> scale fits since 7 units*20=140 exceeds; shrink? keep but cap label --><line x1="0" y1="100" x2="140" y2="40" stroke="#2563eb" stroke-width="2" marker-end="url(#cArrBlue)"/><text x="78" y="30" fill="#2563eb" font-size="13" font-weight="600">A(Bx)=(7,3)</text></g><text x="445" y="30" fill="#1f2937" font-size="12" text-anchor="middle">③ 经 A 后</text><!-- ===== Bottom annotation ===== --><text x="270" y="262" fill="#059669" font-size="17" font-weight="700" text-anchor="middle">(AB)x = A(Bx)，从右往左读</text><text x="270" y="284" fill="#1f2937" font-size="12" text-anchor="middle">靠近 x 的先作用 · 一般地 AB ≠ BA</text></svg><figcaption>复合变换：先 B 后 A，等于矩阵相乘 AB。三联图从左到右：原始单位正方形与向量 x；经剪切 B 后变成平行四边形、x 移到 Bx；再经拉伸 A 后得到最终形状、向量到达 A(Bx)。下方标注 (AB)x = A(Bx)，强调&#x27;靠近 x 的先作用、从右往左读&#x27;，并提示一般 AB≠BA。</figcaption></figure>
+
+<h3>为什么一般 \(AB\neq BA\)？</h3>
+<p>因为"先剪切后旋转"和"先旋转后剪切"在几何上根本是两件事。举例，取旋转 90° 的 \(A=\begin{bmatrix}0&-1\\1&0\end{bmatrix}\) 与缩放 \(B=\begin{bmatrix}2&0\\0&1\end{bmatrix}\)：</p>
+\[
+AB=\begin{bmatrix}0&-1\\1&0\end{bmatrix}\begin{bmatrix}2&0\\0&1\end{bmatrix}=\begin{bmatrix}0&-1\\2&0\end{bmatrix},\qquad
+BA=\begin{bmatrix}2&0\\0&1\end{bmatrix}\begin{bmatrix}0&-1\\1&0\end{bmatrix}=\begin{bmatrix}0&-2\\1&0\end{bmatrix}.
+\]
+<p>两者不等，所以矩阵乘法<strong>不满足交换律</strong>。（但满足结合律 \((AB)C=A(BC)\)，这正是复合变换天然成立的。）</p>
+
+<div class="example">
+<h4>例题：验证复合 = 相乘</h4>
+<p>取剪切 \(B=\begin{bmatrix}1&1\\0&1\end{bmatrix}\) 与拉伸 \(A=\begin{bmatrix}2&1\\0&3\end{bmatrix}\)，作用向量 \(x=\begin{bmatrix}2\\1\end{bmatrix}\)。</p>
+<p><strong>路线一（分两步）：</strong>先算 \(Bx=\begin{bmatrix}1\cdot2+1\cdot1\\0\cdot2+1\cdot1\end{bmatrix}=\begin{bmatrix}3\\1\end{bmatrix}\)，再算 \(A(Bx)=\begin{bmatrix}2\cdot3+1\cdot1\\0\cdot3+3\cdot1\end{bmatrix}=\begin{bmatrix}7\\3\end{bmatrix}.\)</p>
+<p><strong>路线二（先乘矩阵）：</strong>\(AB=\begin{bmatrix}2\cdot1+1\cdot0 & 2\cdot1+1\cdot1\\ 0\cdot1+3\cdot0 & 0\cdot1+3\cdot1\end{bmatrix}=\begin{bmatrix}2&3\\0&3\end{bmatrix}\)，再算 \((AB)x=\begin{bmatrix}2\cdot2+3\cdot1\\0\cdot2+3\cdot1\end{bmatrix}=\begin{bmatrix}7\\3\end{bmatrix}.\)</p>
+<p>两条路线都得 \(\begin{bmatrix}7\\3\end{bmatrix}\)，验证 \((AB)x=A(Bx)\)。顺带一提 \(\det(AB)=\det A\cdot\det B=6\cdot1=6\)：复合变换的面积缩放，就是各步缩放因子相乘。</p>
+</div>
+
+<h2>七、形状契约：维数怎么对上</h2>
+
+<p>到这里前六节用的都是 \(2\times2\) 方阵——输入和输出都在同一个平面里。但矩阵不必是方的。一个 \(m\times n\) 矩阵代表一个把 \(n\) 维向量送到 \(m\) 维空间的线性变换（\(n\) 列、每列是 \(m\) 维落点）。这意味着<strong>它可以改变维数</strong>。</p>
+
+<p>先用一个最小的非方阵建立画面：</p>
+\[
+P=\begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \end{bmatrix}.
+\]
+<p>它是 \(2\times3\)，把三维向量送到二维。看它怎么作用：\(P\begin{bmatrix}x\\y\\z\end{bmatrix}=\begin{bmatrix}x\\y\end{bmatrix}\)——它<strong>丢掉了 \(z\) 坐标</strong>，把 3D 空间压扁投影到 \(xy\) 平面上，这正是一次"降维"。反过来，一个 \(3\times2\) 矩阵则把平面"嵌入"到三维空间里（升维）。"\(m\neq n\) 到底在做什么"，答案就是<strong>在维数之间搬运</strong>。</p>
+
+<p>乘法要能进行，必须满足<strong>形状契约</strong>：</p>
+\[
+(m\times n)\,(n\times p)=(m\times p).
+\]
+
+<div class="key">
+<h4>要点</h4>
+<p>左矩阵的<strong>列数</strong>必须等于右矩阵的<strong>行数</strong>（中间的 \(n\) 要相消），结果矩阵的形状是"外侧两个数" \(m\times p\)。在 ML 里 99% 的形状报错都是这条契约没对上——养成在脑中默念形状的习惯。</p>
+</div>
+
+<h2>八、秩与零空间：被压扁到几维</h2>
+
+<p>当 \(\det A=0\)（或更一般地，非方阵情形），空间被压扁了。两个概念精确描述"压扁的后果"：</p>
+
+<ul>
+<li><strong>秩 rank</strong>：变换后的<em>输出</em>实际填满了几维空间——即列向量张成空间的维数。满秩 = 没压扁；秩下降 = 被压扁了。例如投影 \(\begin{bmatrix}1&0\\0&0\end{bmatrix}\) 把整个平面压到一条直线上，秩 = 1。</li>
+<li><strong>零空间 null space</strong>（也叫<strong>核 kernel</strong>）：所有被变换<em>压到原点</em> \(\mathbf{0}\) 的向量集合，即满足 \(Av=\mathbf{0}\) 的 \(v\)。它衡量"丢失了哪些信息"。</li>
+</ul>
+
+<div class="example">
+<h4>例题：亲手数出秩与零空间</h4>
+<p>对投影矩阵 \(P=\begin{bmatrix}1&0\\0&0\end{bmatrix}\)，我们把三件事都算出来：</p>
+<ul>
+<li><strong>列空间（决定秩）：</strong>两列是 \((1,0)\) 与 \((0,0)\)。第二列是零向量、毫无贡献，输出只能落在第一列张成的 \(x\) 轴上。所以列空间 = \(x\) 轴（一维），<strong>秩 = 1</strong>。</li>
+<li><strong>零空间：</strong>解 \(Pv=\mathbf{0}\)，即 \(\begin{bmatrix}1&0\\0&0\end{bmatrix}\begin{bmatrix}a\\b\end{bmatrix}=\begin{bmatrix}a\\0\end{bmatrix}=\begin{bmatrix}0\\0\end{bmatrix}\)，要求 \(a=0\)、\(b\) 任意。于是零空间是全体 \(\begin{bmatrix}0\\t\end{bmatrix}\)，正是整条 \(y\) 轴（一维），一个基是 \(\begin{bmatrix}0\\1\end{bmatrix}\)。</li>
+<li><strong>当场兑现守恒律：</strong>秩 1 +（零空间维数）1 = 2 = 输入维数（列数）。</li>
+</ul>
+<p>这条"<strong>秩 + 零空间维 = 列数</strong>"的守恒律叫<strong>秩-零化度定理 rank–nullity theorem</strong>。直觉是：输入的每一维，要么被保留到输出里（贡献给秩），要么被压到原点（贡献给零空间），不会凭空消失。后续课会给出正式证明。</p>
+</div>
+
+<div class="ml">
+<h4><span class="tag">ML</span> 和 ML 的联系</h4>
+<p><strong>1. 神经网络每一层 = 线性变换 + 平移 + 非线性。</strong>一层的计算是 \(h=\sigma(Wx+b)\)：权重矩阵 \(W\) 是线性变换（把上一层的特征"掰弯"重组），\(b\) 是平移——\(Wx+b\) 合起来正是上一节说的<strong>仿射变换</strong>（线性变换 + 平移），外面再套的 \(\sigma\)（如 ReLU）是非线性。<em>正因为线性变换的复合还是线性变换</em>（\(A(Bx)=(AB)x\)），如果没有中间的非线性，再多层叠起来也等价于单个矩阵 \(W=W_3W_2W_1\)——深度就白费了。非线性是深度网络的灵魂，而你刚证明的复合律正是"为什么需要它"的数学原因。</p>
+<p><strong>2. 注意力机制里的 \(QK^\top\) 就是一批线性变换 + 两两点积。</strong>把输入经线性变换得到查询 \(Q\) 和键 \(K\)（各是 \(Wx\) 形式），\(QK^\top\) 的第 \(i,j\) 个元素正是第 \(i\) 个查询向量与第 \(j\) 个键向量的点积——也就是上一课讲的"用点积衡量相似度"，被矩阵乘法一次性批量算完。线性变换 + 点积，就是 Transformer 的核心算子。</p>
+</div>
+
+<h2>九、用 numpy 把这一切跑一遍</h2>
+
+<p>下面的代码只用 numpy 和 print，几秒跑完。它打印基向量落点、行列式、并验证 \(A(Bx)=(AB)x\) 以及 \(\det(AB)=\det A\det B\)。</p>
+
+<pre><code>import numpy as np
+
+A = np.array([[2., 1.],
+              [0., 3.]])
+
+# 1) 矩阵的列 = 基向量变换后的落点
+i_hat = np.array([1., 0.])
+j_hat = np.array([0., 1.])
+print("A @ i_hat =", A @ i_hat, "  &lt;- 应等于 A 的第一列", A[:, 0])
+print("A @ j_hat =", A @ j_hat, "  &lt;- 应等于 A 的第二列", A[:, 1])
+
+# 2) 行列式 = 面积缩放因子
+print("det(A) =", round(np.linalg.det(A), 6))   # 期望 6.0
+
+# 单位正方形四角 -> 验证面积
+square = np.array([[0, 0], [1, 0], [1, 1], [0, 1]]).T  # 每列一个角
+print("正方形四角变换后(每行一个角):")
+print((A @ square).T)
+
+# 3) 旋转 90 度: (x,y) -> (-y,x)
+theta = np.pi / 2
+R = np.array([[np.cos(theta), -np.sin(theta)],
+              [np.sin(theta),  np.cos(theta)]])
+print("R @ [3,2] =", np.round(R @ np.array([3., 2.]), 6))  # 期望 [-2, 3]
+
+# 4) 复合变换 = 矩阵相乘
+B = np.array([[1., 1.],
+              [0., 1.]])           # 剪切
+x = np.array([2., 1.])
+print("A @ (B @ x) =", A @ (B @ x))   # 分两步
+print("(A @ B) @ x =", (A @ B) @ x)   # 先乘矩阵, 两者应相同
+
+# 5) 乘法不可交换 + 行列式可乘
+print("AB =\n", A @ B)
+print("BA =\n", B @ A, "  &lt;- 与 AB 不同")
+print("det(A)*det(B) =", round(np.linalg.det(A) * np.linalg.det(B), 6),
+      " det(AB) =", round(np.linalg.det(A @ B), 6))
+</code></pre>
+
+<p>运行后你会看到：基向量落点恰是 \(A\) 的两列；\(\det A=6\) 与四角围成的面积一致；\(R[3,2]^\top=[-2,3]^\top\)；两条复合路线都给 \([7,3]^\top\)；而 \(AB\neq BA\)，但 \(\det(AB)=\det A\det B=6\)。</p>
+
+<h2>动手练习</h2>
+<ol>
+<li><strong>手算 + 列视角。</strong>给定 \(M=\begin{bmatrix}3&-1\\2&2\end{bmatrix}\)，(a) 写出它把 \(\hat{\imath},\hat{\jmath}\) 搬到的落点；(b) 用列视角算 \(M\begin{bmatrix}1\\2\end{bmatrix}\)；(c) 算 \(\det M\) 并说出面积放大几倍、有没有翻转。
+<pre><code>import numpy as np
+M = np.array([[3., -1.], [2., 2.]])
+# TODO: 打印 M 的两列、M @ [1,2]、det(M)
+print(M[:, 0], M[:, 1])
+print(M @ np.array([1., 2.]))
+print(round(np.linalg.det(M), 6))
+</code></pre></li>
+<li><strong>旋转复合。</strong>构造旋转 30° 与旋转 60° 的矩阵，验证它们相乘等于旋转 90° 的矩阵（提示：转 30° 再转 60° 当然等于转 90°）。
+<pre><code>import numpy as np
+def rot(t):
+    return np.array([[np.cos(t), -np.sin(t)],
+                     [np.sin(t),  np.cos(t)]])
+# TODO: 比较 rot(60度) @ rot(30度) 与 rot(90度)
+print(np.round(rot(np.pi/3) @ rot(np.pi/6), 6))
+print(np.round(rot(np.pi/2), 6))
+</code></pre></li>
+<li><strong>压扁、零空间与守恒律。</strong>对投影矩阵 \(P=\begin{bmatrix}1&0\\0&0\end{bmatrix}\)：(a) 写出它零空间的一个<strong>基向量</strong>（一个非零 \(v\) 使 \(Pv=\mathbf{0}\)）；(b) 说出它的秩等于几；(c) 验证"秩 + 零空间维 = 2"这条守恒律；(d) 顺手算 \(\det P\) 确认它为 0。
+<pre><code>import numpy as np
+P = np.array([[1., 0.], [0., 0.]])
+# TODO: 找零空间的基, 数秩, 验证守恒律
+v = np.array([0., 1.])             # 零空间的一个基向量?
+print("P @ v =", P @ v)            # 期望 [0, 0]
+print("rank(P) =", np.linalg.matrix_rank(P))   # 期望 1
+print("det(P) =", round(np.linalg.det(P), 6))  # 期望 0.0
+</code></pre></li>
+<li><strong>不可交换的几何（含 det&lt;0）。</strong>取剪切 \(S=\begin{bmatrix}1&1\\0&1\end{bmatrix}\) 与反射 \(F=\begin{bmatrix}1&0\\0&-1\end{bmatrix}\)，算 \(SF\) 与 \(FS\)，确认不相等，并各自把 \(\begin{bmatrix}1\\1\end{bmatrix}\) 变换一遍看落点差别；再算 \(\det F\) 确认它是<strong>负的</strong>（反射翻转了定向）。</li>
+<li><strong>形状契约。</strong>随机生成一个 \(2\times3\) 矩阵和一个 \(3\times4\) 矩阵相乘，打印结果形状，确认是 \(2\times4\)；再试着把它们反过来乘，观察 numpy 报什么错。</li>
+</ol>
+
+<h2>掌握自检</h2>
+<ul>
+<li>看到任意 \(2\times2\) 矩阵，我能立刻说出它把 \(\hat{\imath},\hat{\jmath}\) 搬到哪两个点（即读出两列）。</li>
+<li>我能用"列的线性组合"和"逐行点积"两种方式算 \(Av\)，并得到相同结果。</li>
+<li>我能说清线性变换的三条性质，能给出仿射变换的正面定义（\(x\mapsto Ax+b\)），并解释为什么 \(Wx+b\) 严格说是仿射而非线性。</li>
+<li>给定一个矩阵，我能算 \(\det\) 并解释它的大小、符号、为零各意味着什么几何后果（包括反射的 \(\det=-1\) 为何代表翻转）。</li>
+<li>我理解 \((AB)x=A(Bx)\)，能举例说明为什么 \(AB\neq BA\)，并知道形状契约 \((m\times n)(n\times p)=(m\times p)\)。</li>
+<li>我能用"压扁到几维"解释秩，用"哪些向量被压到 0"解释零空间，并能亲手验证"秩 + 零空间维 = 列数"。</li>
+<li>我能讲出为什么"线性层之间必须插非线性"，以及 \(QK^\top\) 在算什么。</li>
+</ul>
+
+<p>下一课，我们把"点积"升级为<strong>内积</strong>，用它一次讲透<strong>度量、正交、投影、最小二乘</strong>——也就是机器学习里"拟合"与"误差最小化"的几何本质。</p>
+</article>
+<div class="navbtns"><a class="prev" href="lesson-01-vectors.html"><div class="nlabel">← 上一课</div><div class="ntitle">第1课 · 向量——机器学习的原子</div></a><a class="next" href="lesson-03-inner-product-norm-projection.html"><div class="nlabel">下一课 →</div><div class="ntitle">第3课 · 内积、范数与投影</div></a></div>
+<nav class="toc"><h3>本模块课程表</h3><ol>
+<li><a href="lesson-01-vectors.html"><span class="ln">第1课</span>向量——机器学习的原子</a></li>
+<li class="cur"><a href="lesson-02-matrix-linear-transformation.html"><span class="ln">第2课</span>矩阵即线性变换</a></li>
+<li><a href="lesson-03-inner-product-norm-projection.html"><span class="ln">第3课</span>内积、范数与投影</a></li>
+<li><a href="lesson-04-eigenvalues-eigenvectors.html"><span class="ln">第4课</span>特征值与特征向量</a></li>
+<li><a href="lesson-05-svd-low-rank.html"><span class="ln">第5课</span>SVD 与低秩压缩</a></li>
+<li><a href="lesson-06-derivatives-gradients.html"><span class="ln">第6课</span>导数与梯度</a></li>
+<li><a href="lesson-07-jacobian-hessian.html"><span class="ln">第7课</span>雅可比与海森</a></li>
+<li><a href="lesson-08-chain-rule-computational-graph.html"><span class="ln">第8课</span>链式法则与计算图</a></li>
+<li><a href="lesson-09-matrix-calculus.html"><span class="ln">第9课</span>矩阵求导</a></li>
+<li><a href="lesson-10-backprop-from-scratch.html"><span class="ln">第10课</span>亲手实现反向传播</a></li>
+</ol></nav>
+</div>
+<!-- pyrunner-injected -->
+<style>
+.pr-cell{border:1px solid #334155;border-radius:10px;margin:1.2em 0;overflow:hidden;background:#0f172a;}
+.pr-head{display:flex;align-items:center;gap:8px;background:#1e293b;color:#cbd5e1;padding:6px 10px;font-size:13px;font-family:system-ui,-apple-system,sans-serif;}
+.pr-title{flex:1;font-weight:600;}
+.pr-status{font-size:12px;color:#94a3b8;white-space:nowrap;max-width:50%;overflow:hidden;text-overflow:ellipsis;}
+.pr-btn{cursor:pointer;border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:6px;padding:3px 11px;font-size:13px;line-height:1.4;}
+.pr-btn:hover{background:#0b1220;}
+.pr-run{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:600;}
+.pr-run:hover{background:#1d4ed8;}
+.pr-cell.collapsed .pr-body{display:none;}
+.pr-edit{display:block;width:100%;border:none;background:#0f172a;color:#e2e8f0;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.55;padding:12px 14px;resize:vertical;box-sizing:border-box;outline:none;}
+.pr-out{margin:0;padding:10px 14px;border-top:1px solid #334155;background:#0b1220;color:#cbd5e1;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.5;white-space:pre-wrap;max-height:340px;overflow:auto;}
+.pr-out:empty{display:none;}
+.pr-out.err{color:#fca5a5;}
+#pr-fab{position:fixed;right:18px;bottom:18px;z-index:9998;background:#2563eb;color:#fff;border:none;border-radius:999px;padding:10px 17px;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.22);font-family:system-ui,sans-serif;}
+#pr-fab:hover{background:#1d4ed8;}
+#pr-lab{position:fixed;right:18px;bottom:66px;z-index:9999;width:400px;max-width:92vw;background:#0f172a;border:1px solid #334155;border-radius:12px;display:none;flex-direction:column;box-shadow:0 14px 38px rgba(0,0,0,.4);overflow:hidden;}
+#pr-lab.open{display:flex;}
+#pr-lab .pr-edit{min-height:150px;}
+</style>
+<script>
+(function(){
+  var PYBASE="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+  var pyReady=null;
+  function loadPy(status){
+    if(pyReady)return pyReady;
+    pyReady=(async function(){
+      status("正在加载 Python 运行时（首次约 10 秒，需联网）…");
+      await new Promise(function(res,rej){
+        var s=document.createElement("script");s.src=PYBASE+"pyodide.js";
+        s.onload=res;s.onerror=function(){rej(new Error("无法加载 Pyodide（首次运行需要联网）"));};
+        document.head.appendChild(s);
+      });
+      var py=await loadPyodide({indexURL:PYBASE});
+      status("正在加载 NumPy …");
+      await py.loadPackage("numpy");
+      status("Python 就绪 ✓");
+      return py;
+    })();
+    return pyReady;
+  }
+  async function run(code,outEl,statusEl){
+    var setS=function(m){if(statusEl)statusEl.textContent=m;};
+    outEl.classList.remove("err");outEl.textContent="";
+    var py;
+    try{py=await loadPy(setS);}
+    catch(e){outEl.classList.add("err");outEl.textContent="加载失败："+e.message;return;}
+    var buf="";
+    py.setStdout({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    py.setStderr({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    try{
+      var result=await py.runPythonAsync(code);
+      if(result!==undefined&&result!==null){
+        var r;try{r=result.toString();}catch(_){r=String(result);}
+        if(r!=="None")buf+=(buf&&!buf.endsWith("\n")?"\n":"")+r;
+        if(result&&result.destroy)result.destroy();
+      }
+      outEl.textContent=buf||"（运行成功，无输出。用 print(...) 查看结果）";
+    }catch(e){
+      outEl.classList.add("err");
+      outEl.textContent=buf+(buf?"\n":"")+String((e&&e.message)||e);
+    }
+  }
+  function autosize(ta){ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight+2,460)+"px";}
+  function tabKey(e){
+    if(e.key==="Tab"){e.preventDefault();var s=this.selectionStart,en=this.selectionEnd;
+      this.value=this.value.slice(0,s)+"    "+this.value.slice(en);this.selectionStart=this.selectionEnd=s+4;}
+    if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();var b=this.closest(".pr-cell,#pr-lab").querySelector(".pr-run");if(b)b.click();}
+  }
+  function makeCell(code){
+    var cell=document.createElement("div");cell.className="pr-cell";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">可运行 · Python (NumPy)</span><span class="pr-status"></span><button class="pr-btn pr-toggle">收起</button><button class="pr-btn pr-run">▶ 运行</button></div><div class="pr-body"><textarea class="pr-edit" spellcheck="false"></textarea><pre class="pr-out"></pre></div>';
+    var ta=cell.querySelector(".pr-edit");ta.value=code;
+    var out=cell.querySelector(".pr-out"),st=cell.querySelector(".pr-status");
+    ta.addEventListener("input",function(){autosize(ta);});
+    ta.addEventListener("keydown",tabKey);
+    cell.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    var tog=cell.querySelector(".pr-toggle");
+    tog.onclick=function(){cell.classList.toggle("collapsed");tog.textContent=cell.classList.contains("collapsed")?"展开":"收起";};
+    setTimeout(function(){autosize(ta);},0);
+    return cell;
+  }
+  function enhance(){
+    document.querySelectorAll("article pre").forEach(function(pre){
+      if(pre.closest(".pr-cell"))return;
+      var codeEl=pre.querySelector("code")||pre;
+      var code=codeEl.textContent.replace(/\s+$/,"");
+      if(!code)return;
+      pre.replaceWith(makeCell(code));
+    });
+  }
+  function lab(){
+    var fab=document.createElement("button");fab.id="pr-fab";fab.textContent="▶ Python 实验台";
+    var panel=document.createElement("div");panel.id="pr-lab";
+    panel.innerHTML='<div class="pr-head"><span class="pr-title">Python 实验台 · NumPy</span><span class="pr-status"></span><button class="pr-btn pr-run">▶ 运行</button><button class="pr-btn pr-min">收起</button></div><div class="pr-body"><textarea class="pr-edit" spellcheck="false"></textarea><pre class="pr-out"></pre></div>';
+    document.body.appendChild(fab);document.body.appendChild(panel);
+    var ta=panel.querySelector(".pr-edit");
+    ta.value="import numpy as np\na = np.array([3, 2])\nb = np.array([1, 4])\nprint(\"a + b =\", a + b)\nprint(\"a . b =\", a @ b)\nprint(\"|a|  =\", np.linalg.norm(a))\ncos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))\nprint(\"cos =\", round(float(cos), 4))";
+    ta.addEventListener("keydown",tabKey);
+    var out=panel.querySelector(".pr-out"),st=panel.querySelector(".pr-status");
+    panel.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    fab.onclick=function(){panel.classList.toggle("open");};
+    panel.querySelector(".pr-min").onclick=function(){panel.classList.remove("open");};
+  }
+  function init(){enhance();lab();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+
+</body>
+</html>

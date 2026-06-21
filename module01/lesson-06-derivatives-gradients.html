@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块1 · 第6课 · 导数与梯度——多元函数的下坡方向</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue-bg:#eff6ff;
+--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--pink:#db2777;
+--red:#dc2626;--red-bg:#fef2f2;--bg:#ffffff;--soft:#f8fafc;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);
+font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.85;font-size:17px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:840px;margin:0 auto;padding:0 22px 100px;}
+header.top{background:#fff;border-bottom:1px solid var(--line);padding:26px 22px 22px;margin-bottom:14px;}
+header.top .inner{max-width:840px;margin:0 auto;}
+.crumb{color:var(--muted);font-size:14px;letter-spacing:.3px;margin-bottom:6px;}
+h1{font-size:30px;line-height:1.3;margin:.1em 0 .2em;}
+.sub{color:var(--muted);font-size:15px;}
+article{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:30px 34px;margin-top:18px;}
+h2{font-size:23px;margin:1.7em 0 .6em;padding-bottom:.25em;border-bottom:2px solid var(--line);}
+h2:first-child{margin-top:.2em;}
+h3{font-size:19px;margin:1.3em 0 .4em;color:#0f172a;}
+h4{margin:.2em 0 .5em;font-size:16px;}
+p{margin:.7em 0;}
+ul,ol{padding-left:1.3em;margin:.6em 0;}
+li{margin:.32em 0;}
+code{background:#f1f5f9;padding:.12em .4em;border-radius:5px;font-size:.9em;
+font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a;}
+pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 18px;overflow:auto;font-size:14px;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0;}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:15.5px;}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+thead th{background:var(--soft);}
+figure.fig{margin:1.4em 0;text-align:center;}
+figure.fig svg{max-width:100%;height:auto;}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
+.note,.ml,.key,.pitfall,.example{border-radius:10px;padding:14px 18px;margin:1.2em 0;border:1px solid var(--line);}
+.note{background:var(--soft);border-left:4px solid #94a3b8;}
+.example{background:#fff;border-left:4px solid var(--blue);}
+.ml{background:var(--green-bg);border-left:4px solid var(--green);}
+.key{background:var(--amber-bg);border-left:4px solid var(--amber);}
+.pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
+.toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
+.toc h3{margin:.1em 0 .7em;}
+.toc ol{list-style:none;padding:0;}
+.toc li{padding:7px 10px;border-radius:8px;color:#334155;border:1px solid transparent;}
+.toc li a{color:inherit;text-decoration:none;display:block;}
+.toc li .ln{display:inline-block;min-width:54px;color:var(--muted);font-size:13px;}
+.toc li.cur{background:var(--blue-bg);border-color:#bfdbfe;font-weight:600;color:#1e3a8a;}
+.toc li:not(.cur):hover{background:var(--soft);}
+.navbtns{display:flex;justify-content:space-between;margin-top:22px;gap:12px;}
+.navbtns a{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--ink);}
+.navbtns a:hover{border-color:var(--blue);}
+.navbtns .nlabel{color:var(--muted);font-size:13px;}
+.navbtns .ntitle{font-weight:600;margin-top:3px;}
+.navbtns .next{text-align:right;}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
+.card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
+.card:hover{border-color:var(--blue);}
+.card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
+.card .ct{font-size:18px;font-weight:600;}
+.card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+</style>
+</head>
+<body>
+<header class="top"><div class="inner">
+<div class="crumb"><a href="index.html" style="color:inherit">模块 1 · 线性代数与微积分</a>　/　第 6 课（共 10 课）</div>
+<h1>导数与梯度——多元函数的下坡方向</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　第一阶段：数学与工具基础</div>
+</div></header>
+<div class="wrap">
+<article>
+<p>上一课我们用线性代数搭好了"向量与矩阵"的地基；这一课，我们把高中熟悉的<strong>导数 derivative</strong> 推广到多变量，得到机器学习里最核心的工具——<strong>梯度 gradient</strong>，它会告诉我们：在一座由参数构成的"损失之山"上，往哪个方向走才下坡最快。</p>
+
+<h2>1. 从一元导数说起</h2>
+
+<p>回忆高中的导数。对一元函数 \(f:\mathbb{R}\to\mathbb{R}\)，在点 \(x\) 处的导数定义为差商的极限：</p>
+
+\[
+f'(x)=\lim_{h\to 0}\frac{f(x+h)-f(x)}{h}.
+\]
+
+<p>它的几何意义是<strong>切线斜率 slope</strong>：当 \(x\) 增加一个极小量 \(h\)，函数值大约增加 \(f'(x)\,h\)。把这句话写成式子，就是<strong>局部线性化 local linearization</strong>：</p>
+
+\[
+f(x+h)\approx f(x)+f'(x)\,h.
+\]
+
+<div class="note">
+<p>导数的本质是"<strong>放大后看局部</strong>"：把曲线在一点附近不断放大，它会越来越像一条直线，这条直线的斜率就是导数。这个"曲线局部像直线、曲面局部像平面"的思想，是整门微分学（以及深度学习反向传播）的灵魂。</p>
+</div>
+
+<h2>2. 多元函数与偏导数</h2>
+
+<p>机器学习里的损失函数往往依赖成千上万个参数。我们先看最朴素的多元<strong>标量函数 scalar function</strong>：</p>
+
+\[
+f:\mathbb{R}^n\to\mathbb{R},\qquad f(x_1,x_2,\dots,x_n).
+\]
+
+<p>输入是 \(n\) 个数（一个向量 \(x=[x_1,\dots,x_n]\)），输出是<strong>一个</strong>实数。例如 \(f(x,y)=x^2+3y^2\) 把平面上每个点映成一个"高度"，画出来是一个碗状曲面。</p>
+
+<p>怎么对它求导？关键想法：<strong>一次只动一个变量，其余当常数</strong>。这样多元就退化回一元，照搬一元导数即可。这就是<strong>偏导数 partial derivative</strong>：</p>
+
+\[
+\frac{\partial f}{\partial x_i}
+=\lim_{h\to 0}\frac{f(x_1,\dots,x_i+h,\dots,x_n)-f(x_1,\dots,x_n)}{h}.
+\]
+
+<p>对 \(f(x,y)=x^2+3y^2\)：把 \(y\) 当常数对 \(x\) 求导得 \(\partial f/\partial x=2x\)；把 \(x\) 当常数对 \(y\) 求导得 \(\partial f/\partial y=6y\)。每个偏导数衡量"只沿这一个坐标轴走"时函数变化的快慢。</p>
+
+<h2>3. 梯度：把所有偏导数打包成一个向量</h2>
+
+<p>单看一个偏导数，只知道沿某条坐标轴的陡峭程度。把<strong>所有偏导数排成一个列向量</strong>，就得到<strong>梯度 gradient</strong>，记作 \(\nabla f\)（读作 "nabla f" 或 "del f"）：</p>
+
+\[
+\nabla f(x)=
+\begin{bmatrix}
+\dfrac{\partial f}{\partial x_1}\\[4pt]
+\dfrac{\partial f}{\partial x_2}\\[2pt]
+\vdots\\[2pt]
+\dfrac{\partial f}{\partial x_n}
+\end{bmatrix}.
+\]
+
+<p>注意：\(\nabla f\) 与输入 \(x\) <strong>同形</strong>（都在 \(\mathbb{R}^n\) 里），它在不同位置取不同的值（是 \(x\) 的函数）——即空间每个点都挂着一个向量，这样的对象叫<strong>向量场 vector field</strong>。对 \(f(x,y)=x^2+3y^2\)：</p>
+
+\[
+\nabla f(x,y)=\begin{bmatrix}2x\\6y\end{bmatrix}.
+\]
+
+<p>例如在点 \((1,1)\) 处，\(\nabla f=[2,6]\)。</p>
+
+<h2>4. 方向导数：朝任意方向走有多陡</h2>
+
+<p>偏导数只问了坐标轴方向。但我们想问更一般的问题：站在点 \(x\)，沿任意<strong>单位方向 unit vector</strong> \(u\)（\(\|u\|=1\)）走，函数上升多快？这就是<strong>方向导数 directional derivative</strong>：</p>
+
+\[
+D_u f(x)=\lim_{h\to 0}\frac{f(x+hu)-f(x)}{h}.
+\]
+
+<p>要算它，我们需要把第 1 节的"局部线性化"推广到多元。怎么推广？先固定其余变量、只让 \(x_i\) 动一点点 \(\Delta x_i\)，由偏导数的定义，这一个方向贡献的函数变化约为 \(\dfrac{\partial f}{\partial x_i}\Delta x_i\)。在一阶近似下，各个坐标方向的贡献可以<strong>叠加</strong>，把它们求和：</p>
+
+\[
+f(x+\Delta)-f(x)\approx\sum_{i=1}^{n}\frac{\partial f}{\partial x_i}\,\Delta x_i .
+\]
+
+<p>而这个求和 \(\sum_i \dfrac{\partial f}{\partial x_i}\Delta x_i\)，恰好就是梯度与位移的<strong>点积</strong> \(\nabla f(x)\cdot\Delta\)。于是多元的局部线性化自然落地（把一元的 \(f'(x)h\) 换成 \(\nabla f(x)\cdot\Delta\)）：</p>
+
+\[
+f(x+\Delta)\approx f(x)+\nabla f(x)\cdot\Delta .
+\]
+
+<p>这也让我们看清：\(\nabla f\) 不是凭空"打包"出来的，它正是线性化里自然冒出来的系数向量。（严格成立需要 \(f\) <strong>可微</strong>，本课默认涉及的光滑函数都满足。）</p>
+
+<p>现在取 \(\Delta=hu\) 代入，相减除以 \(h\) 再令 \(h\to 0\)，立刻得到方向导数等于<strong>梯度在该方向上的点积</strong>：</p>
+
+\[
+\boxed{\,D_u f(x)=\nabla f(x)\cdot u\,}
+\]
+
+<figure class="fig"><svg viewBox="0 0 520 470" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif">
+  <title>方向导数是梯度在方向 u 上的投影 D_u f = ‖∇f‖cosα</title>
+  <desc>从公共起点 O 画出梯度向量与单位方向向量 u，从梯度末端向 u 作垂线，投影长度即方向导数；下方三个小图展示 α=0、90、180 三种情形。</desc>
+  <defs>
+    <marker id="arrBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrPink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#db2777"/>
+    </marker>
+    <marker id="arrAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#d97706"/>
+    </marker>
+    <marker id="arrSm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#059669"/>
+    </marker>
+  </defs>
+
+  <!-- ===== Main diagram ===== -->
+  <!-- light grid -->
+  <g stroke="#e2e8f0" stroke-width="0.75">
+    <line x1="60" y1="40" x2="60" y2="230"/>
+    <line x1="120" y1="40" x2="120" y2="230"/>
+    <line x1="180" y1="40" x2="180" y2="230"/>
+    <line x1="240" y1="40" x2="240" y2="230"/>
+    <line x1="300" y1="40" x2="300" y2="230"/>
+    <line x1="360" y1="40" x2="360" y2="230"/>
+    <line x1="420" y1="40" x2="420" y2="230"/>
+    <line x1="60" y1="70" x2="450" y2="70"/>
+    <line x1="60" y1="110" x2="450" y2="110"/>
+    <line x1="60" y1="150" x2="450" y2="150"/>
+    <line x1="60" y1="190" x2="450" y2="190"/>
+  </g>
+
+  <!-- O at (80,210). gradient angle: choose direction up-right at ~33deg, length large. u along x-axis (alpha = 33deg) -->
+  <!-- u direction: horizontal to the right. gradient up-right. -->
+
+  <!-- u line (the projection axis), extended -->
+  <line x1="80" y1="210" x2="450" y2="210" stroke="#db2777" stroke-width="1" stroke-dasharray="4 3"/>
+
+  <!-- projection highlight segment: O to foot of perpendicular -->
+  <line x1="80" y1="210" x2="360" y2="210" stroke="#d97706" stroke-width="6" stroke-linecap="round" opacity="0.85"/>
+
+  <!-- perpendicular dashed from gradient tip to its foot on u-line -->
+  <line x1="360" y1="80" x2="360" y2="210" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/>
+  <!-- right-angle mark at foot -->
+  <path d="M348,210 L348,198 L360,198" fill="none" stroke="#94a3b8" stroke-width="1"/>
+
+  <!-- gradient vector ∇f : O(80,210) -> tip(360,80) -->
+  <line x1="80" y1="210" x2="360" y2="80" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrBlue)"/>
+
+  <!-- unit vector u : O -> (160,210) length=80px = "1" -->
+  <line x1="80" y1="210" x2="160" y2="210" stroke="#db2777" stroke-width="2.5" marker-end="url(#arrPink)"/>
+
+  <!-- angle alpha arc at O -->
+  <path d="M132,210 A52,52 0 0,0 116.5,173.7" fill="none" stroke="#1f2937" stroke-width="1.2"/>
+  <text x="140" y="190" font-size="13" fill="#1f2937">α</text>
+
+  <!-- labels -->
+  <circle cx="80" cy="210" r="3" fill="#1f2937"/>
+  <text x="66" y="226" font-size="13" fill="#1f2937">O</text>
+  <text x="368" y="72" font-size="14" fill="#2563eb" font-weight="600">∇f</text>
+  <text x="300" y="120" font-size="12" fill="#2563eb">‖∇f‖</text>
+  <text x="150" y="228" font-size="13" fill="#db2777">u</text>
+  <text x="112" y="244" font-size="11" fill="#db2777">‖u‖=1</text>
+
+  <!-- projection label -->
+  <text x="150" y="266" font-size="13" fill="#d97706" font-weight="600">D_u f = ‖∇f‖·cosα</text>
+
+  <!-- title -->
+  <text x="80" y="28" font-size="14" fill="#1f2937" font-weight="600">方向导数 = 梯度在方向 u 上的投影</text>
+
+  <!-- ===== separator ===== -->
+  <line x1="40" y1="292" x2="480" y2="292" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- ===== Three small cases ===== -->
+  <!-- Case 1: alpha=0, same direction, max -->
+  <g>
+    <line x1="50" y1="380" x2="150" y2="380" stroke="#db2777" stroke-width="1" stroke-dasharray="4 3"/>
+    <line x1="50" y1="380" x2="138" y2="380" stroke="#d97706" stroke-width="5" stroke-linecap="round" opacity="0.85"/>
+    <line x1="50" y1="380" x2="140" y2="380" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrBlue)"/>
+    <line x1="50" y1="380" x2="90" y2="380" stroke="#db2777" stroke-width="2.5" marker-end="url(#arrSm)" opacity="0"/>
+    <circle cx="50" cy="380" r="2.5" fill="#1f2937"/>
+    <text x="50" y="320" font-size="12" fill="#1f2937" font-weight="600">α = 0°</text>
+    <text x="50" y="337" font-size="11" fill="#1f2937">∇f 与 u 同向</text>
+    <text x="50" y="402" font-size="11" fill="#d97706">投影 = 全长 (最大)</text>
+    <text x="50" y="418" font-size="11" fill="#059669" font-weight="600">同向 → 上升最快</text>
+  </g>
+
+  <!-- Case 2: alpha=90, perpendicular, zero -->
+  <g>
+    <line x1="210" y1="380" x2="290" y2="380" stroke="#db2777" stroke-width="1" stroke-dasharray="4 3"/>
+    <line x1="210" y1="380" x2="270" y2="380" stroke="#db2777" stroke-width="2.5" marker-end="url(#arrPink)"/>
+    <line x1="210" y1="380" x2="210" y2="320" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrBlue)"/>
+    <path d="M210,368 L222,368 L222,380" fill="none" stroke="#94a3b8" stroke-width="1"/>
+    <circle cx="210" cy="380" r="2.5" fill="#1f2937"/>
+    <text x="210" y="312" font-size="12" fill="#1f2937" font-weight="600">α = 90°</text>
+    <text x="276" y="376" font-size="11" fill="#db2777">u</text>
+    <text x="210" y="402" font-size="11" fill="#d97706">投影 = 0</text>
+    <text x="210" y="418" font-size="11" fill="#059669" font-weight="600">垂直 → 不变</text>
+  </g>
+
+  <!-- Case 3: alpha=180, opposite, most negative -->
+  <g>
+    <line x1="370" y1="380" x2="470" y2="380" stroke="#db2777" stroke-width="1" stroke-dasharray="4 3"/>
+    <!-- gradient pointing left (negative along u) -->
+    <line x1="370" y1="380" x2="282" y2="380" stroke="#d97706" stroke-width="5" stroke-linecap="round" opacity="0.85"/>
+    <line x1="370" y1="380" x2="280" y2="380" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrBlue)"/>
+    <!-- u pointing right -->
+    <line x1="370" y1="380" x2="410" y2="380" stroke="#db2777" stroke-width="2.5" marker-end="url(#arrPink)"/>
+    <circle cx="370" cy="380" r="2.5" fill="#1f2937"/>
+    <text x="370" y="320" font-size="12" fill="#1f2937" font-weight="600">α = 180°</text>
+    <text x="370" y="337" font-size="11" fill="#1f2937">∇f 与 u 反向</text>
+    <text x="414" y="376" font-size="11" fill="#db2777">u</text>
+    <text x="282" y="402" font-size="11" fill="#d97706">投影 = −全长</text>
+    <text x="300" y="418" font-size="11" fill="#059669" font-weight="600">反向 → 下降最快</text>
+  </g>
+</svg><figcaption>方向导数是梯度的投影：在固定点处，沿单位方向 u 的方向导数 D_u f = ∇f·u = ‖∇f‖cosα。当 u 与梯度 ∇f 夹角 α=0（同向）时投影最长、方向导数最大；α=90° 时投影为零、函数瞬时不变；α=180° 时投影最负、为最速下降。</figcaption></figure>
+
+<p>换句话说，方向导数就是 \(\nabla f\) 在单位方向 \(u\) 上的<strong>标量投影 scalar projection</strong>（上一课的概念）。因为 \(\|u\|=1\)，标量投影 \((\nabla f\cdot u)/\|u\|\) 正好等于点积 \(\nabla f\cdot u\)。</p>
+
+<h2>5. 核心定理：梯度指向最速上升方向</h2>
+
+<p>现在到本课的高潮。设梯度非零，把点积写成模长与夹角的形式（直接复用上一课的几何点积 \(a\cdot b=\|a\|\,\|b\|\cos\theta\)，这里夹角仍用上一课的记号 \(\theta\)）：</p>
+
+\[
+D_u f=\nabla f\cdot u=\|\nabla f\|\,\|u\|\cos\theta=\|\nabla f\|\cos\theta,
+\]
+
+<p>其中 \(\theta\) 是 \(u\) 与 \(\nabla f\) 的夹角（用了 \(\|u\|=1\)）。\(\|\nabla f\|\) 是固定的，所以 \(D_u f\) 完全由 \(\cos\theta\) 决定：</p>
+
+<ul>
+<li>当 \(\theta=0\)（\(u\) 与 \(\nabla f\) <strong>同向</strong>）：\(\cos\theta=1\)，方向导数<strong>最大</strong>，等于 \(\|\nabla f\|\)。这就是<strong>最速上升方向</strong>。</li>
+<li>当 \(\theta=\pi\)（\(u\) 与 \(\nabla f\) <strong>反向</strong>）：\(\cos\theta=-1\)，方向导数最小（最负），等于 \(-\|\nabla f\|\)。这是<strong>最速下降方向</strong>。</li>
+<li>当 \(\theta=\pi/2\)（垂直）：\(\cos\theta=0\)，沿该方向<strong>函数瞬时不变</strong>。</li>
+</ul>
+
+<div class="key">
+<h4>要点</h4>
+<ul>
+<li><strong>梯度 \(\nabla f\) 指向函数上升最快的方向</strong>，其模长 \(\|\nabla f\|\) 就是这个最大上升率。</li>
+<li>因此 <strong>\(-\nabla f\) 指向下降最快的方向</strong>——这正是梯度下降要走的方向。</li>
+</ul>
+</div>
+
+<h2>6. 梯度与等高线正交</h2>
+
+<p>把曲面 \(f\) 在某高度切平，得到<strong>等高线 / 等值集 level set</strong>：所有满足 \(f(x)=c\) 的点。沿等高线移动时，函数值恒为 \(c\)、不变，所以方向导数为 0。设 \(t\) 是等高线的切向（单位向量），则</p>
+
+\[
+D_t f=\nabla f\cdot t=0.
+\]
+
+<p>点积为零意味着<strong>正交 orthogonal</strong>。于是得到一个漂亮的几何事实：</p>
+
+<div class="key">
+<h4>要点</h4>
+<p><strong>梯度处处垂直于等高线</strong>，并指向函数值增大的一侧（上坡）。这就是为什么在等高线图上，梯度场总是"横穿"等高线、与之成直角。</p>
+</div>
+
+<figure class="fig"><svg viewBox="0 0 520 480" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>f(x,y)=x²+3y² 的等高线与梯度场，梯度与等高线正交并指向外侧上坡</title><defs><marker id="arrW" markerWidth="9" markerHeight="9" refX="7" refY="3.2" orient="auto"><path d="M0,0 L7,3.2 L0,6.4 Z" fill="#db2777"/></marker><marker id="arrG" markerWidth="9" markerHeight="9" refX="7" refY="3.2" orient="auto"><path d="M0,0 L7,3.2 L0,6.4 Z" fill="#059669"/></marker><marker id="arrAx" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker></defs><text x="260" y="26" text-anchor="middle" font-size="14" fill="#1f2937" font-weight="600">等高线与梯度场 f(x,y)=x²+3y²</text><g transform="translate(260,250)"><line x1="-220" y1="0" x2="220" y2="0" stroke="#94a3b8" stroke-width="1" marker-end="url(#arrAx)"/><line x1="0" y1="180" x2="0" y2="-180" stroke="#94a3b8" stroke-width="1" marker-end="url(#arrAx)"/><text x="226" y="5" font-size="13" fill="#94a3b8">x</text><text x="6" y="-184" font-size="13" fill="#94a3b8">y</text><ellipse cx="0" cy="0" rx="50" ry="29" fill="#2563eb" fill-opacity="0.05" stroke="#2563eb" stroke-width="2"/><ellipse cx="0" cy="0" rx="100" ry="58" fill="none" stroke="#2563eb" stroke-width="2" stroke-opacity="0.75"/><ellipse cx="0" cy="0" rx="150" ry="87" fill="none" stroke="#2563eb" stroke-width="2" stroke-opacity="0.55"/><ellipse cx="0" cy="0" rx="200" ry="116" fill="none" stroke="#2563eb" stroke-width="2" stroke-opacity="0.4"/><text x="52" y="-4" font-size="11" fill="#2563eb">f=1</text><text x="102" y="-6" font-size="11" fill="#2563eb">f=4</text><text x="152" y="-8" font-size="11" fill="#2563eb">f=9</text><text x="202" y="-10" font-size="11" fill="#2563eb">f=16</text><g stroke="#db2777" stroke-width="2"><line x1="75" y1="-29" x2="105" y2="-46.5" marker-end="url(#arrW)"/><line x1="-75" y1="-29" x2="-105" y2="-46.5" marker-end="url(#arrW)"/><line x1="75" y1="29" x2="105" y2="46.5" marker-end="url(#arrW)"/><line x1="-75" y1="29" x2="-105" y2="46.5" marker-end="url(#arrW)"/><line x1="100" y1="-43.5" x2="124" y2="-58.5" marker-end="url(#arrW)"/><line x1="-100" y1="-43.5" x2="-124" y2="-58.5" marker-end="url(#arrW)"/><line x1="100" y1="43.5" x2="124" y2="58.5" marker-end="url(#arrW)"/><line x1="-100" y1="43.5" x2="-124" y2="58.5" marker-end="url(#arrW)"/><line x1="100" y1="0" x2="138" y2="0" marker-end="url(#arrW)"/><line x1="-100" y1="0" x2="-138" y2="0" marker-end="url(#arrW)"/><line x1="0" y1="-58" x2="0" y2="-92" marker-end="url(#arrW)"/><line x1="0" y1="58" x2="0" y2="92" marker-end="url(#arrW)"/></g><g transform="translate(75,-29)"><path d="M 0,-12 L 8.6,-20.4" stroke="#1f2937" stroke-width="0.9" fill="none"/><path d="M -10.3,-5.9 L -1.7,-14.3" stroke="#1f2937" stroke-width="0.9" fill="none"/><path d="M -1.7,-14.3 L 0,-12 M 0,-12 L -1.5,-13.9" stroke="#1f2937" stroke-width="0.9" fill="none" stroke-opacity="0"/><rect x="-1.7" y="-14.3" width="0" height="0"/></g><g transform="translate(75,-29) rotate(-30.2)"><rect x="0" y="-13" width="13" height="13" fill="none" stroke="#1f2937" stroke-width="0.9"/></g><g transform="translate(0,-58)"><rect x="0" y="-14" width="13" height="13" fill="none" stroke="#1f2937" stroke-width="0.9"/></g><line x1="-100" y1="43.5" x2="-148" y2="64.4" stroke="#1f2937" stroke-width="0" stroke-opacity="0"/><g stroke="#059669" stroke-width="2" stroke-dasharray="4 3"><line x1="150" y1="0" x2="118" y2="0" marker-end="url(#arrG)"/></g><circle cx="0" cy="0" r="4" fill="#d97706"/><text x="-10" y="16" text-anchor="end" font-size="12" fill="#d97706">最小值 (0,0)</text></g><g font-size="12"><rect x="34" y="430" width="16" height="0" fill="none"/><line x1="34" y1="436" x2="58" y2="436" stroke="#db2777" stroke-width="2" marker-end="url(#arrW)"/><text x="64" y="440" fill="#1f2937">梯度 ∇f=[2x,6y]：垂直等高线、指向外侧上坡，越陡越长</text><line x1="34" y1="458" x2="58" y2="458" stroke="#059669" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#arrG)"/><text x="64" y="462" fill="#1f2937">−∇f：最速下降方向，指向碗底</text></g><g transform="translate(412,243)"><line x1="0" y1="0" x2="-30" y2="13" stroke="#059669" stroke-width="1" stroke-dasharray="4 3"/><text x="2" y="4" font-size="11" fill="#059669">最速下降方向</text></g></svg><figcaption>等高线与梯度场：曲面 f(x,y)=x²+3y² 的等高线为同心椭圆，箭头表示梯度场 ∇f=[2x,6y]。每个梯度箭头都与所在等高线正交，并指向函数值增大的外侧（上坡）；箭头越长表示该处越陡（‖∇f‖越大）。负梯度 −∇f（虚线短箭头）指向碗底，即梯度下降前进的方向。</figcaption></figure>
+
+<h2>7. 例题：梯度、方向导数、走一步梯度下降</h2>
+
+<div class="example">
+<h4>例题</h4>
+<p>设 \(f(x,y)=x^2+xy+3y^2\)。</p>
+
+<p><strong>(a) 求梯度。</strong> 对 \(x\) 求偏导（\(y\) 当常数）：注意交叉项 \(xy\) 对 \(x\) 求导时把 \(y\) 当常数，得 \(y\)，所以 \(\partial f/\partial x=2x+y\)；对 \(y\) 求偏导（\(x\) 当常数，交叉项 \(xy\) 对 \(y\) 求导得 \(x\)）：\(\partial f/\partial y=x+6y\)。故</p>
+\[
+\nabla f(x,y)=\begin{bmatrix}2x+y\\[2pt]x+6y\end{bmatrix}.
+\]
+
+<p><strong>(b) 在点 \(p=(1,2)\) 求梯度。</strong> 代入：\(2(1)+2=4\)，\(1+6(2)=13\)。所以</p>
+\[
+\nabla f(1,2)=\begin{bmatrix}4\\13\end{bmatrix}.
+\]
+
+<p><strong>(c) 在 \(p\) 处沿方向 \(d=(3,4)\) 求方向导数。</strong> 先把 \(d\) 单位化：\(\|d\|=\sqrt{3^2+4^2}=5\)，故 \(u=(3/5,\,4/5)=(0.6,\,0.8)\)。则</p>
+\[
+D_u f(p)=\nabla f(p)\cdot u=4(0.6)+13(0.8)=2.4+10.4=12.8.
+\]
+<p>（正数，说明沿这个方向是上坡，上升率为 12.8。）</p>
+
+<p><strong>(d) 从 \(p\) 做一步梯度下降，学习率 \(\eta=0.1\)。</strong> 更新规则 \(w\leftarrow w-\eta\nabla f(w)\)：</p>
+\[
+\begin{bmatrix}1\\2\end{bmatrix}-0.1\begin{bmatrix}4\\13\end{bmatrix}
+=\begin{bmatrix}1-0.4\\2-1.3\end{bmatrix}
+=\begin{bmatrix}0.6\\0.7\end{bmatrix}.
+\]
+<p>验证函数值确实下降：\(f(1,2)=1+2+12=15\)；\(f(0.6,0.7)=0.36+0.42+1.47=2.25\)。从 15 降到 2.25，一步就大幅下坡。</p>
+</div>
+
+<h2>8. 梯度下降与学习率</h2>
+
+<p>把上面的"走一步"重复很多次，就是<strong>梯度下降 gradient descent</strong>：</p>
+
+\[
+w_{k+1}=w_k-\eta\,\nabla f(w_k).
+\]
+
+<p>每一步都沿当前点的最速下降方向 \(-\nabla f\) 迈出一小步，步长由<strong>学习率 learning rate</strong> \(\eta>0\) 控制。直觉上像一个盲人下山：每走到一处，用脚感受哪边最陡（梯度），然后朝最陡的下坡方向迈 \(\eta\) 那么长一步。</p>
+
+<div class="pitfall">
+<h4>易错</h4>
+<ul>
+<li>梯度本身<strong>不是</strong>步长，它只给方向（和局部陡度）。真正走多远由 \(\eta\) 决定，要乘上去。</li>
+<li>\(\eta\) <strong>太大</strong>：会越过谷底、在两壁间来回<strong>震荡 oscillate</strong> 甚至发散（loss 越来越大）。</li>
+<li>\(\eta\) <strong>太小</strong>：每步挪一点点，收敛<strong>极慢</strong>，浪费大量计算。</li>
+<li>更新要用<strong>减号</strong>。写成加号就成了"梯度上升"——朝 loss 增大的方向走，与训练目标背道而驰（对常见的无下界损失，会让 loss 不断升高）。这是初学者最常见的符号 bug。</li>
+</ul>
+</div>
+
+<h2>9. 临界点：极小、极大与鞍点</h2>
+
+<p>梯度下降走到 \(\nabla f=0\) 的地方就停下（没有下坡方向了）。这种点叫<strong>临界点 critical point</strong>，分三类：</p>
+
+<ul>
+<li><strong>局部极小 local minimum</strong>：四面都是上坡，像碗底。梯度下降想找的就是它。</li>
+<li><strong>局部极大 local maximum</strong>：四面都是下坡，像山顶。</li>
+<li><strong>鞍点 saddle point</strong>：一些方向上坡、另一些方向下坡，像马鞍。\(f(x,y)=x^2-y^2\) 在原点就是典型鞍点。</li>
+</ul>
+
+<div class="note">
+<p>在高维深度学习里，鞍点比局部极小多得多，是优化的主要障碍之一。区分这三类点需要看二阶信息（曲率），由<strong>下一课</strong>的海森（Hessian）矩阵刻画——下一课会先讲雅可比、再讲海森。</p>
+</div>
+
+<div class="ml">
+<h4><span class="tag">ML</span> 和 ML 的联系</h4>
+<p>训练一个模型，本质就是<strong>在损失曲面上做梯度下降</strong>。模型参数 \(w\)（权重）是坐标，损失 \(L(w)\) 是高度，我们要找让 \(L\) 最小的 \(w\)。反向传播 backpropagation 高效地算出 \(\nabla L\)（即 \(\partial L/\partial w\)），优化器再执行 \(w\leftarrow w-\eta\nabla L\)。</p>
+<p>本课记号铺垫了后续约定：我们采用<strong>分母布局 denominator layout</strong>，让 \(\partial L/\partial W\) 与参数 \(W\) <strong>同形</strong>，这样"参数减去梯度"才在形状上对得齐——这个约定会在第 9 课正式声明。学习率 \(\eta\) 是最重要的超参数之一：调大了 loss 震荡发散，调小了训练龟速，这正是上面数学的直接后果。</p>
+</div>
+
+<h2>10. 代码：用 numpy 最小化一个凸二次函数</h2>
+
+<p>我们对 \(f(x,y)=x^2+3y^2\)（梯度 \(\nabla f=[2x,\,6y]\)，最小值在原点）做梯度下降，每步打印 \(x\)、\(y\) 与 loss。注意 \(y\) 方向曲率（系数 6）比 \(x\) 方向（系数 2）大得多，等高线是<strong>狭长椭圆</strong>。下面特意把学习率取在 \(\eta\in(1/6,\,1/3)\) 之间（取 \(0.3\)），这时 \(y\) 方向的迭代因子 \(1-6\eta=-0.8\) 为负，\(y\) 分量会<strong>正负交替、来回震荡着收敛</strong>，而 \(x\) 方向（因子 \(1-2\eta=0.4\)）平滑收敛——这就是经典的<strong>之字形 zig-zag</strong> 轨迹。</p>
+
+<pre><code>import numpy as np
+
+# f(x,y) = x^2 + 3 y^2 ,  最小值在 (0,0)
+def f(w):
+    return w[0]**2 + 3.0 * w[1]**2
+
+def grad(w):
+    return np.array([2.0 * w[0], 6.0 * w[1]])
+
+w = np.array([4.0, 4.0])   # 起点
+eta = 0.3                   # 学习率（落在 (1/6, 1/3) 内，y 方向会之字形震荡）
+
+print("step |        x         y    |   loss")
+for k in range(12):
+    L = f(w)
+    print(f"{k:3d}  | {w[0]: .5f} {w[1]: .5f} | {L: .6f}")
+    w = w - eta * grad(w)   # 核心一行：朝 -梯度 走一步
+
+print("final w =", w, " final loss =", f(w))
+</code></pre>
+
+<p>你会看到 \(y\) 列在 \(4\to-3.2\to2.56\to-2.048\to\dots\) 之间正负跳动、幅度缓慢衰减，而 \(x\) 列平滑趋于 0——典型的之字形。把 <code>eta</code> 改成 <code>0.34</code> 试试：此时 \(y\) 方向因子 \(|1-6\times0.34|=1.04>1\)，\(y\) 会<strong>一边变号一边发散</strong>（每步放大 1.04 倍，loss 越来越大）；改成 <code>0.05</code> 则两个方向都平滑、但收敛得很慢。亲手感受学习率的威力。</p>
+
+<figure class="fig"><svg viewBox="0 0 520 360" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>梯度下降在狭长椭圆等高线上的之字形轨迹</title><desc>对 f(x,y)=x²+3y² 的同心椭圆等高线，从 (4,4) 出发的负梯度迭代在峡谷两壁间来回横跨，收敛到 (0,0)。</desc><defs><marker id="arrBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/></marker><marker id="arrPink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#db2777"/></marker><marker id="arrAxis" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs><text x="260" y="22" text-anchor="middle" font-size="14" fill="#1f2937" font-weight="600">梯度下降之字形轨迹  f(x,y)=x²+3y²，  η=0.3</text><g><ellipse cx="270" cy="190" rx="153.4" ry="88.5" fill="#2563eb" fill-opacity="0.04" stroke="#e2e8f0" stroke-width="0.75"/><ellipse cx="270" cy="190" rx="125.2" ry="72.3" fill="none" stroke="#e2e8f0" stroke-width="0.75"/><ellipse cx="270" cy="190" rx="97.0" ry="56.0" fill="#2563eb" fill-opacity="0.04" stroke="#e2e8f0" stroke-width="0.75"/><ellipse cx="270" cy="190" rx="68.6" ry="39.6" fill="none" stroke="#e2e8f0" stroke-width="0.75"/><ellipse cx="270" cy="190" rx="39.6" ry="22.9" fill="#2563eb" fill-opacity="0.05" stroke="#e2e8f0" stroke-width="0.75"/></g><line x1="100" y1="190" x2="446" y2="190" stroke="#94a3b8" stroke-width="1" marker-end="url(#arrAxis)"/><line x1="270" y1="318" x2="270" y2="74" stroke="#94a3b8" stroke-width="1" marker-end="url(#arrAxis)"/><text x="450" y="194" font-size="12" fill="#94a3b8">x</text><text x="276" y="80" font-size="12" fill="#94a3b8">y</text><g stroke="#2563eb" stroke-width="2" fill="none"><line x1="382" y1="78" x2="350.5" y2="172.6" marker-end="url(#arrBlue)"/><line x1="348.4" y1="178.8" x2="326.7" y2="187.6" marker-end="url(#arrBlue)"/><line x1="324.9" y1="188.9" x2="310.1" y2="189.7" marker-end="url(#arrBlue)"/><line x1="308.4" y1="189.9" x2="298.6" y2="189.99" marker-end="url(#arrBlue)"/><line x1="296.9" y1="190" x2="290.5" y2="190" marker-end="url(#arrBlue)"/><line x1="288.8" y1="190" x2="284.9" y2="190" marker-end="url(#arrBlue)"/></g><g fill="#2563eb"><circle cx="382" cy="78" r="4"/><circle cx="348.4" cy="178.8" r="3.5"/><circle cx="324.9" cy="188.9" r="3.2"/><circle cx="308.4" cy="189.9" r="3"/><circle cx="296.9" cy="190" r="3"/><circle cx="288.8" cy="190" r="2.8"/><circle cx="283.2" cy="190" r="2.8"/></g><g font-size="11" fill="#1f2937"><text x="389" y="74">w₀ (4,4)</text><text x="354" y="174">w₁ (2.8, 0.4)</text><text x="320" y="203" text-anchor="middle">w₂</text><text x="308" y="206" text-anchor="middle">w₃</text></g><circle cx="270" cy="190" r="3" fill="#059669"/><text x="262" y="210" text-anchor="middle" font-size="12" fill="#059669" font-weight="600">最小值 (0,0)</text><g><rect x="40" y="248" width="150" height="98" rx="6" fill="#ffffff" fill-opacity="0.7" stroke="#e2e8f0" stroke-width="0.75"/><text x="115" y="266" text-anchor="middle" font-size="11" fill="#db2777" font-weight="600">η 过大 → 发散</text><line x1="60" y1="300" x2="170" y2="300" stroke="#94a3b8" stroke-width="0.75"/><polyline points="70,300 95,318 120,278 150,332" fill="none" stroke="#db2777" stroke-width="2" stroke-opacity="0.85" marker-end="url(#arrPink)"/><g fill="#db2777"><circle cx="70" cy="300" r="2.6"/><circle cx="95" cy="318" r="2.6"/><circle cx="120" cy="278" r="2.6"/></g><text x="115" y="343" text-anchor="middle" font-size="11" fill="#db2777">振幅逐步放大</text></g><text x="430" y="300" text-anchor="middle" font-size="11" fill="#1f2937">y 方向曲率大</text><text x="430" y="315" text-anchor="middle" font-size="11" fill="#1f2937">→ 步子跨过谷底</text><text x="430" y="330" text-anchor="middle" font-size="11" fill="#1f2937">形成之字形</text></svg><figcaption>梯度下降在狭长椭圆等高线上的之字形轨迹：对 f(x,y)=x²+3y²，由于两方向曲率不同（y 方向更陡），从起点 (4,4) 出发的迭代点沿负梯度方向前进时不断在峡谷两壁间来回横跨，形成 zig-zag 路径，逐步逼近碗底 (0,0)。学习率越大、之字形越剧烈甚至发散。</figcaption></figure>
+
+<h2>动手练习</h2>
+<ol>
+<li><strong>手算梯度。</strong> 对 \(f(x,y)=2x^2+y^2-xy\)，求 \(\nabla f\)，并在点 \((1,1)\) 求出梯度向量。再求沿 \(u=(0,1)\) 的方向导数。（验证：\(\nabla f=[4x-y,\,2y-x]\)，在 \((1,1)\) 为 \([3,1]\)，方向导数 \(=1\)。）</li>
+
+<li><strong>验证正交。</strong> 对 \(f(x,y)=x^2+y^2\)，等高线是圆。在 \((3,4)\) 处求梯度，并验证它与该点处圆的切向量正交（提示：圆在该点的切向与半径垂直，半径方向就是 \((3,4)\)）。</li>
+
+<li><strong>改代码做一步对比。</strong> 用下面骨架，比较 \(\eta=0.1\) 与 \(\eta=0.5\) 走一步后的 loss，看谁下降更多、谁可能反而上升。
+<pre><code>import numpy as np
+
+def f(w):  return w[0]**2 + 3.0*w[1]**2
+def grad(w): return np.array([2.0*w[0], 6.0*w[1]])
+
+w0 = np.array([1.0, 1.0])
+for eta in [0.1, 0.5]:
+    w1 = w0 - eta * grad(w0)
+    print(f"eta={eta}:  w0->w1 = {w0} -> {w1} ,  loss {f(w0):.4f} -> {f(w1):.4f}")
+</code></pre></li>
+
+<li><strong>找鞍点。</strong> 对 \(f(x,y)=x^2-y^2\)，求 \(\nabla f\) 并解 \(\nabla f=0\)。从 \((0.01,\,0.01)\) 跑十步梯度下降（\(\eta=0.1\)），观察 \(y\) 分量是被吸引还是被排斥，体会鞍点的不稳定。</li>
+
+<li><strong>数值偏导。</strong> 不用解析公式，用差商 \(\big(f(x+h,y)-f(x,y)\big)/h\)（取 \(h=10^{-5}\)）近似 \(\partial f/\partial x\)，与解析梯度对比误差，验证偏导数的定义。</li>
+</ol>
+
+<h2>掌握自检</h2>
+<ul>
+<li>我能说出偏导数的定义，并对 \(x^2+xy+3y^2\) 正确写出 \(\nabla f\)。</li>
+<li>我能解释"为什么梯度指向最速上升方向"——并写出 \(D_u f=\|\nabla f\|\cos\theta\) 这一步。</li>
+<li>我能说清为什么梯度与等高线正交（沿等高线 \(f\) 不变 \(\Rightarrow\) 点积为 0）。</li>
+<li>给定点、梯度和学习率，我能手算一步 \(w\leftarrow w-\eta\nabla f\) 并验证 loss 下降。</li>
+<li>我能解释学习率太大/太小各自的后果，并知道更新用减号。</li>
+<li>我能区分极小、极大、鞍点，并知道梯度下降在它们处都会停。</li>
+</ul>
+
+<p>下一课，我们把导数从"标量函数"推广到<strong>向量值函数</strong>：当输出也是一个向量时，所有偏导数排成一个矩阵，就是<strong>雅可比 Jacobian</strong>；而损失曲面的二阶曲率（用来区分极小与鞍点）则由<strong>海森 Hessian</strong> 矩阵刻画。</p>
+</article>
+<div class="navbtns"><a class="prev" href="lesson-05-svd-low-rank.html"><div class="nlabel">← 上一课</div><div class="ntitle">第5课 · SVD 与低秩压缩</div></a><a class="next" href="lesson-07-jacobian-hessian.html"><div class="nlabel">下一课 →</div><div class="ntitle">第7课 · 雅可比与海森</div></a></div>
+<nav class="toc"><h3>本模块课程表</h3><ol>
+<li><a href="lesson-01-vectors.html"><span class="ln">第1课</span>向量——机器学习的原子</a></li>
+<li><a href="lesson-02-matrix-linear-transformation.html"><span class="ln">第2课</span>矩阵即线性变换</a></li>
+<li><a href="lesson-03-inner-product-norm-projection.html"><span class="ln">第3课</span>内积、范数与投影</a></li>
+<li><a href="lesson-04-eigenvalues-eigenvectors.html"><span class="ln">第4课</span>特征值与特征向量</a></li>
+<li><a href="lesson-05-svd-low-rank.html"><span class="ln">第5课</span>SVD 与低秩压缩</a></li>
+<li class="cur"><a href="lesson-06-derivatives-gradients.html"><span class="ln">第6课</span>导数与梯度</a></li>
+<li><a href="lesson-07-jacobian-hessian.html"><span class="ln">第7课</span>雅可比与海森</a></li>
+<li><a href="lesson-08-chain-rule-computational-graph.html"><span class="ln">第8课</span>链式法则与计算图</a></li>
+<li><a href="lesson-09-matrix-calculus.html"><span class="ln">第9课</span>矩阵求导</a></li>
+<li><a href="lesson-10-backprop-from-scratch.html"><span class="ln">第10课</span>亲手实现反向传播</a></li>
+</ol></nav>
+</div>
+<!-- pyrunner-injected -->
+<style>
+.pr-cell{border:1px solid #334155;border-radius:10px;margin:1.2em 0;overflow:hidden;background:#0f172a;}
+.pr-head{display:flex;align-items:center;gap:8px;background:#1e293b;color:#cbd5e1;padding:6px 10px;font-size:13px;font-family:system-ui,-apple-system,sans-serif;}
+.pr-title{flex:1;font-weight:600;}
+.pr-status{font-size:12px;color:#94a3b8;white-space:nowrap;max-width:50%;overflow:hidden;text-overflow:ellipsis;}
+.pr-btn{cursor:pointer;border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:6px;padding:3px 11px;font-size:13px;line-height:1.4;}
+.pr-btn:hover{background:#0b1220;}
+.pr-run{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:600;}
+.pr-run:hover{background:#1d4ed8;}
+.pr-cell.collapsed .pr-body{display:none;}
+.pr-edit{display:block;width:100%;border:none;background:#0f172a;color:#e2e8f0;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.55;padding:12px 14px;resize:vertical;box-sizing:border-box;outline:none;}
+.pr-out{margin:0;padding:10px 14px;border-top:1px solid #334155;background:#0b1220;color:#cbd5e1;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.5;white-space:pre-wrap;max-height:340px;overflow:auto;}
+.pr-out:empty{display:none;}
+.pr-out.err{color:#fca5a5;}
+#pr-fab{position:fixed;right:18px;bottom:18px;z-index:9998;background:#2563eb;color:#fff;border:none;border-radius:999px;padding:10px 17px;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.22);font-family:system-ui,sans-serif;}
+#pr-fab:hover{background:#1d4ed8;}
+#pr-lab{position:fixed;right:18px;bottom:66px;z-index:9999;width:400px;max-width:92vw;background:#0f172a;border:1px solid #334155;border-radius:12px;display:none;flex-direction:column;box-shadow:0 14px 38px rgba(0,0,0,.4);overflow:hidden;}
+#pr-lab.open{display:flex;}
+#pr-lab .pr-edit{min-height:150px;}
+</style>
+<script>
+(function(){
+  var PYBASE="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+  var pyReady=null;
+  function loadPy(status){
+    if(pyReady)return pyReady;
+    pyReady=(async function(){
+      status("正在加载 Python 运行时（首次约 10 秒，需联网）…");
+      await new Promise(function(res,rej){
+        var s=document.createElement("script");s.src=PYBASE+"pyodide.js";
+        s.onload=res;s.onerror=function(){rej(new Error("无法加载 Pyodide（首次运行需要联网）"));};
+        document.head.appendChild(s);
+      });
+      var py=await loadPyodide({indexURL:PYBASE});
+      status("正在加载 NumPy …");
+      await py.loadPackage("numpy");
+      status("Python 就绪 ✓");
+      return py;
+    })();
+    return pyReady;
+  }
+  async function run(code,outEl,statusEl){
+    var setS=function(m){if(statusEl)statusEl.textContent=m;};
+    outEl.classList.remove("err");outEl.textContent="";
+    var py;
+    try{py=await loadPy(setS);}
+    catch(e){outEl.classList.add("err");outEl.textContent="加载失败："+e.message;return;}
+    var buf="";
+    py.setStdout({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    py.setStderr({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    try{
+      var result=await py.runPythonAsync(code);
+      if(result!==undefined&&result!==null){
+        var r;try{r=result.toString();}catch(_){r=String(result);}
+        if(r!=="None")buf+=(buf&&!buf.endsWith("\n")?"\n":"")+r;
+        if(result&&result.destroy)result.destroy();
+      }
+      outEl.textContent=buf||"（运行成功，无输出。用 print(...) 查看结果）";
+    }catch(e){
+      outEl.classList.add("err");
+      outEl.textContent=buf+(buf?"\n":"")+String((e&&e.message)||e);
+    }
+  }
+  function autosize(ta){ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight+2,460)+"px";}
+  function tabKey(e){
+    if(e.key==="Tab"){e.preventDefault();var s=this.selectionStart,en=this.selectionEnd;
+      this.value=this.value.slice(0,s)+"    "+this.value.slice(en);this.selectionStart=this.selectionEnd=s+4;}
+    if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();var b=this.closest(".pr-cell,#pr-lab").querySelector(".pr-run");if(b)b.click();}
+  }
+  function makeCell(code){
+    var cell=document.createElement("div");cell.className="pr-cell";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">可运行 · Python (NumPy)</span><span class="pr-status"></span><button class="pr-btn pr-toggle">收起</button><button class="pr-btn pr-run">▶ 运行</button></div><div class="pr-body"><textarea class="pr-edit" spellcheck="false"></textarea><pre class="pr-out"></pre></div>';
+    var ta=cell.querySelector(".pr-edit");ta.value=code;
+    var out=cell.querySelector(".pr-out"),st=cell.querySelector(".pr-status");
+    ta.addEventListener("input",function(){autosize(ta);});
+    ta.addEventListener("keydown",tabKey);
+    cell.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    var tog=cell.querySelector(".pr-toggle");
+    tog.onclick=function(){cell.classList.toggle("collapsed");tog.textContent=cell.classList.contains("collapsed")?"展开":"收起";};
+    setTimeout(function(){autosize(ta);},0);
+    return cell;
+  }
+  function enhance(){
+    document.querySelectorAll("article pre").forEach(function(pre){
+      if(pre.closest(".pr-cell"))return;
+      var codeEl=pre.querySelector("code")||pre;
+      var code=codeEl.textContent.replace(/\s+$/,"");
+      if(!code)return;
+      pre.replaceWith(makeCell(code));
+    });
+  }
+  function lab(){
+    var fab=document.createElement("button");fab.id="pr-fab";fab.textContent="▶ Python 实验台";
+    var panel=document.createElement("div");panel.id="pr-lab";
+    panel.innerHTML='<div class="pr-head"><span class="pr-title">Python 实验台 · NumPy</span><span class="pr-status"></span><button class="pr-btn pr-run">▶ 运行</button><button class="pr-btn pr-min">收起</button></div><div class="pr-body"><textarea class="pr-edit" spellcheck="false"></textarea><pre class="pr-out"></pre></div>';
+    document.body.appendChild(fab);document.body.appendChild(panel);
+    var ta=panel.querySelector(".pr-edit");
+    ta.value="import numpy as np\na = np.array([3, 2])\nb = np.array([1, 4])\nprint(\"a + b =\", a + b)\nprint(\"a . b =\", a @ b)\nprint(\"|a|  =\", np.linalg.norm(a))\ncos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))\nprint(\"cos =\", round(float(cos), 4))";
+    ta.addEventListener("keydown",tabKey);
+    var out=panel.querySelector(".pr-out"),st=panel.querySelector(".pr-status");
+    panel.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    fab.onclick=function(){panel.classList.toggle("open");};
+    panel.querySelector(".pr-min").onclick=function(){panel.classList.remove("open");};
+  }
+  function init(){enhance();lab();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+
+</body>
+</html>

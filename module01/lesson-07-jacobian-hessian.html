@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块1 · 第7课 · 雅可比与海森——向量值函数的导数与曲率</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue-bg:#eff6ff;
+--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--pink:#db2777;
+--red:#dc2626;--red-bg:#fef2f2;--bg:#ffffff;--soft:#f8fafc;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);
+font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.85;font-size:17px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:840px;margin:0 auto;padding:0 22px 100px;}
+header.top{background:#fff;border-bottom:1px solid var(--line);padding:26px 22px 22px;margin-bottom:14px;}
+header.top .inner{max-width:840px;margin:0 auto;}
+.crumb{color:var(--muted);font-size:14px;letter-spacing:.3px;margin-bottom:6px;}
+h1{font-size:30px;line-height:1.3;margin:.1em 0 .2em;}
+.sub{color:var(--muted);font-size:15px;}
+article{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:30px 34px;margin-top:18px;}
+h2{font-size:23px;margin:1.7em 0 .6em;padding-bottom:.25em;border-bottom:2px solid var(--line);}
+h2:first-child{margin-top:.2em;}
+h3{font-size:19px;margin:1.3em 0 .4em;color:#0f172a;}
+h4{margin:.2em 0 .5em;font-size:16px;}
+p{margin:.7em 0;}
+ul,ol{padding-left:1.3em;margin:.6em 0;}
+li{margin:.32em 0;}
+code{background:#f1f5f9;padding:.12em .4em;border-radius:5px;font-size:.9em;
+font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a;}
+pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 18px;overflow:auto;font-size:14px;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0;}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:15.5px;}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+thead th{background:var(--soft);}
+figure.fig{margin:1.4em 0;text-align:center;}
+figure.fig svg{max-width:100%;height:auto;}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
+.note,.ml,.key,.pitfall,.example{border-radius:10px;padding:14px 18px;margin:1.2em 0;border:1px solid var(--line);}
+.note{background:var(--soft);border-left:4px solid #94a3b8;}
+.example{background:#fff;border-left:4px solid var(--blue);}
+.ml{background:var(--green-bg);border-left:4px solid var(--green);}
+.key{background:var(--amber-bg);border-left:4px solid var(--amber);}
+.pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
+.toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
+.toc h3{margin:.1em 0 .7em;}
+.toc ol{list-style:none;padding:0;}
+.toc li{padding:7px 10px;border-radius:8px;color:#334155;border:1px solid transparent;}
+.toc li a{color:inherit;text-decoration:none;display:block;}
+.toc li .ln{display:inline-block;min-width:54px;color:var(--muted);font-size:13px;}
+.toc li.cur{background:var(--blue-bg);border-color:#bfdbfe;font-weight:600;color:#1e3a8a;}
+.toc li:not(.cur):hover{background:var(--soft);}
+.navbtns{display:flex;justify-content:space-between;margin-top:22px;gap:12px;}
+.navbtns a{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--ink);}
+.navbtns a:hover{border-color:var(--blue);}
+.navbtns .nlabel{color:var(--muted);font-size:13px;}
+.navbtns .ntitle{font-weight:600;margin-top:3px;}
+.navbtns .next{text-align:right;}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
+.card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
+.card:hover{border-color:var(--blue);}
+.card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
+.card .ct{font-size:18px;font-weight:600;}
+.card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+</style>
+</head>
+<body>
+<header class="top"><div class="inner">
+<div class="crumb"><a href="index.html" style="color:inherit">模块 1 · 线性代数与微积分</a>　/　第 7 课（共 10 课）</div>
+<h1>雅可比与海森——向量值函数的导数与曲率</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　第一阶段：数学与工具基础</div>
+</div></header>
+<div class="wrap">
+<article>
+<p>上一课我们为标量函数 \(f:\mathbb{R}^n\to\mathbb{R}\) 装上了"梯度 \(\nabla f\)"这台指南针，它在每个点指向上升最快的方向。但神经网络里到处是<strong>向量进、向量出</strong>的映射：一层把激活向量变成另一个激活向量。这一课我们把导数推广到向量值函数，得到<strong>雅可比矩阵 Jacobian</strong>；再回头给标量函数装上"二阶导数"——<strong>海森矩阵 Hessian</strong>，它描述函数的<em>弯曲程度（曲率 curvature）</em>，正是优化难易、鞍点、二阶方法的几何根源。</p>
+
+<h2>一、雅可比：向量值函数的导数</h2>
+
+<p>考虑一个把 \(n\) 维向量映成 \(m\) 维向量的函数</p>
+\[
+f:\mathbb{R}^n\to\mathbb{R}^m,\qquad
+f(x)=\begin{bmatrix} f_1(x)\\ f_2(x)\\ \vdots\\ f_m(x)\end{bmatrix},\quad
+x=\begin{bmatrix} x_1\\ \vdots\\ x_n\end{bmatrix}.
+\]
+
+<p>它有 \(m\) 个输出分量，每个分量又依赖 \(n\) 个输入变量。于是"导数"不再是一个数，也不再是一个向量，而是把<strong>所有</strong>偏导数 \(\partial f_i/\partial x_j\) 排成的一张表——这就是雅可比矩阵。</p>
+
+<div class="key"><h4>要点</h4>
+<p>雅可比矩阵 \(J\)（也写作 \(\frac{\partial f}{\partial x}\) 或 \(Df\)）的元素定义为</p>
+\[
+J_{ij}=\frac{\partial f_i}{\partial x_j},\qquad
+J=\begin{bmatrix}
+\dfrac{\partial f_1}{\partial x_1} & \cdots & \dfrac{\partial f_1}{\partial x_n}\\[2mm]
+\vdots & \ddots & \vdots\\[1mm]
+\dfrac{\partial f_m}{\partial x_1} & \cdots & \dfrac{\partial f_m}{\partial x_n}
+\end{bmatrix}.
+\]
+<p><strong>形状 \(m\times n\)</strong>：<em>行对应输出分量 \(i\)，列对应输入变量 \(j\)</em>。记忆口诀——"第 \(i\) 行是第 \(i\) 个输出 \(f_i\) 的梯度（横着放）"。</p>
+</div>
+
+<p>两个熟悉的特例帮你定位它在知识地图上的位置：</p>
+<ul>
+<li>当 \(m=1\)（标量输出）时，\(J\) 只有一行，就是梯度的转置 \(\nabla f^\top\)（一个行向量）。所以<strong>梯度是雅可比的特例</strong>。（沿用上一课的约定：梯度 \(\nabla f\) 默认是<strong>列向量</strong>，它转置后才是雅可比那一行。）</li>
+<li>当 \(n=1,m=1\) 时，\(J\) 退化成一个数——就是高中的导数 \(f'(x)\)。</li>
+</ul>
+
+<h3>雅可比 = 局部线性映射</h3>
+
+<div class="note">
+<p>一维时我们说"导数 = 切线斜率"，本质是"在一个点附近，弯的函数看起来像直线"。多维的版本是：<strong>在一点附近，弯曲的映射 \(f\) 看起来像一个线性映射，而那个线性映射的矩阵就是雅可比 \(J\)。</strong></p>
+</div>
+
+<p>把这句话写成公式，就是<strong>一阶线性化（first-order linearization）</strong>。设在点 \(x\) 处给一个微小扰动 \(\Delta\in\mathbb{R}^n\)，则</p>
+\[
+f(x+\Delta)\;\approx\; f(x)+J\,\Delta,
+\]
+<p>右边 \(J\Delta\) 是矩阵乘向量，结果是 \(m\) 维向量，与 \(f(x)\) 同形——量纲对上了。这就是"用一块切平面去贴住弯曲曲面"的多维推广。误差是 \(O(\|\Delta\|^2)\)，扰动越小越准。</p>
+
+<figure class="fig"><svg viewBox="0 0 540 320" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>雅可比作为局部线性映射：输入小方块经 f 近似变为输出平行四边形，面积比为 |det J|</title><desc>左侧输入空间 R^2 中以 x 为中心的小正方形，两边为单位扰动 e1、e2；中间大箭头标注 f（局部约等于乘 J）；右侧输出空间 R^2 中对应平行四边形，两边为 J·e1、J·e2，已不再正交，内部标注面积等于 |det J| 乘原面积。</desc>
+<defs>
+<marker id="arrBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#2563eb"/></marker>
+<marker id="arrPink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#db2777"/></marker>
+<marker id="arrAmber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#d97706"/></marker>
+<marker id="arrAxis" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#94a3b8"/></marker>
+</defs>
+
+<!-- ===================== LEFT PANEL: input ===================== -->
+<text x="100" y="24" text-anchor="middle" font-size="14" fill="#1f2937" font-weight="600">输入空间 R²</text>
+
+<!-- axes (origin at 40,250) -->
+<line x1="40" y1="250" x2="200" y2="250" stroke="#94a3b8" stroke-width="1" marker-end="url(#arrAxis)"/>
+<line x1="40" y1="250" x2="40" y2="60" stroke="#94a3b8" stroke-width="1" marker-end="url(#arrAxis)"/>
+<text x="204" y="254" font-size="11" fill="#94a3b8">x₁</text>
+<text x="32" y="58" font-size="11" fill="#94a3b8">x₂</text>
+
+<!-- faint unit grid of the small square (cell 36px). Square corner at (80,202) to (152,130) -->
+<g stroke="#e2e8f0" stroke-width="0.75">
+<line x1="80" y1="202" x2="80" y2="130"/>
+<line x1="116" y1="202" x2="116" y2="130"/>
+<line x1="152" y1="202" x2="152" y2="130"/>
+<line x1="80" y1="202" x2="152" y2="202"/>
+<line x1="80" y1="166" x2="152" y2="166"/>
+<line x1="80" y1="130" x2="152" y2="130"/>
+</g>
+
+<!-- the small square (light blue fill) -->
+<rect x="80" y="130" width="72" height="72" fill="#2563eb" fill-opacity="0.10" stroke="#2563eb" stroke-width="1.5"/>
+
+<!-- center point x -->
+<circle cx="116" cy="166" r="2.6" fill="#1f2937"/>
+<text x="120" y="162" font-size="12" fill="#1f2937">x</text>
+
+<!-- unit perturbation arrows e1 (horizontal) e2 (vertical) from square corner (80,202) -->
+<line x1="80" y1="202" x2="150" y2="202" stroke="#2563eb" stroke-width="2" marker-end="url(#arrBlue)"/>
+<line x1="80" y1="202" x2="80" y2="132" stroke="#2563eb" stroke-width="2" marker-end="url(#arrBlue)"/>
+<text x="112" y="218" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">e₁</text>
+<text x="62" y="166" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">e₂</text>
+<text x="116" y="240" text-anchor="middle" font-size="11" fill="#1f2937">单位小方块</text>
+
+<!-- ===================== MIDDLE arrow ===================== -->
+<line x1="212" y1="150" x2="318" y2="150" stroke="#1f2937" stroke-width="2.5" marker-end="url(#arrAmber)"/>
+<line x1="212" y1="150" x2="318" y2="150" stroke="#d97706" stroke-width="2.5" marker-end="url(#arrAmber)" opacity="0"/>
+<text x="263" y="138" text-anchor="middle" font-size="14" fill="#1f2937" font-weight="600">f</text>
+<text x="263" y="170" text-anchor="middle" font-size="11" fill="#1f2937">局部 ≈ 乘 J</text>
+
+<!-- ===================== RIGHT PANEL: output ===================== -->
+<text x="430" y="24" text-anchor="middle" font-size="14" fill="#1f2937" font-weight="600">输出空间 R²</text>
+
+<!-- axes (origin at 340,250) -->
+<line x1="340" y1="250" x2="520" y2="250" stroke="#94a3b8" stroke-width="1" marker-end="url(#arrAxis)"/>
+<line x1="340" y1="250" x2="340" y2="60" stroke="#94a3b8" stroke-width="1" marker-end="url(#arrAxis)"/>
+<text x="524" y="254" font-size="11" fill="#94a3b8">y₁</text>
+<text x="332" y="58" font-size="11" fill="#94a3b8">y₂</text>
+
+<!-- base point f(x) at (400,180). Columns of J (scaled by 72px/unit):
+     J = [[1.3,0.7],[0.4,1.1]]  -> J*e1 = (1.3,0.4) screen dx=93.6, dy=-28.8 ; J*e2 = (0.7,1.1) dx=50.4 dy=-79.2
+     parallelogram vertices:
+       A f(x)          = (400,180)
+       B A + J e1      = (493.6,151.2)
+       C B + J e2      = (544, 72)  -> too far right; shift base left to keep inside.
+   Use base (372,196), scale 60px/unit:
+       J e1 = (1.3*60, -0.4*60) = (78,-24) ; J e2 = (0.7*60, -1.1*60) = (42,-66)
+       A=(372,196) B=(450,172) C=(492,106) D=(414,130) -->
+<polygon points="372,196 450,172 492,106 414,130" fill="#d97706" fill-opacity="0.13" stroke="#d97706" stroke-width="1.5"/>
+
+<!-- base point f(x) -->
+<circle cx="372" cy="196" r="2.6" fill="#1f2937"/>
+<text x="350" y="200" font-size="12" fill="#1f2937">f(x)</text>
+
+<!-- J·e1 (first column) -->
+<line x1="372" y1="196" x2="447" y2="173" stroke="#d97706" stroke-width="2" marker-end="url(#arrAmber)"/>
+<text x="430" y="192" text-anchor="middle" font-size="12" fill="#d97706" font-weight="600">J·e₁</text>
+<text x="430" y="205" text-anchor="middle" font-size="11" fill="#d97706">（J 第 1 列）</text>
+
+<!-- J·e2 (second column) -->
+<line x1="372" y1="196" x2="411" y2="135" stroke="#db2777" stroke-width="2" marker-end="url(#arrPink)"/>
+<text x="356" y="150" text-anchor="middle" font-size="12" fill="#db2777" font-weight="600">J·e₂</text>
+<text x="356" y="120" text-anchor="middle" font-size="11" fill="#db2777">（J 第 2 列）</text>
+
+<!-- area annotation inside parallelogram -->
+<text x="448" y="150" text-anchor="middle" font-size="11" fill="#1f2937">面积 =</text>
+<text x="448" y="164" text-anchor="middle" font-size="11" fill="#1f2937">|det J| × 原面积</text>
+
+<!-- hint about distortion -->
+<text x="430" y="240" text-anchor="middle" font-size="11" fill="#1f2937">拉伸 + 旋转 + 错切，不再正交</text>
+</svg><figcaption>雅可比作为局部线性映射：输入空间一个微小方块经 f 映射后，在输出空间近似变成一个平行四边形，其边由雅可比的两列向量张成；方块/平行四边形的面积之比即 |det J|。</figcaption></figure>
+
+<div class="example"><h4>例题：写一个 \(f:\mathbb{R}^2\to\mathbb{R}^2\) 的雅可比</h4>
+<p>设</p>
+\[
+f(x,y)=\begin{bmatrix} x^2 y\\[1mm] x+\sin y\end{bmatrix}
+=\begin{bmatrix} f_1\\ f_2\end{bmatrix}.
+\]
+<p>逐个分量求偏导（这里 \(m=n=2\)，所以 \(J\) 是 \(2\times2\)）：</p>
+<ul>
+<li>\(\dfrac{\partial f_1}{\partial x}=2xy,\qquad \dfrac{\partial f_1}{\partial y}=x^2\)</li>
+<li>\(\dfrac{\partial f_2}{\partial x}=1,\qquad\quad \dfrac{\partial f_2}{\partial y}=\cos y\)</li>
+</ul>
+<p>按"行=输出、列=输入"排好：</p>
+\[
+J(x,y)=\begin{bmatrix} 2xy & x^2\\ 1 & \cos y\end{bmatrix}.
+\]
+<p>代入点 \((x,y)=(1,\tfrac{\pi}{2})\)，注意 \(\cos\tfrac{\pi}{2}=0\)：</p>
+\[
+J\!\left(1,\tfrac{\pi}{2}\right)=\begin{bmatrix} 2\cdot1\cdot\tfrac{\pi}{2} & 1^2\\ 1 & 0\end{bmatrix}
+=\begin{bmatrix} \pi & 1\\ 1 & 0\end{bmatrix}.
+\]
+<p>它告诉我们：在 \((1,\pi/2)\) 附近，给输入加一个小扰动 \(\Delta=[\Delta x,\Delta y]^\top\)，输出大约变化 \(J\Delta=[\pi\,\Delta x+\Delta y,\ \Delta x]^\top\)。</p>
+</div>
+
+<h3>方阵时：\(\det J\) 是局部体积缩放因子</h3>
+
+<p>当 \(m=n\) 时 \(J\) 是方阵，它的行列式有一个漂亮的几何意义。回忆线性代数：一个矩阵 \(A\) 把单位立方体映成平行多面体，体积变成 \(|\det A|\) 倍。既然 \(f\) 在局部就是线性映射 \(J\)，于是：</p>
+
+<div class="key"><h4>要点</h4>
+<p>在点 \(x\) 附近，\(f\) 把一个微小体积元放大/缩小为原来的 \(|\det J(x)|\) 倍。若 \(\det J<0\)，还附带一次"翻面"（定向反转 orientation reversal）。</p>
+</div>
+
+<p><strong>"翻面"是什么直觉？</strong> 就像照镜子——左手照出来变成右手；在二维里，它相当于把图形沿某条线做一次镜像翻转，原本逆时针绕的小圈会被映成顺时针。所以 \(\det J\) 同时编码了两件事：绝对值 \(|\det J|\) 是面积/体积缩放倍数，符号则告诉你有没有镜像翻面。</p>
+
+<p>这正是<strong>换元积分</strong>里那个雅可比行列式因子的来历（你在概率论里会反复见到）。<strong>设 \(y=f(x)\) 为正向变换</strong>，\(J=J_f(x)\) 是 \(f\) 在 \(x\) 处的雅可比。若随机向量 \(y=f(x)\) 是 \(x\) 的可逆变换，则概率密度满足<strong>变量替换公式</strong>：</p>
+\[
+p_Y(y)=p_X(x)\,\Big|\det J_f(x)\Big|^{-1},\qquad x=f^{-1}(y).
+\]
+<p>体积被 \(f\) 放大 \(|\det J_f|\) 倍，概率要守恒（总和为 1），所以密度就得除以这个因子。注意指数 \(-1\) 是因为这里 \(J_f\) 是<strong>正向映射</strong> \(x\to y\) 的雅可比；若改用逆向雅可比 \(J_{f^{-1}}(y)\)，由于 \(\det J_{f^{-1}}=1/\det J_f\)，指数就变成 \(+1\)。两种写法等价，关键是认清你算的是哪个方向的雅可比。这条公式是生成模型里"标准化流（normalizing flows）"的数学心脏。</p>
+
+<div class="example"><h4>例题：上例的 \(\det J\)</h4>
+<p>沿用 \(J(1,\tfrac\pi2)=\begin{bmatrix}\pi&1\\1&0\end{bmatrix}\)。\(2\times2\) 行列式 \(ad-bc\)：</p>
+\[
+\det J=\pi\cdot 0-1\cdot 1=-1.
+\]
+<p>解读：在该点附近，\(f\) 几乎保持体积不变（\(|\det J|=1\)），但因为 \(\det J<0\)，它把小邻域镜像翻了个面（定向反转）——逆时针的小圈被映成顺时针。</p>
+</div>
+
+<h2>二、海森：标量函数的二阶导数（曲率）</h2>
+
+<p>梯度告诉我们函数往哪儿走、走多陡；但它说不清函数<em>弯得多厉害</em>——是平缓的碗，还是狭长的山谷，还是马鞍。要回答这个，得求<strong>二阶导数</strong>。对标量函数 \(f:\mathbb{R}^n\to\mathbb{R}\)，把所有二阶偏导数排成方阵，就是海森矩阵。</p>
+
+<div class="key"><h4>要点</h4>
+<p>海森矩阵 \(H\)（记作 \(\nabla^2 f\) 或 \(H_f\)）定义为</p>
+\[
+H_{ij}=\frac{\partial^2 f}{\partial x_i\,\partial x_j},\qquad
+H=\begin{bmatrix}
+\dfrac{\partial^2 f}{\partial x_1^2} & \cdots & \dfrac{\partial^2 f}{\partial x_1\partial x_n}\\[2mm]
+\vdots & \ddots & \vdots\\[1mm]
+\dfrac{\partial^2 f}{\partial x_n\partial x_1} & \cdots & \dfrac{\partial^2 f}{\partial x_n^2}
+\end{bmatrix}.
+\]
+<p>它的形状是 \(n\times n\)。<strong>海森就是梯度的雅可比</strong>：把向量值函数 \(\nabla f:\mathbb{R}^n\to\mathbb{R}^n\) 求一次雅可比，得到的就是 \(H\)。所以"二阶导 = 一阶导的导"在多维里精确地表达为 \(H=J_{\nabla f}\)。</p>
+</div>
+
+<p><strong>海森是对称的</strong>：只要二阶偏导连续，混合偏导可交换次序（克莱罗定理 Clairaut's theorem），即 \(\dfrac{\partial^2 f}{\partial x_i\partial x_j}=\dfrac{\partial^2 f}{\partial x_j\partial x_i}\)，于是 \(H=H^\top\)。对称矩阵有实特征值、可正交对角化（这是<strong>对称矩阵谱定理</strong>的结论，可回顾线性代数那一课）——这一点后面判断曲率时至关重要。</p>
+
+<h3>二阶泰勒展开</h3>
+
+<p>一维泰勒展开 \(f(x+\Delta)\approx f+f'\Delta+\tfrac12 f''\Delta^2\) 的多维版本，把 \(f'\) 换成梯度、\(f''\) 换成海森：</p>
+
+<div class="key"><h4>要点（二阶泰勒展开）</h4>
+\[
+f(x+\Delta)\;\approx\; f(x)+\nabla f(x)^\top\Delta+\tfrac12\,\Delta^\top H(x)\,\Delta.
+\]
+<p>三项的量纲都是标量：\(\nabla f^\top\Delta\) 是点积（一阶、线性项），\(\tfrac12\Delta^\top H\Delta\) 是<strong>二次型（quadratic form）</strong>（二阶、曲率项）。在临界点处 \(\nabla f=0\)，一阶项消失，<em>函数的局部形状完全由那个二次型 \(\tfrac12\Delta^\top H\Delta\) 决定</em>。</p>
+</div>
+
+<h3>曲率与海森的特征值</h3>
+
+<p>二次型 \(\Delta^\top H\Delta\) 的"脾气"由 \(H\) 的特征值（eigenvalue）决定。把 \(H\) 正交对角化 \(H=Q\Lambda Q^\top\)（即上面提到的对称矩阵谱定理，此处即引即用），沿特征向量（eigenvector）方向看，函数就是一族独立的抛物线，第 \(k\) 条的"曲率"正比于特征值 \(\lambda_k\)：</p>
+<ul>
+<li>沿 \(\lambda_k>0\) 的方向，函数<strong>向上弯</strong>（像碗底，往两边都升高）；</li>
+<li>沿 \(\lambda_k<0\) 的方向，函数<strong>向下弯</strong>（像山顶，往两边都降低）；</li>
+<li>\(\lambda_k=0\) 表示该方向是平的（局部退化）。</li>
+</ul>
+
+<figure class="fig"><svg viewBox="0 0 540 540" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>海森矩阵曲率与临界点：正定碗（极小）、负定穹顶（极大）、不定马鞍（鞍点），上排曲面下排等高线</title><defs><marker id="ax" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#94a3b8"/></marker></defs>
+
+<!-- Column titles -->
+<text x="90" y="22" font-size="14" fill="#1f2937" text-anchor="middle" font-weight="600">正定 positive</text>
+<text x="270" y="22" font-size="14" fill="#1f2937" text-anchor="middle" font-weight="600">负定 negative</text>
+<text x="450" y="22" font-size="14" fill="#1f2937" text-anchor="middle" font-weight="600">不定 indefinite</text>
+
+<!-- ============ ROW 1: surfaces ============ -->
+<!-- COL1 surface: bowl up z=x^2+y^2 -->
+<g>
+<!-- axes (small 3d frame) -->
+<line x1="50" y1="160" x2="130" y2="160" stroke="#94a3b8" stroke-width="1" marker-end="url(#ax)"/>
+<line x1="90" y1="170" x2="90" y2="40" stroke="#94a3b8" stroke-width="1" marker-end="url(#ax)"/>
+<line x1="90" y1="160" x2="48" y2="190" stroke="#94a3b8" stroke-width="1" marker-end="url(#ax)"/>
+<text x="133" y="164" font-size="11" fill="#94a3b8">x</text>
+<text x="94" y="44" font-size="11" fill="#94a3b8">z</text>
+<text x="42" y="198" font-size="11" fill="#94a3b8">y</text>
+<!-- bowl: opening up, vertex at bottom -->
+<ellipse cx="90" cy="62" rx="44" ry="14" fill="#2563eb" fill-opacity="0.1" stroke="#2563eb" stroke-width="2"/>
+<path d="M46 62 Q90 175 134 62" fill="none" stroke="#2563eb" stroke-width="2"/>
+<path d="M62 62 Q90 130 118 62" fill="none" stroke="#2563eb" stroke-width="1" stroke-dasharray="4 3"/>
+<circle cx="90" cy="150" r="3" fill="#d97706"/>
+<text x="90" y="135" font-size="11" fill="#1f2937" text-anchor="middle">z=x²+y²</text>
+</g>
+
+<!-- COL2 surface: dome down z=-(x^2+y^2) -->
+<g>
+<line x1="230" y1="160" x2="310" y2="160" stroke="#94a3b8" stroke-width="1" marker-end="url(#ax)"/>
+<line x1="270" y1="170" x2="270" y2="40" stroke="#94a3b8" stroke-width="1" marker-end="url(#ax)"/>
+<line x1="270" y1="160" x2="228" y2="190" stroke="#94a3b8" stroke-width="1" marker-end="url(#ax)"/>
+<text x="313" y="164" font-size="11" fill="#94a3b8">x</text>
+<text x="274" y="44" font-size="11" fill="#94a3b8">z</text>
+<text x="222" y="198" font-size="11" fill="#94a3b8">y</text>
+<!-- dome: opening down, apex at top -->
+<ellipse cx="270" cy="155" rx="44" ry="14" fill="#db2777" fill-opacity="0.1" stroke="#db2777" stroke-width="2"/>
+<path d="M226 155 Q270 42 314 155" fill="none" stroke="#db2777" stroke-width="2"/>
+<path d="M242 155 Q270 87 298 155" fill="none" stroke="#db2777" stroke-width="1" stroke-dasharray="4 3"/>
+<circle cx="270" cy="62" r="3" fill="#d97706"/>
+<text x="270" y="135" font-size="11" fill="#1f2937" text-anchor="middle">z=-(x²+y²)</text>
+</g>
+
+<!-- COL3 surface: saddle z=x^2-y^2 -->
+<g>
+<line x1="410" y1="160" x2="490" y2="160" stroke="#94a3b8" stroke-width="1" marker-end="url(#ax)"/>
+<line x1="450" y1="170" x2="450" y2="40" stroke="#94a3b8" stroke-width="1" marker-end="url(#ax)"/>
+<line x1="450" y1="160" x2="408" y2="190" stroke="#94a3b8" stroke-width="1" marker-end="url(#ax)"/>
+<text x="493" y="164" font-size="11" fill="#94a3b8">x</text>
+<text x="454" y="44" font-size="11" fill="#94a3b8">z</text>
+<text x="402" y="198" font-size="11" fill="#94a3b8">y</text>
+<!-- saddle surface: up in one direction, down in the other -->
+<path d="M408 58 Q450 88 492 58" fill="none" stroke="#059669" stroke-width="2"/>
+<path d="M408 142 Q450 112 492 142" fill="none" stroke="#059669" stroke-width="2"/>
+<path d="M408 58 Q450 130 408 142" fill="none" stroke="#059669" stroke-width="1" stroke-dasharray="4 3"/>
+<path d="M492 58 Q450 130 492 142" fill="none" stroke="#059669" stroke-width="1" stroke-dasharray="4 3"/>
+<path d="M408 58 Q450 70 492 58" fill="#059669" fill-opacity="0.08" stroke="none"/>
+<circle cx="450" cy="100" r="3" fill="#d97706"/>
+<text x="450" y="135" font-size="11" fill="#1f2937" text-anchor="middle">z=x²-y²</text>
+</g>
+
+<!-- divider -->
+<line x1="20" y1="210" x2="520" y2="210" stroke="#e2e8f0" stroke-width="0.75"/>
+<text x="270" y="228" font-size="12" fill="#1f2937" text-anchor="middle">↓ 对应等高线（俯视）</text>
+
+<!-- ============ ROW 2: contours ============ -->
+<!-- COL1 contour: concentric circles, warm gradient center->out (min) -->
+<g>
+<!-- grid axes -->
+<line x1="40" y1="380" x2="140" y2="380" stroke="#94a3b8" stroke-width="1"/>
+<line x1="90" y1="430" x2="90" y2="330" stroke="#94a3b8" stroke-width="1"/>
+<circle cx="90" cy="380" r="40" fill="none" stroke="#d97706" stroke-width="1" stroke-opacity="0.35"/>
+<circle cx="90" cy="380" r="28" fill="none" stroke="#d97706" stroke-width="1.4" stroke-opacity="0.55"/>
+<circle cx="90" cy="380" r="16" fill="none" stroke="#d97706" stroke-width="1.8" stroke-opacity="0.8"/>
+<circle cx="90" cy="380" r="6" fill="#d97706" fill-opacity="0.18" stroke="#d97706" stroke-width="2"/>
+<circle cx="90" cy="380" r="3" fill="#2563eb"/>
+<text x="90" y="455" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="600">极小 min</text>
+<text x="90" y="471" font-size="11" fill="#2563eb" text-anchor="middle">λ₁,λ₂&gt;0</text>
+</g>
+
+<!-- COL2 contour: concentric circles, warm gradient reversed (out->in) (max) -->
+<g>
+<line x1="220" y1="380" x2="320" y2="380" stroke="#94a3b8" stroke-width="1"/>
+<line x1="270" y1="430" x2="270" y2="330" stroke="#94a3b8" stroke-width="1"/>
+<circle cx="270" cy="380" r="40" fill="none" stroke="#d97706" stroke-width="1.8" stroke-opacity="0.8"/>
+<circle cx="270" cy="380" r="28" fill="none" stroke="#d97706" stroke-width="1.4" stroke-opacity="0.55"/>
+<circle cx="270" cy="380" r="16" fill="none" stroke="#d97706" stroke-width="1" stroke-opacity="0.35"/>
+<circle cx="270" cy="380" r="6" fill="#d97706" fill-opacity="0.05" stroke="#d97706" stroke-width="1" stroke-opacity="0.3"/>
+<circle cx="270" cy="380" r="3" fill="#db2777"/>
+<text x="270" y="455" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="600">极大 max</text>
+<text x="270" y="471" font-size="11" fill="#db2777" text-anchor="middle">λ₁,λ₂&lt;0</text>
+</g>
+
+<!-- COL3 contour: hyperbolae + X asymptotes (saddle) -->
+<g>
+<line x1="400" y1="380" x2="500" y2="380" stroke="#94a3b8" stroke-width="1"/>
+<line x1="450" y1="430" x2="450" y2="330" stroke="#94a3b8" stroke-width="1"/>
+<!-- X asymptotes -->
+<line x1="414" y1="344" x2="486" y2="416" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="486" y1="344" x2="414" y2="416" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/>
+<!-- hyperbolae opening left/right -->
+<path d="M426 344 Q462 380 426 416" fill="none" stroke="#059669" stroke-width="1.6"/>
+<path d="M474 344 Q438 380 474 416" fill="none" stroke="#059669" stroke-width="1.6"/>
+<path d="M416 348 Q458 380 416 412" fill="none" stroke="#059669" stroke-width="1" stroke-opacity="0.55"/>
+<path d="M484 348 Q442 380 484 412" fill="none" stroke="#059669" stroke-width="1" stroke-opacity="0.55"/>
+<!-- hyperbolae opening up/down -->
+<path d="M414 354 Q450 390 486 354" fill="none" stroke="#d97706" stroke-width="1.6"/>
+<path d="M414 406 Q450 370 486 406" fill="none" stroke="#d97706" stroke-width="1.6"/>
+<circle cx="450" cy="380" r="3" fill="#059669"/>
+<text x="450" y="455" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="600">鞍点 saddle</text>
+<text x="450" y="471" font-size="11" fill="#059669" text-anchor="middle">λ 有正有负</text>
+</g>
+
+<!-- footer note -->
+<line x1="20" y1="490" x2="520" y2="490" stroke="#e2e8f0" stroke-width="0.75"/>
+<text x="270" y="508" font-size="11" fill="#1f2937" text-anchor="middle">海森矩阵 H 的特征值 λ 符号决定曲率：同号→极值，异号→鞍点</text>
+<text x="270" y="524" font-size="11" fill="#94a3b8" text-anchor="middle">中心点为临界点 ∇f=0；闭合圈=极值，双曲线=鞍点</text>
+</svg><figcaption>三种曲率对应三类临界点：海森正定=向上的碗（极小）、负定=向下的穹顶（极大）、不定=马鞍（鞍点）。上排为三维曲面缩略，下排为对应的等高线。</figcaption></figure>
+
+<p>由此得到<strong>临界点（\(\nabla f=0\) 的点）分类</strong>，只看 \(H\) 的特征值符号：</p>
+
+<table>
+<thead><tr><th>\(H\) 的特征值</th><th>矩阵性质</th><th>临界点类型</th><th>几何形状</th></tr></thead>
+<tbody>
+<tr><td>全为正</td><td>正定 positive definite</td><td>局部极小 minimum</td><td>碗（处处向上弯）</td></tr>
+<tr><td>全为负</td><td>负定 negative definite</td><td>局部极大 maximum</td><td>穹顶（处处向下弯）</td></tr>
+<tr><td>有正有负</td><td>不定 indefinite</td><td>鞍点 saddle</td><td>马鞍面</td></tr>
+<tr><td>含零、其余同号</td><td>半定 semidefinite</td><td>退化（需更高阶判断）</td><td>有平谷/平脊</td></tr>
+</tbody>
+</table>
+
+<h3>凸性 ⇔ 海森半正定</h3>
+
+<div class="key"><h4>要点</h4>
+<p>一个二阶可微函数 \(f\) 是<strong>凸函数（convex）</strong> ⇔ 它在每一点的海森 \(H(x)\) 都<strong>半正定（所有特征值 \(\ge 0\)）</strong>。凸函数最美的性质是：任何局部极小都是全局极小，没有"陷阱"。</p>
+</div>
+
+<p>这就是为什么线性回归、逻辑回归这类<em>凸</em>问题"好优化"，而深层神经网络的损失<em>非凸</em>、海森到处变号、布满鞍点，优化才那么棘手。</p>
+
+<div class="example"><h4>例题：写海森并用特征值判断临界点类型</h4>
+<p>设 \(g(x,y)=x^2-y^2\)。先找临界点：梯度</p>
+\[
+\nabla g=\begin{bmatrix}\partial g/\partial x\\ \partial g/\partial y\end{bmatrix}
+=\begin{bmatrix}2x\\ -2y\end{bmatrix}=\mathbf 0 \;\Rightarrow\; (x,y)=(0,0).
+\]
+<p>再求海森（对 \(\nabla g\) 求雅可比）：\(\partial(2x)/\partial x=2,\ \partial(2x)/\partial y=0,\ \partial(-2y)/\partial x=0,\ \partial(-2y)/\partial y=-2\)，于是</p>
+\[
+H=\begin{bmatrix}2 & 0\\ 0 & -2\end{bmatrix}.
+\]
+<p>它已是对角阵，特征值就是对角元 \(\lambda_1=2>0,\ \lambda_2=-2<0\)。<strong>有正有负 ⟹ \((0,0)\) 是鞍点</strong>。几何上：沿 \(x\) 轴是向上的抛物线（碗），沿 \(y\) 轴是向下的抛物线（山顶），合起来正是马鞍——和函数名 \(x^2-y^2\) 完全吻合。</p>
+<p>对照另一个例子 \(f(x,y)=x^2+xy+y^2\)，临界点也在原点，海森 \(H=\begin{bmatrix}2&1\\1&2\end{bmatrix}\)，特征值 \(1\) 与 \(3\)（都为正），故原点是<strong>极小</strong>；这个 \(f\) 是凸函数。</p>
+</div>
+
+<div class="pitfall"><h4>易错</h4>
+<ul>
+<li><strong>雅可比的形状别搞反</strong>：是 \(m\times n\)（行=输出、列=输入）。写成 \(n\times m\) 会让后面的链式法则 \(J\Delta\) 维度对不上。</li>
+<li><strong>"行列式 \(>0\) 且对角元 \(>0\)" 不等于正定</strong>。例如 \(\begin{bmatrix}-1&0\\0&-2\end{bmatrix}\) 行列式为 \(+2>0\) 却是负定。判类型要看<em>每个特征值的符号</em>（或用所有顺序主子式的西尔维斯特判据），不能只看行列式。</li>
+<li><strong>海森的对称性依赖二阶偏导连续</strong>。实践中几乎总成立，但写数值海森时务必对称化（取 \(\tfrac12(H+H^\top)\)），否则有限差分噪声会让它略微不对称。</li>
+</ul>
+</div>
+
+<h2>三、牛顿法：用海森修正梯度</h2>
+
+<p>梯度下降 \(x\leftarrow x-\eta\nabla f\) 只用了一阶信息，它不知道每个方向弯得多厉害，所以只能用一个全局学习率 \(\eta\) 凑合。<strong>牛顿法（Newton's method）</strong>更聪明：它在当前点用二阶泰勒展开搭一个抛物面，然后<em>一步跳到这个抛物面的最低点</em>。</p>
+
+<p>对二阶近似 \(q(\Delta)=f+\nabla f^\top\Delta+\tfrac12\Delta^\top H\Delta\) 求最小，令其梯度为零：\(\nabla f+H\Delta=0\)，解出 \(\Delta=-H^{-1}\nabla f\)。于是牛顿更新为</p>
+\[
+x \;\leftarrow\; x-H^{-1}\,\nabla f.
+\]
+
+<div class="note">
+<p>直觉：\(H^{-1}\) 同时<strong>修正了方向和步长</strong>。在弯得陡（\(\lambda\) 大）的方向自动迈小步，在平缓（\(\lambda\) 小）的方向自动迈大步——相当于给每个方向配了一个量身定制的学习率 \(1/\lambda_k\)。<strong>对一个凸（海森正定）二次函数，牛顿法一步就到达它唯一的极小点。</strong></p>
+<p><strong>风险提示：</strong> 这个"一步到位"只在海森正定时成立。若海森<em>不定</em>（如鞍点形 \(g=x^2-y^2\)），牛顿步求的是"二次近似梯度为零的点"，那是个临界点——可能是鞍点甚至极大点，于是牛顿步会径直奔向最近的临界点而非极小。这正是实践中要给牛顿法加<strong>正则化/信赖域</strong>修正的原因之一，也与后面 ML 小节"二阶方法用 \(H\) 的某种估计去拉直曲率"相呼应。</p>
+</div>
+
+<h2>四、向量-雅可比积（VJP）——下一课的钥匙</h2>
+
+<p>牛顿法展示了二阶信息多有用，但代价是要算 \(H^{-1}\)；回到现实，深度学习几乎全靠<strong>一阶</strong>方法——而支撑一阶反向传播的最小积木，就是下面要讲的 VJP。它把我们从"二阶（理想但昂贵）"自然带回"一阶（便宜且实用，下一课的主角）"。</p>
+
+<p>反向传播的全部秘密，可以浓缩成一句话：<strong>它从不显式构造庞大的雅可比矩阵，只反复计算"向量乘雅可比"这个组合。</strong>给定某一层的雅可比 \(J\in\mathbb{R}^{m\times n}\)，以及一个<strong>暂时看作任意给定的 \(m\) 维向量</strong> \(v\in\mathbb{R}^m\)（沿用全篇约定：向量默认是列向量），所谓<strong>向量-雅可比积（vector–Jacobian product, VJP）</strong>就是把 \(v\) 转置后左乘 \(J\)：</p>
+\[
+v^\top J \;\in\; \mathbb{R}^{1\times n},
+\qquad\text{等价地写成列向量}\quad J^\top v \;\in\; \mathbb{R}^{n}.
+\]
+<p>这两种写法只差一个转置：\(v^\top J\) 是行向量，\(J^\top v=(v^\top J)^\top\) 是列向量。机器学习库里习惯让"梯度与参数同形（列向量）"，所以最终拿到手的是 \(J^\top v\in\mathbb{R}^n\)。<strong>\(v\) 是哪来的？</strong> 这里你只需把它看成一个给定的 \(m\) 维向量；在下一课它会是<em>损失对本层输出的梯度</em>，这里无需剧透，只要知道 VJP 是个比存下整个 \(J\) 便宜得多的运算即可。</p>
+<p>为什么不直接存 \(J\)？因为在神经网络里 \(m,n\) 可能是几千几万，\(J\) 大到存不下；但 \(J^\top v\) 只是一个 \(n\) 维向量，而且对许多层（如逐元素激活、矩阵乘）有不依赖于显式 \(J\) 的快速算法。把每一层的 VJP 从输出端一路串到输入端，就是反向传播。</p>
+
+<div class="ml"><h4><span class="tag">ML</span> 和 ML 的联系</h4>
+<ul>
+<li><strong>海森解释"优化难易"。</strong> 损失曲面若是又圆又匀的碗（海森特征值都差不多），梯度下降几步就到底；若是狭长山谷（最大特征值 \(\gg\) 最小特征值），梯度会在陡壁间反复横跳、在谷底方向爬得极慢。两者之比 \(\kappa=\lambda_{\max}/\lambda_{\min}\) 叫<strong>条件数（condition number）</strong>，它几乎决定了一阶方法的收敛速度。<figure class="fig"><svg viewBox="0 0 540 360" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>良态与病态二次型等高线及梯度下降轨迹对比</title><defs><marker id="cR" markerWidth="8" markerHeight="8" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#dc2626"/></marker><marker id="cG" markerWidth="8" markerHeight="8" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#059669"/></marker></defs><text x="270" y="22" font-size="14" fill="#1f2937" text-anchor="middle" font-weight="600">二次型的条件数与梯度下降收敛</text><g><rect x="20" y="40" width="240" height="240" fill="none" stroke="#e2e8f0" stroke-width="0.75"/><text x="140" y="58" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="600">良态 well-conditioned · κ≈1</text><line x1="140" y1="72" x2="140" y2="270" stroke="#94a3b8" stroke-width="1"/><line x1="36" y1="166" x2="252" y2="166" stroke="#94a3b8" stroke-width="1"/><circle cx="140" cy="166" r="86" fill="none" stroke="#bfdbfe" stroke-width="2"/><circle cx="140" cy="166" r="64" fill="none" stroke="#93c5fd" stroke-width="2"/><circle cx="140" cy="166" r="42" fill="none" stroke="#60a5fa" stroke-width="2"/><circle cx="140" cy="166" r="20" fill="none" stroke="#2563eb" stroke-width="2"/><circle cx="140" cy="166" r="3.5" fill="#1f2937"/><text x="150" y="180" font-size="11" fill="#1f2937">x*</text><polyline points="208,228 178,200 158,182 147,172" fill="none" stroke="#dc2626" stroke-width="2" marker-end="url(#cR)"/><circle cx="208" cy="228" r="3.5" fill="#dc2626"/><circle cx="178" cy="200" r="3" fill="#dc2626"/><circle cx="158" cy="182" r="3" fill="#dc2626"/><text x="212" y="244" font-size="12" fill="#dc2626" font-weight="600">x0</text><line x1="208" y1="228" x2="190" y2="210" stroke="#059669" stroke-width="2" marker-end="url(#cG)" stroke-dasharray="4 3"/><text x="196" y="206" font-size="11" fill="#059669">-∇f</text><text x="140" y="298" font-size="11" fill="#1f2937" text-anchor="middle">等高线近圆 · 梯度直指圆心 · 几步收敛</text></g><g><rect x="280" y="40" width="240" height="240" fill="none" stroke="#e2e8f0" stroke-width="0.75"/><text x="400" y="58" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="600">病态 ill-conditioned · κ=100</text><line x1="400" y1="72" x2="400" y2="270" stroke="#94a3b8" stroke-width="1"/><line x1="296" y1="166" x2="512" y2="166" stroke="#94a3b8" stroke-width="1"/><ellipse cx="400" cy="166" rx="104" ry="22" fill="none" stroke="#bfdbfe" stroke-width="2"/><ellipse cx="400" cy="166" rx="78" ry="16.5" fill="none" stroke="#93c5fd" stroke-width="2"/><ellipse cx="400" cy="166" rx="52" ry="11" fill="none" stroke="#60a5fa" stroke-width="2"/><ellipse cx="400" cy="166" rx="26" ry="5.5" fill="none" stroke="#2563eb" stroke-width="2"/><circle cx="400" cy="166" r="3.5" fill="#1f2937"/><text x="408" y="158" font-size="11" fill="#1f2937">x*</text><polyline points="468,198 462,138 452,190 444,148 434,184 426,154 418,180 412,159 406,174 401,164" fill="none" stroke="#dc2626" stroke-width="2" marker-end="url(#cR)"/><circle cx="468" cy="198" r="3.5" fill="#dc2626"/><text x="470" y="214" font-size="12" fill="#dc2626" font-weight="600">x0</text><line x1="468" y1="198" x2="465" y2="170" stroke="#059669" stroke-width="2" marker-end="url(#cG)" stroke-dasharray="4 3"/><text x="473" y="182" font-size="11" fill="#059669">-∇f</text><text x="400" y="298" font-size="11" fill="#1f2937" text-anchor="middle">狭长椭圆 · 之字形横跳 · 收敛缓慢</text></g><text x="270" y="328" font-size="12" fill="#1f2937" text-anchor="middle">条件数 κ = λmax / λmin　左：H=diag(1,1)，κ=1　右：H=diag(1,100)，κ=100</text><text x="270" y="348" font-size="11" fill="#94a3b8" text-anchor="middle">κ 越大，等高线越扁，负梯度越偏离指向 x* 的方向，振荡越剧烈</text></svg><figcaption>良态 vs 病态二次型的等高线：海森特征值相近时等高线是近圆（梯度直指圆心，下降快）；特征值悬殊时是狭长椭圆（梯度几乎垂直于通往最小点的长轴，梯度下降之字形横跳、收敛慢）。</figcaption></figure></li>
+<li><strong>二阶方法</strong>（牛顿法及其近似：L-BFGS、自然梯度、Adam 中的对角缩放）本质都是想"用某种 \(H\) 的估计去拉直病态曲率"。真正的 \(H^{-1}\) 太贵（\(n\) 上百万时无法求逆），所以实践中只用便宜的近似。</li>
+<li><strong>高维里鞍点比局部极小多得多。</strong> 一个临界点要成为局部极小，需要海森<em>所有</em> \(n\) 个特征值都为正；随机情形下这像连抛 \(n\) 次硬币全为正面，概率随维度指数级衰减。所以深度网络训练时"卡住"的地方，多半是鞍点而非真正的极小——这也解释了为什么带噪声的 SGD 反而容易逃离鞍点。</li>
+<li><strong>VJP 是自动微分的原子操作</strong>（PyTorch 的 <code>autograd</code>、JAX 的 <code>vjp</code>），下一课会把它和计算图拼成完整的反向传播。</li>
+</ul>
+</div>
+
+<h2>五、用 numpy 数值验证手算</h2>
+
+<p>有限差分（finite difference）能在不会求导的情况下逼近雅可比与海森，是检查手推公式的利器。下面这段只用 numpy，几秒跑完，把上面两道例题都验一遍。</p>
+
+<pre><code>import numpy as np
+
+# ---------- 1) 数值雅可比：中心差分 ----------
+def num_jacobian(f, x, h=1e-5):
+    x = np.asarray(x, float)
+    fx = np.asarray(f(x), float)
+    m, n = fx.size, x.size
+    J = np.zeros((m, n))
+    for j in range(n):                 # 逐列：扰动第 j 个输入
+        e = np.zeros(n); e[j] = h
+        J[:, j] = (np.asarray(f(x + e)) - np.asarray(f(x - e))) / (2 * h)
+    return J
+
+# f: R^2 -> R^2 , f(x,y) = [x^2 y , x + sin y]
+def f(v):
+    x, y = v
+    return np.array([x**2 * y, x + np.sin(y)])
+
+p = np.array([1.0, np.pi / 2])
+J_num = num_jacobian(f, p)
+J_hand = np.array([[2*p[0]*p[1], p[0]**2],
+                   [1.0,          np.cos(p[1])]])   # = [[pi,1],[1,0]]
+print("数值雅可比 J =\n", np.round(J_num, 6))
+print("手算雅可比 J =\n", np.round(J_hand, 6))
+print("det(J) 数值 =", round(np.linalg.det(J_num), 6), " (手算 = -1)")
+
+# ---------- 2) 数值海森：二阶中心差分 ----------
+def num_hessian(g, x, h=1e-4):
+    x = np.asarray(x, float); n = x.size
+    H = np.zeros((n, n))
+    for i in range(n):
+        for j in range(n):
+            ei = np.zeros(n); ei[i] = h
+            ej = np.zeros(n); ej[j] = h
+            H[i, j] = (g(x+ei+ej) - g(x+ei-ej)
+                       - g(x-ei+ej) + g(x-ei-ej)) / (4*h*h)
+    return 0.5 * (H + H.T)             # 对称化，抹掉差分噪声
+
+# g: R^2 -> R , g(x,y) = x^2 - y^2 ，临界点 (0,0)
+def g(v):
+    x, y = v
+    return x**2 - y**2
+
+H = num_hessian(g, np.array([0.3, -0.4]))   # 海森处处为常数阵
+eig = np.linalg.eigvalsh(H)                 # 对称阵用 eigvalsh
+print("\n数值海森 H =\n", np.round(H, 4), " (手算 = [[2,0],[0,-2]])")
+print("特征值 =", np.round(eig, 4))
+kind = ("极小" if np.all(eig > 0) else
+        "极大" if np.all(eig < 0) else "鞍点")
+print("临界点 (0,0) 类型 ->", kind)        # -> 鞍点
+</code></pre>
+
+<p>运行后你会看到数值结果与手算几乎逐位吻合：雅可比为 \([[\pi,1],[1,0]]\)、行列式 \(-1\)，海森为 \(\mathrm{diag}(2,-2)\)、特征值 \(\{2,-2\}\)，判定为鞍点。</p>
+
+<h2>动手练习</h2>
+<ol>
+<li><strong>写雅可比。</strong> 对极坐标映射 \(f(r,\theta)=[\,r\cos\theta,\ r\sin\theta\,]\) 手推 \(J\)，并证明 \(\det J=r\)（这正是二重积分换元里的 \(r\,dr\,d\theta\) 因子）。用下面骨架在 \((r,\theta)=(2,\pi/3)\) 处验证：
+<pre><code>import numpy as np
+def f(v):
+    r, t = v
+    return np.array([r*np.cos(t), r*np.sin(t)])
+# TODO: 复用上文 num_jacobian，打印数值 J 与 det，并与手算 det=r=2 对比
+</code></pre></li>
+<li><strong>判类型。</strong> 对 \(f(x,y)=x^2+xy+y^2\)，手算梯度找临界点、写出海森、求特征值，判断类型；再用 <code>num_hessian</code> 验证特征值是否为 \(\{1,3\}\)。</li>
+<li><strong>线性化的精度。</strong> 取第一道例题的 \(f\) 与点 \(p=(1,\pi/2)\)，令 \(\Delta=[0.01,-0.02]^\top\)，分别算<em>真值</em> \(f(p+\Delta)\) 与<em>线性近似</em> \(f(p)+J\Delta\)，打印两者之差的范数 <code>np.linalg.norm(...)</code>。再把 \(\Delta\) 缩小 10 倍，观察误差大约缩小多少倍（提示：应约为 \(100\) 倍，因为误差是 \(O(\|\Delta\|^2)\)）。</li>
+<li><strong>条件数与优化。</strong> 我们要让"病态曲率拖累一阶法"这个现象真正显现，关键是给每个 \(H\) 都配上它<em>各自能用的最优学习率</em>，再比较收敛到 \(\|x\|<10^{-3}\) 各需多少步。对二次函数 \(f(x)=\tfrac12 x^\top H x\)（梯度 \(\nabla f=Hx\)），对角海森的最优学习率约为 \(\eta^\star=\dfrac{2}{\lambda_{\max}+\lambda_{\min}}\)。比较 \(H=\mathrm{diag}(1,100)\)（病态，\(\kappa=100\)）与 \(H=\mathrm{diag}(1,1)\)（理想，\(\kappa=1\)）：前者约需数百步、后者一步即到，对比鲜明。<br>原理点睛：<em>一阶法的步长被 \(\lambda_{\max}\) 卡死（步子再大就发散），收敛却被 \(\lambda_{\min}\) 拖死（平缓方向爬得慢），两者之比 \(\kappa=\lambda_{\max}/\lambda_{\min}\) 才是元凶</em>——这与正文 ML 小节的条件数论述闭环。
+<pre><code>import numpy as np
+
+def steps_to_converge(H, tol=1e-3, max_iter=100000):
+    lam = np.diag(H)
+    eta = 2.0 / (lam.max() + lam.min())   # 每个 H 各自的最优学习率
+    x = np.ones(H.shape[0])
+    for k in range(max_iter):
+        if np.linalg.norm(x) < tol:
+            return k, eta
+        x = x - eta * (H @ x)             # f = 0.5 x^T H x 的梯度 = H x
+    return max_iter, eta
+
+for H in [np.diag([1.0, 1.0]), np.diag([1.0, 100.0])]:
+    k, eta = steps_to_converge(H)
+    print(f"kappa={np.linalg.cond(H):6.1f}  eta*={eta:.4f}  收敛步数={k}")
+# 你会看到 kappa=1 只要 1 步，kappa=100 要数百步：条件数越大，一阶法越慢
+</code></pre></li>
+<li><strong>牛顿一步到位。</strong> 同上二次函数（取正定的 \(H=\mathrm{diag}(1,100)\)），用牛顿更新 \(x\leftarrow x-H^{-1}\nabla f\) 走一步，验证无论 \(H\) 多病态都一步到达原点（打印更新后的 \(\|x\|\)，应≈0）。再思考：若把 \(H\) 换成不定的 \(\mathrm{diag}(1,-100)\)，牛顿一步会落到哪里？（提示：仍落到 \(\nabla f=0\) 的临界点，但那是鞍点，不是极小。）</li>
+</ol>
+
+<h2>掌握自检</h2>
+<ul>
+<li>给定 \(f:\mathbb{R}^n\to\mathbb{R}^m\)，我能立刻说出雅可比的形状（\(m\times n\)）、哪个下标是行哪个是列，并解释 \(f(x+\Delta)\approx f(x)+J\Delta\) 为何维度自洽。</li>
+<li>我能解释 \(m=n\) 时 \(|\det J|\) 是体积缩放因子、\(\det J<0\) 代表镜像翻面，并说出它在概率密度变量替换中的作用（以及指数 \(\pm1\) 取决于用正向还是逆向雅可比）。</li>
+<li>我能说清"海森 = 梯度的雅可比"，会写二阶泰勒展开，并知道它为何对称（克莱罗定理 + 谱定理）。</li>
+<li>给一个 \(2\times2\) 海森，我能算特征值并判定极小/极大/鞍点；我知道"凸 ⇔ 海森半正定"。</li>
+<li>我能用一句话说出牛顿法 \(x\leftarrow x-H^{-1}\nabla f\) 的直觉（仅在海森正定时一步到极小），以及条件数 \(\kappa=\lambda_{\max}/\lambda_{\min}\) 为何决定一阶方法的快慢。</li>
+<li>我能复述"反向传播 = 一串 VJP（\(v^\top J\) 或等价的 \(J^\top v\)）"，说明为何不显式存雅可比，并知道梯度默认按列向量约定。</li>
+</ul>
+
+<p>下一课，我们把这些一阶导数（每层的雅可比/VJP）用<strong>链式法则</strong>沿<strong>计算图</strong>从输出端一路乘回输入端——这串 VJP 的连乘，就是驱动整个深度学习的<strong>反向传播</strong>。</p>
+</article>
+<div class="navbtns"><a class="prev" href="lesson-06-derivatives-gradients.html"><div class="nlabel">← 上一课</div><div class="ntitle">第6课 · 导数与梯度</div></a><a class="next" href="lesson-08-chain-rule-computational-graph.html"><div class="nlabel">下一课 →</div><div class="ntitle">第8课 · 链式法则与计算图</div></a></div>
+<nav class="toc"><h3>本模块课程表</h3><ol>
+<li><a href="lesson-01-vectors.html"><span class="ln">第1课</span>向量——机器学习的原子</a></li>
+<li><a href="lesson-02-matrix-linear-transformation.html"><span class="ln">第2课</span>矩阵即线性变换</a></li>
+<li><a href="lesson-03-inner-product-norm-projection.html"><span class="ln">第3课</span>内积、范数与投影</a></li>
+<li><a href="lesson-04-eigenvalues-eigenvectors.html"><span class="ln">第4课</span>特征值与特征向量</a></li>
+<li><a href="lesson-05-svd-low-rank.html"><span class="ln">第5课</span>SVD 与低秩压缩</a></li>
+<li><a href="lesson-06-derivatives-gradients.html"><span class="ln">第6课</span>导数与梯度</a></li>
+<li class="cur"><a href="lesson-07-jacobian-hessian.html"><span class="ln">第7课</span>雅可比与海森</a></li>
+<li><a href="lesson-08-chain-rule-computational-graph.html"><span class="ln">第8课</span>链式法则与计算图</a></li>
+<li><a href="lesson-09-matrix-calculus.html"><span class="ln">第9课</span>矩阵求导</a></li>
+<li><a href="lesson-10-backprop-from-scratch.html"><span class="ln">第10课</span>亲手实现反向传播</a></li>
+</ol></nav>
+</div>
+<!-- pyrunner-injected -->
+<style>
+.pr-cell{border:1px solid #334155;border-radius:10px;margin:1.2em 0;overflow:hidden;background:#0f172a;}
+.pr-head{display:flex;align-items:center;gap:8px;background:#1e293b;color:#cbd5e1;padding:6px 10px;font-size:13px;font-family:system-ui,-apple-system,sans-serif;}
+.pr-title{flex:1;font-weight:600;}
+.pr-status{font-size:12px;color:#94a3b8;white-space:nowrap;max-width:50%;overflow:hidden;text-overflow:ellipsis;}
+.pr-btn{cursor:pointer;border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:6px;padding:3px 11px;font-size:13px;line-height:1.4;}
+.pr-btn:hover{background:#0b1220;}
+.pr-run{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:600;}
+.pr-run:hover{background:#1d4ed8;}
+.pr-cell.collapsed .pr-body{display:none;}
+.pr-edit{display:block;width:100%;border:none;background:#0f172a;color:#e2e8f0;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.55;padding:12px 14px;resize:vertical;box-sizing:border-box;outline:none;}
+.pr-out{margin:0;padding:10px 14px;border-top:1px solid #334155;background:#0b1220;color:#cbd5e1;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.5;white-space:pre-wrap;max-height:340px;overflow:auto;}
+.pr-out:empty{display:none;}
+.pr-out.err{color:#fca5a5;}
+#pr-fab{position:fixed;right:18px;bottom:18px;z-index:9998;background:#2563eb;color:#fff;border:none;border-radius:999px;padding:10px 17px;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.22);font-family:system-ui,sans-serif;}
+#pr-fab:hover{background:#1d4ed8;}
+#pr-lab{position:fixed;right:18px;bottom:66px;z-index:9999;width:400px;max-width:92vw;background:#0f172a;border:1px solid #334155;border-radius:12px;display:none;flex-direction:column;box-shadow:0 14px 38px rgba(0,0,0,.4);overflow:hidden;}
+#pr-lab.open{display:flex;}
+#pr-lab .pr-edit{min-height:150px;}
+</style>
+<script>
+(function(){
+  var PYBASE="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+  var pyReady=null;
+  function loadPy(status){
+    if(pyReady)return pyReady;
+    pyReady=(async function(){
+      status("正在加载 Python 运行时（首次约 10 秒，需联网）…");
+      await new Promise(function(res,rej){
+        var s=document.createElement("script");s.src=PYBASE+"pyodide.js";
+        s.onload=res;s.onerror=function(){rej(new Error("无法加载 Pyodide（首次运行需要联网）"));};
+        document.head.appendChild(s);
+      });
+      var py=await loadPyodide({indexURL:PYBASE});
+      status("正在加载 NumPy …");
+      await py.loadPackage("numpy");
+      status("Python 就绪 ✓");
+      return py;
+    })();
+    return pyReady;
+  }
+  async function run(code,outEl,statusEl){
+    var setS=function(m){if(statusEl)statusEl.textContent=m;};
+    outEl.classList.remove("err");outEl.textContent="";
+    var py;
+    try{py=await loadPy(setS);}
+    catch(e){outEl.classList.add("err");outEl.textContent="加载失败："+e.message;return;}
+    var buf="";
+    py.setStdout({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    py.setStderr({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    try{
+      var result=await py.runPythonAsync(code);
+      if(result!==undefined&&result!==null){
+        var r;try{r=result.toString();}catch(_){r=String(result);}
+        if(r!=="None")buf+=(buf&&!buf.endsWith("\n")?"\n":"")+r;
+        if(result&&result.destroy)result.destroy();
+      }
+      outEl.textContent=buf||"（运行成功，无输出。用 print(...) 查看结果）";
+    }catch(e){
+      outEl.classList.add("err");
+      outEl.textContent=buf+(buf?"\n":"")+String((e&&e.message)||e);
+    }
+  }
+  function autosize(ta){ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight+2,460)+"px";}
+  function tabKey(e){
+    if(e.key==="Tab"){e.preventDefault();var s=this.selectionStart,en=this.selectionEnd;
+      this.value=this.value.slice(0,s)+"    "+this.value.slice(en);this.selectionStart=this.selectionEnd=s+4;}
+    if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();var b=this.closest(".pr-cell,#pr-lab").querySelector(".pr-run");if(b)b.click();}
+  }
+  function makeCell(code){
+    var cell=document.createElement("div");cell.className="pr-cell";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">可运行 · Python (NumPy)</span><span class="pr-status"></span><button class="pr-btn pr-toggle">收起</button><button class="pr-btn pr-run">▶ 运行</button></div><div class="pr-body"><textarea class="pr-edit" spellcheck="false"></textarea><pre class="pr-out"></pre></div>';
+    var ta=cell.querySelector(".pr-edit");ta.value=code;
+    var out=cell.querySelector(".pr-out"),st=cell.querySelector(".pr-status");
+    ta.addEventListener("input",function(){autosize(ta);});
+    ta.addEventListener("keydown",tabKey);
+    cell.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    var tog=cell.querySelector(".pr-toggle");
+    tog.onclick=function(){cell.classList.toggle("collapsed");tog.textContent=cell.classList.contains("collapsed")?"展开":"收起";};
+    setTimeout(function(){autosize(ta);},0);
+    return cell;
+  }
+  function enhance(){
+    document.querySelectorAll("article pre").forEach(function(pre){
+      if(pre.closest(".pr-cell"))return;
+      var codeEl=pre.querySelector("code")||pre;
+      var code=codeEl.textContent.replace(/\s+$/,"");
+      if(!code)return;
+      pre.replaceWith(makeCell(code));
+    });
+  }
+  function lab(){
+    var fab=document.createElement("button");fab.id="pr-fab";fab.textContent="▶ Python 实验台";
+    var panel=document.createElement("div");panel.id="pr-lab";
+    panel.innerHTML='<div class="pr-head"><span class="pr-title">Python 实验台 · NumPy</span><span class="pr-status"></span><button class="pr-btn pr-run">▶ 运行</button><button class="pr-btn pr-min">收起</button></div><div class="pr-body"><textarea class="pr-edit" spellcheck="false"></textarea><pre class="pr-out"></pre></div>';
+    document.body.appendChild(fab);document.body.appendChild(panel);
+    var ta=panel.querySelector(".pr-edit");
+    ta.value="import numpy as np\na = np.array([3, 2])\nb = np.array([1, 4])\nprint(\"a + b =\", a + b)\nprint(\"a . b =\", a @ b)\nprint(\"|a|  =\", np.linalg.norm(a))\ncos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))\nprint(\"cos =\", round(float(cos), 4))";
+    ta.addEventListener("keydown",tabKey);
+    var out=panel.querySelector(".pr-out"),st=panel.querySelector(".pr-status");
+    panel.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    fab.onclick=function(){panel.classList.toggle("open");};
+    panel.querySelector(".pr-min").onclick=function(){panel.classList.remove("open");};
+  }
+  function init(){enhance();lab();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+
+</body>
+</html>

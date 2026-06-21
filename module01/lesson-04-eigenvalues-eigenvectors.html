@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块1 · 第4课 · 特征值与特征向量——变换的不动方向</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue-bg:#eff6ff;
+--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--pink:#db2777;
+--red:#dc2626;--red-bg:#fef2f2;--bg:#ffffff;--soft:#f8fafc;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);
+font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.85;font-size:17px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:840px;margin:0 auto;padding:0 22px 100px;}
+header.top{background:#fff;border-bottom:1px solid var(--line);padding:26px 22px 22px;margin-bottom:14px;}
+header.top .inner{max-width:840px;margin:0 auto;}
+.crumb{color:var(--muted);font-size:14px;letter-spacing:.3px;margin-bottom:6px;}
+h1{font-size:30px;line-height:1.3;margin:.1em 0 .2em;}
+.sub{color:var(--muted);font-size:15px;}
+article{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:30px 34px;margin-top:18px;}
+h2{font-size:23px;margin:1.7em 0 .6em;padding-bottom:.25em;border-bottom:2px solid var(--line);}
+h2:first-child{margin-top:.2em;}
+h3{font-size:19px;margin:1.3em 0 .4em;color:#0f172a;}
+h4{margin:.2em 0 .5em;font-size:16px;}
+p{margin:.7em 0;}
+ul,ol{padding-left:1.3em;margin:.6em 0;}
+li{margin:.32em 0;}
+code{background:#f1f5f9;padding:.12em .4em;border-radius:5px;font-size:.9em;
+font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a;}
+pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 18px;overflow:auto;font-size:14px;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0;}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:15.5px;}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+thead th{background:var(--soft);}
+figure.fig{margin:1.4em 0;text-align:center;}
+figure.fig svg{max-width:100%;height:auto;}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
+.note,.ml,.key,.pitfall,.example{border-radius:10px;padding:14px 18px;margin:1.2em 0;border:1px solid var(--line);}
+.note{background:var(--soft);border-left:4px solid #94a3b8;}
+.example{background:#fff;border-left:4px solid var(--blue);}
+.ml{background:var(--green-bg);border-left:4px solid var(--green);}
+.key{background:var(--amber-bg);border-left:4px solid var(--amber);}
+.pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
+.toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
+.toc h3{margin:.1em 0 .7em;}
+.toc ol{list-style:none;padding:0;}
+.toc li{padding:7px 10px;border-radius:8px;color:#334155;border:1px solid transparent;}
+.toc li a{color:inherit;text-decoration:none;display:block;}
+.toc li .ln{display:inline-block;min-width:54px;color:var(--muted);font-size:13px;}
+.toc li.cur{background:var(--blue-bg);border-color:#bfdbfe;font-weight:600;color:#1e3a8a;}
+.toc li:not(.cur):hover{background:var(--soft);}
+.navbtns{display:flex;justify-content:space-between;margin-top:22px;gap:12px;}
+.navbtns a{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--ink);}
+.navbtns a:hover{border-color:var(--blue);}
+.navbtns .nlabel{color:var(--muted);font-size:13px;}
+.navbtns .ntitle{font-weight:600;margin-top:3px;}
+.navbtns .next{text-align:right;}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
+.card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
+.card:hover{border-color:var(--blue);}
+.card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
+.card .ct{font-size:18px;font-weight:600;}
+.card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+</style>
+</head>
+<body>
+<header class="top"><div class="inner">
+<div class="crumb"><a href="index.html" style="color:inherit">模块 1 · 线性代数与微积分</a>　/　第 4 课（共 10 课）</div>
+<h1>特征值与特征向量——变换的不动方向</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　第一阶段：数学与工具基础</div>
+</div></header>
+<div class="wrap">
+<article>
+<p>上一课我们用内积刻画了"长度、角度、投影"——把向量放进度量的框架里。这一课我们换个视角：不再问"两个向量之间的关系"，而是问"一个矩阵 \(A\) 作为一种<strong>变换</strong>，它对空间做了什么"。答案藏在几个特殊方向里——它们是这场变换的<strong>不动方向</strong>。</p>
+
+<p>而且这一个方程 \(Av=\lambda v\)，后面会一口气解释清楚一串看似无关的前沿现象：PCA 为什么能降维、深度网络为什么会梯度爆炸 / 消失、GAN 的谱归一化到底在归一化什么——它们其实是同一件事的不同侧面。学完这一课，你就拿到了打开这一串概念的同一把钥匙。</p>
+
+<h2>1. 一个矩阵就是一种变换</h2>
+
+<p>把矩阵 \(A\) 乘到向量 \(v\) 上，得到新向量 \(Av\)。一般来说 \(Av\) 既改变了 \(v\) 的长度，又改变了它的方向——它被"扭"到别处去了。但对某些特殊的方向，事情格外简单：变换只把向量<strong>拉长或压短</strong>，方向纹丝不动（或恰好反向）。</p>
+
+<div class="note">
+<p><strong>核心画面。</strong>想象 \(A\) 把整个平面"揉"了一下：大多数箭头会转向，但有那么一两根方向上的箭头，揉完之后还躺在原来那条直线上，只是变长或变短了。这些方向就是变换的"骨架"。理解一个变换，就是找出它的骨架。</p>
+</div>
+
+<p>用式子说：若存在非零向量 \(v\) 和标量 \(\lambda\)，使得</p>
+\[ Av = \lambda v, \]
+<p>则称 \(v\) 是 \(A\) 的一个<strong>特征向量 eigenvector</strong>，\(\lambda\) 是对应的<strong>特征值 eigenvalue</strong>。等号左边是"做变换"，右边是"纯缩放 \(\lambda\) 倍"。特征向量正是那些"被变换 = 被缩放"的方向；\(\lambda\) 就是缩放倍数。</p>
+
+<ul>
+<li>\(\lambda>1\)：沿该方向被拉长；</li>
+<li>\(0<\lambda<1\)：被压短；</li>
+<li>\(\lambda<0\)：方向反过来（再缩放）；</li>
+<li>\(\lambda=0\)：该方向被压扁到原点，说明 \(A\) 不可逆（核非平凡）。</li>
+</ul>
+
+<figure class="fig"><svg viewBox="0 0 540 360" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>特征向量在变换 A 下方向不变，仅被缩放</title><defs><marker id="agray" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#94a3b8"/></marker><marker id="ablue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#2563eb"/></marker><marker id="apink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#db2777"/></marker></defs><text x="135" y="24" text-anchor="middle" font-size="14" fill="#1f2937" font-weight="600">变换前</text><text x="405" y="24" text-anchor="middle" font-size="14" fill="#1f2937" font-weight="600">变换后（A 作用）</text><text x="270" y="24" text-anchor="middle" font-size="14" fill="#1f2937">→</text><g transform="translate(135,165)"><line x1="-110" y1="0" x2="110" y2="0" stroke="#94a3b8" stroke-width="1"/><line x1="0" y1="110" x2="0" y2="-110" stroke="#94a3b8" stroke-width="1"/><line x1="-95" y1="-79" x2="95" y2="79" stroke="#2563eb" stroke-width="1" stroke-dasharray="4 3" opacity="0.55"/><line x1="79" y1="-95" x2="-79" y2="95" stroke="#db2777" stroke-width="1" stroke-dasharray="4 3" opacity="0.55"/><circle cx="0" cy="0" r="72" fill="#2563eb" fill-opacity="0.04" stroke="#94a3b8" stroke-width="1"/><line x1="0" y1="0" x2="72" y2="0" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#agray)"/><line x1="0" y1="0" x2="0" y2="-72" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#agray)"/><line x1="0" y1="0" x2="-72" y2="0" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#agray)"/><line x1="0" y1="0" x2="0" y2="72" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#agray)"/><line x1="0" y1="0" x2="51" y2="-51" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#agray)"/><line x1="0" y1="0" x2="-51" y2="-51" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#agray)"/><line x1="0" y1="0" x2="51" y2="51" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#agray)"/><line x1="0" y1="0" x2="-51" y2="51" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#agray)"/><line x1="0" y1="0" x2="55" y2="-46" stroke="#2563eb" stroke-width="2" marker-end="url(#ablue)"/><text x="62" y="-50" font-size="12" fill="#2563eb" font-weight="600">v₁</text><line x1="0" y1="0" x2="-46" y2="-55" stroke="#db2777" stroke-width="2" marker-end="url(#apink)"/><text x="-66" y="-58" font-size="12" fill="#db2777" font-weight="600">v₂</text><circle cx="0" cy="0" r="2.5" fill="#1f2937"/></g><g transform="translate(405,165)"><line x1="-110" y1="0" x2="110" y2="0" stroke="#94a3b8" stroke-width="1"/><line x1="0" y1="110" x2="0" y2="-110" stroke="#94a3b8" stroke-width="1"/><line x1="-95" y1="-79" x2="95" y2="79" stroke="#2563eb" stroke-width="1" stroke-dasharray="4 3" opacity="0.55"/><line x1="79" y1="-95" x2="-79" y2="95" stroke="#db2777" stroke-width="1" stroke-dasharray="4 3" opacity="0.55"/><ellipse cx="0" cy="0" rx="100" ry="40" fill="#d97706" fill-opacity="0.05" stroke="#94a3b8" stroke-width="1" transform="rotate(-40)"/><line x1="0" y1="0" x2="78" y2="22" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#agray)"/><line x1="0" y1="0" x2="-22" y2="-30" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#agray)"/><line x1="0" y1="0" x2="22" y2="30" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#agray)"/><line x1="0" y1="0" x2="-78" y2="-22" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#agray)"/><line x1="0" y1="0" x2="72" y2="-22" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#agray)"/><line x1="0" y1="0" x2="-30" y2="-58" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#agray)"/><line x1="0" y1="0" x2="30" y2="58" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#agray)"/><line x1="0" y1="0" x2="-72" y2="22" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#agray)"/><line x1="0" y1="0" x2="92" y2="-77" stroke="#2563eb" stroke-width="2" marker-end="url(#ablue)"/><text x="78" y="-82" font-size="12" fill="#2563eb" font-weight="600">λ₁v₁</text><line x1="0" y1="0" x2="-23" y2="-27" stroke="#db2777" stroke-width="2" marker-end="url(#apink)"/><text x="-58" y="-30" font-size="12" fill="#db2777" font-weight="600">λ₂v₂</text><circle cx="0" cy="0" r="2.5" fill="#1f2937"/></g><g font-size="11" fill="#1f2937"><rect x="118" y="296" width="14" height="3" fill="#2563eb"/><line x1="125" y1="297" x2="138" y2="297" stroke="#2563eb" stroke-width="2" marker-end="url(#ablue)"/><text x="146" y="301" fill="#2563eb">特征方向 v₁：λ₁≈2 &gt;1（拉长）</text><line x1="125" y1="316" x2="138" y2="316" stroke="#db2777" stroke-width="2" marker-end="url(#apink)"/><text x="146" y="320" fill="#db2777">特征方向 v₂：0&lt;λ₂&lt;1（压短）</text><line x1="125" y1="335" x2="138" y2="335" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#agray)"/><text x="146" y="339" fill="#94a3b8">普通向量：方向被旋转/扭转</text><line x1="350" y1="307" x2="370" y2="307" stroke="#2563eb" stroke-width="1" stroke-dasharray="4 3" opacity="0.7"/><text x="376" y="311">虚线＝两特征方向所在直线（不变）</text></g></svg><figcaption>图1：变换前后的对比。左图画出单位圆上的若干向量（箭头）及两根特征方向 v1、v2；右图是被 A 作用后的结果——大多数箭头都旋转/扭转到了新方向，唯独沿 v1、v2 的箭头仍躺在原来的直线上，只是分别被拉长 λ1 倍、缩短/缩放 λ2 倍。用醒目颜色标注两根不动方向，并标注 λ1&gt;1（拉长）、0&lt;λ2&lt;1（压短），直观传达&#x27;特征向量=方向不变、只被缩放&#x27;。</figcaption></figure>
+
+<div class="pitfall">
+<h4>易错</h4>
+<p>特征向量必须<strong>非零</strong>（\(v=0\) 永远满足 \(A\cdot 0=\lambda\cdot 0\)，毫无信息）。而特征值 \(\lambda=0\) 是<strong>允许</strong>的——它对应被压扁的方向。两件事别混。还有：若 \(v\) 是特征向量，那么 \(2v、-v、cv\)（任意 \(c\neq0\)）都是同一个特征值的特征向量——特征向量描述的是<strong>方向（一条直线）</strong>，不是某根特定长度的箭头。所以习惯上我们把它<strong>归一化</strong>到单位长度再报告。</p>
+</div>
+
+<h2>2. 怎么找它们：特征方程 det(A−λI)=0</h2>
+
+<p>把定义改写成 \(Av-\lambda v=0\)，即</p>
+\[ (A-\lambda I)\,v = 0. \]
+<p>这是一个齐次线性方程组。我们要的是<strong>非零</strong>解 \(v\)。线性代数告诉我们：方阵 \(M\) 有非零解 \(Mv=0\) 当且仅当 \(M\) <strong>不可逆</strong>，也就是行列式为零。于是特征值必满足</p>
+\[ \boxed{\det(A-\lambda I)=0.} \]
+<p>这叫<strong>特征方程 characteristic equation</strong>，左边展开是关于 \(\lambda\) 的多项式（<strong>特征多项式</strong>）。对 \(n\times n\) 矩阵它是 \(n\) 次多项式，所以（在复数范围内、计重数）恰有 \(n\) 个特征值。</p>
+
+<h3>2×2 手算流程</h3>
+
+<p>设 \(A=\begin{bmatrix} a & b \\ c & d \end{bmatrix}\)。则</p>
+\[ A-\lambda I=\begin{bmatrix} a-\lambda & b \\ c & d-\lambda \end{bmatrix},\qquad \det(A-\lambda I)=(a-\lambda)(d-\lambda)-bc. \]
+<p>展开得到一个二次方程：</p>
+\[ \lambda^2-(a+d)\,\lambda+(ad-bc)=0. \]
+<p>注意 \(\lambda^1\) 项带着<strong>负号</strong> \(-(a+d)\)，常数项是 \(ad-bc\)。由韦达定理（二次方程根与系数的关系），两根之和与两根之积分别是：</p>
+\[ \lambda_1+\lambda_2=a+d=\operatorname{tr}(A),\qquad \lambda_1\lambda_2=ad-bc=\det(A). \]
+<p>这里冒出两个值得记住的量：\(a+d\) 是矩阵的<strong>迹 trace</strong> \(\operatorname{tr}(A)\)（主对角线之和），\(ad-bc\) 是<strong>行列式 determinant</strong> \(\det(A)\)。于是对 2×2 我们得到两条干净结论：<em>两根之和 = 迹，两根之积 = 行列式</em>。这两条既能快速求解，又能事后<strong>验算</strong>。求出 \(\lambda\) 后，把每个 \(\lambda\) 代回 \((A-\lambda I)v=0\) 解出方向 \(v\)（两行一定成比例，取一行即可）。</p>
+
+<div class="example">
+<h4>例题：手算 2×2 的特征值与特征向量并验证</h4>
+<p>取 \(A=\begin{bmatrix} 4 & 1 \\ 2 & 3 \end{bmatrix}\)。</p>
+<p><strong>第 1 步，写特征多项式。</strong>\(\operatorname{tr}(A)=4+3=7\)，\(\det(A)=4\cdot3-1\cdot2=10\)。所以</p>
+\[ \lambda^2-7\lambda+10=0\;\Longrightarrow\;(\lambda-5)(\lambda-2)=0. \]
+<p>得 \(\lambda_1=5,\ \lambda_2=2\)。验算：\(5+2=7=\operatorname{tr}\)，\(5\cdot2=10=\det\)，吻合。</p>
+<p><strong>第 2 步，求 \(\lambda_1=5\) 的特征向量。</strong>解 \((A-5I)v=0\)：</p>
+\[ A-5I=\begin{bmatrix} -1 & 1 \\ 2 & -2 \end{bmatrix},\quad -v_1+v_2=0\;\Rightarrow\;v_2=v_1. \]
+<p>取 \(v^{(1)}=\begin{bmatrix}1\\1\end{bmatrix}\)。</p>
+<p><strong>第 3 步，求 \(\lambda_2=2\) 的特征向量。</strong>解 \((A-2I)v=0\)：</p>
+\[ A-2I=\begin{bmatrix} 2 & 1 \\ 2 & 1 \end{bmatrix},\quad 2v_1+v_2=0\;\Rightarrow\;v_2=-2v_1. \]
+<p>取 \(v^{(2)}=\begin{bmatrix}1\\-2\end{bmatrix}\)。</p>
+<p><strong>第 4 步，验证 \(Av=\lambda v\)。</strong></p>
+\[ A\begin{bmatrix}1\\1\end{bmatrix}=\begin{bmatrix}4+1\\2+3\end{bmatrix}=\begin{bmatrix}5\\5\end{bmatrix}=5\begin{bmatrix}1\\1\end{bmatrix},\qquad A\begin{bmatrix}1\\-2\end{bmatrix}=\begin{bmatrix}4-2\\2-6\end{bmatrix}=\begin{bmatrix}2\\-4\end{bmatrix}=2\begin{bmatrix}1\\-2\end{bmatrix}. \]
+<p>两个都对。</p>
+</div>
+
+<h2>3. 特征空间、几何重数与代数重数</h2>
+
+<p>对固定的 \(\lambda\)，所有满足 \((A-\lambda I)v=0\) 的向量（含 \(0\)）构成一个子空间，叫 \(\lambda\) 的<strong>特征空间 eigenspace</strong>。它就是 \(A-\lambda I\) 的零空间，里面装着该特征值的全部特征向量加上原点。</p>
+
+<ul>
+<li><strong>代数重数 algebraic multiplicity</strong>：\(\lambda\) 作为特征多项式根的重数（在因式分解里出现几次）。</li>
+<li><strong>几何重数 geometric multiplicity</strong>：特征空间的维数（该方向上"独立的特征向量有几根"）。</li>
+</ul>
+
+<p>恒有 \(1\le\text{几何重数}\le\text{代数重数}\)。当某个特征值"几何 < 代数"时（特征向量不够用），矩阵就<strong>不可对角化</strong>（即下一节要讲的那件事——"换到特征基、让变换变成纯缩放"——做不成，因为凑不齐足够多的独立特征方向当坐标轴），称为<strong>亏损 defective</strong>（例如 \(\begin{bmatrix}1&1\\0&1\end{bmatrix}\)：\(\lambda=1\) 代数重数 2，但只有一根特征向量方向）。好消息是：本课后面将看到，<strong>对称矩阵永远不亏损</strong>——而 ML 里我们关心的矩阵（协方差、海森、核矩阵）大多是对称的。</p>
+
+<h2>4. 对角化：换到特征基，变换变成纯缩放</h2>
+
+<p>假设 \(n\times n\) 矩阵 \(A\) 有 \(n\) 根线性无关的特征向量 \(v^{(1)},\dots,v^{(n)}\)（对应 \(\lambda_1,\dots,\lambda_n\)）。把它们当列拼成矩阵 \(P=[\,v^{(1)}\ \cdots\ v^{(n)}\,]\)，把特征值放进对角阵 \(D=\operatorname{diag}(\lambda_1,\dots,\lambda_n)\)。逐列看 \(Av^{(i)}=\lambda_i v^{(i)}\) 就是</p>
+\[ AP=PD\;\Longrightarrow\;\boxed{A=PDP^{-1}.} \]
+<p>这叫<strong>对角化 diagonalization</strong>，或<strong>特征分解 eigendecomposition</strong>。它的几何含义非常美：</p>
+
+<div class="note">
+<p><strong>三步走的画面。</strong>\(A=PDP^{-1}\) 把"复杂的变换"拆成三步——读法是从右往左：</p>
+<ol>
+<li>\(P^{-1}\)：把向量从标准坐标<strong>换到特征基坐标</strong>（用特征向量当新的坐标轴）；</li>
+<li>\(D\)：在特征基下，变换<strong>退化成沿各轴的纯缩放</strong>（第 \(i\) 轴乘 \(\lambda_i\)），不再有任何旋转或剪切（<strong>剪切 shear</strong> 指把方块"推斜"成平行四边形的那种变换，像把正体字写成斜体）；</li>
+<li>\(P\)：换回标准坐标。</li>
+</ol>
+<p>一句话：<em>选对了坐标系，扭曲的变换就变成了简单的拉伸。</em>这正是特征向量的威力——它们是让 \(A\) "看起来最简单"的那组坐标轴。</p>
+</div>
+
+<figure class="fig"><svg viewBox="0 0 540 300" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>对角化 A=PDP⁻¹ 的换基—缩放—换回三步</title><defs><marker id="arrBlue" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#2563eb"/></marker><marker id="arrPink" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#db2777"/></marker><marker id="arrFlow" markerWidth="10" markerHeight="10" refX="8" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9Z" fill="#1f2937"/></marker></defs><text x="270" y="20" font-size="14" fill="#1f2937" text-anchor="middle" font-weight="600">对角化 A = P D P⁻¹：换基 → 纯缩放 → 换回</text><g transform="translate(20,40)"><text x="75" y="12" font-size="12" fill="#1f2937" text-anchor="middle">标准坐标下 A 作用</text><line x1="10" y1="150" x2="145" y2="150" stroke="#94a3b8" stroke-width="1"/><line x1="20" y1="160" x2="20" y2="30" stroke="#94a3b8" stroke-width="1"/><circle cx="20" cy="150" r="2" fill="#94a3b8"/><rect x="20" y="90" width="60" height="60" fill="#e2e8f0" fill-opacity="0.4" stroke="#94a3b8" stroke-width="0.75" stroke-dasharray="4 3"/><path d="M20 150 L110 110 L150 50 L60 90 Z" fill="#2563eb" fill-opacity="0.12" stroke="#2563eb" stroke-width="2"/><text x="95" y="95" font-size="12" fill="#2563eb" text-anchor="middle">A·□</text><text x="78" y="178" font-size="11" fill="#1f2937" text-anchor="middle">倾斜（剪切+缩放）</text></g><g transform="translate(200,40)"><text x="70" y="12" font-size="12" fill="#1f2937" text-anchor="middle">特征基坐标系</text><line x1="8" y1="148" x2="50" y2="40" stroke="#2563eb" stroke-width="1"/><polygon points="50,40 45,50 54,48" fill="#2563eb"/><text x="56" y="42" font-size="11" fill="#2563eb">v₁</text><line x1="8" y1="148" x2="130" y2="120" stroke="#db2777" stroke-width="1"/><polygon points="130,120 121,116 122,125" fill="#db2777"/><text x="134" y="120" font-size="11" fill="#db2777">v₂</text><circle cx="8" cy="148" r="2" fill="#1f2937"/><rect x="40" y="78" width="44" height="44" fill="#e2e8f0" fill-opacity="0.4" stroke="#94a3b8" stroke-width="0.75" stroke-dasharray="4 3"/><rect x="40" y="58" width="88" height="64" fill="#059669" fill-opacity="0.14" stroke="#059669" stroke-width="2"/><text x="40" y="50" font-size="11" fill="#2563eb" text-anchor="middle">λ₁↕</text><text x="138" y="100" font-size="11" fill="#db2777">λ₂↔</text><text x="84" y="92" font-size="12" fill="#059669" text-anchor="middle">D·□</text><text x="70" y="160" font-size="11" fill="#059669" text-anchor="middle" font-weight="600">只拉伸，不歪斜</text><text x="70" y="176" font-size="11" fill="#1f2937" text-anchor="middle">沿两轴纯缩放</text></g><g transform="translate(385,40)"><text x="72" y="12" font-size="12" fill="#1f2937" text-anchor="middle">换回标准坐标</text><line x1="10" y1="150" x2="145" y2="150" stroke="#94a3b8" stroke-width="1"/><line x1="20" y1="160" x2="20" y2="30" stroke="#94a3b8" stroke-width="1"/><circle cx="20" cy="150" r="2" fill="#94a3b8"/><path d="M20 150 L110 110 L150 50 L60 90 Z" fill="#d97706" fill-opacity="0.14" stroke="#d97706" stroke-width="2"/><text x="95" y="95" font-size="12" fill="#d97706" text-anchor="middle">A·□</text><text x="80" y="178" font-size="11" fill="#1f2937" text-anchor="middle">与直接作用 A 相同</text></g><g><line x1="170" y1="115" x2="198" y2="115" stroke="#1f2937" stroke-width="2" marker-end="url(#arrFlow)"/><text x="184" y="106" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="600">P⁻¹</text><line x1="278" y1="200" x2="278" y2="225" stroke="#1f2937" stroke-width="2" marker-end="url(#arrFlow)"/><text x="298" y="217" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="600">D</text><line x1="355" y1="115" x2="383" y2="115" stroke="#1f2937" stroke-width="2" marker-end="url(#arrFlow)"/><text x="369" y="106" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="600">P</text></g><text x="270" y="248" font-size="12" fill="#1f2937" text-anchor="middle">在特征基里 D = diag(λ₁, λ₂)</text><text x="270" y="282" font-size="13" fill="#059669" text-anchor="middle" font-weight="600">选对坐标系，扭曲的 A 变成简单的轴向拉伸</text></svg><figcaption>图2：对角化 A=PDP⁻¹ 的&#x27;换基—缩放—换回&#x27;三步。把一个含剪切的方格网格，经 P⁻¹ 换到特征基坐标（坐标轴变成特征向量方向），在该坐标系里变换退化成沿两轴的纯缩放 D（方格只被横竖拉伸、不歪斜），再由 P 换回标准坐标。三联画从左到右展示原始→特征基下纯缩放→变回，传达&#x27;选对坐标系，扭曲变换变成简单拉伸&#x27;。</figcaption></figure>
+
+<div class="example">
+<h4>例题：一般（非对称）矩阵的对角化</h4>
+<p>沿用第 2 节的 \(A=\begin{bmatrix} 4 & 1 \\ 2 & 3 \end{bmatrix}\)，那里已经算好 \(\lambda_1=5,\ \lambda_2=2\)，\(v^{(1)}=\begin{bmatrix}1\\1\end{bmatrix}\)，\(v^{(2)}=\begin{bmatrix}1\\-2\end{bmatrix}\)。注意这两根特征向量<strong>并不正交</strong>（\(v^{(1)}\cdot v^{(2)}=1\cdot1+1\cdot(-2)=-1\neq0\))——这是<strong>一般矩阵</strong>的常态。</p>
+<p><strong>组装：</strong>\(P=\begin{bmatrix}1&1\\1&-2\end{bmatrix}\)，\(D=\begin{bmatrix}5&0\\0&2\end{bmatrix}\)。因为 \(P\) 的列不正交，\(P^{-1}\) 只能老老实实按 2×2 求逆公式算（\(\det P=1\cdot(-2)-1\cdot1=-3\)）：</p>
+\[ P^{-1}=\frac{1}{-3}\begin{bmatrix}-2&-1\\-1&1\end{bmatrix}=\frac13\begin{bmatrix}2&1\\1&-1\end{bmatrix}. \]
+<p>验证 \(A=PDP^{-1}\)：</p>
+\[ PD=\begin{bmatrix}5&2\\5&-4\end{bmatrix},\qquad PDP^{-1}=\begin{bmatrix}5&2\\5&-4\end{bmatrix}\cdot\frac13\begin{bmatrix}2&1\\1&-1\end{bmatrix}=\frac13\begin{bmatrix}12&3\\6&9\end{bmatrix}=\begin{bmatrix}4&1\\2&3\end{bmatrix}=A. \]
+<p>对得上。关键观察：对<strong>一般</strong>矩阵，换基矩阵 \(P^{-1}\) 必须真的求逆。下一节会看到，<strong>对称</strong>矩阵省掉了这步——它的 \(P^{-1}\) 直接是转置。</p>
+</div>
+
+<h3>立刻的回报：算 \(A^n\)</h3>
+
+<p>反复相乘时，对角化让计算坍缩成对角元的乘方。因为中间的 \(P^{-1}P\) 成对消掉：</p>
+\[ A^n=(PDP^{-1})(PDP^{-1})\cdots(PDP^{-1})=P\,D^n\,P^{-1},\qquad D^n=\operatorname{diag}(\lambda_1^n,\dots,\lambda_n^n). \]
+<p>对角阵的乘方只是把每个对角元各自取 \(n\) 次方——\(O(n)\) 而非 \(O(n)\) 次矩阵乘法。这条式子是后面理解"反复相乘的稳定性"的关键：\(A^n\) 的命运完全由 \(\lambda_i^n\) 决定。</p>
+
+<h2>5. 对称矩阵的特权：谱定理</h2>
+
+<p>上一节的对角化例子里，特征向量歪歪斜斜、\(P^{-1}\) 得费劲求逆——这是一般矩阵的常态（特征值甚至可能是复数，特征向量可能不够用）。但<strong>实对称矩阵</strong>（\(A^\top=A\)）享有一条极强的保证：</p>
+
+<div class="key">
+<h4>要点：谱定理 spectral theorem</h4>
+<p>若 \(A\) 是实对称矩阵，则：</p>
+<ul>
+<li>它的特征值<strong>全是实数</strong>；</li>
+<li>不同特征值的特征向量<strong>相互正交</strong>，且总能选出一组<strong>标准正交</strong>的特征向量当基（即使有重根也行，对称矩阵永不亏损）；</li>
+<li>因此可<strong>正交对角化</strong>：存在正交矩阵 \(Q\)（\(Q^\top Q=I\)，列是单位特征向量）和实对角阵 \(\Lambda\)，使
+\[ \boxed{A=Q\Lambda Q^\top.} \]</li>
+</ul>
+</div>
+
+<p>这里 \(P^{-1}\) 直接变成了 \(Q^\top\)，原因在于 \(Q\) 是<strong>正交矩阵 orthogonal matrix</strong>：它的各列是标准正交向量（两两垂直、各自单位长），由此可推出 \(Q^\top Q=I\)，所以它的逆恰好就是转置，\(Q^{-1}=Q^\top\)；几何上它只做旋转 / 反射，不改变长度与角度（这几条性质我们到专讲正交矩阵那一课会严格证明，这里先当作工具用）。于是对称矩阵的变换图景特别干净：<strong>先旋转到主轴（\(Q^\top\)），沿主轴各自缩放（\(\Lambda\)），再旋转回来（\(Q\)）</strong>，全程没有任何剪切。这组主轴就是它的特征向量。</p>
+
+<div class="example">
+<h4>例题：对一个 2×2 对称矩阵做正交对角化并算 A³</h4>
+<p>取对称矩阵 \(A=\begin{bmatrix} 2 & 1 \\ 1 & 2 \end{bmatrix}\)。</p>
+<p><strong>特征值：</strong>\(\operatorname{tr}=4,\ \det=3\)，故 \(\lambda^2-4\lambda+3=(\lambda-3)(\lambda-1)=0\)，得 \(\lambda_1=3,\ \lambda_2=1\)。</p>
+<p><strong>特征向量：</strong>\(\lambda=3\)：\((A-3I)v=\begin{bmatrix}-1&1\\1&-1\end{bmatrix}v=0\Rightarrow v^{(1)}=\begin{bmatrix}1\\1\end{bmatrix}\)；\(\lambda=1\)：\(\begin{bmatrix}1&1\\1&1\end{bmatrix}v=0\Rightarrow v^{(2)}=\begin{bmatrix}1\\-1\end{bmatrix}\)。这两根<strong>互相垂直</strong>（\(v^{(1)}\cdot v^{(2)}=0\)）——正是谱定理预言的对称矩阵特权。</p>
+<p><strong>组装：</strong>这里我们用<em>未归一化</em>的 \(P=\begin{bmatrix}1&1\\1&-1\end{bmatrix}\)，\(D=\begin{bmatrix}3&0\\0&1\end{bmatrix}\)。由于 \(P\) 的两列虽正交但长度都是 \(\sqrt2\)，有 \(P^\top P=2I\)，于是 \(P^{-1}=\dfrac12 P^\top=\dfrac12\begin{bmatrix}1&1\\1&-1\end{bmatrix}\)——求逆退化成"转置再除以 2"，比上一节的一般矩阵省力得多。（若把每列再除以 \(\sqrt2\) 归一化成正交矩阵 \(Q\)，则严格地 \(P^{-1}=Q^\top\)。）</p>
+<p><strong>算 \(A^3\)：</strong>\(D^3=\operatorname{diag}(27,1)\)，于是</p>
+\[ A^3=P D^3 P^{-1}=\begin{bmatrix}1&1\\1&-1\end{bmatrix}\begin{bmatrix}27&0\\0&1\end{bmatrix}\cdot\tfrac12\begin{bmatrix}1&1\\1&-1\end{bmatrix}=\tfrac12\begin{bmatrix}27&1\\27&-1\end{bmatrix}\begin{bmatrix}1&1\\1&-1\end{bmatrix}=\begin{bmatrix}14&13\\13&14\end{bmatrix}. \]
+<p>直接连乘 \(A\cdot A\cdot A\) 也得 \(\begin{bmatrix}14&13\\13&14\end{bmatrix}\)，一致。</p>
+</div>
+
+<h2>6. 二次型与正定性</h2>
+
+<p>对称矩阵天然和<strong>二次型 quadratic form</strong> \(f(x)=x^\top A x\) 绑在一起（这是一个把向量 \(x\) 映成标量的函数，每一项都是 \(x\) 的两个分量相乘，故称"二次"）。把 \(A=Q\Lambda Q^\top\) 代入，令 \(y=Q^\top x\)（换到主轴坐标），则</p>
+\[ x^\top A x=x^\top Q\Lambda Q^\top x=(Q^\top x)^\top\Lambda(Q^\top x)=y^\top\Lambda y=\sum_{i}\lambda_i\,y_i^2. \]
+<p>最后一步是关键：因为 \(\Lambda\) 是<strong>对角阵</strong>，\(\Lambda y\) 把第 \(i\) 个分量变成 \(\lambda_i y_i\)，再与 \(y^\top\) 做内积就是 \(\sum_i y_i\cdot\lambda_i y_i=\sum_i\lambda_i y_i^2\)——<strong>各分量平方各乘对应对角元，没有任何交叉项 \(y_i y_j\)</strong>（交叉项只会来自非对角元，而对角阵的非对角元全是 0）。所以 \(x^\top A x\) 的<strong>符号完全由特征值的符号决定</strong>：</p>
+
+<table>
+<thead><tr><th>名称</th><th>条件</th><th>等价的特征值条件</th><th>几何/含义</th></tr></thead>
+<tbody>
+<tr><td><strong>正定 positive definite</strong></td><td>\(x^\top A x>0\)（\(\forall x\neq0\)）</td><td>所有 \(\lambda_i>0\)</td><td>碗朝上，唯一极小</td></tr>
+<tr><td><strong>半正定 PSD</strong></td><td>\(x^\top A x\ge0\)</td><td>所有 \(\lambda_i\ge0\)</td><td>碗朝上、可能有平底</td></tr>
+<tr><td>负定 / 半负定</td><td>\(x^\top A x<0\) / \(\le0\)</td><td>所有 \(\lambda_i<0\) / \(\le0\)</td><td>碗朝下</td></tr>
+<tr><td>不定 indefinite</td><td>有正有负</td><td>\(\lambda_i\) 有正有负</td><td>鞍点</td></tr>
+</tbody>
+</table>
+
+<div class="ml">
+<h4><span class="tag">ML</span> 和 ML 的联系</h4>
+<p>这张表直接对应优化里的"形状判断"。损失函数 \(L\) 在某点的<strong>海森矩阵 Hessian</strong>（二阶导组成的对称矩阵）的特征值告诉你这点是什么：全正 → 局部极小（碗底）；全负 → 极大；有正有负 → <strong>鞍点 saddle point</strong>。深度网络的高维损失面里鞍点远多于真正的极小点，这是优化研究的核心母题之一。特征值的<strong>大小</strong>则是<strong>曲率 curvature</strong>：某方向 \(\lambda\) 越大，曲面越陡、梯度变化越剧烈——这正是为什么"病态"（最大与最小特征值之比，即<strong>条件数</strong>很大）的损失面让梯度下降走 Z 字形、收敛慢。</p>
+</div>
+
+<h2>7. 协方差矩阵与 PCA：主成分就是特征向量</h2>
+
+<p>现在把特征分解用到数据上。设数据矩阵每<strong>行</strong>是一个样本（共 \(m\) 个、\(n\) 维），先把每列中心化（减去该特征的均值）得到 \(X\)。<strong>协方差矩阵 covariance matrix</strong></p>
+\[ C=\frac{1}{m-1}\,X^\top X \]
+<p>是 \(n\times n\) <strong>对称半正定</strong>矩阵：对角元 \(C_{ii}\) 是第 \(i\) 个特征的方差，非对角元 \(C_{ij}\) 是特征 \(i,j\) 的协方差（一起变大 / 反向变 / 无关）。</p>
+
+<p>由谱定理 \(C=Q\Lambda Q^\top\)。它的特征向量 \(q_1,q_2,\dots\)（按特征值从大到小排）就是数据点云的<strong>主轴方向</strong>，称<strong>主成分 principal component</strong>；对应特征值 \(\lambda_i\) 就是数据沿该方向的<strong>方差</strong>。</p>
+
+<div class="key">
+<h4>要点：PCA 一句话</h4>
+<p><strong>主成分 = 协方差矩阵的特征向量；该方向上的方差 = 对应的特征值。</strong>第一主成分是数据散得最开（方差最大）的方向，第二主成分是与它正交方向里散得最开的，依此类推。降维就是只保留前 \(k\) 个大特征值对应的方向、丢掉小特征值方向（那些方向上数据几乎不变、信息少）。被保留的方差占比 \(\big(\sum_{i\le k}\lambda_i\big)/\big(\sum_i\lambda_i\big)\) 就是"保留了多少信息"。</p>
+</div>
+
+<figure class="fig"><svg viewBox="0 0 520 400" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>图3：PCA 的几何 —— 主成分是协方差的特征向量，方差是特征值</title><desc>沿约45度方向拉长的二维点云，叠加两根正交的主成分箭头与一个标准差等高椭圆。</desc><defs><marker id="ar-blue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#2563eb"/></marker><marker id="ar-pink" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#db2777"/></marker><marker id="ar-axis" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#94a3b8"/></marker></defs><text x="260" y="26" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2937">图3：PCA 的几何 —— 主成分 = 协方差特征向量</text><line x1="55" y1="350" x2="490" y2="350" stroke="#94a3b8" stroke-width="1" marker-end="url(#ar-axis)"/><line x1="55" y1="350" x2="55" y2="48" stroke="#94a3b8" stroke-width="1" marker-end="url(#ar-axis)"/><text x="494" y="354" font-size="12" fill="#94a3b8">x₁</text><text x="44" y="50" font-size="12" fill="#94a3b8">x₂</text><g><circle cx="263.3" cy="223.0" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="251.2" cy="205.1" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="210.9" cy="242.4" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="343.5" cy="152.7" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="336.1" cy="153.0" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="296.7" cy="183.9" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="184.7" cy="300.6" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="308.6" cy="184.5" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="139.8" cy="250.1" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="209.0" cy="235.3" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="287.5" cy="183.8" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="290.4" cy="161.1" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="295.0" cy="192.4" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="259.2" cy="267.4" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="323.3" cy="195.9" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="220.6" cy="216.4" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="247.7" cy="215.1" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="311.9" cy="173.3" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="227.3" cy="203.4" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="259.3" cy="250.4" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="225.8" cy="245.4" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="270.6" cy="148.9" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="294.7" cy="223.6" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="144.3" cy="294.6" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="250.0" cy="189.0" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="298.7" cy="173.8" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="196.3" cy="289.9" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="325.8" cy="185.3" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="362.1" cy="135.0" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="255.4" cy="168.1" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="296.5" cy="157.0" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="221.8" cy="197.5" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="203.3" cy="237.9" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="313.1" cy="94.9" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="186.9" cy="277.9" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="365.9" cy="139.2" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="114.4" cy="245.1" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="279.1" cy="167.4" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="219.4" cy="275.6" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="338.5" cy="147.9" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="291.9" cy="196.3" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="375.6" cy="132.4" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="310.1" cy="184.9" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="197.7" cy="304.2" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="335.9" cy="162.7" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="141.5" cy="286.3" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="290.1" cy="121.7" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="276.0" cy="229.5" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="218.6" cy="297.8" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="300.5" cy="169.3" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="300.3" cy="196.7" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="296.3" cy="216.8" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="223.5" cy="224.9" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="332.7" cy="148.3" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="233.2" cy="263.0" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="350.1" cy="117.7" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="185.3" cy="266.5" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="256.1" cy="201.5" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="336.8" cy="109.1" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="324.1" cy="111.5" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="233.5" cy="252.0" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="351.8" cy="160.5" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="293.0" cy="185.5" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="288.7" cy="203.8" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="264.1" cy="214.4" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="304.2" cy="171.3" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="325.1" cy="173.0" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="395.6" cy="105.7" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="238.2" cy="214.0" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="284.7" cy="219.1" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="256.3" cy="224.6" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="206.9" cy="261.2" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="297.8" cy="184.8" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="255.2" cy="234.7" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="278.1" cy="175.5" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="421.1" cy="85.2" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="235.2" cy="225.8" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="255.5" cy="210.1" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="98.9" cy="327.1" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="310.7" cy="126.2" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="282.0" cy="222.3" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="346.1" cy="186.8" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="162.4" cy="278.3" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="260.0" cy="229.5" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="290.4" cy="91.8" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="310.9" cy="116.6" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="285.9" cy="136.0" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="300.5" cy="215.0" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="264.3" cy="211.3" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="320.0" cy="162.9" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="290.3" cy="235.0" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="327.7" cy="141.6" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="320.2" cy="148.9" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="289.7" cy="207.4" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="294.0" cy="201.6" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="153.5" cy="246.5" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="290.6" cy="150.0" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="184.1" cy="222.2" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="358.1" cy="151.4" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="342.3" cy="107.5" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="251.0" cy="177.2" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="342.3" cy="193.2" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="242.9" cy="275.7" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="326.1" cy="146.9" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="175.7" cy="326.9" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="254.2" cy="192.8" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="300.7" cy="188.1" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="342.5" cy="104.6" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="362.7" cy="172.7" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="353.8" cy="123.6" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="242.6" cy="257.6" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="279.0" cy="196.7" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="350.7" cy="123.3" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="126.3" cy="307.4" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="172.9" cy="309.3" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="278.7" cy="171.9" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="283.3" cy="217.1" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="296.9" cy="222.5" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="283.7" cy="223.8" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="386.0" cy="157.3" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="244.6" cy="251.2" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="139.8" cy="272.5" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="170.6" cy="319.7" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="196.2" cy="261.5" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="258.0" cy="209.1" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="238.6" cy="234.3" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="377.8" cy="111.1" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="318.4" cy="193.3" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="237.1" cy="184.8" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="254.8" cy="249.2" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="161.6" cy="270.6" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="343.4" cy="165.3" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="283.9" cy="215.7" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="260.2" cy="168.2" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="165.9" cy="265.7" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="315.7" cy="142.5" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="203.2" cy="229.9" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="176.5" cy="274.5" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="205.6" cy="266.4" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="134.5" cy="324.9" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="199.2" cy="193.5" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="308.7" cy="158.2" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="122.1" cy="294.4" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="279.7" cy="176.3" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="329.1" cy="175.8" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="315.3" cy="173.1" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="360.7" cy="146.3" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="262.1" cy="135.9" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="345.5" cy="181.1" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="244.4" cy="205.5" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="356.6" cy="67.7" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="338.5" cy="224.8" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="226.1" cy="260.2" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="380.7" cy="103.0" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="318.6" cy="189.8" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="214.4" cy="243.6" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="301.3" cy="201.8" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="264.7" cy="197.8" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="203.3" cy="243.8" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="325.0" cy="157.3" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="205.0" cy="226.0" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="448.4" cy="89.0" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="264.8" cy="116.4" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="315.2" cy="178.4" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="377.8" cy="124.1" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="274.7" cy="213.8" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="171.1" cy="318.1" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="277.7" cy="169.7" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="379.4" cy="169.6" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="175.1" cy="257.0" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="290.5" cy="189.1" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="229.9" cy="200.6" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="414.0" cy="114.3" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="176.2" cy="233.1" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="388.3" cy="134.3" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="392.3" cy="124.8" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="222.2" cy="248.9" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="128.4" cy="293.4" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="275.2" cy="213.4" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="224.5" cy="234.0" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="303.7" cy="184.5" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="311.6" cy="172.2" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="263.8" cy="232.0" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="259.1" cy="181.1" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="232.6" cy="231.4" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="266.1" cy="208.6" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="272.9" cy="203.5" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="240.9" cy="181.7" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="312.8" cy="199.9" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="292.8" cy="174.4" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="280.5" cy="158.4" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="157.7" cy="296.3" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="226.8" cy="261.4" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="161.3" cy="202.0" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="234.3" cy="283.6" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="224.3" cy="191.9" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="233.1" cy="248.6" r="2.3" fill="#2563eb" fill-opacity="0.5"/><circle cx="302.6" cy="178.6" r="2.3" fill="#2563eb" fill-opacity="0.5"/></g><g transform="rotate(-40 270 200)"><ellipse cx="270" cy="200" rx="78" ry="26" fill="#d97706" fill-opacity="0.10" stroke="#d97706" stroke-width="1.5" stroke-dasharray="4 3"/></g><line x1="270" y1="200" x2="332.7" y2="147.4" stroke="#2563eb" stroke-width="2.4" marker-end="url(#ar-blue)"/><line x1="270" y1="200" x2="289.2" y2="222.9" stroke="#db2777" stroke-width="2.4" marker-end="url(#ar-pink)"/><line x1="263" y1="200" x2="277" y2="200" stroke="#1f2937" stroke-width="1.5"/><line x1="270" y1="193" x2="270" y2="207" stroke="#1f2937" stroke-width="1.5"/><text x="340" y="140" font-size="12" font-weight="600" fill="#2563eb">第一主成分 (PC1)</text><text x="340" y="153" font-size="11" fill="#2563eb">长度 ∝ √λ₁，λ₁ 大</text><text x="296" y="232" font-size="12" font-weight="600" fill="#db2777">第二主成分 (PC2)</text><text x="296" y="245" font-size="11" fill="#db2777">长度 ∝ √λ₂，λ₂ 小</text><line x1="180" y1="150" x2="205" y2="168" stroke="#d97706" stroke-width="1" stroke-dasharray="4 3"/><text x="86" y="142" font-size="11" fill="#d97706">1 个标准差等高椭圆</text><text x="86" y="155" font-size="11" fill="#d97706">半轴长 = √特征值</text><text x="244" y="196" font-size="11" fill="#1f2937">质心</text><text x="260" y="382" text-anchor="middle" font-size="12" fill="#1f2937">箭头方向 = 特征向量　·　方差(伸展量) = 特征值</text></svg><figcaption>图3：PCA 的几何。一团二维数据点云沿斜方向拉长；叠加协方差矩阵的两根特征向量作为主轴箭头——长轴（第一主成分）指向方差最大方向、箭头长度正比于 sqrt(λ1)，短轴（第二主成分）与之正交、长度正比于 sqrt(λ2)。再画出 1 个标准差等高椭圆，其半轴方向=特征向量、半轴长度=sqrt(特征值)，直观说明&#x27;主成分=协方差特征向量、方差=特征值&#x27;。</figcaption></figure>
+
+<div class="note">
+<p><strong>为什么是协方差的特征向量？</strong>沿单位方向 \(u\) 投影后数据的方差恰是 \(u^\top C u\)（一个二次型！）。"找方差最大的方向"就是在 \(\|u\|=1\) 下最大化 \(u^\top C u\)——由第 6 节的 \(\sum\lambda_i y_i^2\) 展开可知，答案就是<strong>最大特征值对应的特征向量</strong>，最大值就是<strong>最大特征值</strong>本身。优化问题的答案，被特征分解一口吞下。</p>
+</div>
+
+<h2>8. 幂迭代：不解方程也能找主方向</h2>
+
+<p>当矩阵很大、只想要<strong>最大</strong>那个特征值/特征向量时，有个极简算法叫<strong>幂迭代 power iteration</strong>：随便取一个向量 \(b_0\)，反复做"乘 \(A\)、再归一化"：</p>
+\[ b_{k+1}=\frac{A b_k}{\|A b_k\|}. \]
+<p><strong>为什么有效？</strong>把初始向量按特征基展开 \(b_0=\sum_i c_i v^{(i)}\)，反复乘 \(A\) 后变成 \(A^k b_0=\sum_i c_i\lambda_i^k v^{(i)}\)。设 \(|\lambda_1|\) 严格最大、且初始向量在 \(v^{(1)}\) 方向有非零分量（\(c_1\neq0\)；随机取一个向量几乎必然满足），提出公因子：</p>
+\[ A^k b_0=\lambda_1^k\Big(c_1 v^{(1)}+\sum_{i\ge2}c_i\big(\tfrac{\lambda_i}{\lambda_1}\big)^k v^{(i)}\Big). \]
+<p>因为 \(|\lambda_i/\lambda_1|<1\)，那些项随 \(k\) 指数衰减——<strong>最大特征值方向越乘越占主导</strong>，归一化后 \(b_k\) 收敛到 \(v^{(1)}\) 张成的那条直线（可能相差一个符号）。具体地：若 \(\lambda_1>0\)，\(b_k\) 收敛到 \(\pm v^{(1)}\) 中某个固定方向；若 \(\lambda_1<0\)，\(\lambda_1^k\) 的符号每步翻转，\(b_k\) 会在 \(+v^{(1)}\) 与 \(-v^{(1)}\) 之间来回跳，但<strong>方向（那条直线）依然收敛</strong>。</p>
+
+<p>要从 \(b_k\) 读出特征值本身，可用<strong>瑞利商 Rayleigh quotient</strong> \(\dfrac{b^\top A b}{b^\top b}\)（对单位向量 \(b\) 就简化为 \(b^\top A b\)），它衡量 \(A\) 在方向 \(b\) 上的"缩放倍数"，且<strong>带符号</strong>——能区分 \(\lambda_1\) 的正负，收敛到 \(\lambda_1\) 本身。相比之下 \(\|Ab_k\|\) 只能收敛到 \(|\lambda_1|\)（永远非负，丢了符号），所以读特征值时瑞利商更常用。Google 早年的 PageRank 本质就是对网页链接矩阵做幂迭代找主特征向量。</p>
+
+<h2>9. 谱半径与稳定性：梯度消失 / 爆炸的根</h2>
+
+<p>定义<strong>谱半径 spectral radius</strong> \(\rho(A)=\max_i|\lambda_i|\)，即特征值模长的最大值。它决定了"反复相乘"会发生什么。由 \(A^n=PD^nP^{-1}\)，\(A^n\) 的增长由 \(\max_i|\lambda_i|^n=\rho(A)^n\) 主导：</p>
+<ul>
+<li>\(\rho(A)<1\)：\(A^n\to 0\)，反复相乘<strong>衰减</strong>到零；</li>
+<li>\(\rho(A)>1\)：\(A^n\) 范数<strong>爆炸</strong>到无穷；</li>
+<li>\(\rho(A)=1\)：临界，刚好不增不减（对应"稳定"边界）。</li>
+</ul>
+
+<div class="ml">
+<h4><span class="tag">ML</span> 和 ML 的联系：梯度消失 / 爆炸的根源</h4>
+<p>循环网络 RNN 把同一个权重矩阵 \(W\) 在时间步上反复相乘；深层网络反向传播时，梯度也要穿过许多层连乘一串雅可比矩阵。无论哪种，"信号穿过 \(T\) 步"都近似一个 \(W^T\) 那样的连乘。于是：</p>
+<ul>
+<li>谱半径 \(\rho(W)<1\) → 梯度按 \(\rho^T\) 指数<strong>消失 vanishing</strong>，网络学不到长程依赖；</li>
+<li>\(\rho(W)>1\) → 梯度指数<strong>爆炸 exploding</strong>，训练发散（NaN）。</li>
+</ul>
+<p>这就是第 4 节 \(A^n=PD^nP^{-1}\) 埋下的伏笔在 ML 里现身。应对手段也都围着谱半径转：梯度裁剪、正交 / 单位范数初始化（让 \(\rho\approx1\)）、LSTM/GRU 的门控、残差连接，以及 GAN 里的<strong>谱归一化 spectral normalization</strong>——直接把权重矩阵除以它的最大奇异值（下一课会看到，对一般矩阵该用奇异值而非特征值）来把"放大倍数"压到 1 附近、稳住训练。<strong>谁控制了谱半径，谁就控制了深层 / 循环网络的稳定性。</strong></p>
+</div>
+
+<h2>10. 代码：用 numpy 验证手算</h2>
+
+<p>下面的代码验证第 2、5 节的两个例题，并演示 \(Av=\lambda v\)、对角化重构、以及一次幂迭代。只用 numpy，几秒跑完。</p>
+
+<pre><code>import numpy as np
+
+# ---- 例题1：A=[[4,1],[2,3]]，手算得 lambda=5,2 ----
+A = np.array([[4., 1.],
+              [2., 3.]])
+vals, vecs = np.linalg.eig(A)          # vals: 特征值; vecs 的每"列"是一个特征向量
+print("特征值:", vals)                  # [5. 2.]
+print("特征向量(按列):\n", vecs)
+
+# 验证 A v = lambda v（对每一列）
+for i in range(2):
+    v = vecs[:, i]
+    print(f"  lambda={vals[i]:.1f}: Av={A@v},  lambda*v={vals[i]*v}")
+
+# 用我们手算的整数向量验证（无需归一化）
+print("A@[1,1]  =", A @ np.array([1., 1.]),  " 应= 5*[1,1]")
+print("A@[1,-2] =", A @ np.array([1., -2.]), " 应= 2*[1,-2]")
+
+# ---- 例题2：对称矩阵 A=[[2,1],[1,2]] 的对角化与 A^3 ----
+S = np.array([[2., 1.],
+              [1., 2.]])
+w, Q = np.linalg.eigh(S)               # 对称矩阵用 eigh：返回实特征值 + 正交特征向量
+print("\n对称矩阵特征值:", w)            # [1. 3.]
+print("Q 是否正交 (Q^T Q ≈ I):\n", np.round(Q.T @ Q, 10))
+
+# 对角化重构 S = Q Λ Qᵀ
+recon = Q @ np.diag(w) @ Q.T
+print("Q Λ Qᵀ 重构 S:\n", np.round(recon, 10))
+
+# 用特征分解算 S^3 ，与直接连乘对比
+S3_eig = Q @ np.diag(w**3) @ Q.T
+print("S^3 (经特征值):\n", np.round(S3_eig, 8))
+print("S^3 (直接连乘):\n", np.linalg.matrix_power(S, 3))   # 应都为 [[14,13],[13,14]]
+
+# ---- 幂迭代：找最大特征值方向 ----
+b = np.array([1., 0.])
+for _ in range(50):
+    b = S @ b
+    b = b / np.linalg.norm(b)
+lam = b @ (S @ b) / (b @ b)              # 瑞利商（带符号），估计最大特征值；b 已归一化故分母≈1
+print("\n幂迭代得到的主方向:", np.round(b, 4), " 估计 lambda:", round(lam, 4))
+print("(应收敛到 [0.7071,0.7071] 方向, lambda≈3)")</code></pre>
+
+<h2>动手练习</h2>
+<ol>
+<li><strong>手算 + 验证。</strong>对 \(A=\begin{bmatrix}3&0\\1&2\end{bmatrix}\)：用 \(\operatorname{tr}/\det\) 写特征多项式、求出两个特征值与各自一根特征向量，并手验 \(Av=\lambda v\)。再用下面骨架核对。
+<pre><code>import numpy as np
+A = np.array([[3., 0.],
+              [1., 2.]])
+vals, vecs = np.linalg.eig(A)
+print("特征值:", vals)              # 期望 3 和 2
+for i in range(2):
+    v = vecs[:, i]
+    print(vals[i], "Av=", A@v, "lambda*v=", vals[i]*v)</code></pre></li>
+
+<li><strong>对角化算高次幂。</strong>对第 1 题的 \(A\)，写出 \(P,D\)，用 \(A^n=PD^nP^{-1}\) 求 \(A^{10}\)，并和 <code>np.linalg.matrix_power(A,10)</code> 对比。观察 \(A^{10}\) 的元素由 \(3^{10}\) 还是 \(2^{10}\) 主导。</li>
+
+<li><strong>判断正定性。</strong>对 \(B=\begin{bmatrix}2&-1\\-1&2\end{bmatrix}\) 用 <code>np.linalg.eigh</code> 求特征值，判断它是否正定；再随机取 50 个 \(x\) 计算 \(x^\top B x\) 看是否恒正。
+<pre><code>import numpy as np
+B = np.array([[2., -1.], [-1., 2.]])
+w, _ = np.linalg.eigh(B)
+print("特征值:", w, " 全正?", np.all(w > 0))
+xs = np.random.randn(50, 2)
+vals = np.einsum('ij,jk,ik->i', xs, B, xs)   # 每行算 xᵀBx
+print("min xᵀBx =", vals.min())              # 应 > 0</code></pre></li>
+
+<li><strong>PCA 雏形。</strong>合成一团沿 45° 拉长的二维数据，中心化后求协方差矩阵的特征向量/值，验证第一主成分指向数据散得最开的方向、其特征值最大。
+<pre><code>import numpy as np
+np.random.seed(0)
+# 沿方向 [1,1] 拉长的点云：行=样本
+t = np.random.randn(500, 1)
+noise = 0.3 * np.random.randn(500, 2)
+X = t * np.array([1., 1.]) + noise
+X = X - X.mean(axis=0)                        # 列中心化
+C = (X.T @ X) / (len(X) - 1)                  # 协方差矩阵
+w, Q = np.linalg.eigh(C)                      # 特征值升序
+print("特征值(方差):", np.round(w, 3))
+print("第一主成分(最大特征值方向):", np.round(Q[:, -1], 3))  # 应≈ ±[0.707,0.707]</code></pre></li>
+
+<li><strong>谱半径与稳定性。</strong>构造 \(W_1=0.9\cdot I\) 与 \(W_2=1.1\cdot R\)（\(R\) 为某旋转矩阵）。各自计算 \(\rho(W)\)，再对一个向量连乘 100 次，打印范数，观察"消失 vs 爆炸"。</li>
+</ol>
+
+<h2>掌握自检</h2>
+<ul>
+<li>我能用一句话说清 \(Av=\lambda v\) 的几何含义，并解释为什么 \(v\) 必须非零、而 \(\lambda=0\) 允许。</li>
+<li>给一个 2×2 矩阵，我能在两分钟内用 \(\operatorname{tr}/\det\) 写出特征方程、求出特征值与特征向量，并验算。</li>
+<li>我能说明 \(A=PDP^{-1}\) 的"换基—缩放—换回"三步画面，并据此解释 \(A^n=PD^nP^{-1}\)。</li>
+<li>我能复述谱定理的三条结论（实特征值、正交特征向量、\(A=Q\Lambda Q^\top\)），并知道它为何对协方差/海森这类对称矩阵成立。</li>
+<li>我能把 \(x^\top A x\) 的符号与特征值符号对应起来，并据此判断海森给出的是极小、极大还是鞍点。</li>
+<li>我能解释"主成分 = 协方差特征向量、方差 = 特征值"，以及降维时为什么丢小特征值方向。</li>
+<li>我能用幂迭代和谱半径，说清楚 RNN/深层网络梯度消失与爆炸的根源。</li>
+</ul>
+
+<p>下一课，我们把特征分解推广到<strong>任意</strong>（非方、非对称）矩阵——那就是<strong>奇异值分解 SVD</strong>。你会看到 \(A=U\Sigma V^\top\) 如何把"任意线性变换"拆成"旋转—缩放—旋转"，谱归一化里那个"最大奇异值"也将在那里正式登场。</p>
+</article>
+<div class="navbtns"><a class="prev" href="lesson-03-inner-product-norm-projection.html"><div class="nlabel">← 上一课</div><div class="ntitle">第3课 · 内积、范数与投影</div></a><a class="next" href="lesson-05-svd-low-rank.html"><div class="nlabel">下一课 →</div><div class="ntitle">第5课 · SVD 与低秩压缩</div></a></div>
+<nav class="toc"><h3>本模块课程表</h3><ol>
+<li><a href="lesson-01-vectors.html"><span class="ln">第1课</span>向量——机器学习的原子</a></li>
+<li><a href="lesson-02-matrix-linear-transformation.html"><span class="ln">第2课</span>矩阵即线性变换</a></li>
+<li><a href="lesson-03-inner-product-norm-projection.html"><span class="ln">第3课</span>内积、范数与投影</a></li>
+<li class="cur"><a href="lesson-04-eigenvalues-eigenvectors.html"><span class="ln">第4课</span>特征值与特征向量</a></li>
+<li><a href="lesson-05-svd-low-rank.html"><span class="ln">第5课</span>SVD 与低秩压缩</a></li>
+<li><a href="lesson-06-derivatives-gradients.html"><span class="ln">第6课</span>导数与梯度</a></li>
+<li><a href="lesson-07-jacobian-hessian.html"><span class="ln">第7课</span>雅可比与海森</a></li>
+<li><a href="lesson-08-chain-rule-computational-graph.html"><span class="ln">第8课</span>链式法则与计算图</a></li>
+<li><a href="lesson-09-matrix-calculus.html"><span class="ln">第9课</span>矩阵求导</a></li>
+<li><a href="lesson-10-backprop-from-scratch.html"><span class="ln">第10课</span>亲手实现反向传播</a></li>
+</ol></nav>
+</div>
+<!-- pyrunner-injected -->
+<style>
+.pr-cell{border:1px solid #334155;border-radius:10px;margin:1.2em 0;overflow:hidden;background:#0f172a;}
+.pr-head{display:flex;align-items:center;gap:8px;background:#1e293b;color:#cbd5e1;padding:6px 10px;font-size:13px;font-family:system-ui,-apple-system,sans-serif;}
+.pr-title{flex:1;font-weight:600;}
+.pr-status{font-size:12px;color:#94a3b8;white-space:nowrap;max-width:50%;overflow:hidden;text-overflow:ellipsis;}
+.pr-btn{cursor:pointer;border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:6px;padding:3px 11px;font-size:13px;line-height:1.4;}
+.pr-btn:hover{background:#0b1220;}
+.pr-run{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:600;}
+.pr-run:hover{background:#1d4ed8;}
+.pr-cell.collapsed .pr-body{display:none;}
+.pr-edit{display:block;width:100%;border:none;background:#0f172a;color:#e2e8f0;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.55;padding:12px 14px;resize:vertical;box-sizing:border-box;outline:none;}
+.pr-out{margin:0;padding:10px 14px;border-top:1px solid #334155;background:#0b1220;color:#cbd5e1;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.5;white-space:pre-wrap;max-height:340px;overflow:auto;}
+.pr-out:empty{display:none;}
+.pr-out.err{color:#fca5a5;}
+#pr-fab{position:fixed;right:18px;bottom:18px;z-index:9998;background:#2563eb;color:#fff;border:none;border-radius:999px;padding:10px 17px;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.22);font-family:system-ui,sans-serif;}
+#pr-fab:hover{background:#1d4ed8;}
+#pr-lab{position:fixed;right:18px;bottom:66px;z-index:9999;width:400px;max-width:92vw;background:#0f172a;border:1px solid #334155;border-radius:12px;display:none;flex-direction:column;box-shadow:0 14px 38px rgba(0,0,0,.4);overflow:hidden;}
+#pr-lab.open{display:flex;}
+#pr-lab .pr-edit{min-height:150px;}
+</style>
+<script>
+(function(){
+  var PYBASE="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+  var pyReady=null;
+  function loadPy(status){
+    if(pyReady)return pyReady;
+    pyReady=(async function(){
+      status("正在加载 Python 运行时（首次约 10 秒，需联网）…");
+      await new Promise(function(res,rej){
+        var s=document.createElement("script");s.src=PYBASE+"pyodide.js";
+        s.onload=res;s.onerror=function(){rej(new Error("无法加载 Pyodide（首次运行需要联网）"));};
+        document.head.appendChild(s);
+      });
+      var py=await loadPyodide({indexURL:PYBASE});
+      status("正在加载 NumPy …");
+      await py.loadPackage("numpy");
+      status("Python 就绪 ✓");
+      return py;
+    })();
+    return pyReady;
+  }
+  async function run(code,outEl,statusEl){
+    var setS=function(m){if(statusEl)statusEl.textContent=m;};
+    outEl.classList.remove("err");outEl.textContent="";
+    var py;
+    try{py=await loadPy(setS);}
+    catch(e){outEl.classList.add("err");outEl.textContent="加载失败："+e.message;return;}
+    var buf="";
+    py.setStdout({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    py.setStderr({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    try{
+      var result=await py.runPythonAsync(code);
+      if(result!==undefined&&result!==null){
+        var r;try{r=result.toString();}catch(_){r=String(result);}
+        if(r!=="None")buf+=(buf&&!buf.endsWith("\n")?"\n":"")+r;
+        if(result&&result.destroy)result.destroy();
+      }
+      outEl.textContent=buf||"（运行成功，无输出。用 print(...) 查看结果）";
+    }catch(e){
+      outEl.classList.add("err");
+      outEl.textContent=buf+(buf?"\n":"")+String((e&&e.message)||e);
+    }
+  }
+  function autosize(ta){ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight+2,460)+"px";}
+  function tabKey(e){
+    if(e.key==="Tab"){e.preventDefault();var s=this.selectionStart,en=this.selectionEnd;
+      this.value=this.value.slice(0,s)+"    "+this.value.slice(en);this.selectionStart=this.selectionEnd=s+4;}
+    if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();var b=this.closest(".pr-cell,#pr-lab").querySelector(".pr-run");if(b)b.click();}
+  }
+  function makeCell(code){
+    var cell=document.createElement("div");cell.className="pr-cell";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">可运行 · Python (NumPy)</span><span class="pr-status"></span><button class="pr-btn pr-toggle">收起</button><button class="pr-btn pr-run">▶ 运行</button></div><div class="pr-body"><textarea class="pr-edit" spellcheck="false"></textarea><pre class="pr-out"></pre></div>';
+    var ta=cell.querySelector(".pr-edit");ta.value=code;
+    var out=cell.querySelector(".pr-out"),st=cell.querySelector(".pr-status");
+    ta.addEventListener("input",function(){autosize(ta);});
+    ta.addEventListener("keydown",tabKey);
+    cell.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    var tog=cell.querySelector(".pr-toggle");
+    tog.onclick=function(){cell.classList.toggle("collapsed");tog.textContent=cell.classList.contains("collapsed")?"展开":"收起";};
+    setTimeout(function(){autosize(ta);},0);
+    return cell;
+  }
+  function enhance(){
+    document.querySelectorAll("article pre").forEach(function(pre){
+      if(pre.closest(".pr-cell"))return;
+      var codeEl=pre.querySelector("code")||pre;
+      var code=codeEl.textContent.replace(/\s+$/,"");
+      if(!code)return;
+      pre.replaceWith(makeCell(code));
+    });
+  }
+  function lab(){
+    var fab=document.createElement("button");fab.id="pr-fab";fab.textContent="▶ Python 实验台";
+    var panel=document.createElement("div");panel.id="pr-lab";
+    panel.innerHTML='<div class="pr-head"><span class="pr-title">Python 实验台 · NumPy</span><span class="pr-status"></span><button class="pr-btn pr-run">▶ 运行</button><button class="pr-btn pr-min">收起</button></div><div class="pr-body"><textarea class="pr-edit" spellcheck="false"></textarea><pre class="pr-out"></pre></div>';
+    document.body.appendChild(fab);document.body.appendChild(panel);
+    var ta=panel.querySelector(".pr-edit");
+    ta.value="import numpy as np\na = np.array([3, 2])\nb = np.array([1, 4])\nprint(\"a + b =\", a + b)\nprint(\"a . b =\", a @ b)\nprint(\"|a|  =\", np.linalg.norm(a))\ncos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))\nprint(\"cos =\", round(float(cos), 4))";
+    ta.addEventListener("keydown",tabKey);
+    var out=panel.querySelector(".pr-out"),st=panel.querySelector(".pr-status");
+    panel.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    fab.onclick=function(){panel.classList.toggle("open");};
+    panel.querySelector(".pr-min").onclick=function(){panel.classList.remove("open");};
+  }
+  function init(){enhance();lab();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+
+</body>
+</html>

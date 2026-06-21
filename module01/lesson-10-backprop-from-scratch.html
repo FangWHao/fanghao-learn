@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块1 · 第10课 · 亲手实现反向传播——两层网络与 micrograd</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue-bg:#eff6ff;
+--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--pink:#db2777;
+--red:#dc2626;--red-bg:#fef2f2;--bg:#ffffff;--soft:#f8fafc;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);
+font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.85;font-size:17px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:840px;margin:0 auto;padding:0 22px 100px;}
+header.top{background:#fff;border-bottom:1px solid var(--line);padding:26px 22px 22px;margin-bottom:14px;}
+header.top .inner{max-width:840px;margin:0 auto;}
+.crumb{color:var(--muted);font-size:14px;letter-spacing:.3px;margin-bottom:6px;}
+h1{font-size:30px;line-height:1.3;margin:.1em 0 .2em;}
+.sub{color:var(--muted);font-size:15px;}
+article{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:30px 34px;margin-top:18px;}
+h2{font-size:23px;margin:1.7em 0 .6em;padding-bottom:.25em;border-bottom:2px solid var(--line);}
+h2:first-child{margin-top:.2em;}
+h3{font-size:19px;margin:1.3em 0 .4em;color:#0f172a;}
+h4{margin:.2em 0 .5em;font-size:16px;}
+p{margin:.7em 0;}
+ul,ol{padding-left:1.3em;margin:.6em 0;}
+li{margin:.32em 0;}
+code{background:#f1f5f9;padding:.12em .4em;border-radius:5px;font-size:.9em;
+font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a;}
+pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 18px;overflow:auto;font-size:14px;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0;}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:15.5px;}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+thead th{background:var(--soft);}
+figure.fig{margin:1.4em 0;text-align:center;}
+figure.fig svg{max-width:100%;height:auto;}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
+.note,.ml,.key,.pitfall,.example{border-radius:10px;padding:14px 18px;margin:1.2em 0;border:1px solid var(--line);}
+.note{background:var(--soft);border-left:4px solid #94a3b8;}
+.example{background:#fff;border-left:4px solid var(--blue);}
+.ml{background:var(--green-bg);border-left:4px solid var(--green);}
+.key{background:var(--amber-bg);border-left:4px solid var(--amber);}
+.pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
+.toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
+.toc h3{margin:.1em 0 .7em;}
+.toc ol{list-style:none;padding:0;}
+.toc li{padding:7px 10px;border-radius:8px;color:#334155;border:1px solid transparent;}
+.toc li a{color:inherit;text-decoration:none;display:block;}
+.toc li .ln{display:inline-block;min-width:54px;color:var(--muted);font-size:13px;}
+.toc li.cur{background:var(--blue-bg);border-color:#bfdbfe;font-weight:600;color:#1e3a8a;}
+.toc li:not(.cur):hover{background:var(--soft);}
+.navbtns{display:flex;justify-content:space-between;margin-top:22px;gap:12px;}
+.navbtns a{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--ink);}
+.navbtns a:hover{border-color:var(--blue);}
+.navbtns .nlabel{color:var(--muted);font-size:13px;}
+.navbtns .ntitle{font-weight:600;margin-top:3px;}
+.navbtns .next{text-align:right;}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
+.card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
+.card:hover{border-color:var(--blue);}
+.card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
+.card .ct{font-size:18px;font-weight:600;}
+.card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+</style>
+</head>
+<body>
+<header class="top"><div class="inner">
+<div class="crumb"><a href="index.html" style="color:inherit">模块 1 · 线性代数与微积分</a>　/　第 10 课（共 10 课）</div>
+<h1>亲手实现反向传播——两层网络与 micrograd</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　第一阶段：数学与工具基础</div>
+</div></header>
+<div class="wrap">
+<article>
+<h2>1. 开场：把九课的工具拼成一台机器</h2>
+
+<p>上一课我们把<strong>矩阵求导 matrix calculus</strong>讲透了：知道了 \(\partial L/\partial W\) 长什么形状、怎么用链式法则一层层往回传。这一课是模块 1 的<strong>压轴实战</strong>——我们不再做孤立的公式练习，而是把前九课的全部工具（向量、矩阵变换、内积、ReLU、softmax、链式法则、矩阵求导）拼装成一台真正会"学习"的机器：一个<strong>两层全连接神经网络 two-layer fully-connected network</strong>，并亲手实现它的<strong>反向传播 backpropagation</strong>。</p>
+
+<p>读完本课，你会从头到尾推导出每一个梯度公式、用 <code>numpy</code> 把它们写成几行代码、用<strong>梯度检查 gradient check</strong>证明它们一字不差，然后看着 loss 从高到低真实地降下来。这就是 PyTorch 里那句 <code>loss.backward()</code> 背后的全部真相——理解了它，以后遇到 NaN、梯度爆炸、梯度消失，你才知道去哪儿找毛病。</p>
+
+<div class="note">
+<p><strong>沿用第 9 课的约定</strong>：全程使用<strong>分母布局 denominator layout</strong>，即 \(\partial L/\partial W\) 与 \(W\) <strong>同形</strong>；数据矩阵<strong>行 = 一个样本</strong>。这两条约定决定了下面所有矩阵乘法的摆放顺序，请时刻记住。</p>
+</div>
+
+<h2>2. 网络长什么样：前向传播</h2>
+
+<p>我们要搭的网络结构非常标准：输入向量先过一个线性层，激活，再过一个线性层，最后用 softmax 变成概率，用交叉熵衡量它和真实标签差多少。画成计算图就是一条链：</p>
+
+<figure class="fig"><svg viewBox="0 0 760 200" role="img" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, system-ui, sans-serif"><title>两层全连接网络前向计算图：x → 线性 → ReLU → 线性 → softmax → 交叉熵损失</title><desc>输入 x 依次经过线性层(W1,b1)、ReLU、线性层(W2,b2)、softmax 得到 ŷ，最后与 y 计算交叉熵损失 L，沿途标注中间量 z1,a1,z2,ŷ 及其形状。</desc><defs><marker id="arwG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#059669"/></marker></defs><g stroke="#059669" stroke-width="2" marker-end="url(#arwG)" fill="none"><line x1="84" y1="92" x2="118" y2="92"/><line x1="222" y1="92" x2="256" y2="92"/><line x1="360" y1="92" x2="394" y2="92"/><line x1="498" y1="92" x2="532" y2="92"/><line x1="636" y1="92" x2="670" y2="92"/></g><g text-anchor="middle" font-size="11" fill="#059669"><text x="101" y="78">W1,b1</text><text x="515" y="78">W2,b2</text></g><g fill="#ffffff" stroke="#2563eb" stroke-width="2"><rect x="14" y="68" width="70" height="48" rx="10"/><rect x="118" y="68" width="104" height="48" rx="10"/><rect x="256" y="68" width="104" height="48" rx="10"/><rect x="394" y="68" width="104" height="48" rx="10"/><rect x="532" y="68" width="104" height="48" rx="10"/></g><rect x="670" y="68" width="76" height="48" rx="10" fill="#ffffff" stroke="#d97706" stroke-width="2"/><g text-anchor="middle" fill="#1f2937"><g font-size="13"><text x="49" y="90">x</text><text x="170" y="89">z₁ = W₁x+b₁</text><text x="308" y="89">a₁ = ReLU(z₁)</text><text x="446" y="89">z₂ = W₂a₁+b₂</text><text x="584" y="89">ŷ = softmax(z₂)</text><text x="708" y="90" fill="#d97706">L</text></g><g font-size="11" fill="#94a3b8"><text x="49" y="106">输入 (D)</text><text x="170" y="105">线性 (H)</text><text x="308" y="105">激活 (H)</text><text x="446" y="105">线性 (K)</text><text x="584" y="105">概率 (K)</text></g></g><g text-anchor="middle"><text x="708" y="106" font-size="11" fill="#d97706">损失 CE(ŷ,y)</text></g><g transform="translate(283,135)"><polyline points="0,30 22,30 50,2" fill="none" stroke="#2563eb" stroke-width="2"/><line x1="-6" y1="30" x2="56" y2="30" stroke="#94a3b8" stroke-width="1"/><line x1="22" y1="36" x2="22" y2="-2" stroke="#94a3b8" stroke-width="1"/><circle cx="22" cy="30" r="2.5" fill="#2563eb"/><text x="25" y="52" text-anchor="middle" font-size="11" fill="#94a3b8">ReLU 折点 (0)</text></g></svg><figcaption>两层全连接网络的计算图：输入 x 依次经过 线性层(W1,b1) → ReLU → 线性层(W2,b2) → softmax → 交叉熵损失 L，沿途标注各中间量 z1,a1,z2,ŷ 与它们的形状。</figcaption></figure>
+
+<p>先看<strong>单个样本</strong>（列向量 \(x\in\mathbb{R}^{D}\)）的前向公式。设隐藏层有 \(H\) 个单元、输出 \(C\) 个类别：</p>
+
+\[
+\begin{aligned}
+z_1 &= W_1 x + b_1, & W_1&\in\mathbb{R}^{H\times D},\ b_1\in\mathbb{R}^{H} \quad\text{(第一层线性)}\\
+a_1 &= \mathrm{ReLU}(z_1) = \max(0,\,z_1) & &\text{(逐元素激活)}\\
+z_2 &= W_2 a_1 + b_2, & W_2&\in\mathbb{R}^{C\times H},\ b_2\in\mathbb{R}^{C} \quad\text{(第二层线性)}\\
+\hat{y} &= \mathrm{softmax}(z_2) & &\text{(变成概率分布)}\\
+L &= \mathrm{CE}(\hat{y}, y) = -\sum_{c=1}^{C} y_c \log \hat{y}_c & &\text{(交叉熵损失)}
+\end{aligned}
+\]
+
+<p>这里 \(y\) 是<strong>独热向量 one-hot vector</strong>：真实类别那一位是 1，其余是 0。所以交叉熵其实只剩一项 \(L=-\log\hat{y}_{\text{正确类}}\)——模型给正确类的概率越高，loss 越小。\(\mathrm{softmax}\) 的第 \(c\) 个分量是</p>
+
+\[
+\hat{y}_c = \frac{e^{z_{2,c}}}{\sum_{k=1}^{C} e^{z_{2,k}}},
+\]
+
+<p>它把任意一组实数"挤"成一个和为 1 的概率分布。</p>
+
+<div class="ml">
+<h4><span class="tag">ML</span> 和 ML 的联系</h4>
+<p>这五行就是几乎所有分类网络的"骨架"。把 \(W_1 x\) 换成卷积，它就是 CNN 的一个 block；把它堆 96 层、把 ReLU 换成 GELU，它就是 GPT 里的 MLP 子层。<strong>线性 → 非线性 → 线性 → softmax → 交叉熵</strong>这条流水线，你会在后面每一个模型里反复见到。今天把两层的梯度推一遍，后面的"深"网络只是同一个模式重复 \(L\) 次。</p>
+</div>
+
+<h2>3. 数值稳定：softmax 的 log-sum-exp 技巧</h2>
+
+<p>在写代码之前必须先排一个雷。softmax 里有 \(e^{z}\)，如果某个 \(z\) 比较大（比如 \(z=1000\)），\(e^{1000}\) 会直接<strong>上溢 overflow</strong> 成 <code>inf</code>，整个计算变成 <code>nan</code>。解决办法是一个简单又精妙的恒等式：分子分母同乘 \(e^{-m}\) 不改变结果，</p>
+
+\[
+\hat{y}_c=\frac{e^{z_c}}{\sum_k e^{z_k}}
+=\frac{e^{z_c-m}}{\sum_k e^{z_k-m}}\qquad\text{对任意常数 } m.
+\]
+
+<p>我们取 \(m=\max_k z_k\)（<strong>每一行各自的最大值</strong>）。这样减完之后，指数的输入最大是 0，\(e^{0}=1\) 不会溢出；最小的那些变成很负的数，\(e^{-\text{大}}\to 0\) 安全地下溢成 0。这就是<strong>log-sum-exp 稳定化</strong>。代码里永远写 <code>Z - Z.max(axis=1, keepdims=True)</code>，<strong>一行都不能省</strong>。</p>
+
+<div class="pitfall">
+<h4>易错</h4>
+<p>减最大值要<strong>按行（每个样本各自）</strong>减，不是减全局最大值，更不能不减。另外 <code>keepdims=True</code> 不能丢——否则 <code>(N,C)</code> 减 <code>(N,)</code> 会触发错误的广播（broadcast）。求 loss 时也别写 <code>np.log(yhat)</code> 直接喂概率：如果某个 \(\hat y\) 被算成 0，<code>log(0)=-inf</code>。我们加一个极小的 <code>1e-12</code> 兜底。</p>
+</div>
+
+<h2>4. 反向传播：从损失一路倒推回去</h2>
+
+<p>现在是本课的心脏。我们要的是 \(\partial L/\partial W_1,\ \partial L/\partial b_1,\ \partial L/\partial W_2,\ \partial L/\partial b_2\)。策略是<strong>沿计算图反向走</strong>，每经过一个节点，就用上一课的链式法则把梯度往前一站传递。绿色是前向数据流，橙色是反向梯度流：</p>
+
+<figure class="fig"><svg viewBox="0 0 540 320" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>前向与反向梯度在计算图上的对照流动</title><desc>上排绿色右向箭头表示前向数据流，下排橙色左向箭头表示反向梯度流，并在线性节点下方标注梯度公式与 ReLU 掩码门。</desc><defs><marker id="arrFwd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#059669"/></marker><marker id="arrBwd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#d97706"/></marker></defs><text x="270" y="20" text-anchor="middle" font-size="14" fill="#1f2937" font-weight="bold">前向（绿）与反向梯度（橙）对照流</text><g><rect x="24" y="44" width="56" height="34" rx="6" fill="#ecfdf5" stroke="#059669" stroke-width="2"/><text x="52" y="65" text-anchor="middle" font-size="13" fill="#1f2937">x</text><rect x="124" y="44" width="56" height="34" rx="6" fill="#ecfdf5" stroke="#059669" stroke-width="2"/><text x="152" y="61" text-anchor="middle" font-size="12" fill="#1f2937">z1=W1x</text><text x="152" y="73" text-anchor="middle" font-size="11" fill="#1f2937">a1=ReLU</text><rect x="224" y="44" width="56" height="34" rx="6" fill="#ecfdf5" stroke="#059669" stroke-width="2"/><text x="252" y="65" text-anchor="middle" font-size="13" fill="#1f2937">z2=W2a1</text><rect x="324" y="44" width="56" height="34" rx="6" fill="#ecfdf5" stroke="#059669" stroke-width="2"/><text x="352" y="65" text-anchor="middle" font-size="13" fill="#1f2937">ŷ=σ(z2)</text><rect x="424" y="44" width="56" height="34" rx="6" fill="#ecfdf5" stroke="#059669" stroke-width="2"/><text x="452" y="65" text-anchor="middle" font-size="13" fill="#1f2937">L</text></g><g stroke="#059669" stroke-width="2" fill="none" marker-end="url(#arrFwd)"><line x1="82" y1="57" x2="121" y2="57"/><line x1="182" y1="57" x2="221" y2="57"/><line x1="282" y1="57" x2="321" y2="57"/><line x1="382" y1="57" x2="421" y2="57"/></g><text x="100" y="51" text-anchor="middle" font-size="11" fill="#059669">W1</text><text x="200" y="51" text-anchor="middle" font-size="11" fill="#059669">W2</text><g stroke="#d97706" stroke-width="2" fill="none" marker-end="url(#arrBwd)"><line x1="421" y1="118" x2="382" y2="118"/><line x1="321" y1="118" x2="282" y2="118"/><line x1="221" y1="118" x2="200" y2="118"/><line x1="139" y1="118" x2="100" y2="118"/></g><g><circle cx="170" cy="118" r="15" fill="#fffbeb" stroke="#d97706" stroke-width="2"/><text x="170" y="115" text-anchor="middle" font-size="10" fill="#d97706">⊙</text><text x="170" y="126" text-anchor="middle" font-size="9" fill="#d97706">1[z1&gt;0]</text></g><text x="170" y="146" text-anchor="middle" font-size="11" fill="#d97706">ReLU 掩码</text><text x="452" y="106" text-anchor="middle" font-size="11" fill="#1f2937">L</text><text x="352" y="106" text-anchor="middle" font-size="11" fill="#1f2937">∂L/∂ŷ</text><g><text x="252" y="106" text-anchor="middle" font-size="11" fill="#1f2937">δ2=ŷ−y</text><text x="252" y="146" text-anchor="middle" font-size="11" fill="#d97706">∂L/∂W2=δ2 a1ᵀ</text></g><text x="200" y="106" text-anchor="middle" font-size="11" fill="#1f2937">∂L/∂a1</text><g><text x="120" y="106" text-anchor="middle" font-size="11" fill="#1f2937">δ1</text><text x="100" y="146" text-anchor="middle" font-size="11" fill="#d97706">∂L/∂W1=δ1 xᵀ</text></g><text x="225" y="178" text-anchor="middle" font-size="11" fill="#94a3b8">前向算 z1,a1,z2,ŷ,L · 反向从 δ2 回传至 W1</text><g><rect x="120" y="262" width="300" height="44" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/><line x1="138" y1="277" x2="170" y2="277" stroke="#059669" stroke-width="2" marker-end="url(#arrFwd)"/><text x="178" y="281" font-size="12" fill="#1f2937">绿=前向数据流</text><line x1="312" y1="277" x2="280" y2="277" stroke="#d97706" stroke-width="2" marker-end="url(#arrBwd)"/><text x="320" y="281" font-size="12" fill="#1f2937">橙=反向梯度流</text><rect x="138" y="291" width="14" height="11" rx="2" fill="#fffbeb" stroke="#d97706" stroke-width="1.5"/><text x="160" y="300" font-size="11" fill="#1f2937">⊙ 门：ReLU 掩码 1[z1&gt;0] 逐元素相乘</text></g></svg><figcaption>前向（绿，向右）与反向梯度（橙，向左）在同一计算图上的对照流动：前向算出 z1,a1,z2,ŷ,L；反向从 δ2=ŷ−y 起手，依次回传 ∂L/∂W2,∂L/∂a1 → 过 ReLU 掩码 → ∂L/∂z1 → ∂L/∂W1。</figcaption></figure>
+
+<h3>第一步（最关键）：softmax + 交叉熵合并求导</h3>
+
+<p>单独对 softmax 求导很麻烦（要算雅可比矩阵），但 softmax 紧接着交叉熵时，会发生一次"奇迹般"的化简。结论极其干净：</p>
+
+\[
+\boxed{\ \frac{\partial L}{\partial z_2} = \hat{y} - y\ }
+\]
+
+<p>也就是<strong>预测概率减去真实独热标签</strong>。直觉上太美了：如果模型对正确类已经预测为 1（\(\hat y=y\)），梯度就是 0，不用再改；预测得越离谱，梯度越大，改得越狠。这个结果第 9 课已经推过，这里直接拿来当反向传播的"起手式"。我们记 \(\delta_2 := \partial L/\partial z_2\)。</p>
+
+<h3>第二步：穿过第二层线性 \(z_2=W_2 a_1+b_2\)</h3>
+
+<p>这是上一课的标准结论。对一个线性层 \(z=Wa+b\)，已知上游梯度 \(\delta=\partial L/\partial z\)，则（分母布局下）：</p>
+
+\[
+\frac{\partial L}{\partial W_2}=\delta_2\, a_1^{\top},\qquad
+\frac{\partial L}{\partial b_2}=\delta_2,\qquad
+\frac{\partial L}{\partial a_1}=W_2^{\top}\,\delta_2.
+\]
+
+<p>记住形状自检法：\(\delta_2\) 是 \(C\times1\)，\(a_1^\top\) 是 \(1\times H\)，外积得到 \(C\times H\)，正好和 \(W_2\) 同形——分母布局的约定让一切自动对齐。最后一项 \(W_2^\top\delta_2\)（\(H\times C\) 乘 \(C\times 1\) 得 \(H\times1\)）就是把梯度<strong>回传</strong>给 \(a_1\)，准备穿过 ReLU。</p>
+
+<h3>第三步：穿过 ReLU</h3>
+
+<p>ReLU 是逐元素的 \(a_1=\max(0,z_1)\)，它的导数是一个"开关"：输入为正时导数为 1（信号原样通过），输入为负时导数为 0（信号被掐断）。所以</p>
+
+\[
+\frac{\partial L}{\partial z_1}=\frac{\partial L}{\partial a_1}\odot \mathbf{1}[z_1>0],
+\]
+
+<p>其中 \(\odot\) 是<strong>逐元素乘 element-wise product</strong>，\(\mathbf{1}[z_1>0]\) 是一个由 0/1 组成的掩码（mask）。记 \(\delta_1:=\partial L/\partial z_1\)。</p>
+
+<div class="note">
+<p><strong>这就是"梯度消失"最朴素的源头之一</strong>：凡是 \(z_1<0\) 的隐藏单元，反向时梯度被乘上 0，它对应的 \(W_1\) 那一部分这一步<strong>完全收不到学习信号</strong>。如果一个单元长期输出负值，它就成了"死亡 ReLU dead ReLU"，永远学不动。理解了这一行乘法，你就理解了为什么后来有 LeakyReLU、GELU。<br>
+反过来也有它的"对偶"：在很深的网络里，把第二步的回传 \(\delta_{\text{prev}}=W^\top\delta\) 一层层连乘下去，如果这些 \(W^\top\) 把梯度越放越大，最后传到浅层时数值会指数级膨胀甚至变 <code>inf</code>——这就是<strong>梯度爆炸 exploding gradient</strong>。它和梯度消失是同一个连乘机制的两个极端，具体的应对（梯度裁剪、归一化、残差连接）留到后面模块讲。</p>
+</div>
+
+<h3>第四步：穿过第一层线性 \(z_1=W_1 x+b_1\)</h3>
+
+<p>和第二步一模一样的模式，只是把 \(a_1\) 换成输入 \(x\)：</p>
+
+\[
+\frac{\partial L}{\partial W_1}=\delta_1\, x^{\top},\qquad
+\frac{\partial L}{\partial b_1}=\delta_1.
+\]
+
+<p>到这里四个梯度全部到手。注意整个过程<strong>只用了前向时存下来的中间量</strong>（\(x, z_1, a_1, \hat y\)）和一路传下来的 \(\delta\)，没有任何重复计算——这正是反向传播比"逐个参数算数值导数"快上千万倍的原因。</p>
+
+<div class="key">
+<h4>要点</h4>
+<p>反向传播 = 从 \(\delta_2=\hat y-y\) 起手，反复套用两条规则：<br>
+① <strong>线性层</strong> \(z=Wa+b\)：<code>dW = δ aᵀ</code>，<code>db = δ</code>，把梯度回传 <code>δ_prev = Wᵀ δ</code>；<br>
+② <strong>逐元素激活</strong>：上游梯度逐元素乘上该激活的导数（ReLU 就是乘 0/1 掩码）。<br>
+任意深的前馈网络，都是这两条规则的循环。</p>
+</div>
+
+<h2>5. 例题：手推一遍全部梯度（带真实数字）</h2>
+
+<div class="example">
+<h4>例题</h4>
+<p>取一个最小网络 \(D=2,\ H=3,\ C=2\)，单个样本。给定</p>
+\[
+x=\begin{bmatrix}1\\-2\end{bmatrix},\
+W_1=\begin{bmatrix}0.5&-0.3\\0.1&0.2\\-0.4&0.6\end{bmatrix},\
+b_1=\begin{bmatrix}0\\0.1\\-0.2\end{bmatrix},\
+W_2=\begin{bmatrix}0.2&-0.1&0.4\\0.3&0.5&-0.2\end{bmatrix},\
+b_2=\begin{bmatrix}0\\0.1\end{bmatrix},
+\]
+<p>真实类别是第 0 类，即 \(y=[1,0]^\top\)。请手推所有梯度。</p>
+
+<p><strong>前向。</strong> 先算 \(z_1=W_1x+b_1\)：</p>
+\[
+z_1=\begin{bmatrix}0.5\cdot1+(-0.3)(-2)+0\\0.1\cdot1+0.2(-2)+0.1\\-0.4\cdot1+0.6(-2)-0.2\end{bmatrix}
+=\begin{bmatrix}1.1\\-0.2\\-1.8\end{bmatrix},\quad
+a_1=\mathrm{ReLU}(z_1)=\begin{bmatrix}1.1\\0\\0\end{bmatrix}.
+\]
+<p>再算 \(z_2=W_2a_1+b_2\)（注意 \(a_1\) 只有第一位非零）：</p>
+\[
+z_2=\begin{bmatrix}0.2\cdot1.1+0\\0.3\cdot1.1+0.1\end{bmatrix}
+=\begin{bmatrix}0.22\\0.43\end{bmatrix}.
+\]
+<p>softmax（减最大值 0.43 稳定化）：\(e^{0.22-0.43}=e^{-0.21}=0.8106,\ e^{0}=1\)，归一化得</p>
+\[
+\hat y=\begin{bmatrix}0.8106/1.8106\\1/1.8106\end{bmatrix}=\begin{bmatrix}0.4477\\0.5523\end{bmatrix},\qquad
+L=-\log(0.4477)=0.8036.
+\]
+
+<p><strong>反向。</strong> 起手式：</p>
+\[
+\delta_2=\hat y-y=\begin{bmatrix}0.4477-1\\0.5523-0\end{bmatrix}=\begin{bmatrix}-0.5523\\0.5523\end{bmatrix}.
+\]
+<p>第二层（\(\delta_2 a_1^\top\)，外积；\(a_1=[1.1,0,0]\)）：</p>
+\[
+\frac{\partial L}{\partial W_2}=\begin{bmatrix}-0.5523\\0.5523\end{bmatrix}\begin{bmatrix}1.1&0&0\end{bmatrix}
+=\begin{bmatrix}-0.6075&0&0\\0.6075&0&0\end{bmatrix},\quad
+\frac{\partial L}{\partial b_2}=\begin{bmatrix}-0.5523\\0.5523\end{bmatrix}.
+\]
+<p>回传到 \(a_1\)：\(\partial L/\partial a_1=W_2^\top\delta_2\)：</p>
+\[
+W_2^\top\delta_2=\begin{bmatrix}0.2&0.3\\-0.1&0.5\\0.4&-0.2\end{bmatrix}\begin{bmatrix}-0.5523\\0.5523\end{bmatrix}
+=\begin{bmatrix}0.0552\\0.3314\\-0.3314\end{bmatrix}.
+\]
+<p>过 ReLU：掩码 \(\mathbf{1}[z_1>0]=[1,0,0]\)（因为 \(z_1=[1.1,-0.2,-1.8]\)），逐元素相乘：</p>
+\[
+\delta_1=\begin{bmatrix}0.0552\\0.3314\\-0.3314\end{bmatrix}\odot\begin{bmatrix}1\\0\\0\end{bmatrix}=\begin{bmatrix}0.0552\\0\\0\end{bmatrix}.
+\]
+<p>第一层（\(\delta_1 x^\top\)，\(x=[1,-2]\)）：</p>
+\[
+\frac{\partial L}{\partial W_1}=\begin{bmatrix}0.0552\\0\\0\end{bmatrix}\begin{bmatrix}1&-2\end{bmatrix}
+=\begin{bmatrix}0.0552&-0.1105\\0&0\\0&0\end{bmatrix},\quad
+\frac{\partial L}{\partial b_1}=\begin{bmatrix}0.0552\\0\\0\end{bmatrix}.
+\]
+<p>注意 \(W_1\) 的后两行梯度全是 0——因为那两个隐藏单元被 ReLU 掐断了，这一步它们学不到任何东西。（也正因如此，这个例子里反向特别"稀疏"；真实网络里多数单元都激活，各项一般都非零，动手练习第 1 题会让你体会满激活的一般情形。）这些数字在下面代码的"梯度检查"里会被有限差分逐一验证为正确。</p>
+</div>
+
+<h2>6. batch 维度：N 个样本一起算</h2>
+
+<p>真实训练不会一次只喂一个样本，而是一<strong>批 batch</strong> \(N\) 个一起。沿用"行=样本"的约定，把数据堆成矩阵 \(X\in\mathbb{R}^{N\times D}\)（每行一个 \(x^\top\)）。前向时所有公式从"矩阵×列向量"变成"矩阵×矩阵"，且权重摆在<strong>右边</strong>：</p>
+
+\[
+Z_1=XW_1+b_1\ (N\times H),\quad A_1=\mathrm{ReLU}(Z_1),\quad Z_2=A_1W_2+b_2\ (N\times C),\quad \hat Y=\mathrm{softmax}(Z_2).
+\]
+
+<p>（这里 \(W_1\) 取 \(D\times H\)、\(W_2\) 取 \(H\times C\)，正好让"行样本"流畅地左乘；偏置 \(b\) 靠广播加到每一行。）损失是<strong>整批的平均</strong>：\(L=\frac1N\sum_{i}\mathrm{CE}(\hat y_i,y_i)\)。反向时的关键约定是：</p>
+
+<ul>
+<li><strong>权重梯度对 batch 求和、再除以 \(N\)（即平均）</strong>。\(\partial L/\partial Z_2=(\hat Y-Y)/N\)，于是 \(\partial L/\partial W_2=A_1^\top\,(\hat Y-Y)/N\)。这个矩阵乘法里的求和 \(\sum_i\) 自动把所有样本的贡献加起来，除以 \(N\) 就是平均。</li>
+<li><strong>偏置梯度沿样本维 axis=0 求和</strong>，因为同一个 \(b\) 被加到了每个样本上，它的总梯度就是各样本贡献之和。注意求和与平均在这里只差一个"已经提前除掉的 \(N\)"：我们传进来的本就是带 \(1/N\) 因子的 \((\hat Y-Y)/N\)，所以 <code>db = ((Ŷ−Y)/N).sum(axis=0)</code> 沿样本维加完，得到的恰好是 \(N\) 个样本梯度的<strong>平均</strong>——和权重梯度口径一致，无需再额外除 \(N\)。</li>
+</ul>
+
+<p>形状上：\(A_1^\top\) 是 \(H\times N\)，\((\hat Y-Y)/N\) 是 \(N\times C\)，乘出来 \(H\times C\) 和 \(W_2\) 同形。漂亮地对齐。</p>
+
+<div class="pitfall">
+<h4>易错</h4>
+<p>(1) <strong>除以 \(N\) 不能漏</strong>，否则梯度大小随 batch 变化，学习率就得跟着调，很容易炸。(2) 偏置一定是 <code>.sum(axis=0)</code>（沿样本求和）而不是 <code>.sum()</code>（全求和成标量）。(3) batch 版里权重在右、转置在左，和单样本版"权重在左"相反——根源是"行样本"约定，别两套混用。</p>
+</div>
+
+<h2>7. 梯度检查：怎么证明你没推错</h2>
+
+<p>推导和写代码都极易出符号错、转置错、漏除 \(N\)。怎么自证清白？用<strong>有限差分 finite difference</strong> 去逼近"真"梯度，和你的解析梯度比。对任意一个参数分量 \(\theta\)，用<strong>中心差分</strong>（误差是 \(O(\epsilon^2)\)，比单边差分准得多）：</p>
+
+\[
+\frac{\partial L}{\partial \theta}\approx\frac{L(\theta+\epsilon)-L(\theta-\epsilon)}{2\epsilon},\qquad \epsilon=10^{-5}.
+\]
+
+<p>然后比较解析梯度 \(g_a\) 与数值梯度 \(g_n\) 的<strong>相对误差 relative error</strong>：</p>
+
+\[
+\text{rel}=\frac{|g_a-g_n|}{|g_a|+|g_n|}.
+\]
+
+<p>如果你的反向传播写对了，相对误差应当<strong>小于 \(10^{-7}\)</strong>（用 <code>float64</code> 时常能到 \(10^{-9}\)）。如果某个参数误差是 \(10^{-2}\) 量级，那里几乎肯定有 bug。下面代码里 <code>grad_check()</code> 抽查若干分量，实测最大相对误差约 \(5\times10^{-9}\)——过关。</p>
+
+<div class="ml">
+<h4><span class="tag">ML</span> 和 ML 的联系</h4>
+<p>梯度检查是<strong>每个手写反向传播的人都要做的第一件事</strong>。框架时代你很少自己写 backward，但一旦你实现自定义算子（custom layer / custom CUDA kernel），PyTorch 的 <code>torch.autograd.gradcheck</code> 干的就是这件事。它慢（每个参数要两次前向），所以只在小网络、调试期用；训练时关掉。</p>
+</div>
+
+<h2>8. 完整代码：合成数据 → 训练 → 梯度检查全过关</h2>
+
+<p>下面是一段<strong>纯 numpy</strong>、可直接在本页运行的完整实现：现场合成三团高斯点做三分类，跑梯度检查，再训练 800 步，打印 loss 下降与准确率。几秒内跑完。</p>
+
+<pre><code>import numpy as np
+rng = np.random.default_rng(42)
+
+# ---------- 1. 合成数据：3 团高斯点（故意让它们有重叠，问题才不平凡）----------
+def make_blobs(n_per=200):
+    centers = np.array([[ 1.3,  0.0],
+                        [-1.0,  1.1],
+                        [-0.7, -1.1]])
+    X, y = [], []
+    for k, c in enumerate(centers):
+        pts = rng.normal(c, 0.95, size=(n_per, 2))   # 标准差大 -> 三团互相重叠
+        X.append(pts); y.append(np.full(n_per, k))
+    X = np.vstack(X); y = np.concatenate(y)
+    idx = rng.permutation(len(y))
+    return X[idx], y[idx]
+
+X, y = make_blobs()
+N, D = X.shape          # N 样本, D=2 特征（行=样本）
+C = 3                   # 类别数
+# np.eye(C) 是 C×C 单位矩阵；用标签数组 y 索引它的行，
+# 把每个整数标签 k 取成第 k 行（第 k 位为 1 的独热向量），
+# 一次性得到形状 (N, C) 的独热标签矩阵 Y。
+Y = np.eye(C)[y]
+H = 16                  # 隐藏单元数
+
+# ---------- 2. 参数初始化（He 初始化，配 ReLU）----------
+# He 初始化：把权重的随机尺度设成 sqrt(2/扇入)，目的是让前向信号
+# 不逐层放大或缩小、训练能顺利起步。为什么恰好是 2/n 留到优化模块讲，
+# 现在只需照用即可。
+def init():
+    return (rng.normal(0, np.sqrt(2/D), (D, H)),  # W1 (D,H)
+            np.zeros(H),                            # b1
+            rng.normal(0, np.sqrt(2/H), (H, C)),   # W2 (H,C)
+            np.zeros(C))                            # b2
+
+# ---------- 3. 前向 + 损失 ----------
+def softmax(Z):
+    Z = Z - Z.max(axis=1, keepdims=True)   # log-sum-exp 稳定化（按行减最大值）
+    e = np.exp(Z)
+    return e / e.sum(axis=1, keepdims=True)
+
+def forward(X, W1, b1, W2, b2):
+    z1 = X @ W1 + b1          # (N,H)
+    a1 = np.maximum(z1, 0)    # ReLU
+    z2 = a1 @ W2 + b2         # (N,C)
+    yhat = softmax(z2)
+    return yhat, (X, z1, a1, z2, yhat)
+
+def loss_fn(yhat, Y):
+    N = Y.shape[0]
+    return -np.sum(Y * np.log(yhat + 1e-12)) / N   # 加 1e-12 防 log(0)
+
+# ---------- 4. 反向（本课的核心，对照第 4、6 节公式）----------
+def backward(cache, Y, W2):
+    X, z1, a1, z2, yhat = cache
+    N = X.shape[0]
+    dz2 = (yhat - Y) / N        # 起手式 ŷ-y，并对 batch 平均
+    dW2 = a1.T @ dz2            # (H,C)  = A1ᵀ δ2
+    db2 = dz2.sum(axis=0)       # (C,)   偏置沿样本维求和
+    da1 = dz2 @ W2.T            # (N,H)  回传到 a1
+    dz1 = da1 * (z1 > 0)        # 过 ReLU：逐元素乘 0/1 掩码
+    dW1 = X.T @ dz1             # (D,H)  = Xᵀ δ1
+    db1 = dz1.sum(axis=0)       # (H,)
+    return dW1, db1, dW2, db2
+
+# ---------- 5. 梯度检查：有限差分 vs 解析梯度 ----------
+def grad_check():
+    W1, b1, W2, b2 = init()
+    Xs, Ys = X[:8], Y[:8]                    # 小批量足够
+    _, cache = forward(Xs, W1, b1, W2, b2)
+    grads  = dict(zip(['W1','b1','W2','b2'], backward(cache, Ys, W2)))
+    params = {'W1':W1, 'b1':b1, 'W2':W2, 'b2':b2}
+    eps, worst = 1e-5, 0.0
+    for name, P in params.items():
+        g_ana = grads[name]
+        for _ in range(20):                  # 每个参数抽查 20 个分量
+            i = tuple(rng.integers(0, s) for s in P.shape)
+            old = P[i]
+            P[i] = old + eps; Lp = loss_fn(forward(Xs,W1,b1,W2,b2)[0], Ys)
+            P[i] = old - eps; Lm = loss_fn(forward(Xs,W1,b1,W2,b2)[0], Ys)
+            P[i] = old
+            g_num = (Lp - Lm) / (2*eps)       # 中心差分
+            rel = abs(g_num - g_ana[i]) / max(1e-12, abs(g_num) + abs(g_ana[i]))
+            worst = max(worst, rel)
+    print(f"梯度检查最大相对误差 = {worst:.2e}   (应 < 1e-7)")
+
+grad_check()
+
+# ---------- 6. 训练循环 ----------
+W1, b1, W2, b2 = init()
+eta = 0.4                                     # 学习率
+print("开始训练：")
+for step in range(1, 801):
+    yhat, cache = forward(X, W1, b1, W2, b2)
+    L = loss_fn(yhat, Y)
+    dW1, db1, dW2, db2 = backward(cache, Y, W2)
+    W1 -= eta*dW1; b1 -= eta*db1             # 梯度下降一步
+    W2 -= eta*dW2; b2 -= eta*db2
+    if step in (1, 50, 100, 200, 400, 800):
+        acc = (yhat.argmax(1) == y).mean()
+        print(f"  step {step:4d}   loss {L:.4f}   acc {acc:.3f}")
+
+yhat, _ = forward(X, W1, b1, W2, b2)
+print(f"最终训练准确率 = {(yhat.argmax(1)==y).mean():.3f}")
+</code></pre>
+
+<p>运行后你会看到类似输出（数字因随机种子固定而可复现）：梯度检查约 <code>5e-09</code> 过关；loss 从 step 1 的 <code>1.8</code> 左右一路降下来，<strong>前 50 步降得最猛</strong>（50 步时已到 <code>0.42</code> 上下、基本收敛），之后缓慢微降，到 800 步稳定在 <code>0.40</code> 附近，准确率到 <code>0.84</code> 左右。三团点故意做成重叠的，所以达不到 100%——这恰恰说明它在<strong>真学</strong>，而不是死记。下图是 loss 随步数下降的示意（前陡后缓）：</p>
+
+<figure class="fig"><svg viewBox="0 0 540 340" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>训练 loss 随步数下降的示意曲线</title><defs><marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker></defs><rect x="70" y="40" width="74" height="220" fill="#2563eb" opacity="0.06"/><text x="76" y="56" font-size="11" fill="#2563eb">前 ~100 步学得最快</text><text x="540" y="20" font-size="11" fill="#1f2937" text-anchor="end">三团重叠高斯点，最终 acc≈0.83，故 loss 不为 0</text><line x1="70" y1="40" x2="70" y2="260" stroke="#e2e8f0" stroke-width="0.75"/><line x1="70" y1="40" x2="500" y2="40" stroke="#e2e8f0" stroke-width="0.75"/><line x1="70" y1="100" x2="500" y2="100" stroke="#e2e8f0" stroke-width="0.75"/><line x1="70" y1="150" x2="500" y2="150" stroke="#e2e8f0" stroke-width="0.75"/><line x1="70" y1="205" x2="500" y2="205" stroke="#e2e8f0" stroke-width="0.75"/><line x1="70" y1="40" x2="70" y2="260" stroke="#94a3b8" stroke-width="1"/><line x1="70" y1="260" x2="500" y2="260" stroke="#94a3b8" stroke-width="1" marker-end="url(#ah)"/><line x1="70" y1="40" x2="70" y2="34" stroke="#94a3b8" stroke-width="1" marker-end="url(#ah)"/><text x="64" y="44" font-size="11" fill="#1f2937" text-anchor="end">1.4</text><text x="64" y="104" font-size="11" fill="#1f2937" text-anchor="end">1.0</text><text x="64" y="154" font-size="11" fill="#1f2937" text-anchor="end">0.6</text><text x="64" y="209" font-size="11" fill="#1f2937" text-anchor="end">0.2</text><text x="64" y="264" font-size="11" fill="#1f2937" text-anchor="end">0.0</text><text x="46" y="150" font-size="12" fill="#1f2937" transform="rotate(-90 46 150)" text-anchor="middle">loss</text><text x="70" y="278" font-size="11" fill="#1f2937" text-anchor="middle">0</text><text x="124" y="278" font-size="11" fill="#1f2937" text-anchor="middle">100</text><text x="178" y="278" font-size="11" fill="#1f2937" text-anchor="middle">200</text><text x="285" y="278" font-size="11" fill="#1f2937" text-anchor="middle">400</text><text x="500" y="278" font-size="11" fill="#1f2937" text-anchor="middle">800</text><text x="285" y="298" font-size="12" fill="#1f2937" text-anchor="middle">step</text><path d="M70.5,81 C78,135 92,178 97,185 C108,201 118,205 124,208 C145,213 178,214 178,214 C285,216 392,216 500,217" fill="none" stroke="#2563eb" stroke-width="2"/><circle cx="70.5" cy="81" r="3.5" fill="#2563eb"/><text x="78" y="78" font-size="11" fill="#2563eb">1.8</text><circle cx="97" cy="185" r="3.5" fill="#2563eb"/><text x="100" y="178" font-size="11" fill="#2563eb">0.45</text><circle cx="124" cy="208" r="3.5" fill="#2563eb"/><text x="128" y="200" font-size="11" fill="#2563eb">0.41</text><circle cx="178" cy="214" r="3.5" fill="#2563eb"/><text x="182" y="208" font-size="11" fill="#2563eb">0.405</text><circle cx="285" cy="216" r="3.5" fill="#2563eb"/><text x="289" y="210" font-size="11" fill="#2563eb">0.402</text><circle cx="500" cy="217" r="3.5" fill="#2563eb"/><text x="496" y="232" font-size="11" fill="#2563eb" text-anchor="end">0.398</text></svg><figcaption>训练 loss 随步数下降的示意曲线：从约 1.3 快速下降，在前 ~100 步陡降，之后缓慢趋平到约 0.40（与第 8 节代码实测一致）。</figcaption></figure>
+
+<p>试着把 <code>eta</code> 调到 <code>5.0</code>（loss 可能震荡或变 <code>nan</code>），或调到 <code>0.01</code>（降得极慢），亲手感受学习率的作用；再把 <code>H</code> 改成 <code>2</code>，看看模型容量不够时准确率怎么掉下来。</p>
+
+<h2>9. micrograd：把"手推链式"升级成"自动反向"</h2>
+
+<p>上面我们是<strong>手工</strong>为这个特定网络写 backward。但框架（PyTorch/TensorFlow）不可能为每种网络手写——它们用<strong>自动微分 automatic differentiation</strong>。核心思想由 Karpathy 的玩具库 <strong>micrograd</strong> 讲得最透彻：<strong>把每个标量包成一个带 <code>grad</code> 字段的节点，记住它是由哪些节点、经什么运算得来的；每个运算自己知道怎么把上游梯度传给输入。</strong>前向时顺手把计算图连起来，调用 <code>.backward()</code> 时按拓扑序倒着走一遍，每个节点执行自己的局部链式法则——这正是我们第 4 节做的事，只是自动化了。</p>
+
+<pre><code>import numpy as np
+
+class Value:
+    """一个标量 + 它的梯度 + 它怎么算出来的（自动微分最小内核）"""
+    def __init__(self, data, _children=()):
+        self.data = float(data)
+        self.grad = 0.0
+        self._backward = lambda: None     # 该节点把梯度回传给输入的局部规则
+        self._prev = set(_children)
+
+    def __add__(self, o):
+        o = o if isinstance(o, Value) else Value(o)
+        out = Value(self.data + o.data, (self, o))
+        def _bw():                        # d(a+b)/da = 1, d(a+b)/db = 1
+            self.grad += out.grad
+            o.grad    += out.grad
+        out._backward = _bw
+        return out
+
+    def __mul__(self, o):
+        o = o if isinstance(o, Value) else Value(o)
+        out = Value(self.data * o.data, (self, o))
+        def _bw():                        # d(a*b)/da = b, d(a*b)/db = a
+            self.grad += o.data * out.grad
+            o.grad    += self.data * out.grad
+        out._backward = _bw
+        return out
+
+    def relu(self):
+        out = Value(max(0.0, self.data), (self,))
+        def _bw():                        # ReLU 导数：输入>0 时 1，否则 0
+            self.grad += (out.data > 0) * out.grad
+        out._backward = _bw
+        return out
+
+    def backward(self):
+        # 1) 拓扑排序：保证回传一个节点前，它的所有"下游"已处理完。
+        #    直觉像倒水：必须先处理离输出最近的节点，再处理喂给它的上游节点；
+        #    这样轮到某节点时，所有用到它的下游节点都已把各自梯度累加进来。
+        topo, seen = [], set()
+        def build(v):
+            if v not in seen:
+                seen.add(v)
+                for ch in v._prev:
+                    build(ch)
+                topo.append(v)
+        build(self)
+        # 2) 从输出开始，梯度设 1，倒序执行每个节点的局部规则
+        self.grad = 1.0
+        for v in reversed(topo):
+            v._backward()
+
+# 验证：算一个神经元 n = relu(x*w + b) 对各输入的梯度
+x, w, b = Value(2.0), Value(3.0), Value(1.0)
+n = (x*w + b).relu()        # relu(2*3+1) = relu(7) = 7
+n.backward()
+print("n =", n.data)                  # 7.0
+print("dx =", x.grad)                 # = w = 3.0
+print("dw =", w.grad)                 # = x = 2.0
+print("db =", b.grad)                 # = 1.0
+
+# 换成会被 ReLU 掐断的情形：relu(-5)=0，梯度全为 0
+x2, w2, b2 = Value(-2.0), Value(3.0), Value(1.0)
+n2 = (x2*w2 + b2).relu()    # relu(-6+1) = relu(-5) = 0
+n2.backward()
+print("n2 =", n2.data, " dx =", x2.grad, " dw =", w2.grad, " db =", b2.grad)
+</code></pre>
+
+<p>运行会打印 <code>n=7.0, dx=3.0, dw=2.0, db=1.0</code>，第二组因 ReLU 截断全是 0——和我们手推的规则完全一致。把 <code>Value</code> 扩展到向量/矩阵、再加上 <code>exp</code>、<code>log</code> 等运算，就是一个迷你 PyTorch。第 8 节那个网络的每一步 <code>.backward()</code>，本质就是这套机制在矩阵上的批量版本。</p>
+
+<div class="key">
+<h4>要点</h4>
+<p><code>loss.backward()</code> 没有任何魔法：前向时把运算连成<strong>计算图</strong>，反向时按<strong>拓扑逆序</strong>让每个节点执行自己的<strong>局部链式法则</strong>，梯度用 <code>+=</code> <strong>累加</strong>（因为一个节点可能被多处用到——这也是为什么 PyTorch 要 <code>zero_grad()</code> 清零）。你手推的两层网络反向，就是这台机器跑出的结果。</p>
+</div>
+
+<h2>10. 小结：你刚刚打通了整个模块 1</h2>
+
+<p>回头看，这一课把前九课串成了一条完整链路：<strong>向量与矩阵</strong>是数据和参数的载体，<strong>内积/线性变换</strong>是每一层的运算，<strong>导数与梯度</strong>是"往哪改"的方向，<strong>链式法则与矩阵求导</strong>是反向传播的引擎，而 <strong>softmax/交叉熵</strong>把它接到分类任务上。你现在能从损失一路手推到第一层权重的梯度、用代码实现它、用梯度检查证明它对、看着它把 loss 真的降下来——这是理解一切深度模型训练的地基。</p>
+
+<div class="ml">
+<h4><span class="tag">ML</span> 和 ML 的联系</h4>
+<p>以后调模型遇到 <strong>loss 变 NaN</strong>，你会第一时间想到 softmax 没做 log-sum-exp 稳定化、或 <code>log(0)</code>；遇到 <strong>梯度消失</strong>，你会想到 ReLU 掩码把信号乘成了 0、或链太长导致 \(W^\top\) 连乘衰减；遇到 <strong>梯度爆炸</strong>，你会想到同一条 \(W^\top\) 连乘反过来把梯度越放越大；遇到 <strong>loss 不降</strong>，你会去查学习率、初始化、或梯度方向写反了。这些"据"，全部来自你今天亲手走过的那一遍反向传播。</p>
+</div>
+
+<h2>动手练习</h2>
+<ol>
+<li><strong>手推 + 复核。</strong> 用第 5 节的同一组数字，但把真实标签改成第 1 类（\(y=[0,1]^\top\)），手推出 \(\delta_2,\ \partial L/\partial W_2,\ \partial L/\partial W_1\)，再用下面骨架核对。<strong>进阶：</strong>再换一组让 \(z_1\) 全为正的输入（例如 \(x=[2,1]^\top\)）重推一遍，体会当所有隐藏单元都被激活时，各梯度项都非零、外积是"满"的——不像例题里那样退化得稀疏。
+<pre><code>import numpy as np
+x=np.array([1.,-2.]); 
+W1=np.array([[.5,-.3],[.1,.2],[-.4,.6]]); b1=np.array([0.,.1,-.2])
+W2=np.array([[.2,-.1,.4],[.3,.5,-.2]]); b2=np.array([0.,.1])
+y=np.array([0.,1.])
+z1=W1@x+b1; a1=np.maximum(z1,0); z2=W2@a1+b2
+e=np.exp(z2-z2.max()); yh=e/e.sum()
+dz2=yh-y
+print("dz2",dz2)
+print("dW2",np.outer(dz2,a1))
+da1=W2.T@dz2; dz1=da1*(z1>0)
+print("dW1",np.outer(dz1,x))
+</code></pre></li>
+<li><strong>去掉稳定化看溢出。</strong> 把第 8 节 <code>softmax</code> 里的 <code>Z - Z.max(...)</code> 删掉，并把某个输入特征乘以 1000（<code>X = X*1000</code>），运行看是否出现 <code>nan</code>；再加回稳定化，确认恢复正常。</li>
+<li><strong>偏置约定实验。</strong> 把 <code>backward</code> 里的 <code>db2 = dz2.sum(axis=0)</code> 误写成 <code>db2 = dz2.sum()</code>（求成标量），重新跑 <code>grad_check()</code>，观察相对误差从约 <code>5e-9</code> 跳到多大——亲手见证"偏置要沿样本维求和"。</li>
+<li><strong>学习率扫描。</strong> 写个循环对 <code>eta in [0.01, 0.1, 0.4, 1.5, 5.0]</code> 各训练 300 步，打印最终 loss 与准确率，找出最好的 <code>eta</code>，并解释太大/太小各发生了什么。</li>
+<li><strong>给 micrograd 加新运算。</strong> 给第 9 节的 <code>Value</code> 类加一个 <code>tanh</code> 方法（前向 <code>np.tanh(x)</code>，反向局部导数 <code>1 - tanh(x)**2</code>），用 <code>backward()</code> 验证它对一个标量输入的梯度，与中心差分对比。</li>
+</ol>
+
+<h2>掌握自检</h2>
+<ul>
+<li>我能不看讲义，从 \(\delta_2=\hat y-y\) 起手，独立推出四个梯度，并说出每个矩阵乘法里转置和左右摆放的理由（靠形状自检）。</li>
+<li>我能解释 log-sum-exp 稳定化为什么不改变 softmax 结果，以及为什么要按行减最大值。</li>
+<li>我能说清 batch 维下"权重梯度对 \(N\) 求平均、偏置沿样本维求和"的来历，知道偏置的求和与平均只差那个已被 \((\hat Y-Y)/N\) 提前吸收的 \(N\)，并知道漏掉除 \(N\) 会怎样。</li>
+<li>我能写出中心差分公式，并知道梯度检查的相对误差应当 \(<10^{-7}\)，否则代码有 bug。</li>
+<li>我能用一句话说明 <code>loss.backward()</code> 的本质（计算图 + 拓扑逆序 + 局部链式法则 + 梯度累加），并解释 ReLU 掩码如何引起梯度消失、\(W^\top\) 连乘如何引起梯度消失或爆炸。</li>
+</ul>
+
+<p class="sub" style="margin-top:1.5em">到这里，<strong>模块 1（线性代数与微积分）全部完成</strong>——你已经备齐了驱动一切模型的数学引擎。下一模块我们换一套语言：进入<strong>概率、信息论与最优化</strong>（含强化学习速成），去回答"模型该有多自信""信息怎么量化""梯度下降之外还有哪些更聪明的优化器"。</p>
+</article>
+<div class="navbtns"><a class="prev" href="lesson-09-matrix-calculus.html"><div class="nlabel">← 上一课</div><div class="ntitle">第9课 · 矩阵求导</div></a><a class="next" href="index.html"><div class="nlabel">→</div><div class="ntitle">模块完成 · 回目录</div></a></div>
+<nav class="toc"><h3>本模块课程表</h3><ol>
+<li><a href="lesson-01-vectors.html"><span class="ln">第1课</span>向量——机器学习的原子</a></li>
+<li><a href="lesson-02-matrix-linear-transformation.html"><span class="ln">第2课</span>矩阵即线性变换</a></li>
+<li><a href="lesson-03-inner-product-norm-projection.html"><span class="ln">第3课</span>内积、范数与投影</a></li>
+<li><a href="lesson-04-eigenvalues-eigenvectors.html"><span class="ln">第4课</span>特征值与特征向量</a></li>
+<li><a href="lesson-05-svd-low-rank.html"><span class="ln">第5课</span>SVD 与低秩压缩</a></li>
+<li><a href="lesson-06-derivatives-gradients.html"><span class="ln">第6课</span>导数与梯度</a></li>
+<li><a href="lesson-07-jacobian-hessian.html"><span class="ln">第7课</span>雅可比与海森</a></li>
+<li><a href="lesson-08-chain-rule-computational-graph.html"><span class="ln">第8课</span>链式法则与计算图</a></li>
+<li><a href="lesson-09-matrix-calculus.html"><span class="ln">第9课</span>矩阵求导</a></li>
+<li class="cur"><a href="lesson-10-backprop-from-scratch.html"><span class="ln">第10课</span>亲手实现反向传播</a></li>
+</ol></nav>
+</div>
+<!-- pyrunner-injected -->
+<style>
+.pr-cell{border:1px solid #334155;border-radius:10px;margin:1.2em 0;overflow:hidden;background:#0f172a;}
+.pr-head{display:flex;align-items:center;gap:8px;background:#1e293b;color:#cbd5e1;padding:6px 10px;font-size:13px;font-family:system-ui,-apple-system,sans-serif;}
+.pr-title{flex:1;font-weight:600;}
+.pr-status{font-size:12px;color:#94a3b8;white-space:nowrap;max-width:50%;overflow:hidden;text-overflow:ellipsis;}
+.pr-btn{cursor:pointer;border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:6px;padding:3px 11px;font-size:13px;line-height:1.4;}
+.pr-btn:hover{background:#0b1220;}
+.pr-run{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:600;}
+.pr-run:hover{background:#1d4ed8;}
+.pr-cell.collapsed .pr-body{display:none;}
+.pr-edit{display:block;width:100%;border:none;background:#0f172a;color:#e2e8f0;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.55;padding:12px 14px;resize:vertical;box-sizing:border-box;outline:none;}
+.pr-out{margin:0;padding:10px 14px;border-top:1px solid #334155;background:#0b1220;color:#cbd5e1;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.5;white-space:pre-wrap;max-height:340px;overflow:auto;}
+.pr-out:empty{display:none;}
+.pr-out.err{color:#fca5a5;}
+#pr-fab{position:fixed;right:18px;bottom:18px;z-index:9998;background:#2563eb;color:#fff;border:none;border-radius:999px;padding:10px 17px;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.22);font-family:system-ui,sans-serif;}
+#pr-fab:hover{background:#1d4ed8;}
+#pr-lab{position:fixed;right:18px;bottom:66px;z-index:9999;width:400px;max-width:92vw;background:#0f172a;border:1px solid #334155;border-radius:12px;display:none;flex-direction:column;box-shadow:0 14px 38px rgba(0,0,0,.4);overflow:hidden;}
+#pr-lab.open{display:flex;}
+#pr-lab .pr-edit{min-height:150px;}
+</style>
+<script>
+(function(){
+  var PYBASE="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+  var pyReady=null;
+  function loadPy(status){
+    if(pyReady)return pyReady;
+    pyReady=(async function(){
+      status("正在加载 Python 运行时（首次约 10 秒，需联网）…");
+      await new Promise(function(res,rej){
+        var s=document.createElement("script");s.src=PYBASE+"pyodide.js";
+        s.onload=res;s.onerror=function(){rej(new Error("无法加载 Pyodide（首次运行需要联网）"));};
+        document.head.appendChild(s);
+      });
+      var py=await loadPyodide({indexURL:PYBASE});
+      status("正在加载 NumPy …");
+      await py.loadPackage("numpy");
+      status("Python 就绪 ✓");
+      return py;
+    })();
+    return pyReady;
+  }
+  async function run(code,outEl,statusEl){
+    var setS=function(m){if(statusEl)statusEl.textContent=m;};
+    outEl.classList.remove("err");outEl.textContent="";
+    var py;
+    try{py=await loadPy(setS);}
+    catch(e){outEl.classList.add("err");outEl.textContent="加载失败："+e.message;return;}
+    var buf="";
+    py.setStdout({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    py.setStderr({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    try{
+      var result=await py.runPythonAsync(code);
+      if(result!==undefined&&result!==null){
+        var r;try{r=result.toString();}catch(_){r=String(result);}
+        if(r!=="None")buf+=(buf&&!buf.endsWith("\n")?"\n":"")+r;
+        if(result&&result.destroy)result.destroy();
+      }
+      outEl.textContent=buf||"（运行成功，无输出。用 print(...) 查看结果）";
+    }catch(e){
+      outEl.classList.add("err");
+      outEl.textContent=buf+(buf?"\n":"")+String((e&&e.message)||e);
+    }
+  }
+  function autosize(ta){ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight+2,460)+"px";}
+  function tabKey(e){
+    if(e.key==="Tab"){e.preventDefault();var s=this.selectionStart,en=this.selectionEnd;
+      this.value=this.value.slice(0,s)+"    "+this.value.slice(en);this.selectionStart=this.selectionEnd=s+4;}
+    if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();var b=this.closest(".pr-cell,#pr-lab").querySelector(".pr-run");if(b)b.click();}
+  }
+  function makeCell(code){
+    var cell=document.createElement("div");cell.className="pr-cell";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">可运行 · Python (NumPy)</span><span class="pr-status"></span><button class="pr-btn pr-toggle">收起</button><button class="pr-btn pr-run">▶ 运行</button></div><div class="pr-body"><textarea class="pr-edit" spellcheck="false"></textarea><pre class="pr-out"></pre></div>';
+    var ta=cell.querySelector(".pr-edit");ta.value=code;
+    var out=cell.querySelector(".pr-out"),st=cell.querySelector(".pr-status");
+    ta.addEventListener("input",function(){autosize(ta);});
+    ta.addEventListener("keydown",tabKey);
+    cell.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    var tog=cell.querySelector(".pr-toggle");
+    tog.onclick=function(){cell.classList.toggle("collapsed");tog.textContent=cell.classList.contains("collapsed")?"展开":"收起";};
+    setTimeout(function(){autosize(ta);},0);
+    return cell;
+  }
+  function enhance(){
+    document.querySelectorAll("article pre").forEach(function(pre){
+      if(pre.closest(".pr-cell"))return;
+      var codeEl=pre.querySelector("code")||pre;
+      var code=codeEl.textContent.replace(/\s+$/,"");
+      if(!code)return;
+      pre.replaceWith(makeCell(code));
+    });
+  }
+  function lab(){
+    var fab=document.createElement("button");fab.id="pr-fab";fab.textContent="▶ Python 实验台";
+    var panel=document.createElement("div");panel.id="pr-lab";
+    panel.innerHTML='<div class="pr-head"><span class="pr-title">Python 实验台 · NumPy</span><span class="pr-status"></span><button class="pr-btn pr-run">▶ 运行</button><button class="pr-btn pr-min">收起</button></div><div class="pr-body"><textarea class="pr-edit" spellcheck="false"></textarea><pre class="pr-out"></pre></div>';
+    document.body.appendChild(fab);document.body.appendChild(panel);
+    var ta=panel.querySelector(".pr-edit");
+    ta.value="import numpy as np\na = np.array([3, 2])\nb = np.array([1, 4])\nprint(\"a + b =\", a + b)\nprint(\"a . b =\", a @ b)\nprint(\"|a|  =\", np.linalg.norm(a))\ncos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))\nprint(\"cos =\", round(float(cos), 4))";
+    ta.addEventListener("keydown",tabKey);
+    var out=panel.querySelector(".pr-out"),st=panel.querySelector(".pr-status");
+    panel.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    fab.onclick=function(){panel.classList.toggle("open");};
+    panel.querySelector(".pr-min").onclick=function(){panel.classList.remove("open");};
+  }
+  function init(){enhance();lab();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+
+</body>
+</html>

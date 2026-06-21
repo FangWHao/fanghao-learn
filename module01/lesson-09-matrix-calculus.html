@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块1 · 第9课 · 矩阵求导——把梯度向量化</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue-bg:#eff6ff;
+--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--pink:#db2777;
+--red:#dc2626;--red-bg:#fef2f2;--bg:#ffffff;--soft:#f8fafc;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);
+font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.85;font-size:17px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:840px;margin:0 auto;padding:0 22px 100px;}
+header.top{background:#fff;border-bottom:1px solid var(--line);padding:26px 22px 22px;margin-bottom:14px;}
+header.top .inner{max-width:840px;margin:0 auto;}
+.crumb{color:var(--muted);font-size:14px;letter-spacing:.3px;margin-bottom:6px;}
+h1{font-size:30px;line-height:1.3;margin:.1em 0 .2em;}
+.sub{color:var(--muted);font-size:15px;}
+article{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:30px 34px;margin-top:18px;}
+h2{font-size:23px;margin:1.7em 0 .6em;padding-bottom:.25em;border-bottom:2px solid var(--line);}
+h2:first-child{margin-top:.2em;}
+h3{font-size:19px;margin:1.3em 0 .4em;color:#0f172a;}
+h4{margin:.2em 0 .5em;font-size:16px;}
+p{margin:.7em 0;}
+ul,ol{padding-left:1.3em;margin:.6em 0;}
+li{margin:.32em 0;}
+code{background:#f1f5f9;padding:.12em .4em;border-radius:5px;font-size:.9em;
+font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a;}
+pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 18px;overflow:auto;font-size:14px;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0;}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:15.5px;}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+thead th{background:var(--soft);}
+figure.fig{margin:1.4em 0;text-align:center;}
+figure.fig svg{max-width:100%;height:auto;}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
+.note,.ml,.key,.pitfall,.example{border-radius:10px;padding:14px 18px;margin:1.2em 0;border:1px solid var(--line);}
+.note{background:var(--soft);border-left:4px solid #94a3b8;}
+.example{background:#fff;border-left:4px solid var(--blue);}
+.ml{background:var(--green-bg);border-left:4px solid var(--green);}
+.key{background:var(--amber-bg);border-left:4px solid var(--amber);}
+.pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
+.toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
+.toc h3{margin:.1em 0 .7em;}
+.toc ol{list-style:none;padding:0;}
+.toc li{padding:7px 10px;border-radius:8px;color:#334155;border:1px solid transparent;}
+.toc li a{color:inherit;text-decoration:none;display:block;}
+.toc li .ln{display:inline-block;min-width:54px;color:var(--muted);font-size:13px;}
+.toc li.cur{background:var(--blue-bg);border-color:#bfdbfe;font-weight:600;color:#1e3a8a;}
+.toc li:not(.cur):hover{background:var(--soft);}
+.navbtns{display:flex;justify-content:space-between;margin-top:22px;gap:12px;}
+.navbtns a{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--ink);}
+.navbtns a:hover{border-color:var(--blue);}
+.navbtns .nlabel{color:var(--muted);font-size:13px;}
+.navbtns .ntitle{font-weight:600;margin-top:3px;}
+.navbtns .next{text-align:right;}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
+.card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
+.card:hover{border-color:var(--blue);}
+.card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
+.card .ct{font-size:18px;font-weight:600;}
+.card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+</style>
+</head>
+<body>
+<header class="top"><div class="inner">
+<div class="crumb"><a href="index.html" style="color:inherit">模块 1 · 线性代数与微积分</a>　/　第 9 课（共 10 课）</div>
+<h1>矩阵求导——把梯度向量化</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　第一阶段：数学与工具基础</div>
+</div></header>
+<div class="wrap">
+<article>
+<p>上一课我们用计算图，把损失对每个<em>标量</em>的偏导一个一个地反向传播出来。那很扎实，但当一层网络有成千上万个权重时，逐元素写偏导既慢又容易错。这一课我们把同样的事情<strong>向量化</strong>：直接对整个向量、整个矩阵求导，让一行公式 \(\partial L/\partial W=\delta\,x^\top\) 替代成千上万行链式法则。</p>
+
+<div class="note">
+<p><strong>一句话动机：</strong>反向传播的本质是"损失对参数的梯度"。参数是矩阵，所以我们需要"对矩阵求导"的语言。学会它，你看任何深度学习公式都会从"天书"变成"一眼看穿形状"。</p>
+</div>
+
+<h2>1. 先把"布局"这件事一次说清</h2>
+
+<p>"矩阵求导"之所以让初学者头疼，90% 的痛苦来自一个根本没说清的约定：<strong>导数排成什么形状</strong>。同一个 \(\partial(a^\top x)/\partial x\)，有的书得到行向量，有的书得到列向量——它们都没错，只是<em>布局约定（layout convention）</em>不同。</p>
+
+<p>有两种约定：</p>
+<ul>
+<li><strong>分子布局（numerator layout）：</strong>结果的形状跟随<em>分子</em>。\(\partial y/\partial x\) 中，\(y\) 决定行、\(x\) 决定列。</li>
+<li><strong>分母布局（denominator layout）：</strong>结果的形状跟随<em>分母</em>。这正是深度学习的惯例，因为我们最关心 \(\partial L/\partial W\)（标量损失对参数），希望它<strong>和参数同形</strong>，这样才能直接做梯度下降 \(W \leftarrow W-\eta\,\partial L/\partial W\)。</li>
+</ul>
+
+<div class="key">
+<h4>要点：本课与全程的约定</h4>
+<p><strong>我们全程使用分母布局。</strong>最重要的一条直接记住：</p>
+\[
+\boxed{\ \frac{\partial L}{\partial W}\ \text{与}\ W\ \textbf{同形}\ }
+\]
+<p>即：损失是标量，那么"标量对矩阵的导数"就是一个与该矩阵一模一样大小的矩阵，第 \((i,j)\) 个元素是 \(\partial L/\partial W_{ij}\)。这就是 PyTorch 里 <code>W.grad</code> 永远和 <code>W</code> 同形的原因。</p>
+<p><strong>全程总原则（记住这一句就不会乱）：</strong>凡<em>分子是标量</em>（即我们绝大多数时候要算的"标量损失对参数"），一律用分母布局，结果<strong>与分母同形</strong>。<strong>唯一的例外</strong>是<em>向量对向量</em>的雅可比——它沿用上一课的分子布局（\(m\times n\)）。本课要算的几乎都是"标量对参数"，所以分母布局是绝对的主角；那个唯一的例外只在 §2.2 露一次面，下面会专门点出。</p>
+</div>
+
+<h3>1.1 四类导数的形状总览</h3>
+
+<p>把"谁对谁求导"分成四类。设标量 \(a\)、列向量 \(x\in\mathbb{R}^n\)、\(y\in\mathbb{R}^m\)、矩阵 \(W\in\mathbb{R}^{m\times n}\)。在<strong>分母布局</strong>下：</p>
+
+<figure class="fig"><svg viewBox="0 0 540 360" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>四类导数在分母布局下的输出形状速查表</title><desc>2行3列网格：行为分子（标量L、向量y），列为分母（标量a、向量x、矩阵W），每格用形状示意输出维度。</desc><text x="270" y="24" text-anchor="middle" font-size="15" font-weight="600" fill="#1f2937">分母布局 denominator layout</text><text x="270" y="42" text-anchor="middle" font-size="12" fill="#94a3b8">形状跟随分母</text><line x1="150" y1="58" x2="150" y2="346" stroke="#e2e8f0" stroke-width="0.75"/><line x1="280" y1="58" x2="280" y2="346" stroke="#e2e8f0" stroke-width="0.75"/><line x1="410" y1="58" x2="410" y2="346" stroke="#e2e8f0" stroke-width="0.75"/><line x1="20" y1="202" x2="520" y2="202" stroke="#e2e8f0" stroke-width="0.75"/><line x1="20" y1="58" x2="520" y2="58" stroke="#94a3b8" stroke-width="1"/><text x="85" y="76" text-anchor="middle" font-size="13" font-weight="600" fill="#1f2937">分子 \ 分母</text><text x="215" y="73" text-anchor="middle" font-size="13" font-weight="600" fill="#1f2937">标量 a</text><text x="345" y="73" text-anchor="middle" font-size="13" font-weight="600" fill="#1f2937">向量 x</text><text x="345" y="89" text-anchor="middle" font-size="11" fill="#94a3b8">∈ R^n</text><text x="475" y="73" text-anchor="middle" font-size="13" font-weight="600" fill="#1f2937">矩阵 W</text><text x="475" y="89" text-anchor="middle" font-size="11" fill="#94a3b8">∈ R^(m×n)</text><text x="85" y="126" text-anchor="middle" font-size="13" font-weight="600" fill="#1f2937">标量 L</text><text x="85" y="262" text-anchor="middle" font-size="13" font-weight="600" fill="#1f2937">向量 y</text><text x="85" y="278" text-anchor="middle" font-size="11" fill="#94a3b8">∈ R^m</text><circle cx="215" cy="135" r="6" fill="#2563eb"/><text x="215" y="168" text-anchor="middle" font-size="12" fill="#1f2937">标量</text><text x="215" y="184" text-anchor="middle" font-size="11" fill="#94a3b8">∈ R</text><rect x="340" y="108" width="11" height="56" rx="2" fill="#2563eb" fill-opacity="0.18" stroke="#2563eb" stroke-width="2"/><text x="345" y="180" text-anchor="middle" font-size="12" fill="#1f2937">R^n 列向量</text><text x="345" y="195" text-anchor="middle" font-size="11" fill="#059669">∇ₓL</text><g stroke="#2563eb" stroke-width="1.5" fill="#2563eb" fill-opacity="0.18"><rect x="453" y="108" width="14" height="14"/><rect x="467" y="108" width="14" height="14"/><rect x="481" y="108" width="14" height="14"/><rect x="453" y="122" width="14" height="14"/><rect x="467" y="122" width="14" height="14"/><rect x="481" y="122" width="14" height="14"/></g><text x="474" y="158" text-anchor="middle" font-size="12" fill="#1f2937">m×n 方块</text><text x="474" y="173" text-anchor="middle" font-size="11" fill="#059669">与 W 同形</text><rect x="210" y="244" width="11" height="56" rx="2" fill="#db2777" fill-opacity="0.18" stroke="#db2777" stroke-width="2"/><text x="215" y="316" text-anchor="middle" font-size="12" fill="#1f2937">R^m 列向量</text><g stroke="#db2777" stroke-width="1.5" fill="#db2777" fill-opacity="0.18"><rect x="335" y="240" width="14" height="14"/><rect x="349" y="240" width="14" height="14"/><rect x="335" y="254" width="14" height="14"/><rect x="349" y="254" width="14" height="14"/><rect x="335" y="268" width="14" height="14"/><rect x="349" y="268" width="14" height="14"/></g><text x="345" y="300" text-anchor="middle" font-size="12" fill="#1f2937">n×m 方块</text><text x="345" y="315" text-anchor="middle" font-size="11" fill="#059669">雅可比转置 Jᵀ</text><g stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"><line x1="464" y1="244" x2="486" y2="266"/><line x1="486" y1="244" x2="464" y2="266"/></g><text x="475" y="300" text-anchor="middle" font-size="12" fill="#94a3b8">高阶张量</text><text x="475" y="315" text-anchor="middle" font-size="11" fill="#94a3b8">本课略</text></svg><figcaption>四类导数的形状速查表：标量/向量 对 标量/向量/矩阵，在分母布局下各自的输出形状。</figcaption></figure>
+
+<table>
+<thead><tr><th>分子＼分母</th><th>对标量 \(a\)</th><th>对向量 \(x\in\mathbb{R}^n\)</th><th>对矩阵 \(W\in\mathbb{R}^{m\times n}\)</th></tr></thead>
+<tbody>
+<tr><td><strong>标量 \(L\)</strong></td><td>标量</td><td>列向量 \(\in\mathbb{R}^{n}\)（梯度 \(\nabla_x L\)）</td><td>矩阵 \(\in\mathbb{R}^{m\times n}\)（与 \(W\) 同形）</td></tr>
+<tr><td><strong>向量 \(y\in\mathbb{R}^m\)</strong></td><td>列向量 \(\in\mathbb{R}^{m}\)</td><td>矩阵 \(\in\mathbb{R}^{n\times m}\)（雅可比的转置）</td><td>（高阶张量，本课不展开）</td></tr>
+</tbody>
+</table>
+
+<p>注意第二行第二列：\(\partial y/\partial x\)。上一课我们把<em>雅可比（Jacobian）</em>\(J\) 定义成 \(m\times n\)（\(J_{ij}=\partial y_i/\partial x_j\)，分子布局）。在分母布局下，\(\partial y/\partial x\) 是它的转置 \(J^\top\in\mathbb{R}^{n\times m}\)。这正是上面"总原则"里说的<strong>唯一例外</strong>——也是两套约定唯一容易"打架"的地方，下面会专门点出。</p>
+
+<div class="pitfall">
+<h4>易错：别背公式，要做形状检查（shape check）</h4>
+<p>本课最重要的方法论不是某个公式，而是一个习惯：<strong>写下任何梯度后，立刻检查它的形状是否等于"分母"的形状。</strong>如果你算出的 \(\partial L/\partial W\) 不是 \(m\times n\)，那一定是某处转置错了。形状对不上的式子，连验证都不用——它一定是错的。后面每个公式我都会带你做一次 shape check。</p>
+</div>
+
+<h2>2. 从第一性原理推导四个必备公式</h2>
+
+<p>我们不背表，而是从定义推。所有推导只用一件事：<strong>标量对向量的导数，第 \(k\) 个分量就是对 \(x_k\) 的偏导。</strong></p>
+
+<h3>2.1 线性型 \(\partial(a^\top x)/\partial x = a\)</h3>
+
+<p>设 \(f(x)=a^\top x=\sum_{k=1}^n a_k x_k\)，这里 \(a\) 是常向量。对第 \(i\) 个分量求偏导：</p>
+\[
+\frac{\partial f}{\partial x_i}=\frac{\partial}{\partial x_i}\sum_{k} a_k x_k = a_i .
+\]
+<p>把所有 \(i\) 堆成一个列向量（分母布局），得到</p>
+\[
+\boxed{\ \frac{\partial (a^\top x)}{\partial x}=a\ }\in\mathbb{R}^n .
+\]
+<p><strong>Shape check：</strong>分母是 \(x\in\mathbb{R}^n\)，结果应是 \(\mathbb{R}^n\) 列向量——而 \(a\in\mathbb{R}^n\)，对上了。这就是标量对向量求导最基本的"砖块"，相当于一元微积分里的 \((ax)'=a\)。</p>
+
+<h3>2.2 矩阵乘向量 \(\partial(Wx)/\partial x\)</h3>
+
+<p>这里 \(y=Wx\) 是<strong>向量对向量</strong>——也就是 §1 里说的那个<em>唯一例外</em>。先别急着记结论：实践中我们几乎从不单独用这个导数，<strong>谁该转置最终由"形状必须对上"自动决定</strong>（见 §4），所以下面的方框只是为了和上一课的雅可比对照，<em>不必背</em>。</p>
+
+<p>第 \(i\) 个输出 \(y_i=\sum_k W_{ik}x_k\)，所以 \(\partial y_i/\partial x_j=W_{ij}\)。雅可比（分子布局，\(m\times n\)）正是 \(W\) 本身：</p>
+\[
+J=\frac{\partial y}{\partial x}\Big|_{\text{分子布局}}=W .
+\]
+<p>而在<strong>分母布局</strong>下，\(\partial y/\partial x\) 是它的转置：</p>
+\[
+\frac{\partial (Wx)}{\partial x}\Big|_{\text{分母布局}}=W^\top\in\mathbb{R}^{n\times m}.\qquad(\textit{不必记忆，仅供对照}）
+\]
+<p><strong>Shape check：</strong>分母 \(x\in\mathbb{R}^n\) 占行（\(n\)），分子 \(y\in\mathbb{R}^m\) 占列（\(m\)），所以是 \(n\times m\)——而 \(W^\top\) 正是 \(n\times m\)。</p>
+
+<div class="note">
+<p><strong>不用死记是 \(W\) 还是 \(W^\top\)。</strong>实践中我们几乎从不单独用这个向量对向量的导数，而是把它放进链式法则里求 \(\partial L/\partial x\)（标量对向量）。那时谁转置由"形状必须对上"自动决定，见 §4。这也呼应本课的方法论：<strong>shape check 比记公式更重要</strong>。</p>
+</div>
+
+<h3>2.3 二次型 \(\partial(x^\top A x)/\partial x=(A+A^\top)x\)</h3>
+
+<p>设 \(f(x)=x^\top A x=\sum_{i}\sum_{j} x_i A_{ij} x_j\)，\(A\) 是常矩阵。要对 \(x_k\) 求偏导，注意 \(x_k\) 出现在两处：作为外层下标 \(i=k\)，以及作为内层下标 \(j=k\)。用乘积法则：</p>
+\[
+\frac{\partial f}{\partial x_k}=\underbrace{\sum_{j} A_{kj}x_j}_{i=k\ \text{那一项}}+\underbrace{\sum_{i} x_i A_{ik}}_{j=k\ \text{那一项}} .
+\]
+<p>第一个和是 \((Ax)_k\)；第二个和是 \(\sum_i A_{ik}x_i=(A^\top x)_k\)。合起来：</p>
+\[
+\boxed{\ \frac{\partial (x^\top A x)}{\partial x}=(A+A^\top)x\ }.
+\]
+<p>当 \(A\) <strong>对称</strong>（\(A=A^\top\)，机器学习里协方差矩阵、海森矩阵都对称）时简化为</p>
+\[
+\frac{\partial (x^\top A x)}{\partial x}=2Ax .
+\]
+<p><strong>Shape check：</strong>\((A+A^\top)\in\mathbb{R}^{n\times n}\) 乘 \(x\in\mathbb{R}^n\) 得 \(\mathbb{R}^n\)，与分母 \(x\) 同形。</p>
+
+<h3>2.4 平方范数 \(\partial\|x\|^2/\partial x=2x\)</h3>
+
+<p>这是 §2.3 的特例：\(\|x\|^2=x^\top x=x^\top I x\)，取 \(A=I\)（对称），立刻得</p>
+\[
+\boxed{\ \frac{\partial\|x\|^2}{\partial x}=2Ix=2x\ }.
+\]
+<p>它是一元 \((x^2)'=2x\) 的向量版本，也是 L2 正则、最小二乘损失里最常见的梯度。</p>
+
+<figure class="fig"><svg viewBox="0 0 560 360" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif">
+<title>四个必备求导公式与形状契约</title>
+<desc>线性型、矩阵乘向量、二次型、平方范数四个求导公式，每个结果的形状都等于分母 x 的形状。</desc>
+<defs>
+<marker id="aBlue" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#2563eb"/></marker>
+<marker id="aAmber" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#d97706"/></marker>
+<marker id="aGreen" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#059669"/></marker>
+</defs>
+
+<!-- Title -->
+<text x="280" y="22" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">四个必备求导公式 · 结果形状 = 分母 x 的形状</text>
+
+<!-- ============ Card 1: linear ============ -->
+<rect x="14" y="38" width="124" height="306" rx="8" fill="#2563eb" fill-opacity="0.04" stroke="#e2e8f0" stroke-width="1"/>
+<text x="76" y="58" text-anchor="middle" font-size="12" font-weight="700" fill="#1f2937">① 线性型</text>
+<text x="76" y="78" text-anchor="middle" font-size="13" fill="#1f2937">∂(aᵀx)/∂x = a</text>
+
+<!-- x column -->
+<rect x="40" y="98" width="16" height="80" rx="3" fill="#2563eb" fill-opacity="0.18" stroke="#2563eb" stroke-width="2"/>
+<text x="48" y="194" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">x</text>
+<text x="48" y="208" text-anchor="middle" font-size="11" fill="#94a3b8">Rⁿ</text>
+<!-- arrow -->
+<line x1="62" y1="138" x2="92" y2="138" stroke="#059669" stroke-width="2" marker-end="url(#aGreen)"/>
+<!-- a column (same shape) -->
+<rect x="98" y="98" width="16" height="80" rx="3" fill="#059669" fill-opacity="0.18" stroke="#059669" stroke-width="2"/>
+<text x="106" y="194" text-anchor="middle" font-size="12" fill="#059669" font-weight="600">a</text>
+<text x="106" y="208" text-anchor="middle" font-size="11" fill="#94a3b8">Rⁿ</text>
+<text x="76" y="234" text-anchor="middle" font-size="11" fill="#1f2937">a 与 x 同为</text>
+<text x="76" y="248" text-anchor="middle" font-size="11" fill="#1f2937">Rⁿ 竖条</text>
+<text x="76" y="276" text-anchor="middle" font-size="11" fill="#059669" font-weight="600">输出 ≅ 分母 x</text>
+
+<!-- ============ Card 2: Wx ============ -->
+<rect x="146" y="38" width="124" height="306" rx="8" fill="#2563eb" fill-opacity="0.04" stroke="#e2e8f0" stroke-width="1"/>
+<text x="208" y="58" text-anchor="middle" font-size="12" font-weight="700" fill="#1f2937">② 矩阵乘向量</text>
+<text x="208" y="78" text-anchor="middle" font-size="13" fill="#1f2937">∂(Wx)/∂x = Wᵀ</text>
+<text x="208" y="92" text-anchor="middle" font-size="11" fill="#94a3b8">（分母布局）</text>
+
+<!-- W block m×n: wider than tall -->
+<rect x="160" y="104" width="44" height="30" rx="3" fill="#2563eb" fill-opacity="0.18" stroke="#2563eb" stroke-width="2"/>
+<text x="182" y="123" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">W</text>
+<text x="182" y="148" text-anchor="middle" font-size="11" fill="#94a3b8">m×n</text>
+<!-- transpose arrow -->
+<line x1="182" y1="160" x2="182" y2="184" stroke="#d97706" stroke-width="2" marker-end="url(#aAmber)"/>
+<text x="232" y="176" text-anchor="middle" font-size="11" fill="#d97706" font-weight="600">转置 ᵀ</text>
+<!-- Wᵀ block n×m: taller than wide -->
+<rect x="167" y="190" width="30" height="44" rx="3" fill="#d97706" fill-opacity="0.18" stroke="#d97706" stroke-width="2"/>
+<text x="182" y="216" text-anchor="middle" font-size="12" fill="#d97706" font-weight="600">Wᵀ</text>
+<text x="208" y="252" text-anchor="middle" font-size="11" fill="#94a3b8">n 行 m 列</text>
+<text x="208" y="276" text-anchor="middle" font-size="11" fill="#059669" font-weight="600">行数 = dim x = n</text>
+<text x="208" y="290" text-anchor="middle" font-size="11" fill="#059669">≅ 分母 x 维度</text>
+
+<!-- ============ Card 3: quadratic ============ -->
+<rect x="278" y="38" width="136" height="306" rx="8" fill="#2563eb" fill-opacity="0.04" stroke="#e2e8f0" stroke-width="1"/>
+<text x="346" y="58" text-anchor="middle" font-size="12" font-weight="700" fill="#1f2937">③ 二次型</text>
+<text x="346" y="78" text-anchor="middle" font-size="12.5" fill="#1f2937">∂(xᵀAx)/∂x</text>
+<text x="346" y="94" text-anchor="middle" font-size="12.5" fill="#1f2937">= (A+Aᵀ)x</text>
+
+<!-- A n×n -->
+<rect x="290" y="106" width="30" height="30" rx="3" fill="#2563eb" fill-opacity="0.18" stroke="#2563eb" stroke-width="2"/>
+<text x="305" y="125" text-anchor="middle" font-size="11" fill="#2563eb" font-weight="600">A</text>
+<text x="326" y="125" text-anchor="middle" font-size="13" fill="#1f2937">+</text>
+<!-- Aᵀ n×n -->
+<rect x="332" y="106" width="30" height="30" rx="3" fill="#db2777" fill-opacity="0.18" stroke="#db2777" stroke-width="2"/>
+<text x="347" y="125" text-anchor="middle" font-size="11" fill="#db2777" font-weight="600">Aᵀ</text>
+<text x="305" y="150" text-anchor="middle" font-size="10.5" fill="#94a3b8">n×n</text>
+<text x="347" y="150" text-anchor="middle" font-size="10.5" fill="#94a3b8">n×n</text>
+
+<!-- (A+Aᵀ) sum block -->
+<rect x="295" y="166" width="34" height="34" rx="3" fill="#d97706" fill-opacity="0.18" stroke="#d97706" stroke-width="2"/>
+<text x="312" y="187" text-anchor="middle" font-size="10.5" fill="#d97706" font-weight="600">A+Aᵀ</text>
+<text x="338" y="188" text-anchor="middle" font-size="13" fill="#1f2937">×</text>
+<!-- x column -->
+<rect x="348" y="160" width="14" height="46" rx="3" fill="#2563eb" fill-opacity="0.18" stroke="#2563eb" stroke-width="2"/>
+<text x="355" y="220" text-anchor="middle" font-size="11" fill="#2563eb" font-weight="600">x</text>
+<!-- arrow to result -->
+<line x1="330" y1="220" x2="330" y2="244" stroke="#059669" stroke-width="2" marker-end="url(#aGreen)"/>
+<!-- result column Rⁿ -->
+<rect x="323" y="250" width="14" height="46" rx="3" fill="#059669" fill-opacity="0.18" stroke="#059669" stroke-width="2"/>
+<text x="330" y="312" text-anchor="middle" font-size="11" fill="#059669" font-weight="600">Rⁿ ≅ x</text>
+<!-- symmetric note -->
+<text x="346" y="332" text-anchor="middle" font-size="10.5" fill="#1f2937">A 对称 → = 2Ax</text>
+
+<!-- ============ Card 4: norm ============ -->
+<rect x="422" y="38" width="124" height="306" rx="8" fill="#2563eb" fill-opacity="0.04" stroke="#e2e8f0" stroke-width="1"/>
+<text x="484" y="58" text-anchor="middle" font-size="12" font-weight="700" fill="#1f2937">④ 平方范数</text>
+<text x="484" y="78" text-anchor="middle" font-size="13" fill="#1f2937">∂‖x‖²/∂x = 2x</text>
+
+<!-- x column -->
+<rect x="446" y="110" width="14" height="60" rx="3" fill="#2563eb" fill-opacity="0.18" stroke="#2563eb" stroke-width="2"/>
+<text x="453" y="186" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">x</text>
+<text x="453" y="200" text-anchor="middle" font-size="11" fill="#94a3b8">Rⁿ</text>
+<!-- ×2 arrow -->
+<line x1="466" y1="140" x2="496" y2="140" stroke="#d97706" stroke-width="2" marker-end="url(#aAmber)"/>
+<text x="481" y="130" text-anchor="middle" font-size="11" fill="#d97706" font-weight="600">×2</text>
+<!-- 2x column: same dim, scaled magnitude (wider stroke vibe via 2× width band) -->
+<rect x="502" y="110" width="22" height="60" rx="3" fill="#059669" fill-opacity="0.22" stroke="#059669" stroke-width="2"/>
+<text x="513" y="186" text-anchor="middle" font-size="12" fill="#059669" font-weight="600">2x</text>
+<text x="513" y="200" text-anchor="middle" font-size="11" fill="#94a3b8">Rⁿ</text>
+<text x="484" y="228" text-anchor="middle" font-size="11" fill="#1f2937">同向放大 2 倍</text>
+<text x="484" y="252" text-anchor="middle" font-size="11" fill="#059669" font-weight="600">输出 ≅ 分母 x</text>
+
+<!-- bottom unifying caption -->
+<text x="280" y="356" text-anchor="middle" font-size="12" font-weight="600" fill="#059669">统一契约：每个导数结果的形状都与分母 x 相同</text>
+</svg><figcaption>四个必备求导公式与各自的形状契约：线性型、矩阵乘向量、二次型、平方范数。</figcaption></figure>
+
+<h2>3. 微分法：一招通杀的 \(dL=\operatorname{tr}(G^\top dX)\Rightarrow \partial L/\partial X=G\)</h2>
+
+<p>逐元素求偏导对复杂表达式会越来越累。有一种更优雅、更不易错的工具——<strong>微分法（differential method）</strong>。它的核心要用到<em>迹（trace）</em>，所以先花一句话把迹讲清楚。</p>
+
+<div class="note">
+<p><strong>先认识迹（trace）。</strong>对一个方阵 \(M\)，<strong>迹 \(\operatorname{tr}(M)\) 就是它对角线元素之和</strong>：\(\operatorname{tr}(M)=\sum_i M_{ii}\)。我们只需要两个关键事实：(1) <strong>标量看成 \(1\times1\) 矩阵时，迹就等于它自己</strong>（所以任何标量都可以"套上一个迹"而不改变值）；(2) <strong>循环性 \(\operatorname{tr}(AB)=\operatorname{tr}(BA)\)</strong>（更一般地 \(\operatorname{tr}(ABC)=\operatorname{tr}(BCA)\)），只要乘积合法、结果是方阵即可。下面 §4.1 把"标量等于自己的迹"再用循环性把 \(dX\) 凑到末尾，全靠这两条。</p>
+</div>
+
+<p>有了迹，微分法的核心是一条"识别定理"：</p>
+
+<div class="key">
+<h4>要点：微分识别公式</h4>
+<p>对标量 \(L\) 与矩阵变量 \(X\in\mathbb{R}^{m\times n}\)，若能把 \(L\) 的全微分写成</p>
+\[
+dL=\operatorname{tr}\!\big(G^\top\,dX\big),
+\]
+<p>则（在分母布局下）</p>
+\[
+\frac{\partial L}{\partial X}=G,\qquad G\in\mathbb{R}^{m\times n}\ \text{与}\ X\ \text{同形}.
+\]
+</div>
+
+<p><strong>为什么成立？</strong>把迹展开：\(\operatorname{tr}(G^\top dX)=\sum_{i,j}G_{ij}\,dX_{ij}\)。而由全微分定义 \(dL=\sum_{i,j}\dfrac{\partial L}{\partial X_{ij}}dX_{ij}\)。两式对每个独立的 \(dX_{ij}\) 都成立，逐项比较系数即得 \(G_{ij}=\partial L/\partial X_{ij}\)，也就是 \(G=\partial L/\partial X\)。向量是 \(n\times 1\) 矩阵的特例，公式照用：\(dL=g^\top dx\Rightarrow \partial L/\partial x=g\)。</p>
+
+<p>三条够用的运算法则（\(d\) 像普通微分一样线性，且服从乘积法则）：</p>
+<ul>
+<li>\(d(AX)=A\,dX\)，\(d(XA)=(dX)A\)（常矩阵提到外面）；</li>
+<li>\(d(\operatorname{tr}(X))=\operatorname{tr}(dX)\)，且迹有循环性 \(\operatorname{tr}(ABC)=\operatorname{tr}(BCA)\)；</li>
+<li>\(\operatorname{tr}(A^\top)=\operatorname{tr}(A)\)，\(\operatorname{tr}(A^\top B)=\sum_{i,j}A_{ij}B_{ij}\)（这正是把"逐元素相乘再求和"写成迹）。</li>
+</ul>
+
+<p><strong>小试身手（用微分法重做平方范数）：</strong>\(L=\|x\|^2=x^\top x\)。两边微分，用乘积法则：</p>
+\[
+dL=(dx)^\top x+x^\top dx=x^\top dx+x^\top dx=2x^\top dx=(2x)^\top dx .
+\]
+<p>对照 \(dL=g^\top dx\)，立得 \(g=\partial L/\partial x=2x\)。和 §2.4 一致，但没碰任何下标。微分法的威力在矩阵情形（下一节）才真正显现。</p>
+
+<h2>4. 一层线性层的全部梯度</h2>
+
+<p>这是反向传播的"原子层"。设</p>
+\[
+y=Wx+b,\qquad W\in\mathbb{R}^{m\times n},\ x\in\mathbb{R}^{n},\ b,y\in\mathbb{R}^{m},
+\]
+<p>后面接一个标量损失 \(L(y)\)。我们已经（在上一课或本层下游）拿到 <strong>上游梯度</strong></p>
+\[
+\delta\ :=\ \frac{\partial L}{\partial y}\in\mathbb{R}^{m}\quad(\text{与 }y\text{ 同形}).
+\]
+<p>目标：求 \(\partial L/\partial W,\ \partial L/\partial b,\ \partial L/\partial x\)。</p>
+
+<h3>4.1 用微分法一次推完</h3>
+
+<p>这里我们<strong>分别对每个变量求偏导</strong>：求 \(\partial L/\partial W\) 时，把 \(b\)、\(x\) 视作常数（即令 \(db=0,\ dx=0\)，注意 \(x\) 是该层的输入、\(b\) 是参数，它们并非恒为常量，只是<em>在对 \(W\) 求偏导这一语境里暂时当常数</em>）。于是 \(y=Wx+b\) 的微分只剩 \(dy=(dW)x\)。又 \(dL=\delta^\top dy\)（这是 \(\delta\) 的定义，标量对向量）。代入：</p>
+\[
+dL=\delta^\top (dW)\,x .
+\]
+<p>这是个标量，等于自己的迹（标量看成 \(1\times1\) 矩阵），再用循环性把 \(dW\) 凑到末尾：</p>
+\[
+dL=\operatorname{tr}\big(\delta^\top (dW)\,x\big)=\operatorname{tr}\big(x\,\delta^\top\,dW\big)=\operatorname{tr}\big((\delta x^\top)^\top dW\big).
+\]
+<p>对照识别公式 \(dL=\operatorname{tr}(G^\top dW)\)，读出 \(G=\delta x^\top\)：</p>
+\[
+\boxed{\ \frac{\partial L}{\partial W}=\delta\,x^\top=\frac{\partial L}{\partial y}\,x^\top\ }.
+\]
+<p>同理，对 \(b\) 求偏导时把 \(W\)、\(x\) 当常数，\(dy=db\Rightarrow dL=\delta^\top db\)，得 \(\partial L/\partial b=\delta\)；对 \(x\) 求偏导时把 \(W\)、\(b\) 当常数，\(dy=W\,dx\Rightarrow dL=\delta^\top W\,dx=(W^\top\delta)^\top dx\)，得 \(\partial L/\partial x=W^\top\delta\)。汇总：</p>
+
+<div class="key">
+<h4>要点：线性层三大梯度（背下来）</h4>
+\[
+\frac{\partial L}{\partial W}=\delta\,x^\top,\qquad
+\frac{\partial L}{\partial b}=\delta,\qquad
+\frac{\partial L}{\partial x}=W^\top\delta,
+\quad\text{其中 }\delta=\frac{\partial L}{\partial y}.
+\]
+</div>
+
+<h3>4.2 外积结构与 shape check</h3>
+
+<p>\(\partial L/\partial W=\delta x^\top\) 是一个<strong>外积（outer product）</strong>：列向量 \(\delta\in\mathbb{R}^{m\times 1}\) 乘行向量 \(x^\top\in\mathbb{R}^{1\times n}\)，结果 \(m\times n\)——<strong>恰好与 \(W\) 同形</strong>。这个"上游梯度 ⊗ 本层输入"的外积，是所有全连接层反向传播的统一模板。</p>
+
+<figure class="fig"><svg viewBox="0 0 520 440" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>外积 ∂L/∂W = δ xᵀ：(m×1) 列向量乘 (1×n) 行向量得到 m×n 矩阵，与 W 同形</title><defs><marker id="arrOrange" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L9,5 L0,10 z" fill="#d97706"/></marker></defs><text x="260" y="26" text-anchor="middle" font-size="14" fill="#1f2937" font-weight="600">外积 ∂L/∂W = δ xᵀ</text><text x="195" y="78" text-anchor="middle" font-size="12" fill="#db2777">行向量 xᵀ (1×n) 本层输入转置</text><g><rect x="150" y="86" width="30" height="28" fill="#db2777" fill-opacity="0.18" stroke="#db2777" stroke-width="1.5"/><rect x="180" y="86" width="30" height="28" fill="#db2777" fill-opacity="0.18" stroke="#db2777" stroke-width="1.5"/><rect x="210" y="86" width="30" height="28" fill="#db2777" fill-opacity="0.45" stroke="#db2777" stroke-width="1.5"/><rect x="240" y="86" width="30" height="28" fill="#db2777" fill-opacity="0.18" stroke="#db2777" stroke-width="1.5"/><text x="165" y="104" text-anchor="middle" font-size="12" fill="#1f2937">x₁</text><text x="195" y="104" text-anchor="middle" font-size="12" fill="#1f2937">x₂</text><text x="225" y="104" text-anchor="middle" font-size="12" fill="#1f2937" font-weight="600">xⱼ</text><text x="255" y="104" text-anchor="middle" font-size="12" fill="#1f2937">xₙ</text></g><g><rect x="56" y="150" width="28" height="30" fill="#2563eb" fill-opacity="0.18" stroke="#2563eb" stroke-width="1.5"/><rect x="56" y="180" width="28" height="30" fill="#2563eb" fill-opacity="0.45" stroke="#2563eb" stroke-width="1.5"/><rect x="56" y="210" width="28" height="30" fill="#2563eb" fill-opacity="0.18" stroke="#2563eb" stroke-width="1.5"/><text x="70" y="170" text-anchor="middle" font-size="12" fill="#1f2937">δ₁</text><text x="70" y="200" text-anchor="middle" font-size="12" fill="#1f2937" font-weight="600">δᵢ</text><text x="70" y="230" text-anchor="middle" font-size="12" fill="#1f2937">δₘ</text></g><text x="70" y="262" text-anchor="middle" font-size="12" fill="#2563eb">列向量 δ</text><text x="70" y="278" text-anchor="middle" font-size="12" fill="#2563eb">(m×1)=∂L/∂y</text><text x="113" y="200" text-anchor="middle" font-size="18" fill="#1f2937">×</text><g stroke="#e2e8f0" stroke-width="0.75"><rect x="150" y="150" width="120" height="90" fill="#d97706" fill-opacity="0.07" stroke="#d97706" stroke-width="1.5"/><line x1="190" y1="150" x2="190" y2="240"/><line x1="230" y1="150" x2="230" y2="240"/><line x1="150" y1="180" x2="270" y2="180"/><line x1="150" y1="210" x2="270" y2="210"/></g><rect x="210" y="180" width="20" height="30" fill="#059669" fill-opacity="0.35" stroke="#059669" stroke-width="1.8"/><text x="210" y="146" text-anchor="middle" font-size="13" fill="#d97706" font-weight="600">∂L/∂W  (m×n)</text><line x1="150" y1="195" x2="84" y2="195" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/><line x1="220" y1="180" x2="225" y2="114" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/><line x1="270" y1="195" x2="312" y2="195" stroke="#d97706" stroke-width="2" marker-end="url(#arrOrange)"/><text x="318" y="184" font-size="12" fill="#059669" font-weight="600">(∂L/∂W)ᵢⱼ</text><text x="318" y="201" font-size="12" fill="#1f2937">= δᵢ · xⱼ</text><text x="318" y="218" font-size="12" fill="#059669">结果 m×n 与 W 同形 ✓</text><line x1="40" y1="350" x2="480" y2="350" stroke="#e2e8f0" stroke-width="0.75"/><text x="260" y="378" text-anchor="middle" font-size="12" fill="#1f2937">前向用 W：y = W x</text><text x="260" y="398" text-anchor="middle" font-size="12" fill="#1f2937">反向 ∂L/∂x = Wᵀ δ 用 Wᵀ（n×m），∂L/∂W = δ xᵀ 用外积</text></svg><figcaption>分母布局下 ∂L/∂W=δxᵀ 的外积形状契约：(m×1) 列向量乘 (1×n) 行向量得到与 W 同形的 m×n 矩阵。</figcaption></figure>
+
+<p>再核对另外两个：\(\partial L/\partial b=\delta\in\mathbb{R}^m\) 与 \(b\) 同形 ✓；\(\partial L/\partial x=W^\top\delta\)，\(W^\top\) 是 \(n\times m\) 乘 \(\delta\) 的 \(m\times1\) 得 \(n\times1\)，与 \(x\) 同形 ✓。三个梯度的形状全部"自动对上"——这正是分母布局的好处。注意 §2.2 那个"该用 \(W\) 还是 \(W^\top\)"的纠结，在这里被 shape check 自动解决了：要让结果与 \(x\) 同形，就只能是 \(W^\top\delta\)。</p>
+
+<div class="ml">
+<h4><span class="tag">ML</span> 和 ML 的联系</h4>
+<p>注意 \(\partial L/\partial x=W^\top\delta\) 里出现的 \(W^\top\)：<strong>前向用 \(W\)，反向用 \(W^\top\)。</strong>反向传播本质上是"把上游梯度沿转置权重传回去"。把多层串起来，\(\partial L/\partial x\) 就是这一层算出的、要喂给上一层的新 \(\delta\)——这就是下一课手写两层网络时反传循环的全部秘密。</p>
+<p>另外，真实训练用 mini-batch，数据矩阵 \(X\in\mathbb{R}^{B\times n}\)（<strong>行=一个样本</strong>），前向写成 \(Y=XW^\top+\mathbf{1}b^\top\)。这里 \(\mathbf{1}\in\mathbb{R}^{B}\) 是全 1 列向量，\(\mathbf{1}b^\top\in\mathbb{R}^{B\times m}\) 表示"把偏置 \(b^\top\) 复制到每一行"——这正是 numpy 里 <em>广播（broadcasting）</em>的效果：把形状为 \(m\) 的 \(b\) 自动加到 \(B\times m\) 矩阵的每一行上（代码里直接写 <code>X @ W.T + b</code> 即可）。此时 \(\partial L/\partial W=\Delta^\top X\)（\(\Delta\) 是 \(B\times m\) 的上游梯度），相当于把 batch 内每个样本的外积 \(\delta_i x_i^\top\) 求和。本课先吃透单样本，batch 版只是把外积换成矩阵乘求和（练习 3 会动手验证）。</p>
+</div>
+
+<h2>5. softmax + 交叉熵：那个"好得不像话"的梯度</h2>
+
+<p>分类网络最后一层几乎总是 <em>softmax</em> 把打分（logits）\(z\in\mathbb{R}^K\) 变成概率，再用<em>交叉熵 cross-entropy</em> 与真标签比对。神奇的是，两者复合后梯度极其简洁：\(\partial L/\partial z=\hat y-y\)。我们来推它——而且照本课一贯的做法，softmax 的雅可比也<strong>从定义亲手推</strong>，不直接抛结论。</p>
+
+<p>记 softmax 输出 \(\hat y_k=\dfrac{e^{z_k}}{\sum_{j}e^{z_j}}\)，真标签是 one-hot 向量 \(y\)（正确类 \(c\) 处为 1，其余 0）。交叉熵损失</p>
+\[
+L=-\sum_{k}y_k\log\hat y_k=-\log\hat y_c .
+\]
+
+<p><strong>第一步：</strong>softmax 的偏导。设 \(S=\sum_j e^{z_j}\)，则 \(\hat y_k=e^{z_k}/S\)。<strong>用商法则</strong>对 \(z_i\) 求导（注意 \(\partial S/\partial z_i=e^{z_i}\)，且分子 \(e^{z_k}\) 只在 \(k=i\) 时才依赖 \(z_i\)），分两种情况：</p>
+\[
+i=k:\quad \frac{\partial \hat y_k}{\partial z_k}=\frac{e^{z_k}S-e^{z_k}e^{z_k}}{S^2}=\frac{e^{z_k}}{S}\Big(1-\frac{e^{z_k}}{S}\Big)=\hat y_k(1-\hat y_k),
+\]
+\[
+i\neq k:\quad \frac{\partial \hat y_k}{\partial z_i}=\frac{0\cdot S-e^{z_k}e^{z_i}}{S^2}=-\frac{e^{z_k}}{S}\frac{e^{z_i}}{S}=-\hat y_k\,\hat y_i .
+\]
+<p>两种情况可以<strong>合写成一条</strong>（用 Kronecker 记号 \(\delta_{ki}\)：\(k=i\) 取 1，否则 0）：</p>
+\[
+\frac{\partial \hat y_k}{\partial z_i}=\hat y_k(\delta_{ki}-\hat y_i).
+\]
+
+<p><strong>第二步：</strong>链式法则。先用 \(L=-\sum_k y_k\log\hat y_k\)，\(\partial L/\partial\hat y_k=-y_k/\hat y_k\)，于是</p>
+\[
+\frac{\partial L}{\partial z_i}=\sum_k\frac{\partial L}{\partial\hat y_k}\frac{\partial \hat y_k}{\partial z_i}
+=\sum_k\left(-\frac{y_k}{\hat y_k}\right)\hat y_k(\delta_{ki}-\hat y_i)
+=-\sum_k y_k(\delta_{ki}-\hat y_i).
+\]
+<p>拆成两个和：\(-\sum_k y_k\delta_{ki}=-y_i\)（只有 \(k=i\) 那项留下）；而第二项里 \(\hat y_i\) <strong>不含求和指标 \(k\)，可提到求和号外面</strong>，得 \(\sum_k y_k\hat y_i=\hat y_i\sum_k y_k=\hat y_i\)（因为 one-hot 的 \(\sum_k y_k=1\)）。所以</p>
+\[
+\frac{\partial L}{\partial z_i}=-y_i+\hat y_i=\hat y_i-y_i .
+\]
+<p>堆成向量：</p>
+\[
+\boxed{\ \frac{\partial L}{\partial z}=\hat y-y\ }.
+\]
+
+<figure class="fig"><svg viewBox="0 0 540 380" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>softmax+交叉熵计算图：梯度汇成 ŷ−y</title><defs><marker id="fwd" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#1f2937"/></marker><marker id="bwd" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#db2777"/></marker></defs><text x="270" y="22" font-size="14" fill="#1f2937" text-anchor="middle" font-weight="bold">softmax + 交叉熵 计算图</text><g><text x="42" y="58" font-size="12" fill="#1f2937" text-anchor="middle">logits z∈R³</text><rect x="22" y="68" width="40" height="78" fill="none" stroke="#94a3b8" stroke-width="1"/><line x1="22" y1="94" x2="62" y2="94" stroke="#e2e8f0" stroke-width="0.75"/><line x1="22" y1="120" x2="62" y2="120" stroke="#e2e8f0" stroke-width="0.75"/><rect x="22" y="68" width="40" height="26" fill="#2563eb" fill-opacity="0.18"/><rect x="22" y="94" width="40" height="26" fill="#2563eb" fill-opacity="0.18"/><rect x="22" y="120" width="40" height="26" fill="#2563eb" fill-opacity="0.18"/><text x="42" y="86" font-size="12" fill="#1f2937" text-anchor="middle">2</text><text x="42" y="112" font-size="12" fill="#1f2937" text-anchor="middle">1</text><text x="42" y="138" font-size="12" fill="#1f2937" text-anchor="middle">0</text></g><line x1="64" y1="107" x2="96" y2="107" stroke="#1f2937" stroke-width="2" marker-end="url(#fwd)"/><rect x="100" y="90" width="62" height="34" rx="4" fill="#2563eb" fill-opacity="0.1" stroke="#2563eb" stroke-width="2"/><text x="131" y="111" font-size="13" fill="#1f2937" text-anchor="middle">softmax</text><line x1="164" y1="107" x2="196" y2="107" stroke="#1f2937" stroke-width="2" marker-end="url(#fwd)"/><g><text x="222" y="58" font-size="12" fill="#1f2937" text-anchor="middle">ŷ∈R³ (Σ=1)</text><rect x="202" y="68" width="40" height="78" fill="none" stroke="#94a3b8" stroke-width="1"/><line x1="202" y1="94" x2="242" y2="94" stroke="#e2e8f0" stroke-width="0.75"/><line x1="202" y1="120" x2="242" y2="120" stroke="#e2e8f0" stroke-width="0.75"/><rect x="202" y="68" width="40" height="26" fill="#2563eb" fill-opacity="0.45"/><rect x="202" y="94" width="40" height="26" fill="#2563eb" fill-opacity="0.28"/><rect x="202" y="120" width="40" height="26" fill="#2563eb" fill-opacity="0.14"/><text x="222" y="86" font-size="12" fill="#1f2937" text-anchor="middle">.665</text><text x="222" y="112" font-size="12" fill="#1f2937" text-anchor="middle">.245</text><text x="222" y="138" font-size="12" fill="#1f2937" text-anchor="middle">.090</text></g><g><text x="222" y="232" font-size="12" fill="#059669" text-anchor="middle">y (one-hot)</text><rect x="202" y="240" width="40" height="78" fill="none" stroke="#94a3b8" stroke-width="1"/><line x1="202" y1="266" x2="242" y2="266" stroke="#e2e8f0" stroke-width="0.75"/><line x1="202" y1="292" x2="242" y2="292" stroke="#e2e8f0" stroke-width="0.75"/><rect x="202" y="240" width="40" height="26" fill="#059669" fill-opacity="0.4"/><text x="222" y="258" font-size="12" fill="#1f2937" text-anchor="middle">1</text><text x="222" y="284" font-size="12" fill="#1f2937" text-anchor="middle">0</text><text x="222" y="310" font-size="12" fill="#1f2937" text-anchor="middle">0</text></g><line x1="244" y1="107" x2="290" y2="130" stroke="#1f2937" stroke-width="2" marker-end="url(#fwd)"/><line x1="244" y1="266" x2="290" y2="218" stroke="#1f2937" stroke-width="2" marker-end="url(#fwd)"/><rect x="296" y="150" width="74" height="48" rx="4" fill="#2563eb" fill-opacity="0.1" stroke="#2563eb" stroke-width="2"/><text x="333" y="170" font-size="13" fill="#1f2937" text-anchor="middle">交叉熵</text><text x="333" y="187" font-size="12" fill="#1f2937" text-anchor="middle">CE</text><line x1="372" y1="174" x2="408" y2="174" stroke="#1f2937" stroke-width="2" marker-end="url(#fwd)"/><circle cx="448" cy="174" r="28" fill="#d97706" fill-opacity="0.14" stroke="#d97706" stroke-width="2"/><text x="448" y="170" font-size="13" fill="#1f2937" text-anchor="middle">标量 L</text><text x="448" y="186" font-size="11" fill="#1f2937" text-anchor="middle">≈0.408</text><g><rect x="270" y="44" width="146" height="34" rx="6" fill="#ffffff" stroke="#d97706" stroke-width="1" stroke-dasharray="4 3"/><text x="343" y="58" font-size="11" fill="#d97706" text-anchor="middle">exp 与 log 相消</text><text x="343" y="72" font-size="11" fill="#d97706" text-anchor="middle">⇒ 梯度极简</text></g><path d="M426 188 Q300 250 244 200" fill="none" stroke="#db2777" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#bwd)"/><path d="M196 180 Q120 230 60 150" fill="none" stroke="#db2777" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#bwd)"/><text x="135" y="232" font-size="11" fill="#db2777" text-anchor="middle">反向梯度</text><g><rect x="60" y="262" width="300" height="86" rx="6" fill="#db2777" fill-opacity="0.06" stroke="#db2777" stroke-width="1"/><text x="210" y="288" font-size="14" fill="#db2777" text-anchor="middle" font-weight="bold">∂L/∂z = ŷ − y</text><text x="210" y="312" font-size="12" fill="#1f2937" text-anchor="middle">= [.665, .245, .090] − [1, 0, 0]</text><text x="210" y="330" font-size="12" fill="#1f2937" text-anchor="middle">≈ [</text><text x="232" y="330" font-size="12" fill="#db2777" text-anchor="middle">−.335</text><text x="276" y="330" font-size="12" fill="#1f2937" text-anchor="middle">, .245, .090 ]</text><text x="210" y="344" font-size="11" fill="#059669" text-anchor="middle">分量和 ≈ 0</text></g></svg><figcaption>softmax+交叉熵的小计算图：logits z 经 softmax 得 ŷ，与 one-hot 标签 y 算交叉熵 L，反向梯度汇成简洁的 ŷ−y。</figcaption></figure>
+
+<div class="note">
+<p><strong>为什么这么干净？</strong>softmax 把指数"曲率"引进来，交叉熵又取了对数"抵消"掉指数——一拉一拽正好对消，只剩下最朴素的"预测概率减真实概率"。这不是巧合：对数似然 + 指数族分布天生配对。结果的直觉也极好：<strong>预测对了（\(\hat y\approx y\)）梯度近 0；错得越离谱，梯度越大</strong>，正好推着模型往正确方向走。</p>
+</div>
+
+<p><strong>Shape check：</strong>\(\hat y,y\in\mathbb{R}^K\)，差还是 \(\mathbb{R}^K\)，与分母 \(z\) 同形 ✓。在实现里，这个 \(\hat y-y\) 就是喂给上一层（输出线性层）的 \(\delta\)，直接套 §4 的三大梯度。</p>
+
+<h2>6. 例题</h2>
+
+<div class="example">
+<h4>例题 1：完整推导 \(\partial(x^\top A x)/\partial x\)，并用具体数验证</h4>
+<p>取 \(A=\begin{bmatrix}1&2\\0&3\end{bmatrix}\)（<em>故意非对称</em>，看 \(A+A^\top\) 是否真有必要），\(x=\begin{bmatrix}1\\2\end{bmatrix}\)。</p>
+<p><strong>(a) 直接展开成标量函数：</strong></p>
+\[
+f=x^\top Ax = x_1^2 + 2x_1x_2 + 0\cdot x_2x_1 + 3x_2^2 = x_1^2+2x_1x_2+3x_2^2 .
+\]
+<p><strong>(b) 逐元素偏导：</strong></p>
+\[
+\frac{\partial f}{\partial x_1}=2x_1+2x_2,\qquad
+\frac{\partial f}{\partial x_2}=2x_1+6x_2 .
+\]
+<p>代入 \(x=(1,2)\)：\(\partial f/\partial x_1=2+4=6\)，\(\partial f/\partial x_2=2+12=14\)。所以梯度 \(=\begin{bmatrix}6\\14\end{bmatrix}\)。</p>
+<p><strong>(c) 用公式 \((A+A^\top)x\) 核对：</strong></p>
+\[
+A+A^\top=\begin{bmatrix}1&2\\0&3\end{bmatrix}+\begin{bmatrix}1&0\\2&3\end{bmatrix}=\begin{bmatrix}2&2\\2&6\end{bmatrix},\quad
+(A+A^\top)x=\begin{bmatrix}2&2\\2&6\end{bmatrix}\begin{bmatrix}1\\2\end{bmatrix}=\begin{bmatrix}6\\14\end{bmatrix}.✓
+\]
+<p>两条路殊途同归。注意若误用 \(2Ax=\begin{bmatrix}2&4\\0&6\end{bmatrix}x=\begin{bmatrix}10\\12\end{bmatrix}\)，就<strong>错了</strong>——只有 \(A\) 对称时才能简化为 \(2Ax\)。</p>
+</div>
+
+<div class="example">
+<h4>例题 2：推导线性层 \(\partial L/\partial W\) 并做维度校验</h4>
+<p>设 \(m=2,n=3\)，\(W\in\mathbb{R}^{2\times3}\)，\(x=\begin{bmatrix}1\\0\\-1\end{bmatrix}\in\mathbb{R}^3\)，上游梯度 \(\delta=\dfrac{\partial L}{\partial y}=\begin{bmatrix}0.5\\-2\end{bmatrix}\in\mathbb{R}^2\)。</p>
+<p><strong>(a) 套公式（外积）：</strong></p>
+\[
+\frac{\partial L}{\partial W}=\delta x^\top=\begin{bmatrix}0.5\\-2\end{bmatrix}\begin{bmatrix}1&0&-1\end{bmatrix}
+=\begin{bmatrix}0.5 & 0 & -0.5\\ -2 & 0 & 2\end{bmatrix}.
+\]
+<p><strong>(b) 维度校验：</strong>\(\delta\) 是 \(2\times1\)，\(x^\top\) 是 \(1\times3\)，外积是 \(2\times3\)——与 \(W\) 同形 ✓。</p>
+<p><strong>(c) 抽一个元素手验：</strong>按定义 \(\partial L/\partial W_{ij}=\delta_i x_j\)（因为 \(y_i=\sum_j W_{ij}x_j+b_i\)，\(\partial y_i/\partial W_{ij}=x_j\)，再乘上游 \(\delta_i\)）。取 \((i,j)=(2,3)\)：\(\delta_2 x_3=(-2)\times(-1)=2\)，与矩阵右下角一致 ✓。</p>
+<p><strong>(d) 顺手求另外两个：</strong>\(\partial L/\partial b=\delta=(0.5,-2)^\top\)；\(\partial L/\partial x=W^\top\delta\in\mathbb{R}^3\)（需要具体 \(W\) 才能算数值，但形状已确定）。</p>
+</div>
+
+<div class="example">
+<h4>例题 3：softmax+CE 的 \(\hat y-y\)（具体数）</h4>
+<p>设三分类 logits \(z=\begin{bmatrix}2\\1\\0\end{bmatrix}\)，真标签是第 0 类，即 \(y=\begin{bmatrix}1\\0\\0\end{bmatrix}\)。</p>
+<p><strong>(a) softmax：</strong>\(e^2\approx7.389,\ e^1\approx2.718,\ e^0=1\)，和 \(S\approx11.107\)。</p>
+\[
+\hat y\approx\begin{bmatrix}7.389/11.107\\2.718/11.107\\1/11.107\end{bmatrix}=\begin{bmatrix}0.665\\0.245\\0.090\end{bmatrix}.
+\]
+<p><strong>(b) 梯度 \(\hat y-y\)：</strong></p>
+\[
+\frac{\partial L}{\partial z}=\hat y-y\approx\begin{bmatrix}0.665-1\\0.245-0\\0.090-0\end{bmatrix}=\begin{bmatrix}-0.335\\0.245\\0.090\end{bmatrix}.
+\]
+<p><strong>解读：</strong>正确类（第 0 类）梯度为负——梯度下降会<em>增大</em> \(z_0\)（沿负梯度方向更新即 \(z_0\) 上升），让模型更自信；其余两类梯度为正，会被压低。三个分量之和 \(\approx0\)（因为 \(\sum\hat y=\sum y=1\)），这是 softmax 梯度的固有性质。</p>
+</div>
+
+<h2>7. 代码：用数值梯度验证我们的公式</h2>
+
+<p>口说无凭。验证矩阵求导公式最可靠的办法是<strong>有限差分数值梯度（finite-difference numerical gradient）</strong>：用 \(\dfrac{\partial L}{\partial \theta_i}\approx\dfrac{L(\theta+\epsilon e_i)-L(\theta-\epsilon e_i)}{2\epsilon}\)（中心差分，误差 \(O(\epsilon^2)\)）逐个分量逼近，再和解析公式比相对误差。下面三段一次性验证 §2.3、§4、§5 的全部公式，相对误差都应 \(<10^{-6}\)。</p>
+
+<pre><code>import numpy as np
+rng = np.random.default_rng(0)
+eps = 1e-6
+
+def numgrad(f, theta):
+    """对标量函数 f(theta) 在 theta 处做中心差分数值梯度（theta 任意形状）。"""
+    g = np.zeros_like(theta, dtype=float)
+    it = np.nditer(theta, flags=['multi_index'])
+    for _ in it:
+        idx = it.multi_index
+        old = theta[idx]
+        theta[idx] = old + eps; fp = f(theta)
+        theta[idx] = old - eps; fm = f(theta)
+        theta[idx] = old
+        g[idx] = (fp - fm) / (2*eps)
+    return g
+
+def relerr(a, b):
+    return np.linalg.norm(a-b) / (np.linalg.norm(a)+np.linalg.norm(b) + 1e-12)
+
+# ---- 验证 1: d(x^T A x)/dx = (A + A^T) x （A 故意非对称）----
+n = 4
+A = rng.standard_normal((n, n))
+x = rng.standard_normal(n)
+f1 = lambda x: x @ A @ x
+g_analytic = (A + A.T) @ x
+g_numeric  = numgrad(f1, x.copy())
+print("[1] x^T A x   相对误差 =", relerr(g_analytic, g_numeric))
+
+# ---- 验证 2: 线性层 y=Wx+b, L=0.5||y-t||^2 ----
+m, n = 3, 5
+W = rng.standard_normal((m, n)); b = rng.standard_normal(m)
+xv = rng.standard_normal(n);     t = rng.standard_normal(m)
+def L2(W, b, xv):
+    y = W @ xv + b
+    return 0.5*np.sum((y - t)**2)
+y = W @ xv + b
+delta = (y - t)              # = dL/dy
+dW = np.outer(delta, xv)     # = delta x^T  (m x n)
+db = delta
+dx = W.T @ delta             # (n,)
+print("[2a] dL/dW    相对误差 =", relerr(dW, numgrad(lambda W: L2(W,b,xv), W.copy())))
+print("[2b] dL/db    相对误差 =", relerr(db, numgrad(lambda b: L2(W,b,xv), b.copy())))
+print("[2c] dL/dx    相对误差 =", relerr(dx, numgrad(lambda xv: L2(W,b,xv), xv.copy())))
+print("     形状检查 dW.shape == W.shape :", dW.shape == W.shape)
+
+# ---- 验证 3: softmax + 交叉熵, dL/dz = yhat - y ----
+K = 5
+z = rng.standard_normal(K)
+y_oh = np.zeros(K); y_oh[2] = 1.0          # 正确类 = 第 2 类
+def softmax(z):
+    z = z - z.max()                         # 数值稳定
+    e = np.exp(z); return e / e.sum()
+def ce(z):
+    p = softmax(z); return -np.sum(y_oh * np.log(p))
+yhat = softmax(z)
+g3 = yhat - y_oh
+print("[3] softmax+CE 相对误差 =", relerr(g3, numgrad(ce, z.copy())))
+</code></pre>
+
+<p>运行后五个相对误差应当都在 \(10^{-9}\sim10^{-6}\) 量级，形状检查输出 <code>True</code>。这就是工程上验证任何反向传播实现是否正确的"金标准"——下一课写完两层网络，我们也会用同样的 <code>numgrad</code> 给它做体检。</p>
+
+<div class="pitfall">
+<h4>易错：数值梯度的 \(\epsilon\) 别取太小，也别在不可导点测</h4>
+<p>很多人以为 \(\epsilon\) 越小越准——错。\(\epsilon\) 太小（如 \(10^{-12}\)）会被浮点舍入误差吞掉，相对误差反而变大。中心差分的甜区是 \(\epsilon\approx10^{-5}\sim10^{-6}\)。</p>
+<p>另外，要<strong>避免在不可导点附近测</strong>——例如 ReLU 在 \(0\)、绝对值 \(|x|\) 在 \(0\)、\(\max\) 在两分支相等处：这些点的解析梯度与有限差分会对不上（差分跨过了"拐点"）。本课的 softmax 不在此列：它处处可导，代码里的 <code>z.max()</code> 只是减一个常数做数值稳定（softmax 平移不变），不影响可导性，所以那段验证的相对误差稳稳落在 \(10^{-10}\) 量级。</p>
+</div>
+
+<h2>动手练习</h2>
+<ol>
+<li><strong>对称化二次型。</strong>证明对任意 \(A\)，\(x^\top A x=x^\top A_{\text{sym}}x\)，其中 \(A_{\text{sym}}=\tfrac12(A+A^\top)\)。由此说明为何梯度公式里只出现 \(A+A^\top\)（"反对称部分对二次型无贡献"）。再用 numpy 取一个随机非对称 \(A\)，数值验证 \(x^\top A x=x^\top A_{\text{sym}}x\)。
+<pre><code>import numpy as np
+rng = np.random.default_rng(1)
+A = rng.standard_normal((4,4)); x = rng.standard_normal(4)
+As = 0.5*(A + A.T)
+print("两种二次型之差 =", x@A@x - x@As@x)   # 应≈0
+</code></pre></li>
+
+<li><strong>L2 正则的梯度。</strong>设 \(L(W)=\tfrac{\lambda}{2}\|W\|_F^2=\tfrac{\lambda}{2}\sum_{ij}W_{ij}^2\)（Frobenius 范数平方）。手推 \(\partial L/\partial W\)，并解释它为什么导致"权重衰减 weight decay"。用 <code>numgrad</code> 验证你的解析式。（提示：答案是 \(\lambda W\)，与 \(W\) 同形。）</li>
+
+<li><strong>batch 版线性层。</strong>把 §4 推广到 mini-batch：\(Y=XW^\top+\mathbf{1}b^\top\)，\(X\in\mathbb{R}^{B\times n}\)（行=样本），其中 \(\mathbf{1}\in\mathbb{R}^B\) 是全 1 列向量、\(\mathbf{1}b^\top\in\mathbb{R}^{B\times m}\) 把偏置复制到每一行（即 numpy 的广播）。上游 \(\Delta=\partial L/\partial Y\in\mathbb{R}^{B\times m}\)。证明 \(\partial L/\partial W=\Delta^\top X\)、\(\partial L/\partial b=\Delta^\top\mathbf{1}\)（按样本求和）、\(\partial L/\partial X=\Delta W\)。用下面骨架做数值验证。
+<pre><code>import numpy as np
+rng = np.random.default_rng(2)
+B, n, m = 8, 5, 3
+X = rng.standard_normal((B, n)); W = rng.standard_normal((m, n)); b = rng.standard_normal(m)
+T = rng.standard_normal((B, m))
+ones = np.ones(B)               # 全 1 列向量 1
+def Lb(W, b, X):
+    Y = X @ W.T + np.outer(ones, b)   # = X W^T + 1 b^T （广播写法等价于 X @ W.T + b）
+    return 0.5*np.sum((Y - T)**2)
+Y = X @ W.T + np.outer(ones, b)
+Delta = (Y - T)                 # B x m
+dW = Delta.T @ X                # m x n  —— 你来核对维度
+db = Delta.T @ ones             # m      （= 按样本求和 Delta.sum(axis=0)）
+# TODO: 写一个 numgrad 验证 dW, db（可复用正文里的 numgrad）
+print("dW.shape =", dW.shape, " 应为", W.shape)
+</code></pre></li>
+
+<li><strong>softmax 雅可比。</strong>不带交叉熵，直接写出 softmax 的雅可比 \(J_{ki}=\partial\hat y_k/\partial z_i=\hat y_k(\delta_{ki}-\hat y_i)\) 的矩阵形式 \(J=\operatorname{diag}(\hat y)-\hat y\hat y^\top\)。用 numpy 构造它，并验证 \(J\mathbf{1}=0\)（每行和为 0，因为概率归一）。</li>
+
+<li><strong>从微分法推 \(\partial L/\partial x=W^\top\delta\)。</strong>仿照 §4.1，对 \(y=Wx\) 取 \(dy=W\,dx\)，代入 \(dL=\delta^\top dy\)，整理成 \(dL=g^\top dx\) 读出 \(g\)。写下每一步，确认 \(g=W^\top\delta\) 且形状为 \(\mathbb{R}^n\)。</li>
+</ol>
+
+<h2>掌握自检</h2>
+<ul>
+<li>我能一口说出本课的布局约定，并解释"为什么 \(\partial L/\partial W\) 必须与 \(W\) 同形"。</li>
+<li>给我任意一个梯度表达式，我能立刻做 shape check，仅凭形状就判断它"不可能对"还是"可能对"。</li>
+<li>我能从第一性原理（逐元素或微分法）独立推出 \(\partial(a^\top x)/\partial x\)、\(\partial(x^\top Ax)/\partial x\)、\(\partial\|x\|^2/\partial x\)，不靠背表。</li>
+<li>我记得线性层三大梯度 \(\partial L/\partial W=\delta x^\top\)、\(\partial L/\partial b=\delta\)、\(\partial L/\partial x=W^\top\delta\)，并能说清那个外积为什么自动与 \(W\) 同形、为什么反向用 \(W^\top\)。</li>
+<li>我能从 softmax 的商法则推导出雅可比 \(\hat y_k(\delta_{ki}-\hat y_i)\)，再得到 softmax+CE 的 \(\partial L/\partial z=\hat y-y\)，并解释它"预测越错梯度越大、分量和为 0"的直觉。</li>
+<li>我会写中心差分 <code>numgrad</code> 去验证任意解析梯度，知道 \(\epsilon\) 不能取太小，也知道要避开 ReLU/绝对值/max 这类不可导点。</li>
+</ul>
+
+<p>下一课，我们把第 1 模块的所有零件——向量、矩阵变换、链式法则、计算图、以及本课的矩阵求导——拼到一起，<strong>从零手写并训练一个两层神经网络</strong>，亲眼看着损失曲线降下来。</p>
+</article>
+<div class="navbtns"><a class="prev" href="lesson-08-chain-rule-computational-graph.html"><div class="nlabel">← 上一课</div><div class="ntitle">第8课 · 链式法则与计算图</div></a><a class="next" href="lesson-10-backprop-from-scratch.html"><div class="nlabel">下一课 →</div><div class="ntitle">第10课 · 亲手实现反向传播</div></a></div>
+<nav class="toc"><h3>本模块课程表</h3><ol>
+<li><a href="lesson-01-vectors.html"><span class="ln">第1课</span>向量——机器学习的原子</a></li>
+<li><a href="lesson-02-matrix-linear-transformation.html"><span class="ln">第2课</span>矩阵即线性变换</a></li>
+<li><a href="lesson-03-inner-product-norm-projection.html"><span class="ln">第3课</span>内积、范数与投影</a></li>
+<li><a href="lesson-04-eigenvalues-eigenvectors.html"><span class="ln">第4课</span>特征值与特征向量</a></li>
+<li><a href="lesson-05-svd-low-rank.html"><span class="ln">第5课</span>SVD 与低秩压缩</a></li>
+<li><a href="lesson-06-derivatives-gradients.html"><span class="ln">第6课</span>导数与梯度</a></li>
+<li><a href="lesson-07-jacobian-hessian.html"><span class="ln">第7课</span>雅可比与海森</a></li>
+<li><a href="lesson-08-chain-rule-computational-graph.html"><span class="ln">第8课</span>链式法则与计算图</a></li>
+<li class="cur"><a href="lesson-09-matrix-calculus.html"><span class="ln">第9课</span>矩阵求导</a></li>
+<li><a href="lesson-10-backprop-from-scratch.html"><span class="ln">第10课</span>亲手实现反向传播</a></li>
+</ol></nav>
+</div>
+<!-- pyrunner-injected -->
+<style>
+.pr-cell{border:1px solid #334155;border-radius:10px;margin:1.2em 0;overflow:hidden;background:#0f172a;}
+.pr-head{display:flex;align-items:center;gap:8px;background:#1e293b;color:#cbd5e1;padding:6px 10px;font-size:13px;font-family:system-ui,-apple-system,sans-serif;}
+.pr-title{flex:1;font-weight:600;}
+.pr-status{font-size:12px;color:#94a3b8;white-space:nowrap;max-width:50%;overflow:hidden;text-overflow:ellipsis;}
+.pr-btn{cursor:pointer;border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:6px;padding:3px 11px;font-size:13px;line-height:1.4;}
+.pr-btn:hover{background:#0b1220;}
+.pr-run{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:600;}
+.pr-run:hover{background:#1d4ed8;}
+.pr-cell.collapsed .pr-body{display:none;}
+.pr-edit{display:block;width:100%;border:none;background:#0f172a;color:#e2e8f0;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.55;padding:12px 14px;resize:vertical;box-sizing:border-box;outline:none;}
+.pr-out{margin:0;padding:10px 14px;border-top:1px solid #334155;background:#0b1220;color:#cbd5e1;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.5;white-space:pre-wrap;max-height:340px;overflow:auto;}
+.pr-out:empty{display:none;}
+.pr-out.err{color:#fca5a5;}
+#pr-fab{position:fixed;right:18px;bottom:18px;z-index:9998;background:#2563eb;color:#fff;border:none;border-radius:999px;padding:10px 17px;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.22);font-family:system-ui,sans-serif;}
+#pr-fab:hover{background:#1d4ed8;}
+#pr-lab{position:fixed;right:18px;bottom:66px;z-index:9999;width:400px;max-width:92vw;background:#0f172a;border:1px solid #334155;border-radius:12px;display:none;flex-direction:column;box-shadow:0 14px 38px rgba(0,0,0,.4);overflow:hidden;}
+#pr-lab.open{display:flex;}
+#pr-lab .pr-edit{min-height:150px;}
+</style>
+<script>
+(function(){
+  var PYBASE="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+  var pyReady=null;
+  function loadPy(status){
+    if(pyReady)return pyReady;
+    pyReady=(async function(){
+      status("正在加载 Python 运行时（首次约 10 秒，需联网）…");
+      await new Promise(function(res,rej){
+        var s=document.createElement("script");s.src=PYBASE+"pyodide.js";
+        s.onload=res;s.onerror=function(){rej(new Error("无法加载 Pyodide（首次运行需要联网）"));};
+        document.head.appendChild(s);
+      });
+      var py=await loadPyodide({indexURL:PYBASE});
+      status("正在加载 NumPy …");
+      await py.loadPackage("numpy");
+      status("Python 就绪 ✓");
+      return py;
+    })();
+    return pyReady;
+  }
+  async function run(code,outEl,statusEl){
+    var setS=function(m){if(statusEl)statusEl.textContent=m;};
+    outEl.classList.remove("err");outEl.textContent="";
+    var py;
+    try{py=await loadPy(setS);}
+    catch(e){outEl.classList.add("err");outEl.textContent="加载失败："+e.message;return;}
+    var buf="";
+    py.setStdout({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    py.setStderr({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    try{
+      var result=await py.runPythonAsync(code);
+      if(result!==undefined&&result!==null){
+        var r;try{r=result.toString();}catch(_){r=String(result);}
+        if(r!=="None")buf+=(buf&&!buf.endsWith("\n")?"\n":"")+r;
+        if(result&&result.destroy)result.destroy();
+      }
+      outEl.textContent=buf||"（运行成功，无输出。用 print(...) 查看结果）";
+    }catch(e){
+      outEl.classList.add("err");
+      outEl.textContent=buf+(buf?"\n":"")+String((e&&e.message)||e);
+    }
+  }
+  function autosize(ta){ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight+2,460)+"px";}
+  function tabKey(e){
+    if(e.key==="Tab"){e.preventDefault();var s=this.selectionStart,en=this.selectionEnd;
+      this.value=this.value.slice(0,s)+"    "+this.value.slice(en);this.selectionStart=this.selectionEnd=s+4;}
+    if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();var b=this.closest(".pr-cell,#pr-lab").querySelector(".pr-run");if(b)b.click();}
+  }
+  function makeCell(code){
+    var cell=document.createElement("div");cell.className="pr-cell";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">可运行 · Python (NumPy)</span><span class="pr-status"></span><button class="pr-btn pr-toggle">收起</button><button class="pr-btn pr-run">▶ 运行</button></div><div class="pr-body"><textarea class="pr-edit" spellcheck="false"></textarea><pre class="pr-out"></pre></div>';
+    var ta=cell.querySelector(".pr-edit");ta.value=code;
+    var out=cell.querySelector(".pr-out"),st=cell.querySelector(".pr-status");
+    ta.addEventListener("input",function(){autosize(ta);});
+    ta.addEventListener("keydown",tabKey);
+    cell.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    var tog=cell.querySelector(".pr-toggle");
+    tog.onclick=function(){cell.classList.toggle("collapsed");tog.textContent=cell.classList.contains("collapsed")?"展开":"收起";};
+    setTimeout(function(){autosize(ta);},0);
+    return cell;
+  }
+  function enhance(){
+    document.querySelectorAll("article pre").forEach(function(pre){
+      if(pre.closest(".pr-cell"))return;
+      var codeEl=pre.querySelector("code")||pre;
+      var code=codeEl.textContent.replace(/\s+$/,"");
+      if(!code)return;
+      pre.replaceWith(makeCell(code));
+    });
+  }
+  function lab(){
+    var fab=document.createElement("button");fab.id="pr-fab";fab.textContent="▶ Python 实验台";
+    var panel=document.createElement("div");panel.id="pr-lab";
+    panel.innerHTML='<div class="pr-head"><span class="pr-title">Python 实验台 · NumPy</span><span class="pr-status"></span><button class="pr-btn pr-run">▶ 运行</button><button class="pr-btn pr-min">收起</button></div><div class="pr-body"><textarea class="pr-edit" spellcheck="false"></textarea><pre class="pr-out"></pre></div>';
+    document.body.appendChild(fab);document.body.appendChild(panel);
+    var ta=panel.querySelector(".pr-edit");
+    ta.value="import numpy as np\na = np.array([3, 2])\nb = np.array([1, 4])\nprint(\"a + b =\", a + b)\nprint(\"a . b =\", a @ b)\nprint(\"|a|  =\", np.linalg.norm(a))\ncos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))\nprint(\"cos =\", round(float(cos), 4))";
+    ta.addEventListener("keydown",tabKey);
+    var out=panel.querySelector(".pr-out"),st=panel.querySelector(".pr-status");
+    panel.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    fab.onclick=function(){panel.classList.toggle("open");};
+    panel.querySelector(".pr-min").onclick=function(){panel.classList.remove("open");};
+  }
+  function init(){enhance();lab();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块1 · 第3课 · 内积、范数与投影——度量与几何</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue-bg:#eff6ff;
+--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--pink:#db2777;
+--red:#dc2626;--red-bg:#fef2f2;--bg:#ffffff;--soft:#f8fafc;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);
+font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.85;font-size:17px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:840px;margin:0 auto;padding:0 22px 100px;}
+header.top{background:#fff;border-bottom:1px solid var(--line);padding:26px 22px 22px;margin-bottom:14px;}
+header.top .inner{max-width:840px;margin:0 auto;}
+.crumb{color:var(--muted);font-size:14px;letter-spacing:.3px;margin-bottom:6px;}
+h1{font-size:30px;line-height:1.3;margin:.1em 0 .2em;}
+.sub{color:var(--muted);font-size:15px;}
+article{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:30px 34px;margin-top:18px;}
+h2{font-size:23px;margin:1.7em 0 .6em;padding-bottom:.25em;border-bottom:2px solid var(--line);}
+h2:first-child{margin-top:.2em;}
+h3{font-size:19px;margin:1.3em 0 .4em;color:#0f172a;}
+h4{margin:.2em 0 .5em;font-size:16px;}
+p{margin:.7em 0;}
+ul,ol{padding-left:1.3em;margin:.6em 0;}
+li{margin:.32em 0;}
+code{background:#f1f5f9;padding:.12em .4em;border-radius:5px;font-size:.9em;
+font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a;}
+pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 18px;overflow:auto;font-size:14px;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0;}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:15.5px;}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+thead th{background:var(--soft);}
+figure.fig{margin:1.4em 0;text-align:center;}
+figure.fig svg{max-width:100%;height:auto;}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
+.note,.ml,.key,.pitfall,.example{border-radius:10px;padding:14px 18px;margin:1.2em 0;border:1px solid var(--line);}
+.note{background:var(--soft);border-left:4px solid #94a3b8;}
+.example{background:#fff;border-left:4px solid var(--blue);}
+.ml{background:var(--green-bg);border-left:4px solid var(--green);}
+.key{background:var(--amber-bg);border-left:4px solid var(--amber);}
+.pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
+.toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
+.toc h3{margin:.1em 0 .7em;}
+.toc ol{list-style:none;padding:0;}
+.toc li{padding:7px 10px;border-radius:8px;color:#334155;border:1px solid transparent;}
+.toc li a{color:inherit;text-decoration:none;display:block;}
+.toc li .ln{display:inline-block;min-width:54px;color:var(--muted);font-size:13px;}
+.toc li.cur{background:var(--blue-bg);border-color:#bfdbfe;font-weight:600;color:#1e3a8a;}
+.toc li:not(.cur):hover{background:var(--soft);}
+.navbtns{display:flex;justify-content:space-between;margin-top:22px;gap:12px;}
+.navbtns a{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--ink);}
+.navbtns a:hover{border-color:var(--blue);}
+.navbtns .nlabel{color:var(--muted);font-size:13px;}
+.navbtns .ntitle{font-weight:600;margin-top:3px;}
+.navbtns .next{text-align:right;}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
+.card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
+.card:hover{border-color:var(--blue);}
+.card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
+.card .ct{font-size:18px;font-weight:600;}
+.card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+</style>
+</head>
+<body>
+<header class="top"><div class="inner">
+<div class="crumb"><a href="index.html" style="color:inherit">模块 1 · 线性代数与微积分</a>　/　第 3 课（共 10 课）</div>
+<h1>内积、范数与投影——度量与几何</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　第一阶段：数学与工具基础</div>
+</div></header>
+<div class="wrap">
+<article>
+<h2>1. 开场：给空间装上"尺子"和"量角器"</h2>
+
+<p>上一课我们学会把矩阵看成<strong>线性变换 linear transformation</strong>——它把整个空间拉伸、旋转、剪切。但变换前后，我们还缺一样东西：<em>度量</em>。两个向量有多长？它们之间夹角多大？谁离谁更近？谁和谁垂直？这些"几何问题"，统统由一个运算回答——<strong>内积 inner product</strong>。</p>
+
+<div class="note">
+<p>把内积想象成空间的"地基协议"：一旦约定了内积，<strong>长度</strong>（范数）和<strong>角度</strong>（夹角）就被一并确定了。本课的主线是：内积 → 范数（长度的不同定义）→ 正交（垂直）→ 投影（把一个向量"压"到另一个方向或子空间上）。而投影，正是<strong>最小二乘 least squares</strong> 和线性回归的几何心脏。</p>
+</div>
+
+<h2>2. 内积：定义、公理与几何意义</h2>
+
+<h3>2.1 从点积说起</h3>
+
+<p>上一模块我们见过两个向量 \(a=[a_1,\dots,a_n]\) 与 \(b=[b_1,\dots,b_n]\) 的<strong>点积 dot product</strong>：</p>
+
+\[ a\cdot b \;=\; a^\top b \;=\; \sum_{i=1}^{n} a_i b_i. \]
+
+<p>它的几何意义是这条核心公式（请把它刻进脑子）：</p>
+
+\[ a\cdot b \;=\; \|a\|\,\|b\|\cos\theta, \]
+
+<p>其中 \(\theta\) 是两向量的夹角。点积同时编码了<em>长度</em>和<em>方向一致程度</em>：同向为正、垂直为零、反向为负。</p>
+
+<h3>2.2 内积的三条公理</h3>
+
+<p>"点积"是 \(\mathbb{R}^n\) 上最常用的内积，但数学家把内积<strong>抽象成三条公理</strong>——任何满足这三条的运算 \(\langle a,b\rangle\) 都配叫内积，都能据此定义长度和角度（本课默认在实向量空间 \(\mathbb{R}^n\) 上讨论；复数域上的内积需对一个参数取共轭，是后话）：</p>
+
+<table>
+<thead><tr><th>公理</th><th>含义</th><th>公式</th></tr></thead>
+<tbody>
+<tr><td><strong>对称 symmetric</strong></td><td>交换两个参数不变</td><td>\(\langle a,b\rangle=\langle b,a\rangle\)</td></tr>
+<tr><td><strong>线性 linear</strong></td><td>对第一个参数线性（可加、可提系数）</td><td>\(\langle \alpha a+\beta c,\,b\rangle=\alpha\langle a,b\rangle+\beta\langle c,b\rangle\)</td></tr>
+<tr><td><strong>正定 positive-definite</strong></td><td>自己和自己内积非负，且只有零向量为零</td><td>\(\langle a,a\rangle\ge 0\)，等号 \(\iff a=0\)</td></tr>
+</tbody>
+</table>
+
+<p>这里只写了对<em>第一个</em>参数线性，是因为有了对称性，对第二个参数的线性可以白送地推出来（把两个参数换个位置即可），所以只需写一边。两个参数都线性的性质合称<strong>双线性 bilinear</strong>。对标准点积，这三条都是显然的：交换求和顺序得对称；求和对加法和数乘线性；而 \(\langle a,a\rangle=\sum a_i^2\ge 0\) 且仅当所有 \(a_i=0\) 才为零——这正是"正定"，它保证了"长度永远非负、只有零向量长度为零"这件天经地义的事。</p>
+
+<div class="key">
+<h4>要点</h4>
+<p>内积 = 满足<strong>对称 + 线性 + 正定</strong>的运算。有了它，长度定义为 \(\|a\|=\sqrt{\langle a,a\rangle}\)，夹角定义为 \(\cos\theta=\dfrac{\langle a,b\rangle}{\|a\|\,\|b\|}\)。<strong>度量与几何，都是内积的派生物。</strong></p>
+</div>
+
+<h2>3. 范数：长度的多种定义</h2>
+
+<p><strong>范数 norm</strong> \(\|x\|\) 是"向量长度"的一般化，它给每个向量一个非负实数，满足：非负（\(\|x\|\ge0\)，仅零向量为零）、齐次（\(\|\alpha x\|=|\alpha|\,\|x\|\)）、三角不等式（\(\|x+y\|\le\|x\|+\|y\|\)）。同一个向量，可以用不同的"尺子"量出不同的长度：</p>
+
+<table>
+<thead><tr><th>名称</th><th>记号</th><th>定义</th><th>直觉</th></tr></thead>
+<tbody>
+<tr><td><strong>L1 范数</strong>（曼哈顿）</td><td>\(\|x\|_1\)</td><td>\(\sum_i |x_i|\)</td><td>沿坐标轴走的"街区距离"</td></tr>
+<tr><td><strong>L2 范数</strong>（欧几里得）</td><td>\(\|x\|_2\)</td><td>\(\sqrt{\sum_i x_i^2}\)</td><td>直线距离，由点积导出 \(\sqrt{x^\top x}\)</td></tr>
+<tr><td><strong>L∞ 范数</strong>（最大值）</td><td>\(\|x\|_\infty\)</td><td>\(\max_i |x_i|\)</td><td>最大的那个分量说了算</td></tr>
+<tr><td><strong>Frobenius 范数</strong>（矩阵）</td><td>\(\|A\|_F\)</td><td>\(\sqrt{\sum_{i,j} A_{ij}^2}\)</td><td>把矩阵摊平成长向量后的 L2</td></tr>
+</tbody>
+</table>
+
+<div class="example">
+<h4>例题：同一向量的三种范数</h4>
+<p>设 \(v=[3,-4,0,12]\)。</p>
+<ul>
+<li>\(\|v\|_1=|3|+|{-4}|+|0|+|12|=3+4+0+12=\mathbf{19}\)。</li>
+<li>\(\|v\|_2=\sqrt{3^2+(-4)^2+0^2+12^2}=\sqrt{9+16+0+144}=\sqrt{169}=\mathbf{13}\)。</li>
+<li>\(\|v\|_\infty=\max(3,4,0,12)=\mathbf{12}\)。</li>
+</ul>
+<p>对矩阵 \(M=\begin{bmatrix}1&2\\2&1\end{bmatrix}\)，\(\|M\|_F=\sqrt{1^2+2^2+2^2+1^2}=\sqrt{10}\approx 3.162\)。</p>
+</div>
+
+<h3>3.1 单位球：菱形 / 圆 / 正方形</h3>
+
+<p>理解范数差异的最好方式，是画出每把尺子下"长度恰好为 1"的所有点——它们构成该范数的<strong>单位球 unit ball</strong>（在二维就是一条单位圈的边界）。三者形状迥异：</p>
+
+<figure class="fig"><svg viewBox="0 0 520 440" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>二维 L1 / L2 / L∞ 单位球对比：菱形 ⊂ 圆 ⊂ 正方形</title><defs><marker id="axarrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#94a3b8"/></marker></defs><g transform="translate(210 200)"><line x1="-150" y1="0" x2="150" y2="0" stroke="#e2e8f0" stroke-width="0.75"/><line x1="0" y1="-150" x2="0" y2="150" stroke="#e2e8f0" stroke-width="0.75"/><line x1="-120" y1="0" x2="143" y2="0" stroke="#94a3b8" stroke-width="1" marker-end="url(#axarrow)"/><line x1="0" y1="120" x2="0" y2="-143" stroke="#94a3b8" stroke-width="1" marker-end="url(#axarrow)"/><text x="150" y="16" font-size="14" fill="#1f2937">x₁</text><text x="8" y="-130" font-size="14" fill="#1f2937">x₂</text><circle cx="0" cy="0" r="2.2" fill="#1f2937"/><text x="6" y="16" font-size="11" fill="#1f2937">O</text><line x1="100" y1="-3" x2="100" y2="3" stroke="#94a3b8" stroke-width="1"/><text x="92" y="18" font-size="11" fill="#94a3b8">1</text><line x1="-100" y1="-3" x2="-100" y2="3" stroke="#94a3b8" stroke-width="1"/><text x="-106" y="18" font-size="11" fill="#94a3b8">-1</text><line x1="-3" y1="-100" x2="3" y2="-100" stroke="#94a3b8" stroke-width="1"/><text x="8" y="-96" font-size="11" fill="#94a3b8">1</text><line x1="-3" y1="100" x2="3" y2="100" stroke="#94a3b8" stroke-width="1"/><text x="8" y="104" font-size="11" fill="#94a3b8">-1</text><rect x="-100" y="-100" width="200" height="200" fill="#d9770618" stroke="#d97706" stroke-width="2"/><circle cx="0" cy="0" r="100" fill="#2563eb14" stroke="#2563eb" stroke-width="2"/><polygon points="100,0 0,-100 -100,0 0,100" fill="#db277718" stroke="#db2777" stroke-width="2"/><circle cx="100" cy="0" r="3.5" fill="#db2777"/><circle cx="-100" cy="0" r="3.5" fill="#db2777"/><circle cx="0" cy="-100" r="3.5" fill="#db2777"/><circle cx="0" cy="100" r="3.5" fill="#db2777"/></g><text x="260" y="430" font-size="12" fill="#db2777" text-anchor="middle">L₁ 尖角恰落在坐标轴上 → 稀疏解</text><text x="260" y="24" font-size="14" fill="#1f2937" text-anchor="middle" font-weight="600">L₁ / L₂ / L∞ 单位球：菱形 ⊂ 圆 ⊂ 正方形</text><g transform="translate(366 120)"><rect x="0" y="-10" width="20" height="12" fill="#db277718" stroke="#db2777" stroke-width="2"/><text x="26" y="0" font-size="12" fill="#1f2937">‖x‖₁ = 1</text><circle cx="10" cy="20" r="7" fill="#2563eb14" stroke="#2563eb" stroke-width="2"/><text x="26" y="24" font-size="12" fill="#1f2937">‖x‖₂ = 1</text><rect x="0" y="36" width="20" height="14" fill="#d9770618" stroke="#d97706" stroke-width="2"/><text x="26" y="48" font-size="12" fill="#1f2937">‖x‖∞ = 1</text></g></svg><figcaption>二维 L1 / L2 / L∞ 单位球对比：L1 是顶点落在坐标轴上的菱形，L2 是光滑的圆，L∞ 是边平行坐标轴的正方形；三者呈嵌套关系 菱形 ⊂ 圆 ⊂ 正方形。图中标出 L1 的尖角恰在坐标轴上（解释稀疏性来源）。</figcaption></figure>
+
+<ul>
+<li><strong>L1：菱形（正方形旋转 45°）</strong>。\(|x_1|+|x_2|=1\) 在四个坐标轴方向顶到最远，<em>尖角恰好落在坐标轴上</em>。</li>
+<li><strong>L2：圆</strong>。\(x_1^2+x_2^2=1\)，各方向完全平等、光滑无尖角。</li>
+<li><strong>L∞：正方形（边平行于坐标轴）</strong>。\(\max(|x_1|,|x_2|)=1\)，四条边在 \(\pm1\) 处。</li>
+</ul>
+
+<p>一个稳定的包含关系：\(\|x\|_\infty\le\|x\|_2\le\|x\|_1\)（同一向量，L∞ 最小、L1 最大），对应单位球"L1 菱形 ⊂ L2 圆 ⊂ L∞ 正方形"的嵌套。</p>
+
+<div class="note">
+<p>这两句话方向看似相反，其实不矛盾，恰恰是同一件事的两面：某把尺子量出的<em>数</em>越大，要凑够"长度 = 1"就越省料、向量越短，于是它的单位球反而越小、越往里缩。所以 L1（同一向量量出的数最大）的菱形最小、最靠内，L∞（量出的数最小）的正方形最大、最靠外。把这个"反直觉"想透，正是真正理解范数差异的钩子。</p>
+</div>
+
+<div class="ml">
+<h4><span class="tag">ML</span> 和 ML 的联系：范数 = 正则化的几何</h4>
+<p>训练模型时常给损失加一个"惩罚权重大小"的<strong>正则项 regularization</strong>，用的就是范数：</p>
+<ul>
+<li><strong>L2 正则（权重衰减 weight decay / 岭回归 ridge）</strong>：加 \(\lambda\|w\|_2^2\)。它的等高线是圆，把权重<em>均匀地往原点收缩</em>，使权重整体变小、变平滑，但很少正好为零。</li>
+<li><strong>L1 正则（Lasso）</strong>：加 \(\lambda\|w\|_1\)。菱形的<em>尖角恰好长在坐标轴上</em>，损失等高线最容易在这些尖角处与约束相切——而尖角意味着某些坐标分量为 0。于是 L1 产生<strong>稀疏 sparsity</strong>：很多权重被精确压成零，相当于自动做特征选择。</li>
+</ul>
+<p>一句话记忆：<strong>圆把权重收小，尖角把权重清零。</strong></p>
+</div>
+
+<h2>4. 单位向量与归一化</h2>
+
+<p>长度为 1 的向量叫<strong>单位向量 unit vector</strong>。把任意非零向量 \(v\) 除以它自己的（L2）长度，就得到同方向的单位向量，这一步叫<strong>归一化 normalization</strong>：</p>
+
+\[ \hat v \;=\; \frac{v}{\|v\|_2}, \qquad \|\hat v\|_2 = 1. \]
+
+<p>归一化"丢掉长度、只保留方向"。它在 ML 里无处不在：余弦相似度先把向量归一化再比方向；批归一化 / 层归一化把激活值缩放到统一尺度；嵌入向量常被归一化到单位球面上以便比较。</p>
+
+<div class="pitfall">
+<h4>易错</h4>
+<p>"归一化"默认指除以 <strong>L2 范数</strong>得到单位长度，别和"标准化 standardization（减均值除标准差）"混为一谈——后者是对数据集每个特征做的统计变换，不是把单个向量缩到长度 1。</p>
+</div>
+
+<h2>5. 正交：垂直的代数判据</h2>
+
+<p>当 \(\cos\theta=0\) 即 \(\theta=90^\circ\) 时，由 \(a\cdot b=\|a\|\|b\|\cos\theta\) 立刻得到最简洁的<strong>正交 orthogonal</strong>判据：</p>
+
+\[ a \perp b \iff a^\top b = 0. \]
+
+<p>无需画图、无需算角度——<em>点积为零就是垂直</em>。两个推广概念：</p>
+
+<ul>
+<li><strong>正交基 orthogonal basis</strong>：一组互相垂直的基向量。</li>
+<li><strong>标准正交基 orthonormal basis</strong>：互相垂直<em>且</em>每个都是单位向量。若把它们排成矩阵 \(Q\) 的列，则 \(Q^\top Q = I\)（每列自己点积为 1，不同列点积为 0）。这种矩阵叫<strong>正交矩阵</strong>，它代表纯旋转 / 反射，不改变长度和角度——是数值上最"乖"的变换。</li>
+</ul>
+
+<div class="note">
+<p>为什么人人都爱标准正交基？因为在它下面，向量 \(b\) 沿第 \(i\) 个基方向的坐标就是简单的点积 \(q_i^\top b\)，不用解方程组。坐标提取从"求逆"退化成"做内积"——这就是后面投影公式会变得无比干净的原因。</p>
+</div>
+
+<h2>6. 投影：把一个向量压到另一个方向上</h2>
+
+<p>给定方向 \(a\) 和目标 \(b\)，我们想找 \(b\) 落在 \(a\) 这条直线上的"影子"。把 \(b\) 分解成两部分：沿 \(a\) 的分量 + 垂直于 \(a\) 的<strong>残差 residual</strong>。</p>
+
+<figure class="fig"><svg viewBox="0 0 520 440" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>向量投影分解：b 沿 a 分解为投影向量 proj 与垂直残差 r</title><defs><marker id="arrA" markerWidth="9" markerHeight="9" refX="7" refY="3.2" orient="auto"><path d="M0,0 L7,3.2 L0,6.4 Z" fill="#2563eb"/></marker><marker id="arrB" markerWidth="9" markerHeight="9" refX="7" refY="3.2" orient="auto"><path d="M0,0 L7,3.2 L0,6.4 Z" fill="#db2777"/></marker><marker id="arrP" markerWidth="9" markerHeight="9" refX="7" refY="3.2" orient="auto"><path d="M0,0 L7,3.2 L0,6.4 Z" fill="#d97706"/></marker><marker id="arrAx" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker></defs><!-- grid --><g stroke="#e2e8f0" stroke-width="0.75"><line x1="60" y1="370" x2="60" y2="50"/><line x1="120" y1="370" x2="120" y2="50"/><line x1="180" y1="370" x2="180" y2="50"/><line x1="240" y1="370" x2="240" y2="50"/><line x1="300" y1="370" x2="300" y2="50"/><line x1="360" y1="370" x2="360" y2="50"/><line x1="60" y1="370" x2="420" y2="370"/><line x1="60" y1="310" x2="420" y2="310"/><line x1="60" y1="250" x2="420" y2="250"/><line x1="60" y1="190" x2="420" y2="190"/><line x1="60" y1="130" x2="420" y2="130"/><line x1="60" y1="70" x2="420" y2="70"/></g><!-- axes (origin O at x=60,y=370; unit=60px) --><g stroke="#94a3b8" stroke-width="1"><line x1="60" y1="370" x2="430" y2="370" marker-end="url(#arrAx)"/><line x1="60" y1="370" x2="60" y2="45" marker-end="url(#arrAx)"/></g><g fill="#1f2937" font-size="12"><text x="60" y="365" text-anchor="end">1</text><text x="120" y="388">1</text><text x="180" y="388">2</text><text x="240" y="388">3</text><text x="300" y="388">4</text><text x="360" y="388">5</text><text x="48" y="314" text-anchor="end">1</text><text x="48" y="254" text-anchor="end">2</text><text x="48" y="194" text-anchor="end">3</text><text x="48" y="134" text-anchor="end">4</text><text x="48" y="74" text-anchor="end">5</text><text x="436" y="374">x</text><text x="50" y="42">y</text></g><text x="48" y="388" fill="#1f2937" font-size="12" text-anchor="end">O</text><!-- direction line of a (the ray / 'this line'): from O through (2,1)=(180,310) extended to (4.4,2.2) --><line x1="60" y1="370" x2="324" y2="238" stroke="#2563eb" stroke-width="1" stroke-dasharray="4 3" opacity="0.6"/><!-- proj_a(b) = [4,2] -> (300,250), orange arrow along a's line --><line x1="60" y1="370" x2="300" y2="250" stroke="#d97706" stroke-width="2" marker-end="url(#arrP)"/><!-- vector a = [2,1] -> (180,310), solid blue arrow on the ray --><line x1="60" y1="370" x2="180" y2="310" stroke="#2563eb" stroke-width="2" marker-end="url(#arrA)"/><!-- vector b = [3,4] -> (240,130), pink --><line x1="60" y1="370" x2="240" y2="130" stroke="#db2777" stroke-width="2" marker-end="url(#arrB)"/><!-- residual r = b - proj : from b(240,130) to proj(300,250), dashed --><line x1="240" y1="130" x2="300" y2="250" stroke="#059669" stroke-width="2" stroke-dasharray="4 3"/><!-- right-angle mark at proj (300,250): r⊥a. a-dir unit ~(0.894,-0.447)->screen(0.894,-0.447); r-dir from proj to b unit ~(-0.447,-0.894)->screen(-0.447,+... ) build small square --><polyline points="313.4,256.7 306.7,243.3 293.3,250 300,250" fill="none" stroke="#059669" stroke-width="1.2"/><!-- endpoint dots --><circle cx="180" cy="310" r="3" fill="#2563eb"/><circle cx="240" cy="130" r="3.5" fill="#db2777"/><circle cx="300" cy="250" r="3.5" fill="#d97706"/><!-- labels --><text x="186" y="332" fill="#2563eb" font-size="14" font-weight="600">a = [2,1]</text><text x="248" y="124" fill="#db2777" font-size="14" font-weight="600">b = [3,4]</text><text x="306" y="246" fill="#d97706" font-size="14" font-weight="600">proj_a(b) = [4,2]</text><text x="276" y="200" fill="#059669" font-size="13" font-weight="600">r = b − proj = [−1,2]</text><text x="330" y="226" fill="#2563eb" font-size="12" opacity="0.85">方向直线 a</text><!-- scalar projection annotation --><text x="60" y="418" fill="#1f2937" font-size="12">标量投影 = a·b / ‖a‖ = 10 / √5 = 2√5  （即影子长度）</text></svg><figcaption>向量投影分解：把 b 沿方向 a 分解为投影向量 proj_a(b) 与残差 r=b-proj_a(b)，残差与 a 垂直（直角标记）。标量投影是影子的长度。以例题数值 a=[2,1], b=[3,4], proj=[4,2], r=[-1,2] 作图。</figcaption></figure>
+
+<p><strong>标量投影 scalar projection</strong>（影子的带符号长度）：</p>
+\[ \text{comp}_a(b) = \frac{a\cdot b}{\|a\|} = \|b\|\cos\theta. \]
+
+<p><strong>投影向量 projection vector</strong>（影子本身，方向沿 \(a\)）：</p>
+\[ \operatorname{proj}_a(b) = \frac{a\cdot b}{\|a\|^2}\,a. \]
+
+<p>关键性质：残差 \(r=b-\operatorname{proj}_a(b)\) 与 \(a\) <strong>正交</strong>。因为投影定义的本意就是"沿 \(a\) 走到离 \(b\) 最近的点"，而到直线的最短距离一定是垂直落下的——这就是投影与<em>最小化误差</em>之间的纽带，下一节我们会把它放大成最小二乘。</p>
+
+<div class="example">
+<h4>例题：把 \(b=[3,4]\) 投影到 \(a=[2,1]\)</h4>
+<p>第 1 步，点积：\(a\cdot b = 2\cdot3 + 1\cdot4 = 6+4 = 10\)。</p>
+<p>第 2 步，分母 \(\|a\|^2 = 2^2+1^2 = 5\)。</p>
+<p>第 3 步，标量系数 \(c=\dfrac{a\cdot b}{\|a\|^2}=\dfrac{10}{5}=2\)。</p>
+<p>第 4 步，投影向量 \(\operatorname{proj}_a(b)=c\,a = 2\cdot[2,1]=[4,2]\)。</p>
+<p>第 5 步，残差 \(r=b-\operatorname{proj}_a(b)=[3,4]-[4,2]=[-1,2]\)。</p>
+<p>验证正交：\(r\cdot a=(-1)(2)+(2)(1)=-2+2=0\) ✓。残差确实垂直于 \(a\)。</p>
+<p>顺带，标量投影（影子长度）\(=\dfrac{a\cdot b}{\|a\|}=\dfrac{10}{\sqrt5}=2\sqrt5\approx4.472\)。这里 \(a\cdot b=10>0\)，影子和 \(a\) 同向，所以是正值。<strong>"带符号"这件事别忘了</strong>：如果换一个与 \(a\) 成钝角的目标，例如 \(b'=[-3,-1]\)，则 \(a\cdot b'=2\cdot(-3)+1\cdot(-1)=-7<0\)，标量投影为负，说明影子指向 \(a\) 的<em>反方向</em>。</p>
+</div>
+
+<h3>6.1 投影到子空间：投影矩阵</h3>
+
+<p>把"一条直线"换成"一个子空间"（比如某矩阵 \(A\) 的<strong>列空间 column space</strong>，即 \(A\) 各列张成的平面/超平面），投影公式从标量推广成矩阵：</p>
+
+\[ P = A\,(A^\top A)^{-1} A^\top, \qquad \operatorname{proj}_{\text{col}(A)}(b) = P\,b. \]
+
+<p>这里要求 \(A\) 的列<strong>线性无关</strong>，\(A^\top A\) 才可逆（否则得改用伪逆 / SVD，第 7 节末尾会再提一句）。别被它吓到，把它和单数版本对照就懂了：单向量时 \(\operatorname{proj}_a(b)=a\,(a^\top a)^{-1}a^\top b\)（这里 \(a^\top a=\|a\|^2\) 是个标量），矩阵版只是把标量 \(\|a\|^2\) 换成了矩阵 \(A^\top A\)。直觉拆解：</p>
+<ul>
+<li>\(A^\top b\)：把 \(b\) 和每个列向量做内积，量出"在各列方向上有多少分量"。</li>
+<li>\((A^\top A)^{-1}\)：修正各列之间不正交、不等长带来的"串扰"。</li>
+<li>左乘 \(A\)：用修正后的系数把这些列向量加回去，得到真正落在列空间里的影子。</li>
+</ul>
+<p>投影矩阵有两个漂亮性质：<strong>幂等 idempotent</strong> \(P^2=P\)（影子再投影还是它自己——已经在子空间里了）和 \(P^\top=P\)（对称）。若 \(A\) 的列<em>本就标准正交</em>（\(A^\top A=I\)），公式直接坍缩成 \(P=AA^\top\)——这又一次印证了"标准正交基让一切变简单"。</p>
+
+<h2>7. 最小二乘：把目标投影到列空间</h2>
+
+<p>现在到本课的高潮。我们想解 \(A w = b\)，但现实里 \(b\) 几乎从不<em>恰好</em>落在 \(A\) 的列空间里（数据有噪声、方程比未知数多）。于是退而求其次：找 \(w\) 让 \(Aw\) 尽量接近 \(b\)，即最小化误差的 L2 长度</p>
+
+\[ \min_{w}\ \|A w - b\|_2^2. \]
+
+<p>几何上，\(Aw\) 只能在列空间这张"平面"上滑动，而 \(b\) 通常悬在平面外。<strong>离 \(b\) 最近的平面内的点，就是 \(b\) 在列空间上的投影</strong>——此时误差向量（残差）必须垂直于整个列空间：</p>
+
+\[ A^\top (b - A w) = 0 \;\Longrightarrow\; A^\top A\, w = A^\top b \;\Longrightarrow\; \boxed{\,w = (A^\top A)^{-1} A^\top b\,}. \]
+
+<p>这就是大名鼎鼎的<strong>正规方程 normal equations</strong>。"normal"在数学里正是"垂直"的意思——它说的就是"残差与列空间正交"这一句几何事实。把 \(w\) 代回 \(Aw=A(A^\top A)^{-1}A^\top b=Pb\)，正好是上一节的投影矩阵。<strong>最小二乘 = 投影到列空间</strong>，两件事是同一件事的代数面与几何面。</p>
+
+<figure class="fig"><svg viewBox="0 0 520 440" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>最小二乘的几何：残差垂直于列空间的正规方程</title><defs><marker id="lsq-blue" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#2563eb"/></marker><marker id="lsq-pink" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#db2777"/></marker><marker id="lsq-green" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#059669"/></marker></defs><polygon points="70,250 320,200 450,260 200,310" fill="#2563eb" fill-opacity="0.08" stroke="#94a3b8" stroke-width="1"/><text x="430" y="290" font-size="13" fill="#94a3b8" text-anchor="end">列空间 col(A)</text><circle cx="200" cy="270" r="3.5" fill="#1f2937"/><text x="186" y="288" font-size="13" fill="#1f2937">O</text><line x1="200" y1="270" x2="330" y2="248" stroke="#2563eb" stroke-width="2" marker-end="url(#lsq-blue)"/><text x="336" y="244" font-size="13" fill="#2563eb">a₁</text><line x1="200" y1="270" x2="250" y2="222" stroke="#2563eb" stroke-width="2" marker-end="url(#lsq-blue)"/><text x="254" y="216" font-size="13" fill="#2563eb">a₂</text><line x1="200" y1="270" x2="295" y2="245" stroke="#059669" stroke-width="2" marker-end="url(#lsq-green)"/><text x="300" y="262" font-size="13" fill="#059669" font-weight="600">Aw = Pb</text><line x1="200" y1="270" x2="278" y2="90" stroke="#db2777" stroke-width="2" marker-end="url(#lsq-pink)"/><text x="284" y="86" font-size="14" fill="#db2777" font-weight="700">b</text><line x1="283" y1="100" x2="295" y2="245" stroke="#db2777" stroke-width="1" stroke-dasharray="4 3"/><text x="304" y="170" font-size="13" fill="#db2777">残差 b − Aw</text><path d="M283,233 L295,231 L297,243" fill="none" stroke="#1f2937" stroke-width="1.2"/><text x="60" y="370" font-size="13" fill="#1f2937">残差 ⊥ 列空间</text><text x="60" y="392" font-size="13" fill="#1f2937">⇒ Aᵀ(b − Aw) = 0</text><text x="60" y="414" font-size="14" fill="#d97706" font-weight="600">⇒ 正规方程</text></svg><figcaption>最小二乘的几何：标签向量 b 悬在列空间（A 各列张成的平面）之外，最近的平面内点是 b 的投影 Pb=Aw，误差向量 b-Aw 垂直于整个列空间——这就是正规方程 Aᵀ(b-Aw)=0 的几何含义。</figcaption></figure>
+
+<div class="example">
+<h4>例题：用正规方程拟合一条直线</h4>
+<p>四个点 \((0,1),(1,3),(2,4),(3,6)\)，拟合 \(y=w_0+w_1 x\)。把每个点代入，写成 \(Xw=y\)（行=一个样本，第一列是常数项 1，第二列是 \(x\)）：</p>
+\[ X=\begin{bmatrix}1&0\\1&1\\1&2\\1&3\end{bmatrix},\quad y=\begin{bmatrix}1\\3\\4\\6\end{bmatrix}. \]
+<p>第 1 步，\(X^\top X=\begin{bmatrix}4&6\\6&14\end{bmatrix}\)（左上 = 4 个 1 的平方和；右下 = \(0^2+1^2+2^2+3^2=14\)；非对角 = \(0+1+2+3=6\)）。</p>
+<p>第 2 步，\(X^\top y=\begin{bmatrix}1+3+4+6\\0+3+8+18\end{bmatrix}=\begin{bmatrix}14\\29\end{bmatrix}\)。</p>
+<p>第 3 步，求逆。这里用到 2×2 矩阵的求逆公式 \(\begin{bmatrix}a&b\\c&d\end{bmatrix}^{-1}=\dfrac{1}{ad-bc}\begin{bmatrix}d&-b\\-c&a\end{bmatrix}\)（行列式 determinant 见上一模块；更高维时不手算逆，直接交给 <code>np.linalg.solve</code> 或 <code>lstsq</code>）。行列式 \(\det=4\cdot14-6\cdot6=56-36=20\)，于是 \((X^\top X)^{-1}=\dfrac{1}{20}\begin{bmatrix}14&-6\\-6&4\end{bmatrix}\)。</p>
+<p>第 4 步，\(w=\dfrac{1}{20}\begin{bmatrix}14&-6\\-6&4\end{bmatrix}\begin{bmatrix}14\\29\end{bmatrix}=\dfrac{1}{20}\begin{bmatrix}14\cdot14-6\cdot29\\-6\cdot14+4\cdot29\end{bmatrix}=\dfrac{1}{20}\begin{bmatrix}22\\32\end{bmatrix}=\begin{bmatrix}1.1\\1.6\end{bmatrix}.\)</p>
+<p>所以拟合直线是 \(y=1.1+1.6x\)。预测值 \([1.1,2.7,4.3,5.9]\)，残差 \([-0.1,0.3,-0.3,0.1]\)。验证残差与两列正交：\(\sum r_i=(-0.1+0.3-0.3+0.1)=0\)，\(\sum r_i x_i=0\cdot(-0.1)+1\cdot0.3+2\cdot(-0.3)+3\cdot0.1=0.3-0.6+0.3=0\) ✓。</p>
+</div>
+
+<div class="ml">
+<h4><span class="tag">ML</span> 和 ML 的联系：这几乎就是整个线性回归</h4>
+<ul>
+<li><strong>线性回归 linear regression</strong> 的解析解就是上面的正规方程 \(w=(X^\top X)^{-1}X^\top y\)，其中数据矩阵 \(X\) <em>每行一个样本</em>（与本课程数据约定一致）。</li>
+<li><strong>L2 损失（均方误差 MSE）</strong> \(\|Xw-y\|_2^2\) 的几何意义，正是"把标签向量 \(y\) 投影到特征列空间"。你之后训练的每个回归头、每条线性探针，背后都是这张投影图。</li>
+<li><strong>余弦相似度 cosine similarity</strong> \(\cos\theta=\dfrac{a^\top b}{\|a\|\|b\|}\) 把内积归一化掉长度，只比方向——它是检索、推荐、向量数据库里衡量"语义接近"的默认尺子。</li>
+<li><strong>正交初始化 orthogonal initialization</strong>：用正交矩阵初始化权重，因为正交变换保长度、保角度，能让信号在深层网络里不爆炸也不消失。</li>
+</ul>
+</div>
+
+<div class="pitfall">
+<h4>易错</h4>
+<p>正规方程要求 \(X^\top X\) 可逆，即 \(X\) 的列<em>线性无关</em>（这正是第 6.1 节那句前提的来历）。若两个特征高度共线（几乎成比例），\(X^\top X\) 接近奇异、求逆数值爆炸——这正是 L2 正则（岭回归）的另一个用途：把它改成 \((X^\top X+\lambda I)\) 后必可逆且稳定。实践中也常用 <code>np.linalg.lstsq</code> 或 SVD 求解而非显式求逆。</p>
+</div>
+
+<h2>8. Gram-Schmidt：把任意基"扶正"成标准正交基</h2>
+
+<p>我们反复看到标准正交基让公式变干净，那如何<em>制造</em>一组标准正交基？<strong>Gram-Schmidt 正交化</strong>给出一条朴素的流水线：逐个拿来基向量，<em>减掉它在已正交化向量上的投影</em>，剩下的残差自然垂直于前面所有向量；最后各自归一化。</p>
+
+<p>对两个向量 \(a_1, a_2\)：</p>
+\[ u_1 = a_1,\qquad u_2 = a_2 - \operatorname{proj}_{u_1}(a_2) = a_2 - \frac{u_1^\top a_2}{u_1^\top u_1}u_1, \]
+<p>再令 \(q_i=u_i/\|u_i\|\) 得标准正交基。"减去投影"用的就是第 6 节的投影向量，"剩下的垂直"用的就是残差正交性——整套技术全是本课零件的拼装。</p>
+
+<div class="note">
+<p>埋一根线给后续课程：把 Gram-Schmidt 整理成矩阵形式，就得到大名鼎鼎的 <strong>QR 分解</strong> \(A=QR\)——\(Q\) 的列正是这里造出的标准正交向量，\(R\) 记录了"减投影、做归一化"的所有系数。它也是数值上比正规方程更稳的最小二乘解法，后面会专门讲。</p>
+</div>
+
+<div class="example">
+<h4>例题：Gram-Schmidt 一遍</h4>
+<p>取 \(a_1=[1,1],\ a_2=[2,0]\)。</p>
+<p>\(u_1=a_1=[1,1]\)。</p>
+<p>\(\operatorname{proj}_{u_1}(a_2)=\dfrac{u_1^\top a_2}{u_1^\top u_1}u_1=\dfrac{2}{2}[1,1]=[1,1]\)。</p>
+<p>\(u_2=a_2-[1,1]=[2,0]-[1,1]=[1,-1]\)。验证 \(u_1^\top u_2=1\cdot1+1\cdot(-1)=0\) ✓。</p>
+<p>归一化：\(q_1=\dfrac{1}{\sqrt2}[1,1],\ q_2=\dfrac{1}{\sqrt2}[1,-1]\)，两者垂直且都为单位长度——一组标准正交基诞生。</p>
+</div>
+
+<h2>9. 动手：用 NumPy 算范数、投影与最小二乘</h2>
+
+<pre><code>import numpy as np
+
+# ---------- 范数族 ----------
+v = np.array([3., -4., 0., 12.])
+print("L1   =", np.linalg.norm(v, 1))     # 19
+print("L2   =", np.linalg.norm(v, 2))     # 13
+print("Linf =", np.linalg.norm(v, np.inf))# 12
+
+M = np.array([[1., 2.], [2., 1.]])
+print("Frobenius =", np.linalg.norm(M))   # sqrt(10) ≈ 3.162
+
+# ---------- 把 b 投影到 a ----------
+a = np.array([2., 1.]); b = np.array([3., 4.])
+coef = (a @ b) / (a @ a)        # 标量系数 = 2
+proj = coef * a                 # 投影向量 = [4, 2]
+resid = b - proj                # 残差 = [-1, 2]
+print("proj_a(b) =", proj)
+print("residual  =", resid)
+print("residual . a =", resid @ a)   # 0 -> 正交
+
+# ---------- 余弦相似度 ----------
+cos = (a @ b) / (np.linalg.norm(a) * np.linalg.norm(b))
+print("cos(theta) =", round(float(cos), 4))   # 0.8944</code></pre>
+
+<pre><code>import numpy as np
+
+# ---------- 用正规方程拟合直线 y = w0 + w1*x ----------
+x = np.array([0., 1., 2., 3.])
+y = np.array([1., 3., 4., 6.])
+X = np.column_stack([np.ones_like(x), x])     # 行=样本, 第1列=常数项
+
+# 正规方程  w = (X^T X)^{-1} X^T y
+w = np.linalg.inv(X.T @ X) @ (X.T @ y)
+print("w (w0, w1) =", w)                       # [1.1 1.6]
+
+pred = X @ w
+resid = y - pred
+print("预测   =", pred)                         # [1.1 2.7 4.3 5.9]
+print("残差   =", resid)                        # [-0.1 0.3 -0.3 0.1]
+print("残差与列空间正交:", np.round(X.T @ resid, 8))  # [0. 0.]
+
+# 投影矩阵 P = X (X^T X)^{-1} X^T，验证 Pb == pred
+P = X @ np.linalg.inv(X.T @ X) @ X.T
+print("P @ y == pred :", np.allclose(P @ y, pred))   # True
+print("P 幂等 P@P==P :", np.allclose(P @ P, P))       # True</code></pre>
+
+<h2>动手练习</h2>
+<ol>
+<li>把 \(b=[1,2,2]\) 投影到 \(a=[2,0,0]\)。手算 \(\operatorname{proj}_a(b)\) 与残差，并用代码核对残差与 \(a\) 正交。
+<pre><code>import numpy as np
+a = np.array([2., 0., 0.]); b = np.array([1., 2., 2.])
+# TODO: 算 coef、proj、resid，并 print(resid @ a)
+</code></pre></li>
+<li>验证 \(\|x\|_\infty\le\|x\|_2\le\|x\|_1\)：随机生成 1000 个五维向量，统计这条不等式是否全部成立。
+<pre><code>import numpy as np
+rng = np.random.default_rng(0)
+X = rng.standard_normal((1000, 5))
+# TODO: 逐行算三种范数, 用布尔数组检查 Linf<=L2<=L1 是否 .all()
+</code></pre></li>
+<li>把第 9 节的拟合改成<strong>二次曲线</strong> \(y=w_0+w_1x+w_2x^2\)：在 \(X\) 里加一列 \(x^2\)，重解正规方程，比较残差是否更小。
+<pre><code>import numpy as np
+x = np.array([0., 1., 2., 3.]); y = np.array([1., 3., 4., 6.])
+X = np.column_stack([np.ones_like(x), x, x**2])
+# TODO: w = inv(X.T@X)@X.T@y ; 打印 w 和残差范数
+</code></pre></li>
+<li>实现 Gram-Schmidt：对 \(a_1=[1,1,0],\,a_2=[1,0,1],\,a_3=[0,1,1]\) 正交化，用代码验证结果矩阵 \(Q\) 满足 \(Q^\top Q=I\)。
+<pre><code>import numpy as np
+A = np.array([[1.,1.,0.],[1.,0.,1.],[0.,1.,1.]]).T  # 列为 a1,a2,a3
+# TODO: 循环减去对前面各列的投影, 再归一化, 最后 print(np.round(Q.T@Q,8))
+</code></pre></li>
+<li><strong>岭回归的 λ 扫描</strong>：在练习 3 的数据上最小化 \(\|Xw-y\|^2+\lambda\|w\|_2^2\)，闭式解为 \(w=(X^\top X+\lambda I)^{-1}X^\top y\)。取一串递增的 \(\lambda\)，观察权重的 L2 范数 \(\|w\|_2\) 如何随 \(\lambda\) 增大而被往零收缩。
+<pre><code>import numpy as np
+x = np.array([0., 1., 2., 3.]); y = np.array([1., 3., 4., 6.])
+X = np.column_stack([np.ones_like(x), x, x**2])
+# TODO: for lam in [0., 0.1, 1., 10., 100.]:
+#         w = inv(X.T@X + lam*np.eye(X.shape[1])) @ X.T @ y
+#         print(lam, w, np.linalg.norm(w))
+# 观察: lambda 越大, ||w||_2 越小 -> 权重被往零收缩(但不会精确为零)
+</code></pre>
+<p><em>选做（思考题）</em>：L1 正则（Lasso）能把权重精确压成零，但它<strong>没有闭式解</strong>，需要坐标下降 / 次梯度等迭代方法（实践中直接用 <code>sklearn.linear_model.Lasso</code>），后续课程会专门讲。这里先体会"圆把权重收小、尖角把权重清零"的差别即可。</p></li>
+</ol>
+
+<h2>掌握自检</h2>
+<ul>
+<li>我能说出内积的三条公理，并解释"正定"为何保证长度非负。</li>
+<li>给定一个向量，我能心算它的 L1 / L2 / L∞ 范数，并画出二维下三者的单位球（菱形 / 圆 / 正方形）。</li>
+<li>我能解释为什么 L1 正则产生稀疏、L2 正则只是把权重收小——从单位球尖角的几何说清楚。</li>
+<li>我能不查公式写出 \(\operatorname{proj}_a(b)=\dfrac{a\cdot b}{\|a\|^2}a\)，并说明残差为何与 \(a\) 正交。</li>
+<li>我能把"最小二乘"翻译成"把 \(b\) 投影到列空间"，并推出正规方程 \(A^\top A w=A^\top b\) 来自"残差 ⊥ 列空间"。</li>
+<li>我能用 NumPy 解一个直线拟合，并验证残差与每个特征列正交、投影矩阵 \(P\) 幂等 idempotent。</li>
+<li>我能描述 Gram-Schmidt 的一步：减投影得残差、残差归一化，从而造出标准正交基。</li>
+</ul>
+
+<div class="key">
+<h4>要点</h4>
+<p>内积是空间的度量地基：它一手定义长度（范数），一手定义角度（正交）。投影是"沿某方向走到离目标最近的点"，残差必与该方向正交；把方向换成子空间，投影矩阵 \(P=A(A^\top A)^{-1}A^\top\) 就给出最小二乘解。<strong>L2 损失、权重衰减、余弦相似度、线性回归、正交初始化——全是这一课几何的直接应用。</strong></p>
+</div>
+
+<p>下一课，我们要问一个新问题：一个线性变换里，有没有某些<strong>特殊方向</strong>，被变换作用后<em>方向不变、只被缩放</em>？这就是<strong>特征值与特征向量 eigenvalue &amp; eigenvector</strong>——它会揭示一个变换"骨子里"的样子。</p>
+</article>
+<div class="navbtns"><a class="prev" href="lesson-02-matrix-linear-transformation.html"><div class="nlabel">← 上一课</div><div class="ntitle">第2课 · 矩阵即线性变换</div></a><a class="next" href="lesson-04-eigenvalues-eigenvectors.html"><div class="nlabel">下一课 →</div><div class="ntitle">第4课 · 特征值与特征向量</div></a></div>
+<nav class="toc"><h3>本模块课程表</h3><ol>
+<li><a href="lesson-01-vectors.html"><span class="ln">第1课</span>向量——机器学习的原子</a></li>
+<li><a href="lesson-02-matrix-linear-transformation.html"><span class="ln">第2课</span>矩阵即线性变换</a></li>
+<li class="cur"><a href="lesson-03-inner-product-norm-projection.html"><span class="ln">第3课</span>内积、范数与投影</a></li>
+<li><a href="lesson-04-eigenvalues-eigenvectors.html"><span class="ln">第4课</span>特征值与特征向量</a></li>
+<li><a href="lesson-05-svd-low-rank.html"><span class="ln">第5课</span>SVD 与低秩压缩</a></li>
+<li><a href="lesson-06-derivatives-gradients.html"><span class="ln">第6课</span>导数与梯度</a></li>
+<li><a href="lesson-07-jacobian-hessian.html"><span class="ln">第7课</span>雅可比与海森</a></li>
+<li><a href="lesson-08-chain-rule-computational-graph.html"><span class="ln">第8课</span>链式法则与计算图</a></li>
+<li><a href="lesson-09-matrix-calculus.html"><span class="ln">第9课</span>矩阵求导</a></li>
+<li><a href="lesson-10-backprop-from-scratch.html"><span class="ln">第10课</span>亲手实现反向传播</a></li>
+</ol></nav>
+</div>
+<!-- pyrunner-injected -->
+<style>
+.pr-cell{border:1px solid #334155;border-radius:10px;margin:1.2em 0;overflow:hidden;background:#0f172a;}
+.pr-head{display:flex;align-items:center;gap:8px;background:#1e293b;color:#cbd5e1;padding:6px 10px;font-size:13px;font-family:system-ui,-apple-system,sans-serif;}
+.pr-title{flex:1;font-weight:600;}
+.pr-status{font-size:12px;color:#94a3b8;white-space:nowrap;max-width:50%;overflow:hidden;text-overflow:ellipsis;}
+.pr-btn{cursor:pointer;border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:6px;padding:3px 11px;font-size:13px;line-height:1.4;}
+.pr-btn:hover{background:#0b1220;}
+.pr-run{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:600;}
+.pr-run:hover{background:#1d4ed8;}
+.pr-cell.collapsed .pr-body{display:none;}
+.pr-edit{display:block;width:100%;border:none;background:#0f172a;color:#e2e8f0;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.55;padding:12px 14px;resize:vertical;box-sizing:border-box;outline:none;}
+.pr-out{margin:0;padding:10px 14px;border-top:1px solid #334155;background:#0b1220;color:#cbd5e1;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.5;white-space:pre-wrap;max-height:340px;overflow:auto;}
+.pr-out:empty{display:none;}
+.pr-out.err{color:#fca5a5;}
+#pr-fab{position:fixed;right:18px;bottom:18px;z-index:9998;background:#2563eb;color:#fff;border:none;border-radius:999px;padding:10px 17px;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.22);font-family:system-ui,sans-serif;}
+#pr-fab:hover{background:#1d4ed8;}
+#pr-lab{position:fixed;right:18px;bottom:66px;z-index:9999;width:400px;max-width:92vw;background:#0f172a;border:1px solid #334155;border-radius:12px;display:none;flex-direction:column;box-shadow:0 14px 38px rgba(0,0,0,.4);overflow:hidden;}
+#pr-lab.open{display:flex;}
+#pr-lab .pr-edit{min-height:150px;}
+</style>
+<script>
+(function(){
+  var PYBASE="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+  var pyReady=null;
+  function loadPy(status){
+    if(pyReady)return pyReady;
+    pyReady=(async function(){
+      status("正在加载 Python 运行时（首次约 10 秒，需联网）…");
+      await new Promise(function(res,rej){
+        var s=document.createElement("script");s.src=PYBASE+"pyodide.js";
+        s.onload=res;s.onerror=function(){rej(new Error("无法加载 Pyodide（首次运行需要联网）"));};
+        document.head.appendChild(s);
+      });
+      var py=await loadPyodide({indexURL:PYBASE});
+      status("正在加载 NumPy …");
+      await py.loadPackage("numpy");
+      status("Python 就绪 ✓");
+      return py;
+    })();
+    return pyReady;
+  }
+  async function run(code,outEl,statusEl){
+    var setS=function(m){if(statusEl)statusEl.textContent=m;};
+    outEl.classList.remove("err");outEl.textContent="";
+    var py;
+    try{py=await loadPy(setS);}
+    catch(e){outEl.classList.add("err");outEl.textContent="加载失败："+e.message;return;}
+    var buf="";
+    py.setStdout({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    py.setStderr({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    try{
+      var result=await py.runPythonAsync(code);
+      if(result!==undefined&&result!==null){
+        var r;try{r=result.toString();}catch(_){r=String(result);}
+        if(r!=="None")buf+=(buf&&!buf.endsWith("\n")?"\n":"")+r;
+        if(result&&result.destroy)result.destroy();
+      }
+      outEl.textContent=buf||"（运行成功，无输出。用 print(...) 查看结果）";
+    }catch(e){
+      outEl.classList.add("err");
+      outEl.textContent=buf+(buf?"\n":"")+String((e&&e.message)||e);
+    }
+  }
+  function autosize(ta){ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight+2,460)+"px";}
+  function tabKey(e){
+    if(e.key==="Tab"){e.preventDefault();var s=this.selectionStart,en=this.selectionEnd;
+      this.value=this.value.slice(0,s)+"    "+this.value.slice(en);this.selectionStart=this.selectionEnd=s+4;}
+    if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();var b=this.closest(".pr-cell,#pr-lab").querySelector(".pr-run");if(b)b.click();}
+  }
+  function makeCell(code){
+    var cell=document.createElement("div");cell.className="pr-cell";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">可运行 · Python (NumPy)</span><span class="pr-status"></span><button class="pr-btn pr-toggle">收起</button><button class="pr-btn pr-run">▶ 运行</button></div><div class="pr-body"><textarea class="pr-edit" spellcheck="false"></textarea><pre class="pr-out"></pre></div>';
+    var ta=cell.querySelector(".pr-edit");ta.value=code;
+    var out=cell.querySelector(".pr-out"),st=cell.querySelector(".pr-status");
+    ta.addEventListener("input",function(){autosize(ta);});
+    ta.addEventListener("keydown",tabKey);
+    cell.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    var tog=cell.querySelector(".pr-toggle");
+    tog.onclick=function(){cell.classList.toggle("collapsed");tog.textContent=cell.classList.contains("collapsed")?"展开":"收起";};
+    setTimeout(function(){autosize(ta);},0);
+    return cell;
+  }
+  function enhance(){
+    document.querySelectorAll("article pre").forEach(function(pre){
+      if(pre.closest(".pr-cell"))return;
+      var codeEl=pre.querySelector("code")||pre;
+      var code=codeEl.textContent.replace(/\s+$/,"");
+      if(!code)return;
+      pre.replaceWith(makeCell(code));
+    });
+  }
+  function lab(){
+    var fab=document.createElement("button");fab.id="pr-fab";fab.textContent="▶ Python 实验台";
+    var panel=document.createElement("div");panel.id="pr-lab";
+    panel.innerHTML='<div class="pr-head"><span class="pr-title">Python 实验台 · NumPy</span><span class="pr-status"></span><button class="pr-btn pr-run">▶ 运行</button><button class="pr-btn pr-min">收起</button></div><div class="pr-body"><textarea class="pr-edit" spellcheck="false"></textarea><pre class="pr-out"></pre></div>';
+    document.body.appendChild(fab);document.body.appendChild(panel);
+    var ta=panel.querySelector(".pr-edit");
+    ta.value="import numpy as np\na = np.array([3, 2])\nb = np.array([1, 4])\nprint(\"a + b =\", a + b)\nprint(\"a . b =\", a @ b)\nprint(\"|a|  =\", np.linalg.norm(a))\ncos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))\nprint(\"cos =\", round(float(cos), 4))";
+    ta.addEventListener("keydown",tabKey);
+    var out=panel.querySelector(".pr-out"),st=panel.querySelector(".pr-status");
+    panel.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    fab.onclick=function(){panel.classList.toggle("open");};
+    panel.querySelector(".pr-min").onclick=function(){panel.classList.remove("open");};
+  }
+  function init(){enhance();lab();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+
+</body>
+</html>
