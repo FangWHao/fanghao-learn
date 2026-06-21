@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>$pagetitle$</title>
+  <meta name="description" content="从数学基础到 LLM、扩散模型、推理模型和 Agent 的中文机器学习自学课程。">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/site.css">
+  $for(header-includes)$
+  $header-includes$
+  $endfor$
+</head>
+<body class="doc-page">
+  <header class="doc-header">
+    <div class="shell">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">λ</span>
+        <span>FangHao Learn</span>
+      </a>
+      <nav class="topnav" aria-label="文档导航">
+        <a href="index.html">首页</a>
+        <a href="module01/lesson-01-vectors.html">第 1 课</a>
+        <a href="frontier-ml-curriculum.md">Markdown</a>
+      </nav>
+    </div>
+  </header>
+  <main class="doc-main">
+    <section class="doc-title">
+      <p class="kicker">Course Curriculum</p>
+      <h1>$title$</h1>
+      <p>一份从数学基础走到 LLM、扩散模型、推理模型和 Agent 的中文自学路线，适合按模块长期推进，也适合按主题查阅。</p>
+    </section>
+    $if(toc)$
+    <nav id="$idprefix$TOC" role="doc-toc">
+      $table-of-contents$
+    </nav>
+    $endif$
+    $body$
+  </main>
+  <footer>
+    <div class="shell">learn.fanghao.top · FangHao Learn</div>
+  </footer>
+</body>
+</html>

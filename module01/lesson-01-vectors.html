@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块1 · 第1课 · 向量——机器学习的原子</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue-bg:#eff6ff;
+--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--pink:#db2777;
+--red:#dc2626;--red-bg:#fef2f2;--bg:#ffffff;--soft:#f8fafc;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);
+font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.85;font-size:17px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:840px;margin:0 auto;padding:0 22px 80px;}
+header.top{background:linear-gradient(0deg,#fff,#fff);border-bottom:1px solid var(--line);
+padding:26px 22px 22px;margin-bottom:14px;}
+header.top .inner{max-width:840px;margin:0 auto;}
+.crumb{color:var(--muted);font-size:14px;letter-spacing:.3px;margin-bottom:6px;}
+h1{font-size:30px;line-height:1.3;margin:.1em 0 .2em;}
+.sub{color:var(--muted);font-size:15px;}
+article{background:var(--bg);border:1px solid var(--line);border-radius:14px;
+padding:30px 34px;margin-top:18px;}
+h2{font-size:23px;margin:1.7em 0 .6em;padding-bottom:.25em;border-bottom:2px solid var(--line);}
+h2:first-child{margin-top:.2em;}
+h3{font-size:19px;margin:1.3em 0 .4em;color:#0f172a;}
+h4{margin:.2em 0 .5em;font-size:16px;}
+p{margin:.7em 0;}
+ul,ol{padding-left:1.3em;margin:.6em 0;}
+li{margin:.32em 0;}
+code{background:#f1f5f9;padding:.12em .4em;border-radius:5px;font-size:.9em;
+font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a;}
+pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 18px;overflow:auto;
+font-size:14px;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0;}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:15.5px;}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+thead th{background:var(--soft);}
+figure.fig{margin:1.4em 0;text-align:center;}
+figure.fig svg{max-width:100%;height:auto;}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
+.note,.ml,.key,.pitfall,.example{border-radius:10px;padding:14px 18px;margin:1.2em 0;
+border:1px solid var(--line);}
+.note{background:var(--soft);border-left:4px solid #94a3b8;}
+.example{background:#fff;border-left:4px solid var(--blue);}
+.ml{background:var(--green-bg);border-left:4px solid var(--green);}
+.key{background:var(--amber-bg);border-left:4px solid var(--amber);}
+.pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;
+padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
+.toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
+.toc h3{margin:.1em 0 .7em;}
+.toc ol{list-style:none;padding:0;counter-reset:none;}
+.toc li{padding:7px 10px;border-radius:8px;color:#334155;border:1px solid transparent;}
+.toc li .ln{display:inline-block;min-width:54px;color:var(--muted);font-size:13px;}
+.toc li.cur{background:var(--blue-bg);border-color:#bfdbfe;font-weight:600;color:#1e3a8a;}
+.home-link{position:fixed;right:18px;bottom:18px;z-index:10;display:inline-flex;align-items:center;
+justify-content:center;min-height:40px;padding:0 14px;border:1px solid var(--line);border-radius:8px;
+background:rgba(255,255,255,.94);color:#1e3a8a;text-decoration:none;font-size:14px;font-weight:700;
+box-shadow:0 12px 28px rgba(15,23,42,.12);backdrop-filter:blur(10px);}
+.home-link:hover{background:#fff;color:var(--blue);}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+</style>
+</head>
+<body>
+<a class="home-link" href="../index.html">返回首页</a>
+<header class="top"><div class="inner">
+<div class="crumb">模块 1 · 线性代数与微积分　/　第 1 课（共 10 课）</div>
+<h1>向量——机器学习的原子</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　第一阶段：数学与工具基础</div>
+</div></header>
+<div class="wrap">
+<article>
+<h2>1. 开场：为什么从向量讲起</h2>
+
+<p>如果把机器学习（machine learning）拆到最底层，你会发现一个反复出现的"原子"——<strong>向量 vector</strong>。无论是一个数据点、一张图片、一个词的语义、还是模型自己的参数，在计算机眼里它们统统是<strong>一串有序的数</strong>。理解了向量，你就拿到了打开后面所有内容（矩阵、梯度、神经网络、注意力机制）的钥匙。</p>
+
+<p>先看四个真实例子，感受"万物皆向量"：</p>
+
+<ul>
+<li><strong>一封邮件 → 词频向量</strong>。假设我们只关心 5 个词 \([\text{免费},\ \text{中奖},\ \text{会议},\ \text{发票},\ \text{你好}]\)，某封邮件里这些词分别出现 \(3,1,0,0,2\) 次，那么这封邮件就是向量 \([3,1,0,0,2]\)。垃圾邮件分类器看到的就是这一串数。</li>
+<li><strong>一张 28×28 灰度图 → 784 维向量</strong>。MNIST 手写数字数据集里每张图有 \(28\times28=784\) 个像素，每个像素是一个 0–255 的灰度值。把这些像素按行展平（flatten）排成一长列，就得到一个 784 维向量 \(x\in\mathbb{R}^{784}\)。这张"图"对模型而言不过是 784 个数。</li>
+<li><strong>一个词 → 词嵌入 word embedding</strong>。在现代语言模型里，"国王"这个词被表示成一个比如 300 维的向量。语义相近的词，向量在空间中也靠得近。</li>
+<li><strong>一组模型权重 → 参数向量</strong>。一个有一百万个参数的模型，它的全部"知识"就是一个一百万维的向量；训练就是在这个高维空间里挪动这个点。</li>
+</ul>
+
+<div class="note">
+<p>记住这句话：<strong>一个样本 = 一个向量；一个特征维度 = 向量的一个坐标分量</strong>。从此"数据集"在你脑中应该变成"一堆点"或"一摞向量"。本课所有内容，都是在为"如何度量、组合、变换这些点"打地基。</p>
+</div>
+
+<h2>2. 向量的三种视角：同一个对象，三种语言</h2>
+
+<p>同一个向量，可以用三种完全不同的语言来说，它们指的是<strong>同一个东西</strong>。以二维向量 \(v=[3,2]\) 为例：</p>
+
+<table>
+<thead>
+<tr><th>视角</th><th>长什么样</th><th>什么时候最好用</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>数据行 data row</strong></td><td>表格里的一行：<code>身高=3, 体重=2</code></td><td>处理数据集时——这正是 pandas / NumPy 里的一行</td></tr>
+<tr><td><strong>几何箭头 arrow</strong></td><td>从原点 \((0,0)\) 指向 \((3,2)\) 的有向箭头</td><td>想理解方向、长度、相似度、变换时</td></tr>
+<tr><td><strong>坐标列 column</strong></td><td>\(\begin{bmatrix}3\\2\end{bmatrix}\)，竖排的数</td><td>做矩阵运算、写权重 \(w\) 时</td></tr>
+</tbody>
+</table>
+
+<figure class="fig"><svg viewBox="0 0 540 320" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>同一个向量 [3,2] 的三种视角：数据表行、平面箭头、坐标列</title><defs><marker id="arrowBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#2563eb"/></marker></defs><text x="270" y="24" font-size="14" fill="#1f2937" text-anchor="middle" font-weight="600">同一个向量，三种语言</text><text x="60" y="56" font-size="12" fill="#1f2937" text-anchor="middle">数据表的一行</text><rect x="20" y="68" width="80" height="56" fill="none" stroke="#94a3b8" stroke-width="1"/><line x1="20" y1="96" x2="100" y2="96" stroke="#94a3b8" stroke-width="1"/><line x1="60" y1="68" x2="60" y2="124" stroke="#e2e8f0" stroke-width="0.75"/><text x="40" y="87" font-size="12" fill="#1f2937" text-anchor="middle">x1</text><text x="80" y="87" font-size="12" fill="#1f2937" text-anchor="middle">x2</text><text x="40" y="115" font-size="14" fill="#2563eb" text-anchor="middle" font-weight="600">3</text><text x="80" y="115" font-size="14" fill="#2563eb" text-anchor="middle" font-weight="600">2</text><text x="290" y="56" font-size="12" fill="#1f2937" text-anchor="middle">平面上的箭头</text><g><line x1="200" y1="80" x2="200" y2="280" stroke="#e2e8f0" stroke-width="0.75"/><line x1="240" y1="80" x2="240" y2="280" stroke="#e2e8f0" stroke-width="0.75"/><line x1="280" y1="80" x2="280" y2="280" stroke="#e2e8f0" stroke-width="0.75"/><line x1="320" y1="80" x2="320" y2="280" stroke="#e2e8f0" stroke-width="0.75"/><line x1="160" y1="120" x2="360" y2="120" stroke="#e2e8f0" stroke-width="0.75"/><line x1="160" y1="160" x2="360" y2="160" stroke="#e2e8f0" stroke-width="0.75"/><line x1="160" y1="200" x2="360" y2="200" stroke="#e2e8f0" stroke-width="0.75"/></g><line x1="160" y1="240" x2="360" y2="240" stroke="#94a3b8" stroke-width="1"/><line x1="160" y1="280" x2="160" y2="80" stroke="#94a3b8" stroke-width="1"/><polygon points="360,240 352,236 352,244" fill="#94a3b8"/><polygon points="160,80 156,88 164,88" fill="#94a3b8"/><text x="364" y="244" font-size="11" fill="#94a3b8">x</text><text x="156" y="78" font-size="11" fill="#94a3b8">y</text><text x="152" y="254" font-size="11" fill="#1f2937" text-anchor="end">O</text><text x="200" y="254" font-size="11" fill="#94a3b8" text-anchor="middle">1</text><text x="240" y="254" font-size="11" fill="#94a3b8" text-anchor="middle">2</text><text x="280" y="254" font-size="11" fill="#94a3b8" text-anchor="middle">3</text><text x="320" y="254" font-size="11" fill="#94a3b8" text-anchor="middle">4</text><text x="152" y="204" font-size="11" fill="#94a3b8" text-anchor="end">1</text><text x="152" y="164" font-size="11" fill="#94a3b8" text-anchor="end">2</text><text x="152" y="124" font-size="11" fill="#94a3b8" text-anchor="end">3</text><line x1="280" y1="240" x2="280" y2="160" stroke="#2563eb" stroke-width="1" stroke-dasharray="4 3"/><line x1="160" y1="160" x2="280" y2="160" stroke="#2563eb" stroke-width="1" stroke-dasharray="4 3"/><text x="280" y="234" font-size="11" fill="#2563eb" text-anchor="middle" font-weight="600">3</text><text x="170" y="156" font-size="11" fill="#2563eb" font-weight="600">2</text><line x1="160" y1="240" x2="280" y2="160" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/><text x="216" y="190" font-size="13" fill="#2563eb" font-weight="600">v=[3,2]</text><text x="480" y="56" font-size="12" fill="#1f2937" text-anchor="middle">坐标列向量</text><path d="M455 78 L448 78 L448 142 L455 142" fill="none" stroke="#1f2937" stroke-width="1.5"/><path d="M505 78 L512 78 L512 142 L505 142" fill="none" stroke="#1f2937" stroke-width="1.5"/><text x="480" y="102" font-size="14" fill="#2563eb" text-anchor="middle" font-weight="600">3</text><text x="480" y="130" font-size="14" fill="#2563eb" text-anchor="middle" font-weight="600">2</text><path d="M104 110 Q140 110 158 175" fill="none" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="4 3"/><path d="M362 175 Q420 130 446 110" fill="none" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="4 3"/></svg><figcaption>同一个向量 [3,2] 的三种视角：数据表的一行、二维平面上从原点出发的箭头、竖排的坐标列</figcaption></figure>
+
+<p>三者可以自由切换：数据行强调"它是一条记录"，几何箭头强调"它有方向和长度"，坐标列强调"它能参与代数运算"。会切换视角，是学好线性代数的核心技能——很多看起来难的问题，换个视角就一目了然。</p>
+
+<p>记号约定：向量用粗体或带箭头表示，本课写作 \(v=[v_1, v_2, \dots, v_n]\)，其中 \(n\) 是<strong>维度 dimension</strong>。习惯上向量默认是"列向量"，写成一行只是为了排版方便；后面我们会看到，把列向量"转置"成行，正好用来写点积。</p>
+
+<div class="ml">
+<h4><span class="tag">ML</span> 和 ML 的联系</h4>
+<p>这三种视角在代码和模型里天天出现：<strong>数据行视角</strong>对应 <code>df.iloc[0]</code> 取出的一行样本；<strong>坐标列视角</strong>对应神经网络里的权重列向量 \(w\)；<strong>几何箭头视角</strong>对应词嵌入在语义空间里的位置——"猫"和"狗"的箭头方向相近，"猫"和"火箭"则相差很远。同一份数据，工程时当它是行，建模时当它是列，理解时当它是箭头。</p>
+</div>
+
+<h2>3. 向量的长度、加法与数乘</h2>
+
+<h3>向量的长度：范数 norm</h3>
+
+<p>在做加法、数乘之前，先把一个最基础的量讲清楚：向量有多"长"。一个向量的长度叫作它的<strong>范数 norm</strong>，记作 \(\|v\|\)。在二维里，它就是从原点到箭头尖的距离，由勾股定理给出：</p>
+
+\[
+\|[a_1,a_2]\|=\sqrt{a_1^2+a_2^2}
+\]
+
+<p>推广到 \(n\) 维，就是把所有分量平方求和再开根号：</p>
+
+\[
+\|a\|=\sqrt{a_1^2+a_2^2+\cdots+a_n^2}=\sqrt{\sum_{i=1}^{n} a_i^2}
+\]
+
+<p>例如 \(\|[3,4]\|=\sqrt{3^2+4^2}=\sqrt{25}=5\)。范数衡量的就是"这个箭头有多长"，后面讲数乘的伸缩、点积的几何定义、投影和余弦相似度时都要反复用到它，所以先把它放在最前面。</p>
+
+<h3>向量加法：尖尾相接 / 平行四边形</h3>
+
+<p>两个向量相加，代数上就是<strong>对应分量相加</strong>：</p>
+
+\[
+a+b=[a_1,a_2]+[b_1,b_2]=[a_1+b_1,\ a_2+b_2]
+\]
+
+<p>几何上有两种等价画法：</p>
+<ul>
+<li><strong>尖尾相接</strong>：把 \(b\) 的尾巴接到 \(a\) 的箭头尖上，从 \(a\) 的起点到 \(b\) 的终点画一支新箭头，就是 \(a+b\)。直觉是"先走 \(a\)，再走 \(b\)"。</li>
+<li><strong>平行四边形法则 parallelogram rule</strong>：以 \(a\) 和 \(b\) 为相邻两边作平行四边形，对角线就是 \(a+b\)。这强调加法的对称性：\(a+b=b+a\)。</li>
+</ul>
+
+<h3>数乘：沿方向伸缩或翻转</h3>
+
+<p>一个数（标量 scalar）\(c\) 乘以向量，就是把每个分量都乘以 \(c\)：</p>
+
+\[
+c\,a=[c\,a_1,\ c\,a_2]
+\]
+
+<p>几何意义非常直观（这里"长度翻倍/减半"指的就是上面讲的范数 \(\|a\|\)）：</p>
+<ul>
+<li>\(c>1\)：沿原方向<strong>拉长</strong>（如 \(2a\) 长度翻倍，方向不变）。</li>
+<li>\(c=1\)：<strong>原封不动</strong>，\(1\cdot a=a\)。</li>
+<li>\(0<c<1\)：沿原方向<strong>缩短</strong>。</li>
+<li>\(c=0\)：得到<strong>零向量 zero vector</strong> \(\mathbf{0}=[0,0]\)——长度为 0、落在原点的特殊向量。</li>
+<li>\(c<0\)：<strong>翻转方向</strong>，再按 \(|c|\) 缩放（如 \(-0.5a\) 反向且长度减半）。</li>
+</ul>
+
+<figure class="fig"><svg viewBox="0 0 540 300" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif">
+<title>向量加法的平行四边形法则与向量数乘示意图</title>
+<defs>
+<marker id="arrA" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#2563eb"/></marker>
+<marker id="arrB" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#db2777"/></marker>
+<marker id="arrSum" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#d97706"/></marker>
+<marker id="arrG" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#059669"/></marker>
+<marker id="arrAx" markerWidth="8" markerHeight="8" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#94a3b8"/></marker>
+</defs>
+
+<!-- ===== LEFT SUBPLOT: vector addition ===== -->
+<!-- grid -->
+<g stroke="#e2e8f0" stroke-width="0.75">
+<line x1="74" y1="48" x2="74" y2="216"/>
+<line x1="102" y1="48" x2="102" y2="216"/>
+<line x1="158" y1="48" x2="158" y2="216"/>
+<line x1="186" y1="48" x2="186" y2="216"/>
+<line x1="214" y1="48" x2="214" y2="216"/>
+<line x1="242" y1="48" x2="242" y2="216"/>
+<line x1="74" y1="48" x2="248" y2="48"/>
+<line x1="74" y1="76" x2="248" y2="76"/>
+<line x1="74" y1="104" x2="248" y2="104"/>
+<line x1="74" y1="132" x2="248" y2="132"/>
+<line x1="74" y1="188" x2="248" y2="188"/>
+</g>
+<!-- axes -->
+<g stroke="#94a3b8" stroke-width="1">
+<line x1="74" y1="160" x2="252" y2="160" marker-end="url(#arrAx)"/>
+<line x1="130" y1="216" x2="130" y2="44" marker-end="url(#arrAx)"/>
+</g>
+<text x="256" y="164" font-size="12" fill="#94a3b8">x</text>
+<text x="124" y="42" font-size="12" fill="#94a3b8">y</text>
+<text x="120" y="174" font-size="11" fill="#1f2937">O</text>
+<text x="252" y="30" font-size="12" fill="#1f2937" font-weight="600" text-anchor="middle">向量加法 · 平行四边形法则</text>
+
+<!-- parallelogram helper dashed sides -->
+<g stroke-dasharray="4 3" stroke-width="1">
+<!-- b translated onto tip of a -->
+<line x1="214" y1="132" x2="242" y2="76" stroke="#db2777"/>
+<!-- a translated onto tip of b -->
+<line x1="158" y1="104" x2="242" y2="76" stroke="#2563eb"/>
+</g>
+
+<!-- vectors -->
+<line x1="130" y1="160" x2="214" y2="132" stroke="#2563eb" stroke-width="2" marker-end="url(#arrA)"/>
+<line x1="130" y1="160" x2="158" y2="104" stroke="#db2777" stroke-width="2" marker-end="url(#arrB)"/>
+<line x1="130" y1="160" x2="242" y2="76" stroke="#d97706" stroke-width="2.6" marker-end="url(#arrSum)"/>
+
+<!-- labels -->
+<text x="178" y="152" font-size="14" fill="#2563eb" font-weight="600">a</text>
+<text x="138" y="120" font-size="14" fill="#db2777" font-weight="600">b</text>
+<text x="186" y="96" font-size="14" fill="#d97706" font-weight="600">a+b</text>
+
+<!-- ===== RIGHT SUBPLOT: scalar multiplication ===== -->
+<!-- grid -->
+<g stroke="#e2e8f0" stroke-width="0.75">
+<line x1="356" y1="60" x2="356" y2="216"/>
+<line x1="378" y1="60" x2="378" y2="216"/>
+<line x1="422" y1="60" x2="422" y2="216"/>
+<line x1="444" y1="60" x2="444" y2="216"/>
+<line x1="466" y1="60" x2="466" y2="216"/>
+<line x1="488" y1="60" x2="488" y2="216"/>
+<line x1="356" y1="94" x2="492" y2="94"/>
+<line x1="356" y1="116" x2="492" y2="116"/>
+<line x1="356" y1="138" x2="492" y2="138"/>
+<line x1="356" y1="182" x2="492" y2="182"/>
+</g>
+<!-- axes (with negative half) -->
+<g stroke="#94a3b8" stroke-width="1">
+<line x1="356" y1="160" x2="496" y2="160" marker-end="url(#arrAx)"/>
+<line x1="400" y1="216" x2="400" y2="56" marker-end="url(#arrAx)"/>
+</g>
+<text x="500" y="164" font-size="12" fill="#94a3b8">x</text>
+<text x="394" y="54" font-size="12" fill="#94a3b8">y</text>
+<text x="386" y="174" font-size="11" fill="#1f2937">O</text>
+<text x="426" y="30" font-size="12" fill="#1f2937" font-weight="600" text-anchor="middle">向量数乘 · 同线缩放</text>
+
+<!-- 2a (draw first, longest) -->
+<line x1="400" y1="160" x2="488" y2="116" stroke="#059669" stroke-width="2" marker-end="url(#arrG)"/>
+<!-- a base -->
+<line x1="400" y1="160" x2="444" y2="138" stroke="#2563eb" stroke-width="2.4" marker-end="url(#arrA)"/>
+<!-- -0.5a reversed -->
+<line x1="400" y1="160" x2="378" y2="171" stroke="#db2777" stroke-width="2" marker-end="url(#arrB)"/>
+
+<!-- labels -->
+<text x="448" y="132" font-size="14" fill="#2563eb" font-weight="600">a</text>
+<text x="470" y="108" font-size="14" fill="#059669" font-weight="600">2a</text>
+<text x="350" y="188" font-size="13" fill="#db2777" font-weight="600">-0.5a</text>
+
+<!-- annotations -->
+<text x="408" y="238" font-size="12" fill="#059669">2a：方向不变，长度 ×2</text>
+<text x="356" y="256" font-size="12" fill="#db2777">-0.5a：反向，长度 ×0.5</text>
+</svg><figcaption>左：平行四边形法则演示 a+b；右：数乘 2a（拉长）与 -0.5a（反向且减半）</figcaption></figure>
+
+<div class="note">
+<p>留意 \(c=0\) 这一档：任何向量乘以 \(0\) 都得到<strong>零向量</strong>（原点）。更一般地，把一组向量的线性组合系数全取为 \(0\)，结果也是零向量。这件小事在下一节很关键——它意味着用一组向量"搭"出来的所有点（它们的 span）<strong>必然包含原点</strong>，所以我们后面才会反复说"过原点的直线/平面"。</p>
+</div>
+
+<div class="ml">
+<h4><span class="tag">ML</span> 和 ML 的联系</h4>
+<p><strong>数乘 = 参数更新的一步</strong>。梯度下降里，参数更新写作 \(w \leftarrow w - \eta\,\nabla L\)，其中 \(\eta\) 是<strong>学习率 learning rate</strong>（一个标量），\(\nabla L\) 是梯度（一个向量）。\(\eta\,\nabla L\) 就是数乘——决定这一步沿梯度方向迈多大。<br><strong>加法 = 嵌入相加</strong>。Transformer 里，每个 token 的表示 = 词嵌入 + 位置编码（position embedding），两个向量逐分量相加，既保留"是什么词"又注入"在第几个位置"。</p>
+</div>
+
+<h2>4. 线性组合、张成 span 与基 basis</h2>
+
+<p>有了加法和数乘，就能做<strong>线性组合 linear combination</strong>——这是整门线性代数最核心的操作。给定向量 \(v_1,v_2,\dots,v_k\) 和标量 \(c_1,c_2,\dots,c_k\)，下式就是一个线性组合：</p>
+
+\[
+c_1 v_1 + c_2 v_2 + \cdots + c_k v_k
+\]
+
+<p>当 \(c_i\) 取遍所有可能的实数时，所有能"搭"出来的向量构成的集合，叫作这组向量的<strong>张成 span</strong>。（回忆上一节：当所有 \(c_i=0\) 时得到零向量，所以任何 span 都包含原点。）</p>
+
+<h3>二维直觉：两个不共线向量张成整个平面</h3>
+
+<p>取两个标准向量 \(e_1=[1,0]\) 和 \(e_2=[0,1]\)。任何二维向量 \([x,y]\) 都能写成 \(x\,e_1+y\,e_2\)。所以 \(\{e_1,e_2\}\) 的 span 就是<strong>整个平面 \(\mathbb{R}^2\)</strong>。其实只要两个向量<strong>不共线</strong>（不指向同一条直线），它们就能张成整个平面。</p>
+
+<p>反过来，如果两个向量<strong>共线</strong>，比如 \([1,2]\) 和 \([2,4]\)（后者是前者的 2 倍），那它们的所有线性组合都落在同一条过原点的直线上——span 只是一条<strong>直线</strong>，覆盖不了整个平面。这种"一个能被另一个表示出来"的情形叫<strong>线性相关 linearly dependent</strong>；反之，谁也表示不了谁，叫<strong>线性无关 linearly independent</strong>。</p>
+
+<figure class="fig"><svg viewBox="0 0 540 320" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif">
+<title>张成空间与基：线性无关张成平面，线性相关只张成一条直线</title>
+<desc>左图两个不共线向量 e1、e2 张成整个平面 R²；右图两个共线向量 v 与 2v 只能张成一条过原点的直线。</desc>
+<defs>
+<marker id="arrBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#2563eb"/></marker>
+<marker id="arrPink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#db2777"/></marker>
+<marker id="arrAmber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#d97706"/></marker>
+<marker id="arrAxis" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#94a3b8"/></marker>
+</defs>
+
+<!-- ===================== LEFT SUBPLOT ===================== -->
+<!-- lattice points (integer combinations of e1,e2), origin (130,160), scale 26 -->
+<!-- x from -3..3, y from -3..3 -->
+<g fill="#2563eb" opacity="0.28">
+<circle cx="52" cy="82" r="1.8"/><circle cx="78" cy="82" r="1.8"/><circle cx="104" cy="82" r="1.8"/><circle cx="130" cy="82" r="1.8"/><circle cx="156" cy="82" r="1.8"/><circle cx="182" cy="82" r="1.8"/><circle cx="208" cy="82" r="1.8"/>
+<circle cx="52" cy="108" r="1.8"/><circle cx="78" cy="108" r="1.8"/><circle cx="104" cy="108" r="1.8"/><circle cx="130" cy="108" r="1.8"/><circle cx="156" cy="108" r="1.8"/><circle cx="182" cy="108" r="1.8"/><circle cx="208" cy="108" r="1.8"/>
+<circle cx="52" cy="134" r="1.8"/><circle cx="78" cy="134" r="1.8"/><circle cx="104" cy="134" r="1.8"/><circle cx="130" cy="134" r="1.8"/><circle cx="156" cy="134" r="1.8"/><circle cx="182" cy="134" r="1.8"/><circle cx="208" cy="134" r="1.8"/>
+<circle cx="52" cy="160" r="1.8"/><circle cx="78" cy="160" r="1.8"/><circle cx="104" cy="160" r="1.8"/><circle cx="130" cy="160" r="1.8"/><circle cx="156" cy="160" r="1.8"/><circle cx="182" cy="160" r="1.8"/><circle cx="208" cy="160" r="1.8"/>
+<circle cx="52" cy="186" r="1.8"/><circle cx="78" cy="186" r="1.8"/><circle cx="104" cy="186" r="1.8"/><circle cx="130" cy="186" r="1.8"/><circle cx="156" cy="186" r="1.8"/><circle cx="182" cy="186" r="1.8"/><circle cx="208" cy="186" r="1.8"/>
+<circle cx="52" cy="212" r="1.8"/><circle cx="78" cy="212" r="1.8"/><circle cx="104" cy="212" r="1.8"/><circle cx="130" cy="212" r="1.8"/><circle cx="156" cy="212" r="1.8"/><circle cx="182" cy="212" r="1.8"/><circle cx="208" cy="212" r="1.8"/>
+<circle cx="52" cy="238" r="1.8"/><circle cx="78" cy="238" r="1.8"/><circle cx="104" cy="238" r="1.8"/><circle cx="130" cy="238" r="1.8"/><circle cx="156" cy="238" r="1.8"/><circle cx="182" cy="238" r="1.8"/><circle cx="208" cy="238" r="1.8"/>
+</g>
+
+<!-- axes -->
+<line x1="44" y1="160" x2="218" y2="160" stroke="#94a3b8" stroke-width="1" marker-end="url(#arrAxis)"/>
+<line x1="130" y1="248" x2="130" y2="74" stroke="#94a3b8" stroke-width="1" marker-end="url(#arrAxis)"/>
+<text x="222" y="164" fill="#94a3b8" font-size="11">x</text>
+<text x="135" y="78" fill="#94a3b8" font-size="11">y</text>
+<text x="118" y="174" fill="#1f2937" font-size="11">O</text>
+
+<!-- basis vectors e1=[1,0], e2=[0,1] -->
+<line x1="130" y1="160" x2="156" y2="160" stroke="#2563eb" stroke-width="2" marker-end="url(#arrBlue)"/>
+<text x="148" y="176" fill="#2563eb" font-size="12">e₁</text>
+<line x1="130" y1="160" x2="130" y2="134" stroke="#db2777" stroke-width="2" marker-end="url(#arrPink)"/>
+<text x="135" y="130" fill="#db2777" font-size="12">e₂</text>
+
+<!-- span label left -->
+<text x="130" y="278" fill="#059669" font-size="13" text-anchor="middle">span = 整个平面 R²</text>
+<text x="130" y="298" fill="#1f2937" font-size="13" text-anchor="middle" font-weight="600">线性无关</text>
+
+<!-- ===================== RIGHT SUBPLOT ===================== -->
+<!-- origin (400,200), scale 24. v=[1,2] -> (424,152); 2v=[2,4] -> (448,104) -->
+<!-- light grid lines for context -->
+<g stroke="#e2e8f0" stroke-width="0.75">
+<line x1="328" y1="80" x2="328" y2="248"/><line x1="352" y1="80" x2="352" y2="248"/><line x1="376" y1="80" x2="376" y2="248"/><line x1="400" y1="80" x2="400" y2="248"/><line x1="424" y1="80" x2="424" y2="248"/><line x1="448" y1="80" x2="448" y2="248"/><line x1="472" y1="80" x2="472" y2="248"/>
+<line x1="328" y1="104" x2="472" y2="104"/><line x1="328" y1="128" x2="472" y2="128"/><line x1="328" y1="152" x2="472" y2="152"/><line x1="328" y1="176" x2="472" y2="176"/><line x1="328" y1="200" x2="472" y2="200"/><line x1="328" y1="224" x2="472" y2="224"/>
+</g>
+
+<!-- span line through origin along direction [1,2]: slope dy/dx in screen = -48/24 -> passes O.
+clamp within box: from (376,248) up-right to (424,152)... extend full: line y = 200 - 2*(x-400). At x=362 -> y=276(out). Use x range 364..464 -->
+<line x1="368" y1="264" x2="436" y2="128" stroke="#d97706" stroke-width="2.5" opacity="0.45"/>
+
+<!-- axes -->
+<line x1="320" y1="200" x2="488" y2="200" stroke="#94a3b8" stroke-width="1" marker-end="url(#arrAxis)"/>
+<line x1="400" y1="248" x2="400" y2="86" stroke="#94a3b8" stroke-width="1" marker-end="url(#arrAxis)"/>
+<text x="492" y="204" fill="#94a3b8" font-size="11">x</text>
+<text x="405" y="90" fill="#94a3b8" font-size="11">y</text>
+<text x="386" y="214" fill="#1f2937" font-size="11">O</text>
+
+<!-- 2v first (behind), v on top -->
+<line x1="400" y1="200" x2="448" y2="104" stroke="#db2777" stroke-width="2" marker-end="url(#arrPink)"/>
+<text x="452" y="104" fill="#db2777" font-size="12">2v</text>
+<line x1="400" y1="200" x2="424" y2="152" stroke="#2563eb" stroke-width="2" marker-end="url(#arrBlue)"/>
+<text x="428" y="160" fill="#2563eb" font-size="12">v</text>
+
+<!-- span label right -->
+<text x="404" y="278" fill="#d97706" font-size="13" text-anchor="middle">span = 一条直线</text>
+<text x="404" y="298" fill="#1f2937" font-size="13" text-anchor="middle" font-weight="600">线性相关</text>
+</svg><figcaption>左：两个不共线向量张成整个平面（线性组合网格）；右：两个共线向量只能张成一条直线</figcaption></figure>
+
+<p>一组<strong>线性无关</strong>且能<strong>张成整个空间</strong>的向量，就叫这个空间的一组<strong>基 basis</strong>。基是空间的"最小骨架"：二维平面的基恰好需要 2 个向量，多了冗余，少了不够。基里向量的个数，就是空间的<strong>维度 dimension</strong>。</p>
+
+<p>这里正好把第 2 节的"维度"和这里的"维度"打通：第 2 节说维度是<strong>分量个数 \(n\)</strong>，这里说维度是<strong>基向量个数</strong>——两者一致，正是因为标准基 \(e_1,\dots,e_n\) 恰好有 \(n\) 个向量。还有一个关键直觉：<strong>基不是唯一的</strong>。同一个平面有无穷多组基（任意两个不共线的向量都能当基），"换一组基"本质上就是"换一个坐标系"——这正是下一课矩阵变换、以及 PCA 选主轴的出发点。</p>
+
+<div class="key">
+<h4>要点</h4>
+<ul>
+<li><strong>线性组合</strong>：用加法和数乘把一组向量"搭"成新向量。</li>
+<li><strong>span</strong>：所有能搭出来的向量的集合（一条线、一个面、或更高维空间），必过原点。</li>
+<li><strong>线性无关</strong>：组里没有哪个向量是其他向量的线性组合（没有冗余）。</li>
+<li><strong>基 basis</strong>：线性无关 + 张成全空间；基向量个数 = 维度；同一空间的基不唯一。</li>
+</ul>
+</div>
+
+<div class="ml">
+<h4><span class="tag">ML</span> 和 ML 的联系</h4>
+<p><strong>神经元输出就是线性组合</strong>。单个神经元先算 \(w^\top x = w_1x_1+w_2x_2+\cdots+w_nx_n\)，这正是输入特征以权重为系数的线性组合。<br><strong>嵌入空间的类比</strong>。著名现象"国王 − 男人 + 女人 ≈ 王后"——一个概念可以由已知向量<strong>线性组合</strong>得到，这正是 span 思想的体现。需要提醒的是：这种漂亮的线性结构在词向量中<strong>常被观察到，但并非处处成立</strong>，近年研究也指出它部分依赖具体的训练和后处理方式，不必把它当成铁律。理解 span，能帮你理解为什么模型有时能"组合"出训练中没直接见过的概念。</p>
+</div>
+
+<h2>5. 点积的两副面孔</h2>
+
+<p><strong>点积 dot product</strong>（又叫内积 inner product）是机器学习里出现频率最高的运算，几乎没有之一。它有两个<strong>等价</strong>的定义。</p>
+
+<h3>代数定义</h3>
+
+\[
+a\cdot b=\sum_{i=1}^{n} a_i b_i = a_1b_1+a_2b_2+\cdots+a_nb_n
+\]
+
+<p>把对应分量相乘再求和，得到<strong>一个数</strong>（标量）。</p>
+
+<div class="note">
+<h4>记号小桥：\(w^\top x\) 是什么？</h4>
+<p>ML 文献里点积常写成 \(w^\top x\)。这里的 \(^\top\) 是<strong>转置 transpose</strong>，意思就是"行列互换"：把列向量 \(w\) 转置成一行，再与列向量 \(x\) 逐分量相乘求和。所以 \(w^\top x\)、\(w\cdot x\)、\(\sum_i w_i x_i\) <strong>是同一个数</strong>，只是写法不同。下面 ML 框里出现的 \(q^\top k\) 同理。</p>
+</div>
+
+<h3>你只需要知道的三角</h3>
+
+<div class="note">
+<p>下面的几何定义会用到夹角 \(\theta\) 和 \(\cos\theta\)。不熟三角也没关系，你只需要记住 \(\cos\theta\) 衡量"两个方向有多接近"，并记牢三个锚点：</p>
+<ul>
+<li>夹角 \(0^\circ\)（同向）：\(\cos 0^\circ=1\)（最接近）。</li>
+<li>夹角 \(90^\circ\)（垂直）：\(\cos 90^\circ=0\)（互不相干）。</li>
+<li>夹角 \(180^\circ\)（反向）：\(\cos 180^\circ=-1\)（最相反）。</li>
+</ul>
+<p>角度从 \(0^\circ\) 增大到 \(180^\circ\)，\(\cos\theta\) 就从 \(1\) 平滑地下降到 \(-1\)。直角三角形里"邻边比斜边"就是 \(\cos\)，这点直觉足够支撑本课所有内容。</p>
+</div>
+
+<h3>几何定义</h3>
+
+\[
+a\cdot b=\|a\|\,\|b\|\cos\theta
+\]
+
+<p>其中 \(\|a\|=\sqrt{a\cdot a}=\sqrt{\sum_i a_i^2}\) 就是第 3 节讲过的<strong>范数</strong>（长度），\(\theta\) 是两向量之间的夹角。这个定义告诉我们：点积衡量的是"两个向量有多大程度指向同一个方向"。</p>
+
+<ul>
+<li>方向相同（\(\theta=0,\ \cos\theta=1\)）：点积最大、为正。</li>
+<li>垂直（\(\theta=90^\circ,\ \cos\theta=0\)）：点积为 0——这正是<strong>正交 orthogonal</strong>的定义。</li>
+<li>方向相反（\(\theta=180^\circ,\ \cos\theta=-1\)）：点积为负。</li>
+</ul>
+
+<figure class="fig"><svg viewBox="0 0 520 380" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif">
+  <title>点积的代数定义与几何定义等价</title>
+  <desc>二维坐标系中向量 a 与 b 的夹角 θ，以及 b 在 a 上的投影长度 ‖b‖cosθ，并标注 a·b 的两种等价定义。</desc>
+  <defs>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrowPink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#db2777"/>
+    </marker>
+  </defs>
+
+  <!-- grid -->
+  <g stroke="#e2e8f0" stroke-width="0.75">
+    <line x1="40" y1="50"  x2="40"  y2="290"/>
+    <line x1="90" y1="50"  x2="90"  y2="290"/>
+    <line x1="140" y1="50" x2="140" y2="290"/>
+    <line x1="190" y1="50" x2="190" y2="290"/>
+    <line x1="240" y1="50" x2="240" y2="290"/>
+    <line x1="290" y1="50" x2="290" y2="290"/>
+    <line x1="340" y1="50" x2="340" y2="290"/>
+    <line x1="390" y1="50" x2="390" y2="290"/>
+    <line x1="40" y1="50"  x2="430" y2="50"/>
+    <line x1="40" y1="90"  x2="430" y2="90"/>
+    <line x1="40" y1="130" x2="430" y2="130"/>
+    <line x1="40" y1="170" x2="430" y2="170"/>
+    <line x1="40" y1="210" x2="430" y2="210"/>
+    <line x1="40" y1="250" x2="430" y2="250"/>
+  </g>
+
+  <!-- axes -->
+  <g stroke="#94a3b8" stroke-width="1">
+    <line x1="40" y1="290" x2="440" y2="290"/>
+    <line x1="40" y1="300" x2="40" y2="45"/>
+  </g>
+  <polygon points="440,290 432,286 432,294" fill="#94a3b8"/>
+  <polygon points="40,45 36,53 44,53" fill="#94a3b8"/>
+  <text x="446" y="294" font-size="12" fill="#94a3b8">x</text>
+  <text x="33" y="44" font-size="12" fill="#94a3b8">y</text>
+
+  <!-- origin O at (40,290); a along +x to (370,290); b at ~40deg to (290,118) -->
+  <!-- projection of b onto a: foot at (290,290) on the x-axis line -->
+
+  <!-- projection segment (emphasis, drawn under vectors) -->
+  <line x1="40" y1="290" x2="290" y2="290" stroke="#059669" stroke-width="4"/>
+
+  <!-- dashed perpendicular from b tip to foot -->
+  <line x1="290" y1="118" x2="290" y2="290" stroke="#059669" stroke-width="1" stroke-dasharray="4 3"/>
+
+  <!-- right-angle symbol at foot (290,290) -->
+  <polyline points="278,290 278,278 290,278" fill="none" stroke="#059669" stroke-width="1"/>
+
+  <!-- vector a (blue, longer, horizontal) -->
+  <line x1="40" y1="290" x2="362" y2="290" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <!-- vector b (pink, ~40deg) -->
+  <line x1="40" y1="290" x2="284" y2="123" stroke="#db2777" stroke-width="2" marker-end="url(#arrowPink)"/>
+
+  <!-- angle arc theta near origin -->
+  <path d="M 105 290 A 65 65 0 0 0 89.7 250.7" fill="none" stroke="#1f2937" stroke-width="1"/>
+  <text x="112" y="270" font-size="14" fill="#1f2937">θ</text>
+
+  <!-- vector labels -->
+  <text x="330" y="282" font-size="14" fill="#2563eb" font-weight="bold">a</text>
+  <text x="262" y="118" font-size="14" fill="#db2777" font-weight="bold">b</text>
+
+  <!-- origin label -->
+  <circle cx="40" cy="290" r="2.5" fill="#1f2937"/>
+  <text x="26" y="305" font-size="12" fill="#1f2937">O</text>
+
+  <!-- projection length label -->
+  <text x="120" y="312" font-size="12" fill="#059669" font-weight="bold">‖b‖cosθ</text>
+
+  <!-- formula box -->
+  <rect x="44" y="324" width="432" height="44" rx="6" fill="#2563eb" fill-opacity="0.06" stroke="#94a3b8" stroke-width="1"/>
+  <text x="60" y="345" font-size="14" fill="#1f2937">a · b = Σ aᵢbᵢ = ‖a‖‖b‖cosθ</text>
+  <text x="60" y="362" font-size="12" fill="#059669">代数定义　=　几何定义（两副面孔等价）</text>
+</svg><figcaption>向量 a、b 的夹角 θ 与 b 在 a 上的投影长度 ‖b‖cosθ，标注两副面孔等价</figcaption></figure>
+
+<p><strong>两个定义为什么等价？</strong> 这里给一个<strong>直觉版理由，不是严格证明</strong>。我们先承认一个事实：<strong>点积只跟两个向量的长度和夹角有关，与坐标系怎么摆放无关</strong>（即点积在旋转坐标系下不变）。既然如此，我们干脆把坐标轴转一下，让 \(a\) 正好躺在 \(x\) 轴上，于是 \(a=[\|a\|,\,0]\)。此时 \(b\) 与 \(x\) 轴的夹角正好是 \(\theta\)，由直角三角形分解，它的水平分量是 \(\|b\|\cos\theta\)、竖直分量是 \(\|b\|\sin\theta\)，即 \(b=[\|b\|\cos\theta,\ \|b\|\sin\theta]\)。代入代数定义：</p>
+
+\[
+a\cdot b=\|a\|\cdot\|b\|\cos\theta+0\cdot\|b\|\sin\theta=\|a\|\,\|b\|\cos\theta
+\]
+
+<p>两副面孔合二为一。（这里"旋转不变性"被当作直觉前提，严格证明留待后面学了正交矩阵再补。）</p>
+
+<div class="pitfall">
+<h4>易错</h4>
+<p>点积的结果是<strong>一个标量</strong>，不是向量！\(a\cdot b\) 算完是一个数。另外别把点积和"逐分量相乘"混为一谈——逐分量相乘 \([a_1b_1, a_2b_2]\) 仍是向量（NumPy 里是 <code>a*b</code>），而点积要再求和（<code>a@b</code> 或 <code>np.dot</code>）。</p>
+</div>
+
+<div class="ml">
+<h4><span class="tag">ML</span> 和 ML 的联系</h4>
+<p>点积是 ML 计算的"基本粒子"：单个神经元的加权和 \(w^\top x\) 是点积；Transformer 注意力机制里 query 和 key 的打分 \(q^\top k\) 是点积；线性回归的预测 \(\hat y=w^\top x\) 是点积。当你看到矩阵乘法时，记住它无非是大量点积的批量打包。</p>
+</div>
+
+<h2>6. 从点积到投影、夹角与余弦相似度</h2>
+
+<h3>投影：标量投影与投影向量</h3>
+
+<p>把 \(b\) 投影到 \(a\) 的方向上，先看<strong>标量投影 scalar projection</strong>——也就是 \(b\) 在 \(a\) 方向上的"影子"长度（带符号）：</p>
+
+\[
+\text{标量投影}=\|b\|\cos\theta=\frac{a\cdot b}{\|a\|}
+\]
+
+<p>它回答的问题是："沿着 \(a\) 这个方向看，\(b\) 有多大成分？" 注意这个值<strong>可正可负</strong>：当夹角 \(\theta>90^\circ\)（\(\cos\theta<0\)）时它为负，<strong>负号表示投影落在 \(a\) 的反方向</strong>，并不是"长度为负"。</p>
+
+<p>很多场景（最小二乘、正交分解、PCA）真正要的是<strong>投影向量 projection vector</strong>——\(b\) 沿 \(a\) 方向的那个<strong>分量向量</strong>，它把上面的标量再乘回 \(a\) 的单位方向：</p>
+
+\[
+\operatorname{proj}_a(b)=\frac{a\cdot b}{\|a\|^2}\,a=\frac{a\cdot b}{a\cdot a}\,a
+\]
+
+<p>几何上，\(\operatorname{proj}_a(b)\) 就是把 \(b\) 投到 \(a\) 所在直线上得到的那支箭头；\(b\) 减去它，剩下的部分恰好与 \(a\) 正交——这就是"正交分解"的雏形，后面 PCA、最小二乘都是它的放大版。</p>
+
+<h3>夹角与余弦相似度</h3>
+
+<p>把几何定义反解出 \(\cos\theta\)，就得到<strong>余弦相似度 cosine similarity</strong>：</p>
+
+\[
+\cos\theta=\frac{a\cdot b}{\|a\|\,\|b\|}
+=\frac{\sum_i a_i b_i}{\sqrt{\sum_i a_i^2}\,\sqrt{\sum_i b_i^2}}
+\]
+
+<p>它的取值范围是 \([-1, 1]\)，含义是"两个向量方向有多接近"，<strong>与长度无关</strong>——这是它相比裸点积的关键优势：只比方向，不比大小。</p>
+
+<figure class="fig"><svg viewBox="0 0 540 260" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>余弦相似度三种情形：同向、正交、反向</title><defs><marker id="arrA" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#2563eb"/></marker><marker id="arrB" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#db2777"/></marker><marker id="arrAxis" markerWidth="8" markerHeight="8" refX="6.5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#94a3b8"/></marker></defs><g transform="translate(20,20)"><text x="80" y="0" text-anchor="middle" font-size="14" fill="#1f2937" font-weight="600">cosθ ≈ 1</text><line x1="20" y1="150" x2="150" y2="150" stroke="#94a3b8" stroke-width="1" marker-end="url(#arrAxis)"/><line x1="30" y1="160" x2="30" y2="30" stroke="#94a3b8" stroke-width="1" marker-end="url(#arrAxis)"/><circle cx="30" cy="150" r="2" fill="#1f2937"/><text x="22" y="164" font-size="11" fill="#1f2937">O</text><line x1="30" y1="150" x2="135" y2="78" stroke="#2563eb" stroke-width="2" marker-end="url(#arrA)"/><line x1="30" y1="150" x2="133" y2="62" stroke="#db2777" stroke-width="2" marker-end="url(#arrB)"/><text x="140" y="92" font-size="12" fill="#2563eb">a</text><text x="138" y="56" font-size="12" fill="#db2777">b</text><text x="80" y="200" text-anchor="middle" font-size="12" fill="#1f2937">高度相似</text><text x="80" y="218" text-anchor="middle" font-size="12" fill="#059669" font-weight="600">cosθ = 0.98</text></g><g transform="translate(190,20)"><text x="80" y="0" text-anchor="middle" font-size="14" fill="#1f2937" font-weight="600">cosθ = 0</text><line x1="20" y1="150" x2="150" y2="150" stroke="#94a3b8" stroke-width="1" marker-end="url(#arrAxis)"/><line x1="30" y1="160" x2="30" y2="30" stroke="#94a3b8" stroke-width="1" marker-end="url(#arrAxis)"/><circle cx="30" cy="150" r="2" fill="#1f2937"/><text x="22" y="164" font-size="11" fill="#1f2937">O</text><line x1="30" y1="150" x2="130" y2="150" stroke="#2563eb" stroke-width="2" marker-end="url(#arrA)"/><line x1="30" y1="150" x2="30" y2="55" stroke="#db2777" stroke-width="2" marker-end="url(#arrB)"/><path d="M30,135 L45,135 L45,150" fill="none" stroke="#1f2937" stroke-width="1"/><text x="120" y="166" font-size="12" fill="#2563eb">a</text><text x="36" y="60" font-size="12" fill="#db2777">b</text><text x="80" y="200" text-anchor="middle" font-size="12" fill="#1f2937">不相关 / 正交</text><text x="80" y="218" text-anchor="middle" font-size="12" fill="#059669" font-weight="600">cosθ = 0.00</text></g><g transform="translate(360,20)"><text x="80" y="0" text-anchor="middle" font-size="14" fill="#1f2937" font-weight="600">cosθ ≈ -1</text><line x1="20" y1="150" x2="150" y2="150" stroke="#94a3b8" stroke-width="1" marker-end="url(#arrAxis)"/><line x1="85" y1="160" x2="85" y2="30" stroke="#94a3b8" stroke-width="1" marker-end="url(#arrAxis)"/><circle cx="85" cy="100" r="2" fill="#1f2937"/><text x="90" y="114" font-size="11" fill="#1f2937">O</text><line x1="85" y1="100" x2="145" y2="90" stroke="#2563eb" stroke-width="2" marker-end="url(#arrA)"/><line x1="85" y1="100" x2="27" y2="112" stroke="#db2777" stroke-width="2" marker-end="url(#arrB)"/><text x="148" y="84" font-size="12" fill="#2563eb">a</text><text x="18" y="120" font-size="12" fill="#db2777">b</text><text x="80" y="200" text-anchor="middle" font-size="12" fill="#1f2937">强烈相反</text><text x="80" y="218" text-anchor="middle" font-size="12" fill="#059669" font-weight="600">cosθ = -0.97</text></g></svg><figcaption>三组向量分别展示 cosθ≈1（同向）、cosθ≈0（正交）、cosθ≈-1（反向）对应的余弦相似度</figcaption></figure>
+
+<ul>
+<li>\(\cos\theta\approx 1\)：几乎同向 → 高度相似。</li>
+<li>\(\cos\theta\approx 0\)：接近正交 → 基本不相关。</li>
+<li>\(\cos\theta\approx -1\)：几乎反向 → 强烈相反。</li>
+</ul>
+
+<div class="ml">
+<h4><span class="tag">ML</span> 和 ML 的联系</h4>
+<p><strong>余弦相似度是语义检索的引擎</strong>。把每个文档/句子编码成嵌入向量后，要找"和查询最相关的内容"，就是找与 query 向量<strong>夹角最小（余弦相似度最大）</strong>的那些向量。这正是 RAG（检索增强生成）召回、语义搜索、"猜你喜欢"推荐相似商品背后的核心计算。用余弦而非欧氏距离，是因为我们关心"主题方向"而非"向量大小"——一篇长文和一篇短文只要主题一致，方向就该接近。</p>
+</div>
+
+<h2>例题</h2>
+
+<div class="example">
+<h4>例题 1：向量的和、范数与点积</h4>
+<p>设 \(a=[3,4]\)，\(b=[4,3]\)。</p>
+<p><strong>(1) 求 \(a+b\)：</strong></p>
+\[a+b=[3+4,\ 4+3]=[7,\ 7]\]
+<p><strong>(2) 求范数：</strong></p>
+\[\|a\|=\sqrt{3^2+4^2}=\sqrt{9+16}=\sqrt{25}=5\]
+\[\|b\|=\sqrt{4^2+3^2}=\sqrt{16+9}=\sqrt{25}=5\]
+<p><strong>(3) 求点积（代数定义）：</strong></p>
+\[a\cdot b=3\times4+4\times3=12+12=24\]
+</div>
+
+<div class="example">
+<h4>例题 2：夹角的余弦（接例题 1）</h4>
+<p>用余弦相似度公式计算 \(a=[3,4]\) 与 \(b=[4,3]\) 的夹角余弦：</p>
+\[
+\cos\theta=\frac{a\cdot b}{\|a\|\,\|b\|}=\frac{24}{5\times5}=\frac{24}{25}=0.96
+\]
+<p>所以 \(\theta=\arccos(0.96)\approx 16.26^\circ\)。两个向量方向相当接近，余弦相似度 \(0.96\)，说明高度相似。</p>
+<p><strong>验证两副面孔等价</strong>：几何定义应给出 \(\|a\|\|b\|\cos\theta=5\times5\times0.96=24\)，与代数定义算出的点积 \(24\) 完全一致。</p>
+</div>
+
+<div class="example">
+<h4>例题 3：正交与反向（体会余弦的三种情形）</h4>
+<p>设 \(u=[1,0]\)，\(v=[0,1]\)，\(w=[-1,0]\)。</p>
+<ul>
+<li>\(u\cdot v=1\times0+0\times1=0\)，故 \(\cos\theta=0\)，二者<strong>正交</strong>（夹角 \(90^\circ\)），不相关。</li>
+<li>\(u\cdot w=1\times(-1)+0\times0=-1\)，而 \(\|u\|=\|w\|=1\)，故 \(\cos\theta=-1\)，二者<strong>完全反向</strong>（夹角 \(180^\circ\)）。</li>
+</ul>
+</div>
+
+<h2>动手练习</h2>
+
+<ol>
+<li><strong>手算热身</strong>：设 \(a=[1,2,2]\)，\(b=[2,2,1]\)。手算 \(a+b\)、\(\|a\|\)、\(\|b\|\)、\(a\cdot b\) 与 \(\cos\theta\)。（提示：\(\|a\|=3\)，\(a\cdot b=8\)，\(\cos\theta=8/9\approx0.889\)。）</li>
+<li><strong>三视角切换</strong>：把向量 \([5,-2]\) 分别写成"数据表里的一行"、"坐标列"，并用一句话描述它作为几何箭头的方向（指向第几象限）。</li>
+<li><strong>span 判断</strong>：判断下面每组向量张成什么——是一条直线还是整个平面？(a) \([1,0]\) 与 \([0,1]\)；(b) \([2,1]\) 与 \([4,2]\)；(c) \([1,1]\) 与 \([1,-1]\)。（提示：判断共线的代数判据是"是否存在常数 \(k\) 使一个向量等于另一个的 \(k\) 倍"——存在则共线，span 是直线；不存在则不共线，span 是整个平面。）</li>
+<li><strong>进阶：高维与"必相关"</strong>：(a) 判断三维向量 \([1,2,3]\) 与 \([2,4,6]\) 是否共线（提示：找有没有公共倍数 \(k\)）。(b) 给定三个二维向量 \([1,0]\)、\([0,1]\)、\([1,1]\)，它们的 span 是什么？想一想：在二维平面里，三个向量为什么<strong>必然线性相关</strong>（总有一个能被另外两个表示出来）？</li>
+<li><strong>NumPy 小实验</strong>：补全下面的代码骨架，用 NumPy 计算范数、点积、夹角与余弦相似度，并验证它和你手算的结果一致。</li>
+</ol>
+
+<pre><code>import numpy as np
+
+# 构造两个向量
+a = np.array([3.0, 4.0])
+b = np.array([4.0, 3.0])
+
+# 1) 向量加法与数乘
+print("a + b      =", a + b)          # 期望 [7. 7.]
+print("2 * a      =", 2 * a)          # 期望 [6. 8.]
+print("-0.5 * a   =", -0.5 * a)       # 期望 [-1.5 -2.]
+print("0 * a      =", 0 * a)          # 期望 [0. 0.]  零向量，落在原点
+
+# 2) 范数（L2 长度）
+norm_a = np.linalg.norm(a)
+norm_b = np.linalg.norm(b)
+print("||a|| =", norm_a, " ||b|| =", norm_b)   # 期望 5.0 5.0
+
+# 3) 点积：以下三种写法等价
+dot1 = np.dot(a, b)
+dot2 = a @ b
+dot3 = np.sum(a * b)                  # 注意 a*b 是逐分量相乘，再求和
+print("dot =", dot1, dot2, dot3)      # 期望 24.0
+
+# 4) 余弦相似度与夹角
+cos_sim = (a @ b) / (norm_a * norm_b)
+theta_rad = np.arccos(np.clip(cos_sim, -1.0, 1.0))
+print("cosine similarity =", cos_sim)              # 期望 0.96
+print("angle (deg)       =", np.degrees(theta_rad))# 期望 ~16.26
+
+# 5) 动手：换成你自己的两个向量，验证手算结果
+# c = np.array([...]); d = np.array([...])
+# ...
+</code></pre>
+
+<h2>掌握自检</h2>
+
+<ul>
+<li>我能用一句话说清楚：为什么数据点、特征、嵌入、模型权重本质都是向量，并各举一个真实例子。</li>
+<li>给我一个向量，我能在"数据行 / 几何箭头 / 坐标列"三种视角间自由切换，并说出每种视角各自适合的场景。</li>
+<li>我能用勾股定理写出范数 \(\|a\|=\sqrt{\sum a_i^2}\)，用平行四边形法则解释加法、用沿轴缩放解释数乘，并预测 \(2a\)、\(-0.5a\)、\(0\cdot a\) 的方向与长度。</li>
+<li>我能判断两个向量张成的是一条直线还是整个平面，能解释 span（为何必过原点）、基 basis（为何不唯一）、线性相关/无关的区别，并说清两套"维度"定义为何一致。</li>
+<li>我能同时用 \(\sum a_i b_i\) 和 \(\|a\|\|b\|\cos\theta\) 算出点积，知道 \(w^\top x\) 与 \(a\cdot b\) 是一回事，并能解释二者为何等价（含承认旋转不变性这一前提）。</li>
+<li>我能从点积推出标量投影与投影向量，区分二者，并说明余弦相似度为什么是语义检索/RAG 的核心。</li>
+<li>我能用 NumPy 算出范数、点积、夹角和余弦相似度，并验证它与手算一致。</li>
+</ul>
+
+<div class="key">
+<h4>要点：小结与下一课预告</h4>
+<p>本课我们确立了 ML 的"原子"——向量，掌握了三种视角、范数（长度）、加法与数乘的几何（含零向量）、线性组合 / span / 基这套地基，以及点积的两副面孔和由它衍生的投影与余弦相似度。<strong>下一课：矩阵 = 线性变换</strong>。如果说向量是空间里的"点"，那么矩阵就是"移动整个空间的动作"——旋转、拉伸、投影。我们会看到，"换一组基 = 换坐标系"如何用矩阵表达，以及神经网络的每一层，本质上就是一次"矩阵变换 + 非线性"。</p>
+</div>
+</article>
+<nav class="toc">
+<h3>本模块课程表</h3>
+<ol>
+<li class="cur"><span class="ln">第1课</span>向量——机器学习的原子</li>
+<li><span class="ln">第2课</span>矩阵即线性变换——把空间“掰弯”</li>
+<li><span class="ln">第3课</span>内积、范数与投影——度量与几何</li>
+<li><span class="ln">第4课</span>特征值与特征向量——变换的不动方向</li>
+<li><span class="ln">第5课</span>SVD 与低秩压缩——万能分解</li>
+<li><span class="ln">第6课</span>导数与梯度——多元函数的下坡方向</li>
+<li><span class="ln">第7课</span>雅可比与海森——向量值函数的导数与曲率</li>
+<li><span class="ln">第8课</span>链式法则与计算图——梯度如何流动</li>
+<li><span class="ln">第9课</span>矩阵求导——把梯度向量化</li>
+<li><span class="ln">第10课</span>亲手实现反向传播——两层网络与 micrograd</li>
+</ol>
+</nav>
+</div>
+</body>
+</html>

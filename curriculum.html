@@ -1,0 +1,3278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>从零到前沿：机器学习系统自学路线</title>
+  <meta name="description" content="从数学基础到 LLM、扩散模型、推理模型和 Agent 的中文机器学习自学课程。">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/site.css">
+  </head>
+<body class="doc-page">
+  <header class="doc-header">
+    <div class="shell">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">λ</span>
+        <span>FangHao Learn</span>
+      </a>
+      <nav class="topnav" aria-label="文档导航">
+        <a href="index.html">首页</a>
+        <a href="module01/lesson-01-vectors.html">第 1 课</a>
+        <a href="frontier-ml-curriculum.md">Markdown</a>
+      </nav>
+    </div>
+  </header>
+  <main class="doc-main">
+    <section class="doc-title">
+      <p class="kicker">Course Curriculum</p>
+      <h1>从零到前沿：机器学习系统自学路线</h1>
+      <p>一份从数学基础走到 LLM、扩散模型、推理模型和 Agent 的中文自学路线，适合按模块长期推进，也适合按主题查阅。</p>
+    </section>
+        <nav id="TOC" role="doc-toc">
+      <ul>
+      <li><a href="#第一部分--课程总览">第一部分 · 课程总览</a>
+      <ul>
+      <li><a href="#11-设计理念七条核心哲学">1.1
+      设计理念（七条核心哲学）</a></li>
+      <li><a href="#12-总时长">1.2 总时长</a></li>
+      <li><a href="#13-学习方法论直觉数学代码复盘四步法">1.3
+      学习方法论（"直觉→数学→代码→复盘"四步法）</a></li>
+      <li><a href="#14-如何使用本课程">1.4 如何使用本课程</a></li>
+      <li><a href="#15-先修关系图prerequisite-dag文字表达">1.5
+      先修关系图（Prerequisite DAG，文字表达）</a></li>
+      </ul></li>
+      <li><a href="#第二部分--学习路线tracks">第二部分 ·
+      学习路线（Tracks）</a></li>
+      <li><a href="#第三部分--模块详情按阶段组织">第三部分 ·
+      模块详情（按阶段组织）</a></li>
+      <li><a href="#阶段-0--数学与工具基础1014-周">阶段 0 ·
+      数学与工具基础（10–14 周）</a>
+      <ul>
+      <li><a
+      href="#模块-1--线性代数与微积分含矩阵求导与反向传播数学">模块 1 ·
+      线性代数与微积分（含矩阵求导与反向传播数学）</a>
+      <ul>
+      <li><a href="#学习目标">学习目标</a></li>
+      <li><a href="#先修">先修</a></li>
+      <li><a
+      href="#主题与要点为什么重要">主题与要点（为什么重要）</a></li>
+      <li><a href="#关键资源">关键资源</a></li>
+      <li><a href="#动手项目">动手项目</a></li>
+      <li><a href="#常见误区">常见误区</a></li>
+      <li><a href="#时间估计">时间估计</a></li>
+      <li><a href="#掌握自检">掌握自检</a></li>
+      </ul></li>
+      <li><a href="#模块-2--概率统计信息论与最优化含强化学习速成">模块 2
+      · 概率统计、信息论与最优化（含强化学习速成）</a>
+      <ul>
+      <li><a href="#学习目标-1">学习目标</a></li>
+      <li><a href="#先修-1">先修</a></li>
+      <li><a href="#主题与要点">主题与要点</a></li>
+      <li><a href="#关键资源-1">关键资源</a></li>
+      <li><a href="#动手项目-1">动手项目</a></li>
+      <li><a href="#常见误区-1">常见误区</a></li>
+      <li><a href="#时间估计-1">时间估计</a></li>
+      <li><a href="#掌握自检-1">掌握自检</a></li>
+      </ul></li>
+      <li><a href="#模块-3--pythonnumpypytorch-与实验工程">模块 3 ·
+      Python、NumPy、PyTorch 与实验工程</a>
+      <ul>
+      <li><a href="#学习目标-2">学习目标</a></li>
+      <li><a href="#先修-2">先修</a></li>
+      <li><a href="#主题与要点-1">主题与要点</a></li>
+      <li><a href="#关键资源-2">关键资源</a></li>
+      <li><a href="#动手项目-2">动手项目</a></li>
+      <li><a href="#常见误区-2">常见误区</a></li>
+      <li><a href="#时间估计-2">时间估计</a></li>
+      <li><a href="#掌握自检-2">掌握自检</a></li>
+      </ul></li>
+      </ul></li>
+      <li><a href="#阶段-1--经典机器学习与深度学习基础1013-周">阶段 1 ·
+      经典机器学习与深度学习基础（10–13 周）</a>
+      <ul>
+      <li><a href="#模块-4--经典机器学习">模块 4 · 经典机器学习</a>
+      <ul>
+      <li><a href="#学习目标-3">学习目标</a></li>
+      <li><a href="#先修-3">先修</a></li>
+      <li><a href="#主题与要点-2">主题与要点</a></li>
+      <li><a href="#关键资源-3">关键资源</a></li>
+      <li><a href="#动手项目-3">动手项目</a></li>
+      <li><a href="#常见误区-3">常见误区</a></li>
+      <li><a href="#时间估计-3">时间估计</a></li>
+      <li><a href="#掌握自检-3">掌握自检</a></li>
+      </ul></li>
+      <li><a href="#模块-5--深度学习基础从感知机到能训练的神经网络">模块
+      5 · 深度学习基础：从感知机到能训练的神经网络</a>
+      <ul>
+      <li><a href="#学习目标-4">学习目标</a></li>
+      <li><a href="#先修-4">先修</a></li>
+      <li><a href="#主题与要点-3">主题与要点</a></li>
+      <li><a href="#关键资源-4">关键资源</a></li>
+      <li><a href="#动手项目-4">动手项目</a></li>
+      <li><a href="#常见误区-4">常见误区</a></li>
+      <li><a href="#时间估计-4">时间估计</a></li>
+      <li><a href="#掌握自检-4">掌握自检</a></li>
+      </ul></li>
+      </ul></li>
+      <li><a href="#阶段-2--视觉与序列两大经典架构家族811-周">阶段 2 ·
+      视觉与序列：两大经典架构家族（8–11 周）</a>
+      <ul>
+      <li><a href="#模块-6--卷积神经网络与计算机视觉">模块 6 ·
+      卷积神经网络与计算机视觉</a>
+      <ul>
+      <li><a href="#学习目标-5">学习目标</a></li>
+      <li><a href="#先修-5">先修</a></li>
+      <li><a href="#主题与要点-4">主题与要点</a></li>
+      <li><a href="#关键资源-5">关键资源</a></li>
+      <li><a href="#动手项目-5">动手项目</a></li>
+      <li><a href="#常见误区-5">常见误区</a></li>
+      <li><a href="#时间估计-5">时间估计</a></li>
+      <li><a href="#掌握自检-5">掌握自检</a></li>
+      </ul></li>
+      <li><a href="#模块-7--循环网络与序列建模rnn--lstm--gru">模块 7 ·
+      循环网络与序列建模（RNN / LSTM / GRU）</a>
+      <ul>
+      <li><a href="#学习目标-6">学习目标</a></li>
+      <li><a href="#先修-6">先修</a></li>
+      <li><a href="#主题与要点-5">主题与要点</a></li>
+      <li><a href="#关键资源-6">关键资源</a></li>
+      <li><a href="#动手项目-6">动手项目</a></li>
+      <li><a href="#常见误区-6">常见误区</a></li>
+      <li><a href="#时间估计-6">时间估计</a></li>
+      <li><a href="#掌握自检-6">掌握自检</a></li>
+      </ul></li>
+      </ul></li>
+      <li><a href="#阶段-3--表示学习与-transformer-枢纽912-周">阶段 3 ·
+      表示学习与 Transformer 枢纽（9–12 周）</a>
+      <ul>
+      <li><a
+      href="#模块-8--表示学习与生成模型-iae--vae--gan--嵌入--对比学习损失">模块
+      8 · 表示学习与生成模型 I（AE / VAE / GAN / 嵌入 /
+      对比学习损失）</a>
+      <ul>
+      <li><a href="#学习目标-7">学习目标</a></li>
+      <li><a href="#先修-7">先修</a></li>
+      <li><a href="#主题与要点-6">主题与要点</a></li>
+      <li><a href="#关键资源-7">关键资源</a></li>
+      <li><a href="#动手项目-7">动手项目</a></li>
+      <li><a href="#常见误区-7">常见误区</a></li>
+      <li><a href="#时间估计-7">时间估计</a></li>
+      <li><a href="#掌握自检-7">掌握自检</a></li>
+      </ul></li>
+      <li><a
+      href="#模块-9--transformer-架构与注意力核心枢纽-最高优先级">模块 9
+      · Transformer 架构与注意力（核心枢纽 ★最高优先级）</a>
+      <ul>
+      <li><a href="#学习目标-8">学习目标</a></li>
+      <li><a href="#先修-8">先修</a></li>
+      <li><a href="#主题与要点-7">主题与要点</a></li>
+      <li><a href="#关键资源-8">关键资源</a></li>
+      <li><a href="#动手项目-8">动手项目</a></li>
+      <li><a href="#常见误区-8">常见误区</a></li>
+      <li><a href="#时间估计-8">时间估计</a></li>
+      <li><a href="#掌握自检-8">掌握自检</a></li>
+      </ul></li>
+      </ul></li>
+      <li><a href="#阶段-4--生成模型-ii-与大模型训练范式912-周">阶段 4 ·
+      生成模型 II 与大模型训练范式（9–12 周）</a>
+      <ul>
+      <li><a href="#模块-10--扩散模型与多模态生成含-clip">模块 10 ·
+      扩散模型与多模态生成（含 CLIP）</a>
+      <ul>
+      <li><a href="#学习目标-9">学习目标</a></li>
+      <li><a href="#先修-9">先修</a></li>
+      <li><a href="#主题与要点-8">主题与要点</a></li>
+      <li><a href="#关键资源-9">关键资源</a></li>
+      <li><a href="#动手项目-9">动手项目</a></li>
+      <li><a href="#常见误区-9">常见误区</a></li>
+      <li><a href="#时间估计-9">时间估计</a></li>
+      <li><a href="#掌握自检-9">掌握自检</a></li>
+      </ul></li>
+      <li><a
+      href="#模块-11--大语言模型预训练与扩展数据工程一等公民">模块 11 ·
+      大语言模型预训练与扩展（数据工程一等公民）</a>
+      <ul>
+      <li><a href="#学习目标-10">学习目标</a></li>
+      <li><a href="#先修-10">先修</a></li>
+      <li><a href="#主题与要点-9">主题与要点</a></li>
+      <li><a href="#关键资源-10">关键资源</a></li>
+      <li><a href="#动手项目-10">动手项目</a></li>
+      <li><a href="#常见误区-10">常见误区</a></li>
+      <li><a href="#时间估计-10">时间估计</a></li>
+      <li><a href="#掌握自检-10">掌握自检</a></li>
+      </ul></li>
+      </ul></li>
+      <li><a href="#阶段-5--对齐微调应用与前沿追踪1014-周--长期">阶段 5
+      · 对齐、微调应用与前沿追踪（10–14 周 + 长期）</a>
+      <ul>
+      <li><a href="#模块-12--后训练与对齐sft--rlhf--dpo">模块 12 ·
+      后训练与对齐（SFT / RLHF / DPO）</a>
+      <ul>
+      <li><a href="#学习目标-11">学习目标</a></li>
+      <li><a href="#先修-11">先修</a></li>
+      <li><a href="#主题与要点-10">主题与要点</a></li>
+      <li><a href="#关键资源-11">关键资源</a></li>
+      <li><a href="#动手项目-11">动手项目</a></li>
+      <li><a href="#常见误区-11">常见误区</a></li>
+      <li><a href="#时间估计-11">时间估计</a></li>
+      <li><a href="#掌握自检-11">掌握自检</a></li>
+      </ul></li>
+      <li><a
+      href="#模块-13--微调与应用peft--prompt--rag--agent--推理优化">模块
+      13 · 微调与应用（PEFT / Prompt / RAG / Agent / 推理优化）</a>
+      <ul>
+      <li><a href="#学习目标-12">学习目标</a></li>
+      <li><a href="#先修-12">先修</a></li>
+      <li><a href="#主题与要点-11">主题与要点</a></li>
+      <li><a href="#关键资源-12">关键资源</a></li>
+      <li><a href="#动手项目-12">动手项目</a></li>
+      <li><a href="#常见误区-12">常见误区</a></li>
+      <li><a href="#时间估计-12">时间估计</a></li>
+      <li><a href="#掌握自检-12">掌握自检</a></li>
+      </ul></li>
+      <li><a
+      href="#模块-14--前沿进展20242026推理模型moe长上下文多模态agent-与模型版图">模块
+      14 · 前沿进展（2024–2026）：推理模型、MoE、长上下文、多模态、Agent
+      与模型版图</a>
+      <ul>
+      <li><a href="#学习目标-13">学习目标</a></li>
+      <li><a href="#先修-13">先修</a></li>
+      <li><a href="#主题与要点-12">主题与要点</a></li>
+      <li><a href="#关键资源-13">关键资源</a></li>
+      <li><a href="#动手项目-13">动手项目</a></li>
+      <li><a href="#常见误区-13">常见误区</a></li>
+      <li><a href="#时间估计-13">时间估计</a></li>
+      <li><a href="#掌握自检-13">掌握自检</a></li>
+      </ul></li>
+      </ul></li>
+      <li><a href="#第四部分--贯穿式支线吸收评审补全的横向能力">第四部分
+      · 贯穿式支线（吸收评审补全的横向能力）</a>
+      <ul>
+      <li><a href="#支线-m-e--评测与方法论贯穿-m4m11m13m14">支线 M-E ·
+      评测与方法论（贯穿 M4/M11/M13/M14）</a></li>
+      <li><a
+      href="#支线-m-s--伦理安全与负责任-ai贯穿-m12独立成框架">支线 M-S ·
+      伦理、安全与负责任 AI（贯穿 M12，独立成框架）</a></li>
+      <li><a href="#支线-m-i--可解释性与可视化贯穿-m6m8m14">支线 M-I ·
+      可解释性与可视化（贯穿 M6/M8/M14）</a></li>
+      <li><a
+      href="#概览补充评审指出的应用域工程闭环至少概览级">概览补充（评审指出的应用域/工程闭环，至少概览级）</a></li>
+      </ul></li>
+      <li><a href="#第五部分--贯穿全程的里程碑项目capstones">第五部分 ·
+      贯穿全程的里程碑项目（Capstones）</a></li>
+      <li><a href="#第六部分--推荐总资源清单">第六部分 ·
+      推荐总资源清单</a>
+      <ul>
+      <li><a href="#课程一手优先">课程（一手优先）</a></li>
+      <li><a href="#书籍多数免费在线">书籍（多数免费在线）</a></li>
+      <li><a href="#关键论文按主线">关键论文（按主线）</a></li>
+      <li><a href="#博客工具仓库">博客/工具/仓库</a></li>
+      </ul></li>
+      <li><a href="#第七部分--学完之后如何持续跟踪前沿">第七部分 ·
+      学完之后如何持续跟踪前沿</a>
+      <ul>
+      <li><a href="#1-建立固定节律">1. 建立固定节律</a></li>
+      <li><a href="#2-信息源分层">2. 信息源分层</a></li>
+      <li><a href="#3-读论文三遍法--批判清单">3. 读论文"三遍法 +
+      批判清单"</a></li>
+      <li><a href="#4-区分真突破刷榜营销的启发式">4.
+      区分"真突破/刷榜/营销"的启发式</a></li>
+      <li><a href="#5-最小复现策略">5. 最小复现策略</a></li>
+      <li><a href="#6-评测素养">6. 评测素养</a></li>
+      <li><a href="#7-持续校准模型版图">7. 持续校准模型版图</a></li>
+      <li><a href="#8-选定方向深耕研究路线">8.
+      选定方向深耕（研究路线）</a></li>
+      </ul></li>
+      </ul>
+    </nav>
+        <blockquote>
+        <p>一份可直接使用的中文自学课程文档。覆盖从高中数学到 2024–2026
+        前沿（推理模型、MoE、长上下文、多模态、Agent）的完整路线，强调"先建直觉再补严谨、能从零实现才算理解、数学服务于模型、读一手资料、项目驱动闭环"。</p>
+        <p><strong>本版已吸收课程评审意见</strong>：补齐了评测方法论、强化学习基础、数据工程、AI
+        安全与负责任 AI、可解释性、GNN/推荐系统概览、经典 NLP
+        铺垫、MLOps、Agent 系统设计等缺口；修正了 CLIP/RL/分词/RoPE
+        的先后顺序；消除了反向传播、分词、归一化、KL、生成模型对比等重复；并把"模型版图"等强时效内容改造为"可自我更新的判断框架"。</p>
+        </blockquote>
+        <hr />
+        <h2 id="第一部分--课程总览">第一部分 · 课程总览</h2>
+        <h3 id="11-设计理念七条核心哲学">1.1
+        设计理念（七条核心哲学）</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>理念</th>
+        <th>含义</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>先建直觉再补严谨</strong></td>
+        <td>每个概念先用几何/代码直觉跑通，再回头补形式化推导。拒绝一上来啃定理证明而失去动力，也拒绝只调
+        API 而不懂原理。</td>
+        </tr>
+        <tr class="even">
+        <td><strong>能从零实现才算理解</strong>（implement-to-understand）</td>
+        <td>核心机制（反向传播、注意力、扩散采样、LoRA、GRPO）都要求先用
+        NumPy/PyTorch
+        手写最小版本，再用框架。判据是"能复现"而非"能复述"。</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>数学服务于模型</strong></td>
+        <td>线性代数/概率/最优化只学到能支撑后续模型的深度，遇到新需求再回炉加深。拒绝"先学完三本数学书再开始"的拖延陷阱。</td>
+        </tr>
+        <tr class="even">
+        <td><strong>沿信息流主线推进</strong></td>
+        <td>数据 → 表示 → 架构 → 训练目标 → 优化 → 对齐 →
+        应用。Transformer（模块9）是全程枢纽。</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>读一手资料</strong></td>
+        <td>经典论文、原始课程（CS231n/CS224n/CS336）优先于二手博客。建立"读论文—复现—质疑"的研究品味。</td>
+        </tr>
+        <tr class="even">
+        <td><strong>项目驱动、里程碑闭环</strong></td>
+        <td>每阶段结束都有可展示的
+        capstone，把零散知识缝合成作品集。</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>拥抱"足够好"与迭代</strong></td>
+        <td>前沿变化极快，目标不是学完所有东西，而是建立能持续自学新论文的底层能力与工程肌肉。</td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="12-总时长">1.2 总时长</h3>
+        <ul>
+        <li><strong>系统深入路线</strong>：约 20–22 个月</li>
+        <li><strong>工程应用快速路线</strong>：约 10–12 个月</li>
+        <li><strong>研究方向路线</strong>：系统路线 + 论文复现，22+
+        个月持续滚动</li>
+        <li>假设投入：<strong>每周 10–15 小时</strong>（理论输入 40% +
+        动手编码 40% + 复盘笔记 20%）</li>
+        </ul>
+        <h3 id="13-学习方法论直觉数学代码复盘四步法">1.3
+        学习方法论（"直觉→数学→代码→复盘"四步法）</h3>
+        <ol type="1">
+        <li><strong>直觉</strong>：先看可视化/动画（3Blue1Brown、distill.pub、bbycroft.net/llm）。</li>
+        <li><strong>数学</strong>：补形式化推导。</li>
+        <li><strong>代码</strong>：亲手实现最小可运行版（Karpathy 的
+        micrograd → makemore → nanoGPT → minbpe 是脊柱）。</li>
+        <li><strong>复盘</strong>：用费曼学习法讲给"假想的人"听，写进第二大脑（Notion/Obsidian/Anki，做间隔重复）。</li>
+        </ol>
+        <p><strong>关键习惯</strong>：</p>
+        <ul>
+        <li>用 <strong>masteryChecks</strong>
+        做关卡判据，不达标不前进——后面的模块会无情放大前面的债务。</li>
+        <li><strong>算力管理</strong>：从
+        CPU/小数据集玩具规模起步（MNIST、tiny-shakespeare、CIFAR-10），需要
+        GPU 时用 Colab/Kaggle
+        免费额度或按需租云（Lambda/RunPod）。先验证正确性，再放大。</li>
+        <li><strong>从阶段 2
+        起读论文</strong>：用"三遍法"（先摘要+图表抓骨架，再方法抓核心，最后细节能复现）。</li>
+        <li><strong>作品集导向 / learn in public</strong>：每个 capstone
+        整理成 GitHub 仓库 + 简短博客。</li>
+        <li><strong>善用 AI
+        助手做苏格拉底式提问，但不外包理解</strong>：可问 LLM
+        解释/debug，但推导与实现必须自己跑通。警惕"看懂了"的错觉。</li>
+        </ul>
+        <h3 id="14-如何使用本课程">1.4 如何使用本课程</h3>
+        <ul>
+        <li><strong>本课程把评审指出的横向能力做成了"贯穿支线"</strong>：评测方法论、数据工程、AI
+        安全与伦理、可解释性，会在多个模块以小节嵌入并在
+        0.5/补充模块统一框架，避免散落。</li>
+        <li>每个模块都标注了<strong>先修依赖</strong>，并在三条路线中标注可略读节点。</li>
+        <li>螺旋上升的概念（如 KL
+        散度、注意力、缩放定律）在多处出现时，会明确是"复用/深化"而非"重讲"。</li>
+        </ul>
+        <h3 id="15-先修关系图prerequisite-dag文字表达">1.5
+        先修关系图（Prerequisite DAG，文字表达）</h3>
+        <pre><code>阶段0  M1(线代/微积分/矩阵求导) ─┐
+       M2(概率/信息论/最优化/RL速成) ─┼─→ 全程地基
+       M3(Python/NumPy/PyTorch/实验工程) ─┘
+                    │
+阶段1  M4(经典ML) ──→ M5(深度学习基础, 复用M1反传数学)
+                    │
+阶段2  M6(CNN/CV)   M7(RNN/序列/注意力雏形, +最小分词概念)
+                    │            （M7 attention 是 M9 强先修）
+阶段3  M8(表示学习/AE/VAE/GAN/嵌入/对比学习loss)
+       M9(Transformer 枢纽 ★最高优先级, 分词深化, CLIP在此后)
+                    │
+阶段4  M10(扩散/多模态生成, 生成模型统一对比表)
+       M11(LLM预训练/缩放/分布式/MoE, 数据工程一等公民)
+                    │
+阶段5  M12(对齐 SFT/RLHF/DPO, 依赖M2 RL速成)
+       M13(PEFT/Prompt/RAG/Agent/推理优化)
+       M14(前沿2024–2026: 推理模型/MoE/长上下文/多模态/Agent/版图)
+                    │
+贯穿   M-E(评测与方法论)  M-S(安全与负责任AI)  M-I(可解释性)
+       概览补充(GNN/推荐/经典NLP/MLOps)</code></pre>
+        <p><strong>关键先修断层修复（吸收评审）</strong>：</p>
+        <ul>
+        <li><strong>RL 基础前置</strong>：M2
+        末尾新增"强化学习速成"（MDP、策略梯度、价值函数、actor-critic、GAE、PPO
+        直觉），消除 M12 RLHF/PPO 的最严重先修断层。</li>
+        <li><strong>CLIP 顺序修正</strong>：M8
+        只讲对比学习损失（纯表示学习视角），<strong>CLIP
+        的多模态对齐推迟到 M9 之后（并入 M10）</strong>，因为 CLIP
+        文本编码器依赖 Transformer。</li>
+        <li><strong>分词最小概念前置</strong>：M7 前给出最小分词概念，M9
+        讲清算法，M11 只讲规模化工程取舍。</li>
+        <li><strong>变分推断前置</strong>：M2 信息论补 Jensen
+        不等式与变分下界直觉，支撑 M8 的 ELBO。</li>
+        </ul>
+        <hr />
+        <h2 id="第二部分--学习路线tracks">第二部分 ·
+        学习路线（Tracks）</h2>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>路线</th>
+        <th>时长</th>
+        <th>策略</th>
+        <th>适合</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>系统深入路线</strong></td>
+        <td>20–22 月</td>
+        <td>阶段 0→5 全程顺序，每模块做 masteryChecks +
+        动手项目，核心机制坚持从零实现。重点投入阶段0（数学不偷工）与
+        M9（Transformer 打磨到逐行复现）。所有 capstone 全做。</td>
+        <td>立志做研究或追求彻底理解者</td>
+        </tr>
+        <tr class="even">
+        <td><strong>工程应用快速路线</strong></td>
+        <td>10–12 月</td>
+        <td>数学只学到"能看懂、会用"（M1/2 抓重点、跳证明）；M4/6/7
+        取精华略读（CNN 与 RNN 任选其一精读，<strong>但 M7 attention
+        不可跳</strong>）；重点压在 M9 Transformer
+        直觉（理解即可）与阶段5（M12 概念级、M13 重度实操）。capstone
+        聚焦"微调+RAG+Agent"。M14 按需查阅。</td>
+        <td>尽快用 LLM 做产品者</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>研究方向路线</strong></td>
+        <td>22+ 月持续</td>
+        <td>系统路线之上，从阶段2 起每周精读 1 篇论文，每阶段额外做 1
+        个复现实验。强化阶段4（扩散/LLM训练数学）与阶段5（对齐/推理模型/可解释性）。选定
+        1–2 个细分方向深耕。终点是能持续产出复现与改进。</td>
+        <td>立志做研究、形成研究品味者</td>
+        </tr>
+        <tr class="even">
+        <td><strong>数学/工程薄弱补强支线</strong>（嵌入式）</td>
+        <td>按需</td>
+        <td>任何路线中发现数学/工程拖后腿，回炉阶段0
+        对应薄弱主题（矩阵求导、概率、PyTorch
+        调试），遵循"数学服务于模型"，遇卡点再加深。</td>
+        <td>所有人</td>
+        </tr>
+        </tbody>
+        </table>
+        <p><strong>三条路线的可略读标注约定</strong>：模块内每个主题标注
+        <code>[全]</code>（全程必修）/<code>[研]</code>（研究路线深读）/<code>[快]</code>（快速路线可略读）。</p>
+        <hr />
+        <h2 id="第三部分--模块详情按阶段组织">第三部分 ·
+        模块详情（按阶段组织）</h2>
+        <hr />
+        <h1 id="阶段-0--数学与工具基础1014-周">阶段 0 ·
+        数学与工具基础（10–14 周）</h1>
+        <blockquote>
+        <p>目标：把高中数学拉升到能读懂并推导 ML
+        论文的核心数学，并建立扎实的 Python
+        科学计算与深度学习实验工程能力。M1/2/3
+        可部分并行（上午数学、晚上敲代码，M3 贯穿始终）。</p>
+        </blockquote>
+        <h2 id="模块-1--线性代数与微积分含矩阵求导与反向传播数学">模块 1
+        · 线性代数与微积分（含矩阵求导与反向传播数学）</h2>
+        <p><strong>一句话</strong>：用"几何直觉 +
+        动手计算"双轨打通向量/矩阵/张量、特征值/SVD、梯度/雅可比/海森与矩阵求导链式法则，最终亲手推导反向传播——把它从"会调
+        <code>.backward()</code>"变成"知道每一步偏导从哪来"。</p>
+        <h3 id="学习目标">学习目标</h3>
+        <ul>
+        <li>用几何语言解释矩阵乘法（线性变换的复合）、行列式（面积/体积缩放与定向）、特征向量，并能在
+        NumPy 里画出二维线性变换前后的网格。</li>
+        <li>正确书写标量/向量/矩阵的各类导数，掌握分子布局/分母布局两套约定，知道为何深度学习里梯度
+        ∂L/∂W 与 W 同形。</li>
+        <li>从第一性原理推导常见矩阵求导公式（∂(Wx)/∂x、∂(xᵀAx)/∂x、∂‖x‖²/∂x
+        等），并用数值梯度验证。</li>
+        <li>把两层全连接网络写成计算图、手推每个参数梯度（含 softmax +
+        交叉熵的简洁梯度 ŷ−y）。</li>
+        <li><strong>仅用 NumPy</strong> 实现该网络的前向与反向，在 MNIST
+        子集上把损失训到下降。</li>
+        <li>用 SVD 解释
+        PCA、低秩近似、四个基本子空间与条件数；解释反向模式自动微分为何适合"多输入单输出"。</li>
+        </ul>
+        <h3 id="先修">先修</h3>
+        <p>高中代数与三角；一元微积分入门（导数定义、链式法则一元形式）；基础
+        Python/NumPy（与 M3 并行）；愿意"先直觉再严谨"的心态。</p>
+        <h3 id="主题与要点为什么重要">主题与要点（为什么重要）</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>主题</th>
+        <th>关键点</th>
+        <th>为什么重要</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>向量/矩阵/张量与线性变换</strong>
+        <code>[全]</code></td>
+        <td>矩阵乘法=线性变换的复合（列=基向量变换后落点）；线性变换三性质；行列式=面积/体积缩放；张量=多维数组；形状契约
+        (m×n)·(n×p)=(m×p)；广播与转置陷阱</td>
+        <td>每一层=线性变换+非线性。理解几何后，前向传播张量形状、卷积、注意力
+        QKᵀ 都变"看得见"</td>
+        </tr>
+        <tr class="even">
+        <td><strong>内积/范数/距离</strong> <code>[全]</code></td>
+        <td>aᵀb=‖a‖‖b‖cosθ；L1/L2/L∞/Frobenius；投影与正交分解；归一化与余弦相似度；标准正交基</td>
+        <td>L2损失、权重衰减、余弦相似度、注意力分数、嵌入检索都建立在此</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>特征值/特征向量/对角化</strong>
+        <code>[全]</code></td>
+        <td>Av=λv
+        几何画面；A=PDP⁻¹；对称矩阵谱定理；正定/半正定；谱半径与稳定性</td>
+        <td>PCA、协方差、海森曲率、谱归一化、梯度消失/爆炸根因</td>
+        </tr>
+        <tr class="even">
+        <td><strong>SVD 与低秩结构</strong> <code>[全]</code></td>
+        <td>A=UΣVᵀ=旋转→缩放→旋转；奇异值=各方向增益；四个基本子空间；Eckart–Young
+        低秩近似；条件数=σ_max/σ_min；伪逆</td>
+        <td>"线性代数的瑞士军刀"，直接是 LoRA 低秩微调的数学根基</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>导数/偏导/梯度/方向导数</strong>
+        <code>[全]</code></td>
+        <td>梯度指向上升最快方向、模长=最大方向导数；梯度与等高线正交；局部线性化
+        f(x+Δ)≈f+∇f·Δ；鞍点</td>
+        <td>梯度下降是训练一切的引擎</td>
+        </tr>
+        <tr class="even">
+        <td><strong>雅可比/海森与二阶信息</strong>
+        <code>[全]</code></td>
+        <td>雅可比
+        J=多元链式法则积木；det(J)=局部体积缩放；海森特征值=曲率；二阶泰勒展开；向量-雅可比积
+        VJP</td>
+        <td>反向传播=一连串 VJP；海森解释优化难易</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>多元链式法则与计算图</strong> <code>[全]</code></td>
+        <td>路径求和；计算图节点知道局部导数；正向 vs
+        反向模式；扇出梯度累加；detach</td>
+        <td>通往"反向传播为什么成立"的总枢纽</td>
+        </tr>
+        <tr class="even">
+        <td><strong>矩阵求导：布局与核心公式</strong>
+        <code>[全]</code></td>
+        <td>四类导数；分子/分母布局；必背公式；形状检查法；微分法
+        dL=tr(Gᵀ dX)</td>
+        <td>全连接层、注意力、归一化的梯度推导全靠这套</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>落到反向传播：公式到 NumPy</strong>
+        <code>[全]</code></td>
+        <td>∂L/∂z2=ŷ−y 起手回推；权重梯度=上游梯度⊗输入；batch
+        求和约定；梯度检查（相对误差&lt;1e-7）；log-sum-exp</td>
+        <td>阶段0 capstone 核心，亲手推+写才真正拥有反向传播</td>
+        </tr>
+        </tbody>
+        </table>
+        <blockquote>
+        <p><strong>吸收评审（消除重复）</strong>：反向传播在 M1/M3/M5
+        三处分工明确——<strong>M1 只负责数学推导</strong>（公式 +
+        一个最小 NumPy 验证），完整工程实现留给 M5。</p>
+        </blockquote>
+        <h3 id="关键资源">关键资源</h3>
+        <ul>
+        <li><strong>3Blue1Brown《线性代数的本质》/《微积分的本质》/《神经网络》</strong>
+        (video) — 几何直觉打底首选。</li>
+        <li><strong>Gilbert Strang《Introduction to Linear Algebra》+
+        MIT 18.06</strong> (course) — 四个基本子空间、SVD
+        讲得最透。</li>
+        <li><strong>The Matrix Cookbook</strong> (book) —
+        矩阵求导速查工具书。</li>
+        <li><strong>《Mathematics for Machine Learning》(Deisenroth et
+        al.)</strong> (book, 免费) — 专为 ML 写的数学主线。</li>
+        <li><strong>CS231n 反向传播/向量矩阵梯度讲义</strong> (course) —
+        手写 BP 前必读。</li>
+        <li><strong>Karpathy《building micrograd》(YouTube +
+        repo)</strong> (video) — implement-to-understand 范本。</li>
+        <li><strong>Parr &amp; Howard《The Matrix Calculus You Need For
+        Deep Learning》(explained.ai)</strong> (blog) —
+        矩阵求导最佳单篇。</li>
+        </ul>
+        <h3 id="动手项目">动手项目</h3>
+        <ol type="1">
+        <li>可视化线性变换（旋转/缩放/剪切 +
+        特征向量验证方向不变）。</li>
+        <li>手算+数值梯度验证 5
+        个矩阵求导公式（相对误差&lt;1e-6，产出对照表）。</li>
+        <li>SVD 图像压缩（k=5/20/50 重建对比 + 奇异值衰减曲线）。</li>
+        <li><strong>纯 NumPy 两层全连接网络 +
+        反向传播</strong>（线性→ReLU→线性→softmax→CE，加梯度检查，MNIST
+        子集）。</li>
+        <li>跟做 micrograd（标量自动求导引擎 + 玩具 MLP）。</li>
+        <li>梯度几何小实验（病态二次型等高线 + 梯度场 + 之字形轨迹 +
+        海森特征值）。</li>
+        </ol>
+        <h3 id="常见误区">常见误区</h3>
+        <ul>
+        <li>把矩阵乘法当"机械行乘列"死记，从不建立几何图像。</li>
+        <li>混用分子/分母布局导致该转置的没转置 → 固定一套约定 +
+        永远形状检查。</li>
+        <li>推完公式不做数值梯度验证就写进代码。</li>
+        <li>跳过手写反向传播直接上 <code>.backward()</code>，遇
+        NaN/梯度消失无从下手。</li>
+        <li>softmax/交叉熵不做 log-sum-exp 稳定化导致 NaN。</li>
+        <li>陷入"先读完三本数学书"的拖延；特征值/SVD 深水区可在 PCA/LoRA
+        用到时回炉。</li>
+        <li>混淆特征分解（需方阵）与 SVD（任意矩阵）。</li>
+        <li>忽视 batch 维求和/平均约定。</li>
+        <li>只看视频获得"懂了的错觉"，从不动笔。</li>
+        </ul>
+        <h3 id="时间估计">时间估计</h3>
+        <p>约 3–4
+        周（35–55h）。第1周线代直觉+可视化；第2周内积/范数/特征值/SVD+压缩；第3周导数/梯度/雅可比/海森/链式法则；第4周矩阵求导+手写两层网络+micrograd。</p>
+        <h3 id="掌握自检">掌握自检</h3>
+        <p>能画二维剪切矩阵对网格的作用并说清行列式/特征向量；能推
+        ∂(xᵀAx)/∂x=(A+Aᵀ)x；能说清非方阵 SVD 中 U/Σ/V
+        形状与几何；能解释"梯度指向上升最快"与"梯度与等高线正交"为何同一件事；能把两层网络画成计算图手推
+        ∂L/∂W；能纯 NumPy
+        实现并通过梯度检查；能解释反向模式为何高效、本质是 VJP 链；能写
+        log-sum-exp 稳定化；能用海森特征值判断临界点类型。</p>
+        <hr />
+        <h2 id="模块-2--概率统计信息论与最优化含强化学习速成">模块 2 ·
+        概率统计、信息论与最优化（含强化学习速成）</h2>
+        <p><strong>一句话</strong>：从随机变量与贝叶斯出发，经 MLE/MAP
+        把"概率假设"翻译成"损失函数"，用信息论（熵/交叉熵/KL/互信息）解释损失为何长这样，再用凸性与梯度下降/SGD/Adam
+        把损失优化下去——三条线在"最小化损失"汇合，并为 VAE 的 ELBO 与
+        RLHF 的 KL 约束埋伏笔。<strong>末尾新增"强化学习速成"消除 M12
+        先修断层。</strong></p>
+        <h3 id="学习目标-1">学习目标</h3>
+        <ul>
+        <li>说清随机变量/PMF/PDF/CDF；写出伯努利、二项、Categorical、高斯、均匀、指数、泊松分布及用途。</li>
+        <li>计算期望/方差/协方差/相关系数，理解期望线性性质与协方差矩阵几何。</li>
+        <li>运用条件概率、全概率、贝叶斯定理，分清先验/似然/后验/证据。</li>
+        <li>从"i.i.d.+概率模型"推导 MLE，说明 MLE ⟺ 最小化 NLL；加先验得
+        MAP，解释 MAP 对应 L2/L1 正则。</li>
+        <li>写出熵/交叉熵/KL/互信息定义，证明"最小化交叉熵 ⟺ 最小化 KL ⟺
+        最大化似然"三者等价。</li>
+        <li>解释分类用交叉熵、回归用 MSE 各自追溯到 Categorical/高斯
+        MLE。</li>
+        <li>判断凸性，手写 GD/SGD/动量/Adam
+        更新公式；解释学习率、warmup、二阶方法思想。</li>
+        <li><strong>（新增 RL 速成）</strong> 说清
+        MDP、状态/动作/奖励/策略、价值函数、策略梯度、actor-critic、GAE
+        与 PPO 的直觉。</li>
+        <li>讲清 KL 将在 VAE 的 ELBO 与 RLHF
+        奖励约束中的角色（埋点）。</li>
+        </ul>
+        <h3 id="先修-1">先修</h3>
+        <p>M1
+        的梯度/链式法则/向量矩阵运算；会求一元极值与简单定积分；Python/NumPy
+        入门；对数/指数性质。</p>
+        <h3 id="主题与要点">主题与要点</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>主题</th>
+        <th>关键点</th>
+        <th>为什么重要</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>随机变量与常见分布</strong> <code>[全]</code></td>
+        <td>PMF（离散）vs
+        PDF（连续，值可&gt;1）；伯努利/二项/Categorical/高斯/均匀/指数/泊松的物理意义；高斯一维+多维（协方差椭圆）；CLT；配分函数</td>
+        <td>模型输出层、损失、初始化、噪声假设全用分布描述</td>
+        </tr>
+        <tr class="even">
+        <td><strong>期望/方差/协方差</strong> <code>[全]</code></td>
+        <td>期望线性性质（即使不独立）；方差/协方差矩阵（对称半正定，呼应
+        M1 特征分解）；无偏估计；蒙特卡洛估计</td>
+        <td>每个损失本质是"某个量的期望"；SGD
+        梯度是真梯度的无偏估计</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>条件概率与贝叶斯</strong> <code>[全]</code></td>
+        <td>P(A|B)；链式法则（自回归 LM 的数学根
+        P(x)=∏P(xₜ|x_&lt;t)）；posterior∝likelihood×prior；基率谬误；条件独立；贝叶斯
+        vs 频率派</td>
+        <td>判别/生成区别、MLE/MAP、朴素贝叶斯、VAE 后验、RLHF
+        策略更新都在此</td>
+        </tr>
+        <tr class="even">
+        <td><strong>MLE 与 MAP</strong> <code>[全]</code></td>
+        <td>对数似然把连乘变连加；高斯MLE→MSE、伯努利/Categorical
+        MLE→交叉熵；MAP：高斯先验→L2、拉普拉斯→L1；为何用对数；小样本过拟合</td>
+        <td>枢纽：把"数据怎么生成"翻译成"该最小化什么"</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>采样基础</strong> <code>[全]</code></td>
+        <td>逆变换采样；<strong>重参数化预告</strong> μ+σ·ε（VAE
+        能反传的关键）；拒绝/重要性采样、MCMC 概念；随机种子可复现</td>
+        <td>VAE/扩散/RL 策略采样/LLM 解码全是采样</td>
+        </tr>
+        <tr class="even">
+        <td><strong>熵与交叉熵</strong> <code>[全]</code></td>
+        <td>自信息 −log p；熵=平均不确定性；交叉熵
+        H(p,q)≥H(p)；分类交叉熵=one-hot 与 softmax
+        间交叉熵=NLL；log-sum-exp；CrossEntropyLoss 内含
+        log-softmax</td>
+        <td>深度学习最常用损失，从图像分类到 LM 预训练</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>KL 散度与互信息</strong> <code>[全]</code></td>
+        <td>D_KL(p‖q)=H(p,q)−H(p)；非负、不对称、非距离；最小化CE⟺最小化KL（三线汇合）；前向
+        vs 反向 KL（矩匹配 vs
+        寻峰）；互信息=表示学习理论基础；<strong>埋点：VAE 的 ELBO、RLHF
+        的 KL 惩罚</strong></td>
+        <td>连接信息论与现代生成/对齐模型的总枢纽</td>
+        </tr>
+        <tr class="even">
+        <td><strong>凸性与优化几何</strong> <code>[全]</code></td>
+        <td>凸集/凸函数/Hessian
+        半正定；深网络非凸但可训（敌人是鞍点/病态/坏初始化）；负梯度=最速下降；条件数与病态</td>
+        <td>决定损失能否真正降下去</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>GD/SGD/动量/Adam</strong> <code>[全]</code></td>
+        <td>full-batch vs SGD vs
+        mini-batch；动量=梯度指数滑动平均；AdaGrad→RMSProp→Adam（动量+自适应+偏差修正）；<strong>AdamW</strong>（解耦权重衰减，Transformer
+        标准）；手写对比</td>
+        <td>把"损失"变"训练好的模型"的引擎</td>
+        </tr>
+        <tr class="even">
+        <td><strong>学习率/调度/二阶概览</strong> <code>[全]</code></td>
+        <td>学习率最重要；step/cosine + 线性 warmup；梯度裁剪；牛顿法
+        O(d³) 不可行 → 几乎都用一阶；Adam=廉价近似二阶</td>
+        <td>warmup+cosine 是现代大模型标配</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>★ 强化学习速成（新增，吸收评审）</strong>
+        <code>[全]</code></td>
+        <td>MDP（状态/动作/奖励/转移/折扣）；策略 π、回报 G、价值函数
+        V/Q；策略梯度 ∇J=E[∇log π·A]；REINFORCE
+        的高方差与基线；actor-critic；优势 A=Q−V 与
+        <strong>GAE</strong>；<strong>PPO
+        直觉</strong>（裁剪代理目标、信任域、KL
+        约束）；on/off-policy</td>
+        <td><strong>消除 M12 RLHF/PPO 与 M14 RL-for-reasoning
+        的最严重先修断层</strong></td>
+        </tr>
+        </tbody>
+        </table>
+        <blockquote>
+        <p><strong>吸收评审</strong>：RL 速成放在 M2 末尾（也可在 M11 与
+        M12 之间复习），让学员到 PPO/GRPO 时不再遇到未学概念。M2
+        信息论补 <strong>Jensen 不等式与变分下界直觉</strong>，前置 M8
+        的 ELBO 推导工具。</p>
+        </blockquote>
+        <h3 id="关键资源-1">关键资源</h3>
+        <ul>
+        <li><strong>3Blue1Brown — Probability / CLT / Bayes</strong>
+        (video) — 几何直觉首选。</li>
+        <li><strong>StatQuest (Josh Starmer)</strong> (video) —
+        概念"蠢萌好懂"，按主题点播。</li>
+        <li><strong>MIT 6.041 / 6.431x (Tsitsiklis)</strong> (course) —
+        权威概率第一课。</li>
+        <li><strong>Deep Learning（花书）第3/4/5/8章</strong> (book,
+        免费) — 概率+信息论+优化精炼综述。</li>
+        <li><strong>PRML (Bishop) 第1.6/第2章</strong> (book) —
+        贝叶斯视角黄金标准。</li>
+        <li><strong>Sebastian Ruder《gradient descent
+        overview》</strong> (blog) — 优化器最高效单点资源。</li>
+        <li><strong>Adam (2015) / AdamW (2019) 原论文</strong>
+        (paper)。</li>
+        <li><strong>Convex Optimization (Boyd) + EE364A</strong>
+        (book/course, 免费)。</li>
+        <li><strong>Distill《Why Momentum Really Works》</strong> (blog)
+        — 交互可视化。</li>
+        <li><strong>（RL 速成）Sutton &amp; Barto《Reinforcement
+        Learning》第3/13章 + OpenAI Spinning Up（PPO/GAE）+ Hugging Face
+        Deep RL Course</strong> — RL 入门与 PPO 落地。</li>
+        <li><strong>Karpathy makemore / Zero to Hero</strong> (repo) —
+        把概念落到代码。</li>
+        </ul>
+        <h3 id="动手项目-1">动手项目</h3>
+        <ol type="1">
+        <li>分布动物园（采样直方图 vs 理论曲线 +
+        二维高斯协方差椭圆，联系 M1 特征向量）。</li>
+        <li>贝叶斯推断（医疗检测后验曲线扫基率 + 手写朴素贝叶斯垃圾邮件
+        vs sklearn）。</li>
+        <li>从概率假设到损失（高斯回归
+        MLE→最小二乘、Categorical→交叉熵、MAP 先验强度扫描）。</li>
+        <li>信息论三件套验证（entropy/cross_entropy/kl/mutual_information，验证
+        H(p,q)=H(p)+D_KL）。</li>
+        <li>优化器擂台（病态二次/Rosenbrock 上 GD/SGD/动量/Adam 轨迹 +
+        cosine 调度对比）。</li>
+        <li>微型 softmax
+        分类器（缝合"分布→MLE→交叉熵→SGD+动量→L2"整条链路）。</li>
+        <li><strong>（RL 速成）</strong> 在 CartPole 或 GridWorld 上跑通
+        REINFORCE 与一个最小 actor-critic，观察基线如何降方差。</li>
+        </ol>
+        <h3 id="常见误区-1">常见误区</h3>
+        <ul>
+        <li>把 PDF 值当概率（连续分布只有积分才是概率）。</li>
+        <li>期望线性性质只对线性运算成立：E[XY]≠E[X]E[Y]、E[g(X)]≠g(E[X])（Jensen
+        来源）。</li>
+        <li>死记交叉熵不知它=Categorical NLL。</li>
+        <li>把 KL 当距离（不对称、无三角不等式）。</li>
+        <li>数值不稳定（小概率取 log、连乘下溢、softmax
+        不减最大值）。</li>
+        <li>对 CrossEntropyLoss 再手动 softmax。</li>
+        <li>因"非凸"恐惧深度学习（真正的敌人是鞍点/病态/坏初始化/学习率）。</li>
+        <li>把 Adam 当万能默认。</li>
+        <li>忽视 warmup/调度致 Transformer 初期 NaN。</li>
+        <li>MLE 小样本必过拟合（拉普拉斯平滑/MAP 来救）。</li>
+        <li><strong>（RL）</strong> 把策略梯度的高方差误判为
+        bug；忘了基线/优势能大幅降方差。</li>
+        </ul>
+        <h3 id="时间估计-1">时间估计</h3>
+        <p>约 3.5–4.5 周（含 RL 速成约 +0.5–1
+        周）。第1周分布/期望方差协方差；第2周贝叶斯/MLE/MAP/采样；第3周信息论；第4周最优化；第4.5–5周
+        RL 速成。</p>
+        <h3 id="掌握自检-1">掌握自检</h3>
+        <p>能从 i.i.d. 推 MLE 并说明 MLE⟺最小化
+        NLL，分别推出高斯→MSE、Categorical→交叉熵；能证 H(p,q)=H(p)+D_KL
+        并说清"优化交叉熵"而非"KL"的原因；能做贝叶斯数值题并解释基率谬误；能说清高斯先验↔︎L2、拉普拉斯↔︎L1；能纯
+        NumPy 实现 GD/SGD/动量/Adam 并解释偏差修正；能完整训练 softmax
+        分类器并逐项对应概念；能处理 softmax 数值稳定；能预告 KL 在
+        ELBO/RLHF
+        的角色；<strong>（RL）能写出策略梯度公式、解释优势函数与
+        GAE、说清 PPO 裁剪目标在做什么。</strong></p>
+        <hr />
+        <h2 id="模块-3--pythonnumpypytorch-与实验工程">模块 3 ·
+        Python、NumPy、PyTorch 与实验工程</h2>
+        <p><strong>一句话</strong>：从科学计算栈到能从零写出完整、可复现训练循环的深度学习工程地基——吃透
+        NumPy 向量化/广播、PyTorch
+        张量/autograd/nn.Module/训练循环、数据加载、GPU/混合精度，并建立实验管理、调参调试与
+        Hugging Face 生态的工程肌肉。</p>
+        <h3 id="学习目标-2">学习目标</h3>
+        <ul>
+        <li>把含 for 循环的数值代码改写成纯向量化，并用广播规则解释
+        shape 变化与内存开销。</li>
+        <li>从零写不依赖高层封装的训练循环（zero_grad→forward→loss→backward→step），解释每行作用与漏写后果。</li>
+        <li>解释 autograd 计算图与反向传播，正确用 requires_grad /
+        detach / no_grad / retain_graph。</li>
+        <li>用
+        nn.Module/DataLoader/调度器/混合精度组装工业级可复现训练脚本。</li>
+        <li>接入 W&amp;B 或 TensorBoard，落地可复现性清单。</li>
+        <li>用 Hugging Face datasets/transformers
+        跑通推理与最小微调。</li>
+        <li>系统化调试训练故障（NaN/不降/OOM/CPU 瓶颈/train-val
+        不一致）。</li>
+        </ul>
+        <h3 id="先修-2">先修</h3>
+        <p>基础 Python；M1 线代（看懂张量 shape）；M1/M2
+        链式法则、梯度下降、交叉熵；命令行；可用 Python 环境（Miniconda
+        或 Colab）。</p>
+        <h3 id="主题与要点-1">主题与要点</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>主题</th>
+        <th>关键点</th>
+        <th>为什么重要</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>Python 科学计算栈与环境工程</strong>
+        <code>[全]</code></td>
+        <td>conda/venv 隔离环境 +
+        版本锁定；NumPy/SciPy/Pandas/Matplotlib/sklearn
+        分工；Jupyter/Colab 隐藏状态陷阱；何时从 notebook 毕业到 .py +
+        argparse；pdb/breakpoint/assert</td>
+        <td>多数"跑不出来"是环境/版本/隐藏状态而非算法</td>
+        </tr>
+        <tr class="even">
+        <td><strong>NumPy 数组/向量化/广播</strong>
+        <code>[全]</code></td>
+        <td>shape/dtype/view vs copy；向量化快
+        10–100×；广播尾部对齐规则；花式索引/布尔掩码/axis/keepdims；数值稳定（logaddexp、softmax
+        减最大值）</td>
+        <td>张量心智模型 1:1 迁移到 PyTorch</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>PyTorch 张量与设备/dtype</strong>
+        <code>[全]</code></td>
+        <td>Tensor vs ndarray（device/dtype/requires_grad）；from_numpy
+        零拷贝陷阱；view 要连续 vs
+        reshape；<code>.to(device)</code>；float32/bf16/int64；in-place
+        风险</td>
+        <td>设备/dtype 不匹配是最高频报错</td>
+        </tr>
+        <tr class="even">
+        <td><strong>Autograd 自动微分</strong> <code>[全]</code></td>
+        <td>动态计算图；requires_grad/leaf/grad_fn；<strong>.grad 累加 →
+        必须 zero_grad</strong>；no_grad/detach/freeze
+        三场景；retain_graph/create_graph</td>
+        <td>区别于 NumPy 的核心魔法，但不是黑箱（呼应
+        M1，<strong>此处只讲机制不重推数学</strong>）</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>nn.Module 与模型构建</strong> <code>[全]</code></td>
+        <td><strong>init</strong> 注册子模块/forward
+        定义计算；nn.Parameter/ModuleList（普通 list
+        不注册=经典坑）；train/eval 模式；nn.init；state_dict 保存</td>
+        <td>把张量运算组织成可复用/保存/迁移的模型</td>
+        </tr>
+        <tr class="even">
+        <td><strong>★ 从零写训练循环（核心）</strong>
+        <code>[全]</code></td>
+        <td>五步骨架默写；CrossEntropyLoss 喂 logits；epoch/batch +
+        验证分离 + no_grad；调度器何时 step；梯度裁剪/累积</td>
+        <td>阶段0 masteryCheck 硬指标，后续所有模型共用</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>数据加载 Dataset/DataLoader</strong>
+        <code>[全]</code></td>
+        <td><strong>len</strong>/<strong>getitem</strong>；batch_size/shuffle/num_workers/pin_memory；<strong>collate_fn
+        处理变长 padding</strong>（NLP 必备）；transforms
+        只训练加增强；数据管线是隐形瓶颈</td>
+        <td>模型再快数据喂不上也白搭</td>
+        </tr>
+        <tr class="even">
+        <td><strong>GPU/CUDA 与混合精度</strong>
+        <code>[全]/[快略]</code></td>
+        <td>GPU 并行；避免循环里 <code>.item()/.cpu()</code>
+        同步；显存构成（参数+激活+优化器+梯度）；<strong>AMP
+        autocast+GradScaler + loss scaling</strong>；bf16 vs
+        fp16；torch.compile；DDP 概念</td>
+        <td>LoRA/QLoRA 的前提；混合精度省一半显存提速</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>实验管理与可复现性</strong> <code>[全]</code></td>
+        <td>W&amp;B/TensorBoard 记录
+        loss/指标/超参/资源；可复现清单（种子+cudnn+环境锁定+数据划分+commit
+        hash）；严格可复现 vs 结果可比；一次只改一个变量</td>
+        <td>没有追踪就无法判断哪组最好</td>
+        </tr>
+        <tr class="even">
+        <td><strong>调参与调试方法论</strong> <code>[全]</code></td>
+        <td>故障诊断树（NaN/不降/OOM/过拟合）；<strong>先过拟合一个
+        batch</strong>；shape/device/dtype 排查；学习率最重要（lr range
+        test）；网格/随机/贝叶斯搜索</td>
+        <td>真实训练 90% 时间在调试</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>Hugging Face 生态入门</strong>
+        <code>[全]/[快深]</code></td>
+        <td>AutoModel/AutoTokenizer/pipeline；datasets
+        <code>.map()</code>；<strong>Trainer
+        内部就是你手写的循环</strong>；Hub/accelerate</td>
+        <td>通往阶段5 的工具桥梁，先会手写再用封装</td>
+        </tr>
+        </tbody>
+        </table>
+        <blockquote>
+        <p><strong>吸收评审（时效性）</strong>：混合精度的数值原理（fp16/bf16
+        动态范围、loss scaling）在 M3
+        作<strong>概念引入</strong>，真正规模化落地在
+        M11；避免过早深挖。</p>
+        </blockquote>
+        <h3 id="关键资源-2">关键资源</h3>
+        <ul>
+        <li><strong>PyTorch 官方教程（Learn the Basics / 60 Minute
+        Blitz）</strong> (course)。</li>
+        <li><strong>《Deep Learning with PyTorch》(Manning, 免费
+        PDF)</strong> (book) — 核心开发者参与。</li>
+        <li><strong>Karpathy《building micrograd》</strong> (video/repo)
+        — 理解 autograd 最佳一课。</li>
+        <li><strong>NumPy 官方 Broadcasting 文档</strong> (blog)。</li>
+        <li><strong>CS231n Python/NumPy + PyTorch tutorial</strong>
+        (course)。</li>
+        <li><strong>W&amp;B Quickstart + PyTorch TensorBoard
+        教程</strong> (blog)。</li>
+        <li><strong>Hugging Face NLP Course</strong> (course)。</li>
+        <li><strong>Karpathy《A Recipe for Training Neural
+        Networks》</strong> (blog) — 训练调试圣经。</li>
+        <li><strong>PyTorch AMP recipe + torch.compile 教程</strong>
+        (blog)。</li>
+        </ul>
+        <h3 id="动手项目-2">动手项目</h3>
+        <ol type="1">
+        <li>NumPy
+        向量化重写挑战（欧氏距离矩阵/softmax/一维卷积，<code>%timeit</code>
+        对比 + shape 推导）。</li>
+        <li>纯 NumPy 两层网络（直通阶段0 capstone，参照 micrograd
+        验证梯度）。</li>
+        <li><strong>从零 PyTorch
+        训练循环</strong>（不用高层封装，MNIST/FashionMNIST
+        MLP，能默写每行）。</li>
+        <li>autograd 透视实验（打印 grad/grad_fn，分别试
+        detach/no_grad/漏写 zero_grad）。</li>
+        <li>可复现 + 实验追踪脚本（接入
+        W&amp;B，跑两次验证可比，对比有无 BatchNorm）。</li>
+        <li>混合精度与 OOM 实战（fp32/amp/amp+累积
+        三配置显存吞吐对比表）。</li>
+        <li>调试方法论演练（植入 5 个经典 bug 逐一定位）。</li>
+        <li>Hugging Face 跑通（pipeline 推理 + Trainer 微调
+        distilbert，与手写循环逐项对照）。</li>
+        </ol>
+        <h3 id="常见误区-2">常见误区</h3>
+        <p>张量与模型不在同一设备；忘记 zero_grad/backward/step；验证忘
+        eval()/no_grad()；对 CrossEntropyLoss 手动 softmax；普通 list
+        装子模块；循环里频繁 <code>.item()/.cpu()</code> 同步 +
+        累加张量拖着计算图致显存泄漏；view 对 transpose 后张量报错（需
+        contiguous）；切片返回 view 就地修改改到原数组；广播隐形 bug
+        (N,1)−(N,)→(N,N)；notebook
+        乱序执行隐藏状态；不固定种子就调参；NaN 盲调；跳过"过拟合一个
+        batch"；直接用 Trainer 跳过手写循环。</p>
+        <h3 id="时间估计-2">时间估计</h3>
+        <p>约 4–6 周（50–80h），与 M1/2 并行。"从零写训练循环"与"NumPy
+        两层网络"打磨到能默写；HF 跑通即可。</p>
+        <h3 id="掌握自检-2">掌握自检</h3>
+        <p>能默写完整训练脚本并逐行解释；能把 for 循环改写成向量化并推导
+        shape；能解释 zero_grad/backward/no_grad/detach/eval
+        及漏用后果；能手画计算图说明 backward 与 .grad 累加；面对
+        NaN/不降/OOM 能给系统排查顺序；能接入 W&amp;B 落地可复现；能写
+        AMP 代码并解释 loss scaling/bf16 vs fp16；能用 HF
+        加载推理+Trainer 微调并指出对应手写循环哪部分。</p>
+        <hr />
+        <h1 id="阶段-1--经典机器学习与深度学习基础1013-周">阶段 1 ·
+        经典机器学习与深度学习基础（10–13 周）</h1>
+        <blockquote>
+        <p>目标：从"最小化损失"统一视角理解监督/无监督学习，掌握偏差-方差/正则化/泛化；进入神经网络吃透反向传播、优化器、初始化、正则化与训练技巧。建立"模型=架构+损失+优化+数据"的统一心智模型。M4
+        是 M5 的概念铺垫。</p>
+        </blockquote>
+        <h2 id="模块-4--经典机器学习">模块 4 · 经典机器学习</h2>
+        <p><strong>一句话</strong>：用"模型=架构+损失+优化+数据"的统一视角吃透监督/无监督经典算法、模型评估与特征工程，建立贯穿全程的偏差-方差、正则化、泛化心智模型，并理解经典
+        ML 在工业界为何不可替代。</p>
+        <h3 id="学习目标-3">学习目标</h3>
+        <ul>
+        <li>用统一"损失+优化"视角解释线性/逻辑回归、SVM、决策树、k-means
+        的本质区别（假设空间/损失/优化/正则化四维）。</li>
+        <li>从零实现线性回归（正规方程+梯度下降）、逻辑回归（sigmoid+交叉熵+手推梯度）、决策树、k-means，对比
+        sklearn。</li>
+        <li>手推 L2 解析解、从约束几何/次梯度解释 L1 稀疏；实验展示 λ
+        移动偏差-方差。</li>
+        <li>讲清 SVM 最大间隔、对偶/支持向量、核技巧；bagging 降方差 vs
+        boosting 降偏差，调参 XGBoost/LightGBM。</li>
+        <li>为分类/回归选对指标，设计无泄漏交叉验证，用学习曲线诊断过拟合/欠拟合并对症下药。</li>
+        <li>完成端到端特征工程流水线。</li>
+        </ul>
+        <h3 id="先修-3">先修</h3>
+        <p>M1 线代+微积分；M2 概率/信息论/最优化（含拉格朗日乘子）；M3
+        Python/NumPy/Pandas/Matplotlib。无需深度学习——本模块正是 M5
+        的概念地基。</p>
+        <h3 id="主题与要点-2">主题与要点</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>主题</th>
+        <th>关键点</th>
+        <th>为什么重要</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>统一视角：损失最小化</strong> <code>[全]</code></td>
+        <td>假设空间+损失+优化；经验风险 ERM vs 期望风险=泛化鸿沟；参数
+        vs 非参数模型</td>
+        <td>把十几个算法串成一张图的"元知识"，深度学习只是换模型/优化</td>
+        </tr>
+        <tr class="even">
+        <td><strong>线性回归</strong> <code>[全]</code></td>
+        <td>正规方程闭式解 vs 梯度下降；高斯噪声
+        MLE=最小二乘；投影几何；多重共线性</td>
+        <td>麻雀虽小五脏俱全</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>逻辑回归与分类</strong> <code>[全]</code></td>
+        <td>sigmoid+交叉熵（伯努利 MLE）；为何不用 MSE；softmax
+        多分类；概率校准</td>
+        <td>"神经网络的一个神经元"，工业主力</td>
+        </tr>
+        <tr class="even">
+        <td><strong>正则化 L1/L2</strong> <code>[全]</code></td>
+        <td>岭回归解析解 w=(XᵀX+λI)⁻¹Xᵀy；L1 稀疏（菱形 vs
+        圆/次梯度）；Elastic
+        Net；L2↔︎高斯先验、L1↔︎拉普拉斯（MAP）；λ=偏差-方差旋钮</td>
+        <td>对抗过拟合核心，贯穿全程（weight
+        decay/dropout/标签平滑都是正则化）</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>SVM 与核方法</strong>
+        <code>[全]/[快略对偶]</code></td>
+        <td>最大间隔；软间隔 C；hinge loss=SVM
+        纳入统一框架；对偶与支持向量；核技巧 K(x,x')；RBF/多项式核</td>
+        <td>深度学习前的统治算法，对偶/核训练对理解注意力有迁移价值</td>
+        </tr>
+        <tr class="even">
+        <td><strong>决策树与集成 RF/GBDT</strong> <code>[全]</code></td>
+        <td>信息增益/基尼分裂；bagging（RF 降方差）vs boosting（GBDT
+        降偏差）；XGBoost/LightGBM（二阶近似、直方图、leaf-wise）</td>
+        <td>表格数据"打不过"的模型，偏差-方差最生动实战</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>聚类 k-means/层次</strong> <code>[全]</code></td>
+        <td>k-means=EM 特例（分配-更新）；k-means++；选
+        k（肘部/轮廓）；层次聚类树状图；DBSCAN/GMM 拓展</td>
+        <td>k-means 为 VAE/GMM 埋伏笔</td>
+        </tr>
+        <tr class="even">
+        <td><strong>降维 PCA/t-SNE/UMAP</strong> <code>[全]</code></td>
+        <td>PCA=协方差特征分解=SVD=最大方差=最小重构误差三等价；t-SNE
+        只是可视化（不保距/全局）；UMAP</td>
+        <td>PCA=表示学习的线性前身，直通 M8 自编码器</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>模型评估 I：划分与交叉验证</strong>
+        <code>[全]</code></td>
+        <td>train/val/test 职责分离；k
+        折/分层/时序切分；<strong>数据泄漏</strong>（预处理必须折内
+        fit，用 Pipeline）；嵌套 CV</td>
+        <td>评估错则结论全错，是所有 ML（含 LLM 评测）可信度基石</td>
+        </tr>
+        <tr class="even">
+        <td><strong>模型评估 II：偏差-方差诊断</strong>
+        <code>[全]</code></td>
+        <td>泛化误差=偏差²+方差+噪声；学习曲线/验证曲线；对症清单；双下降对照</td>
+        <td>从"瞎试"到"有依据决策"的关键能力</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>模型评估 III：指标</strong> <code>[全]</code></td>
+        <td>混淆矩阵/precision/recall/F1；不平衡下准确率误导；ROC/AUC（概率解释）vs
+        PR；RMSE/MAE/R²</td>
+        <td>选错指标=优化错目标</td>
+        </tr>
+        <tr class="even">
+        <td><strong>特征工程</strong> <code>[全]</code></td>
+        <td>缺失值/异常值；标准化（线性/SVM/kNN/k-means/PCA
+        必需，树不需）；类别编码（目标编码须折内防泄漏）；特征构造/选择；Pipeline/ColumnTransformer</td>
+        <td>"特征决定上限"，工业表格高度依赖</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>何时不用深度学习</strong> <code>[全]</code></td>
+        <td>表格数据 GBDT
+        常胜；可解释/合规（评分卡、SHAP）；成本/延迟/小数据；先建强基线再判断升级</td>
+        <td>纠正"万物皆深度学习"偏见</td>
+        </tr>
+        </tbody>
+        </table>
+        <blockquote>
+        <p><strong>吸收评审（缺口补充）</strong>：本模块在 M4
+        概览层面补充 <strong>GNN/推荐系统/表格深度学习</strong>
+        的存在与归纳偏置（见"概览补充"小节链接），符合"归纳偏置随数据结构变化"的核心哲学；<strong>可解释性</strong>（SHAP/LIME/部分依赖）在此首次系统出现，呼应贯穿支线
+        M-I。</p>
+        </blockquote>
+        <h3 id="关键资源-3">关键资源</h3>
+        <ul>
+        <li><strong>ISL/ISLP (James et al., 2023)</strong> (book, 免费)
+        — 经典 ML 最佳入门主线。</li>
+        <li><strong>ESL (Hastie et al.)</strong> (book, 免费) —
+        进阶查阅手册。</li>
+        <li><strong>Andrew Ng ML Specialization / CS229</strong>
+        (course) — 直觉+严谨。</li>
+        <li><strong>scikit-learn User Guide</strong> (blog) —
+        世界级工程文档。</li>
+        <li><strong>《Hands-On ML》(Géron) 第1部分</strong> (book) —
+        工程实战主线。</li>
+        <li><strong>XGBoost (2016) + LightGBM (2017) 论文</strong>
+        (paper)。</li>
+        <li><strong>t-SNE 论文 + distill《How to Use t-SNE
+        Effectively》</strong> (paper/blog)。</li>
+        <li><strong>StatQuest</strong> (video)。</li>
+        <li><strong>Kaggle Titanic/House Prices + Learn 微课</strong>
+        (course)。</li>
+        <li><strong>《Interpretable ML》(Molnar)</strong> (book, 免费) —
+        SHAP/LIME，呼应可解释性支线。</li>
+        </ul>
+        <h3 id="动手项目-3">动手项目</h3>
+        <ol type="1">
+        <li>从零线性回归（正规方程+GD+岭回归，对齐 sklearn）。</li>
+        <li>从零逻辑回归（sigmoid+交叉熵+手推梯度+决策边界）。</li>
+        <li>从零决策树+k-means（基尼/信息增益/k-means++/肘部/轮廓）。</li>
+        <li>L1 vs L2 正则化路径图（展示 L1 压到 0）。</li>
+        <li>SVM 核方法可视化（make_moons/circles，线性 vs RBF，扫
+        C/γ）。</li>
+        <li>梯度提升表格实战（完整 Pipeline + 交叉验证调
+        XGBoost/LightGBM + 特征重要性 + Kaggle 提交）。</li>
+        <li>PCA+t-SNE/UMAP 可视化（MNIST，扫 perplexity）。</li>
+        <li><strong>评估与诊断综合项目</strong>（不平衡数据 +
+        故意制造泄漏 + 混淆矩阵/ROC/PR + 学习曲线诊断，阶段1 capstone
+        核心）。</li>
+        </ol>
+        <h3 id="常见误区-3">常见误区</h3>
+        <p>测试集污染；数据泄漏（预处理在划分前）；不平衡盲信准确率；忘记特征缩放（树不需）；过度解读
+        t-SNE 图；k-means 当万能聚类；GBDT
+        不调学习率/树数配合+不早停；只调模型不做特征工程；混淆
+        bagging/boosting
+        作用；正则化方向搞反；"复杂模型一定更好"；不设种子/不记录配置。</p>
+        <h3 id="时间估计-3">时间估计</h3>
+        <p>5–7 周（60–90h）。工程快速路线可压到 4 周（略读 SVM 对偶，重
+        GBDT+评估+特征工程）。</p>
+        <h3 id="掌握自检-3">掌握自检</h3>
+        <p>能填四维表格；能从零实现线性/逻辑回归并对齐
+        sklearn；能手推岭回归解析解+解释 L1 稀疏；能讲清 SVM
+        最大间隔/软间隔/支持向量/RBF；能说清 RF vs GBDT
+        机制并调出优于基线的 GBDT；不平衡任务能选对指标+读 ROC/PR+解释
+        AUC；能设计零泄漏 Pipeline+用学习曲线诊断；能讲三个"该用经典
+        ML"场景。</p>
+        <hr />
+        <h2 id="模块-5--深度学习基础从感知机到能训练的神经网络">模块 5 ·
+        深度学习基础：从感知机到能训练的神经网络</h2>
+        <p><strong>一句话</strong>：吃透"模型=架构+损失+优化+数据"统一心智模型，亲手推导反向传播并用纯
+        NumPy 从零实现能在 MNIST
+        上收敛的多层网络，再系统掌握让深网络"训得动"的全套工程武器：激活函数、初始化、正则化、归一化、优化器与学习率调度。</p>
+        <h3 id="学习目标-4">学习目标</h3>
+        <ul>
+        <li>用几何与计算图两种视角解释感知机、MLP、通用逼近定理；说清单层为何解不了
+        XOR。</li>
+        <li>从标量链式法则手推两层网络（ReLU+softmax
+        交叉熵）完整反向传播，写出矩阵形式。</li>
+        <li><strong>纯 NumPy</strong>
+        实现前向/反向/SGD+动量/mini-batch，MNIST 上 &gt;97%。</li>
+        <li>解释 sigmoid/tanh/ReLU/LeakyReLU/GELU 优缺点与死亡
+        ReLU；从方差守恒推 Xavier/He 初始化。</li>
+        <li>解释 Dropout/权重衰减/早停/数据增强机制差异，正确实现
+        inverted dropout。</li>
+        <li>推导 BatchNorm 前向/反向，解释 train/eval 与 running
+        stats；说清 LayerNorm 为何适合序列。</li>
+        <li>用梯度检验验证实现，诊断梯度消失/爆炸；解释
+        SGD/Momentum/RMSProp/Adam/AdamW 差异，配置
+        warmup+cosine，产出训练技巧消融报告。</li>
+        </ul>
+        <h3 id="先修-4">先修</h3>
+        <p>M1 矩阵求导/链式法则；M2 交叉熵/MLE/梯度下降/期望方差；M3
+        NumPy 向量化/PyTorch/训练循环；M4
+        损失/过拟合/偏差-方差/正则化统一视角。</p>
+        <h3 id="主题与要点-3">主题与要点</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>主题</th>
+        <th>关键点</th>
+        <th>为什么重要</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>感知机/MLP/通用逼近</strong> <code>[全]</code></td>
+        <td>感知机=线性+阶跃，XOR
+        反例；非线性是关键（否则多层=单层）；通用逼近"存在≠可学到"；计算图统一语言；张量形状记账</td>
+        <td>从线性到深度的概念跳板</td>
+        </tr>
+        <tr class="even">
+        <td><strong>★ 反向传播：手推+梯度检验</strong>
+        <code>[全]</code></td>
+        <td>链式法则在计算图上高效复用；标量→矩阵形式（dW=xᵀ·d_out,
+        db=Σd_out, dx=d_out·Wᵀ）；softmax+CE 联合梯度
+        (p−y)/B；局部×上游梯度路由；梯度检验&lt;1e-7</td>
+        <td>整个深度学习的引擎（<strong>此处做完整实现，呼应 M1
+        只推数学</strong>）</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>激活函数：ReLU 族</strong> <code>[全]</code></td>
+        <td>sigmoid/tanh 饱和→梯度消失；ReLU
+        不饱和但死亡；LeakyReLU/GELU/SiLU；激活与初始化/归一化耦合</td>
+        <td>决定梯度能否健康流过深层</td>
+        </tr>
+        <tr class="even">
+        <td><strong>损失与输出层</strong> <code>[全]/[快略]</code></td>
+        <td>MSE/Huber vs 交叉熵；softmax
+        数值稳定（减最大值/log-softmax）；为何分类不用
+        MSE；标签平滑/focal</td>
+        <td>连接概率建模与优化的桥梁</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>初始化 Xavier/He</strong> <code>[全]</code></td>
+        <td>全零破坏对称性失败；方差守恒推
+        Xavier（tanh）/He（ReLU）；初始化错误→信号消失/爆炸</td>
+        <td>BatchNorm/残差前是生死线</td>
+        </tr>
+        <tr class="even">
+        <td><strong>正则化</strong> <code>[全]</code></td>
+        <td>inverted dropout（训练除 keep_prob）；weight decay=L2（Adam
+        需 AdamW）；早停；数据增强；先判过/欠拟合再加正则</td>
+        <td>控制泛化，对应 M4 偏差-方差</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>归一化 BatchNorm/LayerNorm</strong>
+        <code>[全]</code></td>
+        <td>BN 对特征在 batch 维标准化+γβ；train/eval 与 running
+        stats；BN 反向推导；<strong>LayerNorm 沿特征维（RNN/Transformer
+        用）</strong>；RMSNorm</td>
+        <td>让深网络训到上百层的关键</td>
+        </tr>
+        <tr class="even">
+        <td><strong>优化实践</strong> <code>[全]</code></td>
+        <td>SGD→Momentum→RMSProp→Adam→AdamW；学习率最重要+lr range
+        test+warmup+cosine；梯度裁剪；消失/爆炸成因（谱半径）与对策链</td>
+        <td>把"架构+损失"变可用模型的最后一公里</td>
+        </tr>
+        </tbody>
+        </table>
+        <blockquote>
+        <p><strong>吸收评审（消除重复）</strong>：归一化在 M5 讲清
+        BatchNorm 基础与 LayerNorm 动机；<strong>M9 不再重复 BN
+        基础</strong>，只差异化讲 Transformer 为何用
+        LayerNorm/RMSNorm。反向传播的完整 NumPy
+        实现集中在本模块；<strong>阶段0 与阶段1 capstone
+        差异化</strong>——阶段0=micrograd（标量自动求导引擎），阶段1=两层
+        MLP+MNIST（手写每层 backward + 模块化组件消融），避免重复。</p>
+        </blockquote>
+        <h3 id="关键资源-4">关键资源</h3>
+        <ul>
+        <li><strong>CS231n Module 1/2 笔记</strong> (course) —
+        反向传播/激活/初始化/BN/优化最佳讲义。</li>
+        <li><strong>花书第6/7/8章</strong> (book, 免费) —
+        权威严谨参考。</li>
+        <li><strong>Michael Nielsen《Neural Networks and
+        DL》第2章</strong> (book, 免费) — 反向传播四方程直觉。</li>
+        <li><strong>Karpathy Zero to Hero（micrograd/makemore）</strong>
+        (video)。</li>
+        <li><strong>karpathy/micrograd repo</strong> (repo)。</li>
+        <li><strong>BatchNorm/Dropout/Adam/He init 原论文</strong>
+        (paper)。</li>
+        <li><strong>Karpathy《Yes you should understand
+        backprop》</strong> (blog)。</li>
+        <li><strong>D2L (d2l.ai)</strong> (book, 中英双语免费)。</li>
+        </ul>
+        <h3 id="动手项目-4">动手项目</h3>
+        <ol type="1">
+        <li><strong>核心：纯 NumPy 可训练
+        MLP</strong>（Linear/ReLU/Softmax-CE 三层各写
+        forward/backward，mini-batch SGD+动量，MNIST
+        &gt;97%，先梯度检查&lt;1e-7）。</li>
+        <li>micrograd 风格自动求导引擎（解 XOR）。</li>
+        <li>模块化组件消融（He init/BN/dropout/weight
+        decay，对照曲线图）。</li>
+        <li>初始化与激活诊断（6-8
+        层各激活值/梯度标准差直方图，看信号消失/爆炸/死亡 ReLU）。</li>
+        <li>PyTorch 优化器与调度消融（SGD/Momentum/RMSProp/Adam/AdamW ×
+        constant/step/cosine+warmup，写训练技巧消融报告，衔接阶段1
+        capstone）。</li>
+        </ol>
+        <h3 id="常见误区-4">常见误区</h3>
+        <p>不做梯度检验就训练；softmax/log 数值不稳；Dropout
+        训练/推理混淆（忘 inverted/eval）；BN 推理用错统计量/小
+        batch；初始化与激活不匹配；学习率没调就下结论；Adam 里用 L2 当
+        weight decay（应
+        AdamW）；梯度爆炸不裁剪/消失误判；只看训练损失不划验证集。</p>
+        <h3 id="时间估计-4">时间估计</h3>
+        <p>5–6
+        周（60–80h）。第1周感知机/MLP/计算图；第2周反向传播手推+梯度检验；第3周核心
+        NumPy
+        MLP；第4周激活/初始化/损失诊断；第5周正则化与归一化；第6周优化器/调度+PyTorch
+        消融报告。</p>
+        <h3 id="掌握自检-4">掌握自检</h3>
+        <p>能白纸推两层 ReLU+softmax 网络全部反向公式（矩阵形式）；能纯
+        NumPy 实现并通过梯度检查、MNIST&gt;97%；能解释
+        XOR；能从方差守恒推 Xavier/He；能写 inverted dropout 与 BN 的
+        train/eval 两套逻辑；能解释 SGD/Momentum/RMSProp/Adam/AdamW
+        差异与 AdamW 必要性；面对"训不动"能给系统诊断清单；能解释 BN
+        加速效果与对初始化/学习率的放松。</p>
+        <hr />
+        <h1 id="阶段-2--视觉与序列两大经典架构家族811-周">阶段 2 ·
+        视觉与序列：两大经典架构家族（8–11 周）</h1>
+        <blockquote>
+        <p>目标：掌握处理网格数据的 CNN 与处理序列数据的
+        RNN/LSTM/GRU，理解归纳偏置如何随数据结构变化，第一次接触注意力雏形与编码器-解码器——这是通往
+        Transformer 的关键跳板。M6/M7
+        相对独立，快速路线可任选其一精读，<strong>但 M7 的 attention
+        不可跳</strong>。</p>
+        </blockquote>
+        <h2 id="模块-6--卷积神经网络与计算机视觉">模块 6 ·
+        卷积神经网络与计算机视觉</h2>
+        <p><strong>一句话</strong>：从卷积运算的归纳偏置出发，串起经典
+        CNN
+        演进（LeNet→ResNet→DenseNet）、迁移学习与下游视觉任务，并理解为何注意力催生了
+        Vision Transformer，为 Transformer 枢纽埋伏笔。</p>
+        <h3 id="学习目标-5">学习目标</h3>
+        <ul>
+        <li>用"参数共享+局部连接+平移等变性"解释卷积的归纳偏置。</li>
+        <li>徒手计算卷积/池化输出尺寸、参数量、FLOPs 与感受野。</li>
+        <li>讲清 LeNet→ResNet
+        演进主线，从优化角度解释残差连接为何让超深网络可训练。</li>
+        <li>PyTorch 从零搭 mini-ResNet 在 CIFAR-10
+        &gt;90%，可视化卷积核/特征图。</li>
+        <li>正确执行迁移学习（冻结 vs 微调、分层学习率）。</li>
+        <li>说清分类/检测/分割三类任务的输入输出与代表架构。</li>
+        <li>阐述 CNN 局部偏置在数据充足时成瓶颈，从而理解 ViT
+        动机。</li>
+        </ul>
+        <h3 id="先修-5">先修</h3>
+        <p>M5 深度学习基础；M3 PyTorch 工程；M1
+        线代/链式法则；基础图像概念（H×W×C 张量、RGB、归一化）。</p>
+        <h3 id="主题与要点-4">主题与要点</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>主题</th>
+        <th>关键点</th>
+        <th>为什么重要</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>卷积本质与归纳偏置</strong> <code>[全]</code></td>
+        <td>卷积=互相关；局部连接/参数共享/平移等变（区分等变 vs
+        不变）；多通道参数量 C_out×C_in×k×k；输出尺寸公式；1×1 卷积</td>
+        <td>视觉深度学习的原子操作</td>
+        </tr>
+        <tr class="even">
+        <td><strong>感受野/池化/下采样</strong> <code>[全]</code></td>
+        <td>感受野递推；堆叠小核（两层3×3≈5×5）；max/avg pooling；stride
+        卷积 vs 池化；全局平均池化；空洞卷积</td>
+        <td>连接"局部卷积"与"全局理解"的桥梁</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>经典演进 I：LeNet/AlexNet/VGG</strong>
+        <code>[全]/[快略]</code></td>
+        <td>LeNet
+        模板；AlexNet（ReLU/Dropout/GPU）；VGG（小核加深但参数爆炸）</td>
+        <td>展示"加深"逼近极限并暴露两大难题</td>
+        </tr>
+        <tr class="even">
+        <td><strong>经典演进 II：GoogLeNet/ResNet/DenseNet</strong>
+        <code>[全]</code></td>
+        <td>Inception 多尺度+1×1 bottleneck；<strong>ResNet 残差块
+        F(x)+x</strong>（从优化角度解释梯度高速公路与退化问题）；DenseNet
+        拼接</td>
+        <td>残差思想成为 Transformer/扩散标配，连接 M9</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>迁移学习与微调</strong> <code>[全]</code></td>
+        <td>浅层通用/深层任务特定；特征提取 vs 微调；分层学习率+ImageNet
+        归一化+增强；何时失效</td>
+        <td>视觉工程默认起点，预演"预训练+微调"</td>
+        </tr>
+        <tr class="even">
+        <td><strong>下游任务：分类/检测/分割</strong>
+        <code>[全]/[快略]</code></td>
+        <td>检测两/单阶段（R-CNN/YOLO，IoU/NMS/mAP）；分割（FCN/U-Net/DeepLab）；共享
+        backbone+任务头；编码器-解码器</td>
+        <td>检测/分割是工业落地主力</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>从 CNN 到 ViT 动机</strong> <code>[全]</code></td>
+        <td>归纳偏置双面性；ViT
+        patch→token+位置编码+全局自注意力；数据规模决定 CNN vs
+        ViT；Swin/ConvNeXt</td>
+        <td>阶段2 通往阶段3 的桥梁</td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="关键资源-5">关键资源</h3>
+        <ul>
+        <li><strong>CS231n</strong> (course) — CNN 入门金标准，作业用
+        NumPy 从零实现卷积。</li>
+        <li><strong>D2L 第7–8章</strong> (book) — PyTorch 逐一实现经典
+        CNN。</li>
+        <li><strong>AlexNet/VGG/ResNet/DenseNet/ViT 原论文</strong>
+        (paper) — <strong>ResNet 务必精读</strong>。</li>
+        <li><strong>PyTorch Transfer Learning Tutorial +
+        torchvision.models</strong> (blog)。</li>
+        <li><strong>CNN Explainer (poloclub)</strong> (blog) —
+        交互可视化。</li>
+        <li><strong>labml.ai 注释实现 / timm</strong> (repo)。</li>
+        </ul>
+        <h3 id="动手项目-5">动手项目</h3>
+        <ol type="1">
+        <li>NumPy 手写 2D 卷积与池化（Sobel 边缘检测 + 反向传播对比
+        autograd）。</li>
+        <li>感受野与尺寸计算器（分析 VGG-16/ResNet-18）。</li>
+        <li><strong>阶段2 capstone 核心：mini-ResNet 训 CIFAR-10
+        &gt;90%</strong>（含 BN/增强/调度/TensorBoard；消融去残差/加深到
+        56 层复现退化现象）。</li>
+        <li>可视化卷积核与特征图。</li>
+        <li>迁移学习实战（冻结 vs 微调对比）。</li>
+        <li>（选做）跑通现成 Faster R-CNN/DeepLabV3
+        推理，建立任务直觉。</li>
+        </ol>
+        <h3 id="常见误区-5">常见误区</h3>
+        <p>卷积输出尺寸算错；混淆等变 vs
+        不变；以为是数学卷积（实为互相关）；忘归一化/用错 mean-std；BN
+        小
+        batch/推理用错；微调学习率过大冲毁预训练；盲目堆深不加残差/BN；CIFAR
+        直接套 224×224 架构；认为 ViT 全面碾压 CNN。</p>
+        <h3 id="时间估计-5">时间估计</h3>
+        <p>4–5 周（50–70h）。工程快速路线压到 2.5–3 周（侧重
+        capstone+迁移学习）。</p>
+        <h3 id="掌握自检-5">掌握自检</h3>
+        <p>能写卷积输出尺寸公式并徒手算尺寸/参数量/感受野；能解释三大归纳偏置并区分等变/不变；能
+        NumPy 写 2D 卷积前向并与 PyTorch 对拍；能从优化角度解释残差让
+        100+ 层可训练 + 说清退化实验；能搭 mini-ResNet 训到 &gt;90%
+        并复现退化；能正确迁移学习并解释策略选择；能说清三任务输入输出+共享
+        backbone；能讲清 ViT 与数据规模权衡。</p>
+        <hr />
+        <h2 id="模块-7--循环网络与序列建模rnn--lstm--gru">模块 7 ·
+        循环网络与序列建模（RNN / LSTM / GRU）</h2>
+        <p><strong>一句话</strong>：从时序依赖与 RNN 的展开/BPTT
+        出发，吃透梯度消失与门控（LSTM/GRU）的缓解机制，再走通 seq2seq
+        编码器-解码器与注意力雏形——最终从信息流与并行性两个角度论证 RNN
+        为何被 Transformer 取代，为 M9 铺设最强跳板。</p>
+        <h3 id="学习目标-6">学习目标</h3>
+        <ul>
+        <li>解释序列数据归纳偏置（时间参数共享、变长、顺序敏感）。</li>
+        <li>把 RNN 沿时间展开成共享权重深层计算图，手推 BPTT
+        并解释梯度连乘。</li>
+        <li>从雅可比连乘定量解释梯度消失/爆炸；掌握梯度裁剪。</li>
+        <li>从零实现 vanilla RNN 与 LSTM cell 前向/反向，解释门控与 cell
+        state 加法更新为何缓解梯度消失。</li>
+        <li>说清 GRU 相对 LSTM 的简化与工程取舍；解释双向 RNN
+        适用与因果限制。</li>
+        <li>画出 seq2seq 信息流，指出定长上下文向量瓶颈，解释
+        Bahdanau/Luong 注意力。</li>
+        <li>用"信息流"和"可并行性"精确说出 RNN 两个根本瓶颈，论证
+        Transformer 设计动机。</li>
+        </ul>
+        <h3 id="先修-6">先修</h3>
+        <p>M5（反向传播/计算图/优化/梯度问题）；M1/M2（雅可比/链式法则/softmax/交叉熵）；M3
+        熟练 PyTorch；M8 嵌入基本概念（仅用到"离散
+        token→向量"）；<strong>最小分词概念（吸收评审，见下）</strong>。</p>
+        <h3 id="主题与要点-5">主题与要点</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>主题</th>
+        <th>关键点</th>
+        <th>为什么重要</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>最小分词概念（前置，新增）</strong>
+        <code>[全]</code></td>
+        <td>字符级 vs 词级 vs 子词的存在；本模块用字符级即可；为何 OOV
+        是问题</td>
+        <td><strong>吸收评审：避免分词在 M9 才迟到，字符级 LM capstone
+        需要它</strong></td>
+        </tr>
+        <tr class="even">
+        <td><strong>序列数据与时序依赖</strong> <code>[全]</code></td>
+        <td>变长+依赖+顺序；语言建模
+        P(x)=∏P(xₜ|x_&lt;t)；<strong>困惑度=exp(平均交叉熵)</strong>；hidden
+        state=被压缩的历史；任务形态分类；teacher forcing 与 exposure
+        bias</td>
+        <td>整个大模型时代本质是自回归 LM</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>RNN 展开与 BPTT</strong> <code>[全]</code></td>
+        <td>h_t=tanh(W_hh h_{t-1}+W_xh x_t)；展开成深度=T
+        前馈网络；∂h_t/∂h_k=∏雅可比；truncated
+        BPTT+detach；正交初始化</td>
+        <td>理解 RNN 一切问题的数学入口</td>
+        </tr>
+        <tr class="even">
+        <td><strong>梯度消失与爆炸</strong> <code>[全]</code></td>
+        <td>雅可比谱半径&lt;1 消失/&gt;1 爆炸；tanh/sigmoid
+        饱和；爆炸→NaN
+        用裁剪治，消失更隐蔽；加法式状态=梯度高速公路</td>
+        <td>解释 vanilla RNN 记不住长程依赖</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>LSTM：门控与 cell state</strong>
+        <code>[全]</code></td>
+        <td>C_t=f_t⊙C_{t-1}+i_t⊙C̃_t（加法通路）；遗忘/输入/输出门；f_t≈1
+        时梯度不衰减；遗忘门偏置初始化为正</td>
+        <td>核心 implement-to-understand 里程碑</td>
+        </tr>
+        <tr class="even">
+        <td><strong>GRU：精简门控</strong> <code>[全]</code></td>
+        <td>更新门+重置门，无独立 cell
+        state；参数更少更快；无普适赢家</td>
+        <td>"门控"是可裁剪的设计空间</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>双向与多层 RNN</strong> <code>[全]</code></td>
+        <td>双向看左右上下文（编码类有益）；<strong>双向不能用于自回归生成</strong>；stacked
+        RNN+层间 dropout；ELMo</td>
+        <td>双向 vs 单向是 BERT vs GPT 的分水岭伏笔</td>
+        </tr>
+        <tr class="even">
+        <td><strong>seq2seq 编码器-解码器</strong>
+        <code>[全]</code></td>
+        <td>编码器压成定长 context
+        vector，解码器自回归生成；<strong>信息瓶颈</strong>；贪心 vs
+        beam search；teacher forcing；BLEU</td>
+        <td>催生注意力的直接动因</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>★ 注意力起源 Bahdanau/Luong</strong>
+        <code>[全]</code></td>
+        <td>对齐权重+动态上下文向量；加性 vs 乘性打分；可解释热力图；与
+        self-attention 的 Q/K/V 对应</td>
+        <td><strong>跳板中的跳板，M9 强先修，不可跳</strong></td>
+        </tr>
+        <tr class="even">
+        <td><strong>RNN 根本瓶颈 → Transformer</strong>
+        <code>[全]</code></td>
+        <td>瓶颈一：顺序计算不可并行；瓶颈二：长程路径长度线性增长（self-attention
+        为 O(1)）；O(T²) 代价；时间线</td>
+        <td>全程转折锚</td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="关键资源-6">关键资源</h3>
+        <ul>
+        <li><strong>CS224n</strong> (course) —
+        序列建模黄金标准课程。</li>
+        <li><strong>Karpathy《Unreasonable Effectiveness of
+        RNNs》</strong> (blog)。</li>
+        <li><strong>Olah《Understanding LSTM Networks》</strong> (blog)
+        — LSTM 最清晰图解。</li>
+        <li><strong>LSTM (1997) / GRU+seq2seq (2014) / Bahdanau (2015) /
+        Luong (2015) 原论文</strong> (paper)。</li>
+        <li><strong>D2L RNN/注意力章节</strong> (book) — 完整 PyTorch
+        从零实现。</li>
+        <li><strong>Pascanu et al. (2013) 梯度消失/爆炸</strong>
+        (paper)。</li>
+        </ul>
+        <h3 id="动手项目-6">动手项目</h3>
+        <ol type="1">
+        <li>从零 vanilla RNN（NumPy/张量，手写
+        BPTT，字符级莎士比亚，观察梯度指数衰减）。</li>
+        <li><strong>从零 LSTM cell</strong>（手写四门 + cell state，对比
+        RNN，遗忘门偏置消融，核心里程碑）。</li>
+        <li>PyTorch nn.LSTM/GRU 复现 char-rnn/makemore（GRU vs LSTM
+        参数/速度/效果对比表）。</li>
+        <li>不带 attention 的
+        seq2seq（日期格式归一化，长序列暴露瓶颈）。</li>
+        <li>加 Bahdanau/Luong 注意力（对比 + 注意力热力图，通往 M9
+        关键一跃）。</li>
+        <li>RNN 串行瓶颈基准（单步前向耗时随 T 线性增长，为"RNN
+        为何被取代"提供实验证据）。</li>
+        </ol>
+        <h3 id="常见误区-6">常见误区</h3>
+        <p>混淆"展开深度"与"多层深度"；以为 LSTM
+        彻底解决梯度消失（只是缓解）；张量形状灾难（batch_first/双向翻倍）；梯度裁剪只治爆炸不治消失；自回归生成错用双向；忽视
+        exposure bias；把注意力当黑盒 trick；BPTT
+        忘记累加共享权重梯度/忘 detach
+        致显存爆炸；窗口短于依赖跨度学不到长程。</p>
+        <h3 id="时间估计-6">时间估计</h3>
+        <p>3–4 周（35–55h）。工程快速路线压到 2 周（精读 LSTM 与
+        attention，<strong>attention 不可跳</strong>），字符级 LSTM LM
+        整理为阶段2 capstone 的一半。</p>
+        <h3 id="掌握自检-6">掌握自检</h3>
+        <p>能白板展开 RNN 并手推 ∂h_t/∂h_k
+        雅可比连乘、定量解释梯度消失/爆炸条件；能从零实现 LSTM cell
+        并解释 cell state 加法更新；能说清 GRU vs LSTM
+        三条工程取舍；能解释双向不能自回归→BERT vs GPT 区别；能画
+        seq2seq+attention 信息流并指出解决/未解决的痛点；能写
+        Bahdanau/Luong 打分函数并对应 Q/K/V；能用两条主线论证 RNN
+        瓶颈+Transformer 如何回应；能展示加 attention
+        前后差距+读懂热力图。</p>
+        <hr />
+        <h1 id="阶段-3--表示学习与-transformer-枢纽912-周">阶段 3 ·
+        表示学习与 Transformer 枢纽（9–12 周）</h1>
+        <blockquote>
+        <p>全程的转折与核心。先通过
+        AE/VAE/GAN/嵌入建立"学习紧致表示与生成分布"视角，随后集中火力攻克
+        Transformer 与自注意力——它是
+        LLM、扩散、多模态的共同地基。<strong>M9
+        是整个路线最高优先级，配合 capstone"从零实现
+        nanoGPT"，建议放慢节奏反复打磨。</strong></p>
+        </blockquote>
+        <h2
+        id="模块-8--表示学习与生成模型-iae--vae--gan--嵌入--对比学习损失">模块
+        8 · 表示学习与生成模型 I（AE / VAE / GAN / 嵌入 /
+        对比学习损失）</h2>
+        <p><strong>一句话</strong>：从"压缩重建"到"学习并采样一个数据分布"，建立表示学习与生成建模的统一视角：用自编码器理解瓶颈表示，用
+        VAE 打通隐变量与变分推断，用 GAN
+        理解对抗博弈，用词嵌入与对比学习理解"语义即几何"，为后续 Latent
+        Diffusion 与多模态埋伏笔。</p>
+        <h3 id="学习目标-7">学习目标</h3>
+        <ul>
+        <li>区分判别式 vs
+        生成式建模；解释"学习紧致表示"与"学习数据分布"是一枚硬币两面。</li>
+        <li>从零实现 AE/去噪 AE/稀疏
+        AE，解释三种正则各逼模型学什么。</li>
+        <li>逐项推导 VAE 的 ELBO，讲清重参数化为何让采样可反传、KL
+        项的信息瓶颈双重作用。</li>
+        <li>解释 VAE 与信息论（KL、率失真、后验坍塌）、β-VAE 解耦。</li>
+        <li>写出 GAN minimax 目标，解释判别器最优时最小化 JS
+        散度，识别缓解模式崩溃。</li>
+        <li>解释 word2vec（Skip-gram+负采样）与 GloVe
+        目标差异、嵌入几何（king−man+woman≈queen）。</li>
+        <li>讲清对比学习核心（InfoNCE、正负样本、SimCLR 增强）——
+        <strong>CLIP 的多模态对齐推迟到 M10</strong>。</li>
+        <li>说出 VAE 在 Latent Diffusion 中的角色。</li>
+        </ul>
+        <h3 id="先修-7">先修</h3>
+        <p>M2
+        概率+信息论（高斯、KL、MLE、<strong>Jensen/变分下界直觉</strong>）+最优化；M3
+        PyTorch；M5 深度学习基础；M6（部分）卷积/转置卷积；<strong>M9
+        的注意力非硬门槛</strong>。</p>
+        <blockquote>
+        <p><strong>吸收评审（顺序修正）</strong>：M8
+        <strong>只讲对比学习损失的纯表示学习视角</strong>（SimCLR/InfoNCE/嵌入几何），<strong>CLIP
+        的图文多模态对齐移到 M9 之后（并入 M10）</strong>，因为 CLIP
+        文本编码器依赖 Transformer。</p>
+        </blockquote>
+        <h3 id="主题与要点-6">主题与要点</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>主题</th>
+        <th>关键点</th>
+        <th>为什么重要</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>表示学习统一视角</strong> <code>[全]</code></td>
+        <td>好表示=低维/解耦/对下游有用；判别 p(y|x) vs 生成
+        p(x)；自监督；潜变量 z 的"真实自由度"直觉；脉络
+        AE→VAE→GAN→嵌入/对比→扩散</td>
+        <td>阶段3 世界观</td>
+        </tr>
+        <tr class="even">
+        <td><strong>自编码器 AE</strong> <code>[全]</code></td>
+        <td>编码器/瓶颈/解码器+重建损失；瓶颈强迫丢冗余；线性
+        AE+MSE=PCA；<strong>AE 隐空间不是生成式的</strong>（随机 z
+        解码出噪声）；异常检测</td>
+        <td>VAE 的动机来源</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>去噪 AE / 稀疏 AE</strong> <code>[全]</code></td>
+        <td>DAE 加噪重建干净→学数据流形；<strong>DAE 隐式学 score ∇log
+        p(x)（通往扩散）</strong>；稀疏 AE（L1/KL
+        稀疏惩罚）；<strong>稀疏 AE 是 2024+ LLM 可解释性核心工具（呼应
+        M-I）</strong></td>
+        <td>三种正则注入归纳偏置；两条线连向前沿</td>
+        </tr>
+        <tr class="even">
+        <td><strong>★ VAE：ELBO 与重参数化</strong>
+        <code>[全]</code></td>
+        <td>p(x)=∫p(x|z)p(z)dz 不可解；变分推断
+        ELBO=重建−KL(q‖p)；<strong>重参数化
+        z=μ+σ⊙ε</strong>（采样可反传）；AE 编码"点"vs VAE 编码"分布"；KL
+        warmup 防后验坍塌；VAE 偏模糊原因</td>
+        <td>连接深度学习与概率推断的枢纽，Stable Diffusion 的压缩器</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>VAE 与信息论</strong> <code>[全]/[研]</code></td>
+        <td>KL=额外码率→率失真框架；后验坍塌（码率压到0）；β-VAE（信息瓶颈强度
+        vs 重建）；互信息视角</td>
+        <td>把 M2 信息论用起来</td>
+        </tr>
+        <tr class="even">
+        <td><strong>生成对抗网络 GAN</strong> <code>[全]</code></td>
+        <td>minimax；判别器最优 D*=p_data/(p_data+p_g)→最小化 JS
+        散度；非饱和损失/WGAN-GP/谱归一化；模式崩溃识别与缓解；FID/IS
+        评估</td>
+        <td>隐式生成模型路线</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>词嵌入 word2vec/GloVe</strong>
+        <code>[全]</code></td>
+        <td>分布假说；Skip-gram+负采样；GloVe
+        共现矩阵分解；余弦相似度+线性类比（共现对数线性结构涌现）；静态
+        vs 上下文嵌入</td>
+        <td>离散世界接入网络的接口，"语义=几何"，RAG/向量检索基石</td>
+        </tr>
+        <tr class="even">
+        <td><strong>对比学习 SimCLR（仅损失视角）</strong>
+        <code>[全]</code></td>
+        <td>InfoNCE=互信息下界（与负采样一脉）；SimCLR（强增强+投影头+大
+        batch）；MoCo/BYOL/DINO；对比 vs 生成式表示学习</td>
+        <td>2020 后自监督主流；<strong>CLIP 留到 M10</strong></td>
+        </tr>
+        <tr class="odd">
+        <td><strong>承前启后：VAE 在 Latent Diffusion</strong>
+        <code>[全]</code></td>
+        <td>像素空间扩散算力爆炸→VAE
+        压到低维潜空间跑扩散；VAE=感知压缩器</td>
+        <td>把零散知识缝成通往前沿的网</td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="关键资源-7">关键资源</h3>
+        <ul>
+        <li><strong>CS231n 生成模型一讲（AE/VAE/GAN）</strong>
+        (course)。</li>
+        <li><strong>CS224n 词向量两讲（word2vec/GloVe）</strong>
+        (course)。</li>
+        <li><strong>Lilian Weng《From Autoencoder to Beta-VAE》/《From
+        GAN to WGAN》</strong> (blog) — 跟着推 ELBO。</li>
+        <li><strong>Auto-Encoding Variational Bayes (2013)</strong>
+        (paper) — VAE 原始。</li>
+        <li><strong>GAN (2014) + NIPS 2016 GAN Tutorial</strong>
+        (paper)。</li>
+        <li><strong>SimCLR (2020) + Lilian Weng《Contrastive
+        Representation Learning》</strong> (paper/blog) —（CLIP 移到
+        M10）。</li>
+        <li><strong>word2vec (2013) / GloVe (2014)</strong>
+        (paper)。</li>
+        <li><strong>pytorch/examples (vae/dcgan) + lucidrains</strong>
+        (repo)。</li>
+        <li><strong>Latent Diffusion (Rombach 2022) 第3节前半</strong>
+        (paper) — 仅读 VAE 潜空间动机。</li>
+        <li><strong>Embedding Projector + Jay Alammar《Illustrated
+        Word2vec》</strong> (blog)。</li>
+        </ul>
+        <h3 id="动手项目-7">动手项目</h3>
+        <ol type="1">
+        <li><strong>AE 三连</strong>（普通卷积 AE / 去噪 AE / 稀疏
+        AE，2维隐空间散点 + 网格采样看"AE 隐空间不连续"——VAE
+        动机）。</li>
+        <li><strong>从零 VAE</strong>（自写 ELBO+重参数化；随机采样生成
+        + 隐空间插值；KL annealing 实验防后验坍塌）。</li>
+        <li><strong>DCGAN
+        并复现一次模式崩溃</strong>（训练日志+失败分析，再用
+        WGAN-GP/标签平滑缓解）。</li>
+        <li>词嵌入几何探索（gensim word2vec 或 GloVe，验证类比 + t-SNE
+        可视化 + most_similar）。</li>
+        <li>（进阶）迷你 SimCLR（CIFAR-10 InfoNCE + 线性探针，对比预训练
+        vs 随机特征）。</li>
+        <li>（选做衔接）潜空间生成概念串联（固定 VAE 编码器，在 z
+        上训小生成模型，写笔记连接 Latent Diffusion）。</li>
+        </ol>
+        <h3 id="常见误区-7">常见误区</h3>
+        <p>把 KL 项当黑魔法死记（要手推
+        ELBO）；重参数化没理解透（随机性必须外置到
+        ε）；后验坍塌不自知（KL≈0 要警觉）；AE 与 VAE 混为一谈；GAN
+        把所有问题归为学习率（loss
+        不指示进展，要看样本）；模式崩溃当"没训好"硬训；图像 VAE
+        模糊以为代码错（原理性短板）；把类比当精确等式；对比学习忽视增强/大
+        batch；输出激活与损失不匹配。</p>
+        <h3 id="时间估计-7">时间估计</h3>
+        <p>4–5 周（50–70h）。第1周表示学习+AE/DAE/稀疏；第2–3周
+        VAE（重头，放慢）；第3–4周 GAN；第4周嵌入+对比学习+Latent
+        Diffusion 衔接。</p>
+        <h3 id="掌握自检-7">掌握自检</h3>
+        <p>能从 log p(x) 推 ELBO 并解释重建/KL
+        项与信息论含义；能讲清重参数化为何梯度可回传；能做隐空间插值并解释
+        VAE 能而 AE 不能；能写 GAN minimax 并证明判别器最优时最小化
+        JS+识别缓解模式崩溃；能对比 AE/DAE/稀疏正则各逼学什么+指出 DAE
+        与扩散 score 联系；能说清 word2vec vs GloVe
+        目标差异+复现类比；能写 InfoNCE+说清 SimCLR
+        正负例/增强/batch；能讲清"为何 Stable Diffusion 先用 VAE
+        压到潜空间"。</p>
+        <hr />
+        <h2
+        id="模块-9--transformer-架构与注意力核心枢纽-最高优先级">模块 9
+        · Transformer 架构与注意力（核心枢纽 ★最高优先级）</h2>
+        <p><strong>一句话</strong>：从零吃透自注意力、多头机制、位置编码与三种
+        Transformer 范式（BERT/GPT/T5），精读《Attention Is All You
+        Need》，最终能逐行实现并解释一个 decoder-only 小型
+        GPT——这是连接前面所有架构与后面所有大模型前沿的分水岭模块。</p>
+        <h3 id="学习目标-8">学习目标</h3>
+        <ul>
+        <li>NumPy 从零实现缩放点积注意力，解释张量形状随
+        batch/seq/头数变化。</li>
+        <li>解释 Q/K/V 角色分工，把注意力理解为"可微分软字典查找"。</li>
+        <li>PyTorch
+        从零实现多头自注意力、因果掩码、残差+LayerNorm、FFN，组装完整
+        block。</li>
+        <li>对比绝对/相对/RoPE
+        位置编码，说清如何把顺序信息注入置换不变的注意力。</li>
+        <li>讲清三范式训练目标与适用（BERT+MLM、GPT+CLM、T5/encoder-decoder），解释为何主流走向
+        decoder-only。</li>
+        <li>解释 BPE/WordPiece/SentencePiece 原理与差异，手动跑通 BPE
+        合并。</li>
+        <li>逐节复述《Attention Is All You
+        Need》并批判性指出已被改进之处。</li>
+        <li>搭建 decoder-only 小型
+        GPT（nanoGPT），训练并采样生成连贯文本。</li>
+        </ul>
+        <h3 id="先修-8">先修</h3>
+        <p>M5 深度学习基础；<strong>M7
+        强先修</strong>（seq2seq+attention 信息流、RNN 两瓶颈）；M8
+        嵌入；M1 线代（追踪 (batch, seq, d_model)）；M3
+        PyTorch（einsum/bmm）。</p>
+        <h3 id="主题与要点-7">主题与要点</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>主题</th>
+        <th>关键点</th>
+        <th>为什么重要</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>从 RNN 瓶颈到注意力</strong> <code>[全]</code></td>
+        <td>直接连接路径 O(1) vs RNN O(n)；自/交叉/掩码注意力</td>
+        <td>抓住"直接连接+可并行"主线</td>
+        </tr>
+        <tr class="even">
+        <td><strong>★ 缩放点积注意力</strong> <code>[全]</code></td>
+        <td>softmax(QKᵀ/√d_k)V 逐项拆解；<strong>为何除
+        √d_k</strong>（防 softmax 饱和）；张量形状全程追踪；掩码用 −∞
+        加（非 0 乘）；软字典查找</td>
+        <td>唯一真正"新"的计算原语</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>自注意力与 Q/K/V</strong> <code>[全]</code></td>
+        <td>Q/K/V 来自同一 X
+        的独立投影；非对称相似度；<strong>置换不变→必须加位置编码</strong>；注意力可解释性争议</td>
+        <td>从套公式到懂设计的关键一跃</td>
+        </tr>
+        <tr class="even">
+        <td><strong>多头注意力</strong> <code>[全]</code></td>
+        <td>多个相似度子空间；reshape 到 (batch, h, seq, d_k)
+        并行；concat+W_O；MQA/GQA 伏笔</td>
+        <td>表达力核心，reshape 最易出错处</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>位置编码：绝对/相对/RoPE</strong>
+        <code>[全]/[RoPE 深化留 M11/M14]</code></td>
+        <td>sinusoidal/可学习绝对；相对（T5/ALiBi）；<strong>RoPE
+        旋转</strong>（实现简洁+外推优势，现代标准）；加法 vs
+        注入方式</td>
+        <td>长上下文的核心战场（<strong>M9 简述 RoPE，M11/M14
+        结合长上下文深入</strong>）</td>
+        </tr>
+        <tr class="even">
+        <td><strong>残差+LayerNorm+FFN（完整 block）</strong>
+        <code>[全]</code></td>
+        <td>Pre-LN vs Post-LN（现代用
+        Pre-LN）；残差=梯度高速公路；FFN（4×宽，GELU/SwiGLU）；<strong>LayerNorm
+        沿特征维（M5 已讲 BN 基础，此处只差异化）</strong>；RMSNorm</td>
+        <td>把单一原语堆成可训练深层网络的胶水</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>范式一：Encoder-only BERT+MLM</strong>
+        <code>[全]/[快略]</code></td>
+        <td>双向；MLM 遮
+        15%；预训练-微调；[CLS]/[SEP]/[MASK]；不能直接生成</td>
+        <td>检索/嵌入/分类主力（RAG 检索器）</td>
+        </tr>
+        <tr class="even">
+        <td><strong>范式二：Decoder-only GPT+CLM</strong>
+        <code>[全]</code></td>
+        <td>自回归
+        CLM；<strong>因果掩码</strong>（下三角）；为何主流（统一目标/ICL/可扩展/KV
+        缓存）；GPT 演进</td>
+        <td>所有主流 LLM 骨架，capstone 目标</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>范式三：Encoder-Decoder T5</strong>
+        <code>[全]/[快略]</code></td>
+        <td>交叉注意力（Q 自身，K/V 编码器）；T5
+        text-to-text；span-corruption；三范式对比表</td>
+        <td>理解交叉注意力最佳载体</td>
+        </tr>
+        <tr class="even">
+        <td><strong>分词 BPE/WordPiece/SentencePiece</strong>
+        <code>[全]</code></td>
+        <td>子词平衡词表/序列长；BPE 合并最高频对；byte-level BPE 永不
+        OOV；WordPiece 按似然；SentencePiece
+        unigram；分词对数字/代码/多语言的隐性影响</td>
+        <td>模型与文本世界的接口（<strong>M11
+        只讲规模化工程取舍，避免重复</strong>）</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>★ 精读《Attention Is All You Need》</strong>
+        <code>[全]</code></td>
+        <td>按节精读；第4节复杂度/路径长度对比表是精华；批判：Post-LN→Pre-LN、sinusoidal→RoPE、ReLU→GELU/SwiGLU</td>
+        <td>培养"读论文—复现—质疑"品味</td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="关键资源-8">关键资源</h3>
+        <ul>
+        <li><strong>Attention Is All You Need (2017)</strong> (paper) —
+        必精读第3/4节。</li>
+        <li><strong>Jay Alammar《Illustrated Transformer》</strong>
+        (blog) — 最佳可视化。</li>
+        <li><strong>The Annotated Transformer (Harvard)</strong> (blog)
+        — 逐行 PyTorch。</li>
+        <li><strong>CS224N / CS336</strong> (course)。</li>
+        <li><strong>Karpathy《Let's build GPT》视频 +
+        nanoGPT/minGPT/minbpe repo</strong> (video/repo) — capstone
+        直接配套。</li>
+        <li><strong>RoFormer (RoPE, 2021) + EleutherAI《Rotary: A
+        Relative Revolution》</strong> (paper/blog)。</li>
+        <li><strong>BERT/GPT-2/T5 原论文</strong> (paper)。</li>
+        <li><strong>Hugging Face NLP Course Tokenizers 章节</strong>
+        (course)。</li>
+        <li><strong>Lilian Weng《The Transformer Family v2》</strong>
+        (blog) — 衔接 M14。</li>
+        </ul>
+        <h3 id="动手项目-8">动手项目</h3>
+        <ol type="1">
+        <li>NumPy 缩放点积注意力（含因果掩码，手算验证 +
+        形状打印）。</li>
+        <li>PyTorch MultiHeadSelfAttention（reshape 多头 + 形状断言 +
+        与官方对拍）。</li>
+        <li>完整 Transformer block（Pre-LN vs Post-LN
+        对比稳定性）。</li>
+        <li><strong>★ Capstone：从零 nanoGPT</strong>（token+位置嵌入 +
+        N 个因果掩码 block + 输出投影，tiny-shakespeare
+        训练采样，逐行解释张量形状）。</li>
+        <li>minbpe 从零实现 byte-level BPE（train/encode/decode，与
+        tiktoken 对比）。</li>
+        <li>位置编码实验（sinusoidal/可学习/RoPE 替换对比 +
+        外推）。</li>
+        <li>Annotated Transformer 复现 encoder-decoder（toy
+        翻译/序列反转，观察交叉注意力）。</li>
+        <li>对比实验（同语料 RNN/LSTM vs
+        nanoGPT，loss/质量/单步耗时，体会并行性）。</li>
+        </ol>
+        <h3 id="常见误区-8">常见误区</h3>
+        <p>忘除 √d_k 或缩放写错（不报错难发现）；因果掩码方向错/没在
+        softmax 前应用（信息泄露）；多头 reshape/transpose
+        维度错；掩码用 0 乘而非 −∞ 加；忽视位置编码（退化成
+        bag-of-words）；混淆
+        LayerNorm/BatchNorm；把注意力权重当可靠因果解释；nanoGPT
+        数据/标签错位一位；Post-LN 不加 warmup
+        致发散；只看视频不亲手敲；分词字节级细节没处理；d_model 不被 h
+        整除。</p>
+        <h3 id="时间估计-8">时间估计</h3>
+        <p><strong>5–7
+        周（60–90h），全程最高优先级，宁可放慢反复打磨。</strong>
+        第1周缩放点积注意力+NumPy；第2周多头+完整
+        block；第3周位置编码+残差/LN/FFN；第4周三范式+分词；第5周精读论文+Annotated
+        复现；第6–7周打磨 nanoGPT+拓展实验。</p>
+        <h3 id="掌握自检-8">掌握自检</h3>
+        <p>能白纸默写缩放点积注意力公式+解释 √d_k+softmax
+        维度+张量形状；能 PyTorch
+        从零写支持掩码的多头自注意力并对拍；能画完整 block
+        数据流（残差/LN 位置/FFN）+说清
+        Pre/Post-LN；能默画三范式对比表；能解释因果掩码+KV
+        缓存加速；能手动跑 BPE 合并+说清三分词差异+byte-level 为何永不
+        OOV；能讲清三种位置编码+RoPE
+        为何成标准；能逐节复述论文第4节+指出 3
+        处已改进设计；<strong>完成 nanoGPT 训到 loss
+        下降并采样通顺文本，逐行解释每个张量</strong>；能 5 分钟向只懂
+        RNN 的人讲清 Transformer 解决了什么。</p>
+        <hr />
+        <h1 id="阶段-4--生成模型-ii-与大模型训练范式912-周">阶段 4 ·
+        生成模型 II 与大模型训练范式（9–12 周）</h1>
+        <blockquote>
+        <p>在 Transformer 地基上理解现代生成式 AI
+        两条主线：扩散+多模态生成，以及 LLM
+        预训练/缩放定律/分布式训练。理解"预训练学知识、海量算力换能力"的范式。研究路线建议两者都深入，工程路线可侧重
+        M11。</p>
+        </blockquote>
+        <h2 id="模块-10--扩散模型与多模态生成含-clip">模块 10 ·
+        扩散模型与多模态生成（含 CLIP）</h2>
+        <p><strong>一句话</strong>：在 Transformer 与 VAE/GAN
+        地基上，吃透扩散模型从前向加噪到反向去噪的数学与采样原理，理解
+        Stable Diffusion 等潜空间扩散的工程架构，打通 CLIP/VLM
+        的多模态对齐思路，最终从零实现一个可采样的 DDPM。</p>
+        <h3 id="学习目标-9">学习目标</h3>
+        <ul>
+        <li>推导前向加噪、闭式采样
+        q(x_t|x_0)、反向去噪训练目标，解释为何简化为"预测噪声"MSE。</li>
+        <li>从零实现 DDPM（噪声调度+时间嵌入
+        U-Net+训练/采样循环），MNIST/CIFAR-10 生成。</li>
+        <li>解释扩散与 score-based、SDE
+        三视角统一（score=−噪声/σ）。</li>
+        <li>说清 DDIM 等快速采样、classifier-free guidance
+        机制与引导强度权衡。</li>
+        <li>画出 Stable Diffusion 数据流（文本→CLIP→交叉注意力→VAE
+        潜空间 U-Net→解码）。</li>
+        <li><strong>解释 CLIP 对比学习如何对齐图文（吸收评审：CLIP 从 M8
+        移到此处，因依赖 Transformer 文本编码器）</strong>。</li>
+        <li>系统对比扩散 vs GAN vs
+        VAE（<strong>统一对比表集中在此，消除重复</strong>）。</li>
+        <li>概念性说清 ControlNet、图生图/重绘、文生视频与 VLM。</li>
+        </ul>
+        <h3 id="先修-9">先修</h3>
+        <p>M2 概率（高斯/KL/贝叶斯/MLE）；M8 VAE 的
+        ELBO+重参数化、GAN、潜空间、<strong>对比学习损失</strong>；<strong>M9
+        Transformer/自/交叉注意力（CLIP 文本编码器、Stable Diffusion
+        条件、VLM 都依赖）</strong>；M6 U-Net；M3 PyTorch。</p>
+        <h3 id="主题与要点-8">主题与要点</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>主题</th>
+        <th>关键点</th>
+        <th>为什么重要</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>前向加噪与闭式采样</strong> <code>[全]</code></td>
+        <td>固定无参马尔可夫链；重参数化合并
+        x_t=√ᾱ_t·x_0+√(1−ᾱ_t)·ε；t→T 趋纯高斯；linear/cosine 调度</td>
+        <td>整个框架的"锚"，训练目标的数学核心</td>
+        </tr>
+        <tr class="even">
+        <td><strong>★ 反向去噪与 DDPM 训练目标</strong>
+        <code>[全]</code></td>
+        <td>反向近似高斯；从 ELBO（与 VAE 同源）展开成 KL
+        项；<strong>简化为预测噪声 MSE
+        L=E‖ε−ε_θ‖²</strong>；正弦时间嵌入；ε/x_0/v 三种参数化</td>
+        <td>模块数学心脏，capstone 理论依据</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>Score-based 与 SDE 统一</strong>
+        <code>[全]/[研]</code></td>
+        <td>score=∇log
+        p；NCSN+朗之万；<strong>score≈−ε_θ/√(1−ᾱ_t)</strong>；SDE/概率流
+        ODE</td>
+        <td>理解 DDIM/DPM-Solver 合理性</td>
+        </tr>
+        <tr class="even">
+        <td><strong>采样器 DDPM→DDIM 加速</strong>
+        <code>[全]</code></td>
+        <td>DDPM ~1000 步慢；DDIM 确定性大步跳（20–50
+        步）；DPM-Solver/UniPC（10–20 步）；蒸馏/consistency/LCM（1–4
+        步）；质量-速度-多样性三角</td>
+        <td>从研究走向产品的关键瓶颈</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>条件生成与 Classifier-Free Guidance</strong>
+        <code>[全]</code></td>
+        <td>ε_θ(x_t,t,c)；CFG 训练随机丢条件+采样外推；引导强度
+        w（保真度 vs 多样性）</td>
+        <td>现代文生图出图质量秘密武器</td>
+        </tr>
+        <tr class="even">
+        <td><strong>潜空间扩散与 Stable Diffusion</strong>
+        <code>[全]</code></td>
+        <td>VAE
+        压到潜空间（算力降一个数量级）；三组件（VAE/U-Net/文本编码器）；交叉注意力注入文本；SDXL/SD3(DiT+rectified
+        flow)/FLUX</td>
+        <td>开源文生图事实标准</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>文生图/图生图/ControlNet/文生视频</strong>
+        <code>[全]/[快略]</code></td>
+        <td>img2img（strength）；inpainting；<strong>ControlNet
+        零卷积</strong>；IP-Adapter/LoRA/DreamBooth；文生视频时间注意力（Sora/DiT）</td>
+        <td>最有产品价值的部分</td>
+        </tr>
+        <tr class="even">
+        <td><strong>★ CLIP 与多模态对齐（从 M8 移入）</strong>
+        <code>[全]</code></td>
+        <td>对称 InfoNCE 在 4
+        亿图文对；图文共享嵌入空间；零样本分类；CLIP
+        在文生图的双重角色；SigLIP</td>
+        <td><strong>连接视觉与语言的桥梁，文生图/VLM
+        共同基石</strong></td>
+        </tr>
+        <tr class="odd">
+        <td><strong>视觉-语言模型 VLM</strong>
+        <code>[全]/[快略]</code></td>
+        <td>视觉编码器+连接模块（投影
+        MLP/Q-Former/交叉注意力）+LLM；视觉指令微调（LLaVA）；扩散=文→图
+        vs VLM=图→文；幻觉/计数难点</td>
+        <td>当下多模态主战场</td>
+        </tr>
+        <tr class="even">
+        <td><strong>★ 扩散 vs GAN vs VAE 系统对比（统一对比表）</strong>
+        <code>[全]</code></td>
+        <td>训练稳定性/样本质量/模式覆盖/推理速度/似然/潜空间；VAE
+        与扩散共享 ELBO 框架；latent diffusion=VAE+扩散</td>
+        <td><strong>吸收评审：三处生成模型对比集中于此</strong></td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="关键资源-9">关键资源</h3>
+        <ul>
+        <li><strong>DDPM (Ho et al., 2020)</strong> (paper) — capstone
+        蓝本。</li>
+        <li><strong>Lilian Weng《What are Diffusion Models?》</strong>
+        (blog) — 最佳数学综述伴读。</li>
+        <li><strong>The Annotated Diffusion Model (HF)</strong> (blog) —
+        逐行 PyTorch 脚手架。</li>
+        <li><strong>DDIM (2021) / Score-based SDE (2021) + Yang Song
+        博客</strong> (paper/blog)。</li>
+        <li><strong>Latent Diffusion (Rombach 2022)</strong> (paper) —
+        Stable Diffusion 源论文。</li>
+        <li><strong>Classifier-Free Guidance (Ho &amp; Salimans
+        2022)</strong> (paper)。</li>
+        <li><strong>CLIP (Radford 2021)</strong> (paper) —
+        多模态对齐基石。</li>
+        <li><strong>ControlNet (Zhang 2023)</strong> (paper)。</li>
+        <li><strong>Hugging Face diffusers 库</strong> (repo)。</li>
+        <li><strong>EDM (Karras) + MIT 6.S184/Flow Matching
+        课程</strong> (course/paper)。</li>
+        <li><strong>LLaVA (2023) + BLIP-2 (2023)</strong> (paper) — VLM
+        通用范式。</li>
+        </ul>
+        <h3 id="动手项目-9">动手项目</h3>
+        <ol type="1">
+        <li><strong>核心 capstone：从零 DDPM</strong>（纯
+        PyTorch，cosine 调度 + 时间嵌入 U-Net + 噪声预测 MSE + DDPM
+        采样，MNIST 清晰数字，再 CIFAR-10）。</li>
+        <li>加 DDIM 采样（1000 步 vs 20/50 步质量/耗时曲线）。</li>
+        <li>条件 DDPM + CFG（按标签生成，扫描 w
+        观察保真度/多样性）。</li>
+        <li>diffusers 跑通 Stable Diffusion
+        全流程（文生图/图生图/inpainting/ControlNet，架构图对应代码）。</li>
+        <li>从零 mini-CLIP（小图像+文本编码器，对称
+        InfoNCE，零样本检索）。</li>
+        <li>（进阶）潜空间扩散迷你版（小 VAE 潜空间跑
+        DDPM，对比算力收益）。</li>
+        <li>（研究路线）复现一个消融（linear vs cosine 调度 / ε vs
+        v-prediction）。</li>
+        </ol>
+        <h3 id="常见误区-9">常见误区</h3>
+        <p>把前向过程当需学习的网络；时间步 t
+        没作为条件/时间嵌入写错；闭式采样系数写反/索引错位；采样循环 t=0
+        仍加噪声；CFG 忘训练阶段丢条件；guidance scale
+        一味调大；彩色数据不归一化；误以为 SD
+        在像素空间扩散；训练步数预期不切实际（先 MNIST
+        验证管线）；把扩散与 GAN/VAE
+        对立看（SD=VAE+扩散）；CLIP/对比学习用过小 batch；只会调
+        diffusers 高层 API。</p>
+        <h3 id="时间估计-9">时间估计</h3>
+        <p>4–6 周（50–80h）。第1–2周吃透 DDPM 数学+从零实现；第3周
+        score/SDE/DDIM/CFG；第4周 Latent Diffusion+diffusers；第5–6周
+        CLIP/VLM/文生视频+三范式对比+mini-CLIP。研究路线+1–2
+        周复现。</p>
+        <h3 id="掌握自检-9">掌握自检</h3>
+        <p>能推闭式采样并解释系数来历；能从 ELBO 推到简化 MSE
+        并说清"预测噪声=预测 score";能从零写 DDPM（时间嵌入
+        U-Net+训练/采样）MNIST 生成并逐行解释；能解释 DDIM 为何 20–50
+        步并实现对比；能画 SD 数据流说清各组件职责+为何潜空间；能解释
+        CFG 训练/采样两端+w 权衡；能讲清 CLIP
+        对比学习如何对齐图文+被文生图/VLM 复用；能一句话概括 VLM
+        架构+举代表模型；能从五维度对比扩散/GAN/VAE+解释 latent
+        diffusion=VAE+扩散；能讲清 ControlNet 零卷积。</p>
+        <hr />
+        <h2 id="模块-11--大语言模型预训练与扩展数据工程一等公民">模块 11
+        · 大语言模型预训练与扩展（数据工程一等公民）</h2>
+        <p><strong>一句话</strong>：理解"基座模型"如何从海量文本中通过自监督预训练诞生：从训练目标、数据流水线、缩放定律、分布式并行到混合专家与评测，建立"预训练学知识、算力换能力"的工程化范式认知。</p>
+        <h3 id="学习目标-10">学习目标</h3>
+        <ul>
+        <li>解释预训练 vs 微调分工，说清
+        CLM/MLM/去噪三目标的损失、架构与代表模型。</li>
+        <li>描述完整预训练数据流水线（抓取→过滤→PII→精确/模糊去重
+        MinHash→配比→tokenizer），解释每步影响。</li>
+        <li>从零训练 BPE tokenizer（<strong>规模化工程取舍，呼应 M9
+        已讲算法</strong>）。</li>
+        <li>写出 Kaplan/Chinchilla 缩放定律，推导 C≈6ND 下 N/D
+        最优配比（~20 tokens/参数），判断"训练不足"还是"参数过大"。</li>
+        <li>区分数据/张量/流水线并行，解释 ZeRO 三阶段与 FSDP，估算 GPU
+        数与显存。</li>
+        <li>解释 MoE 路由/稀疏激活/负载均衡，说清固定 FLOPs
+        下放大参数及代价。</li>
+        <li>解释上下文长度对注意力的二次方影响与长上下文训练做法。</li>
+        <li>用困惑度与下游基准评估基座，理解数据污染。</li>
+        </ul>
+        <h3 id="先修-10">先修</h3>
+        <p><strong>M9 强先修</strong>（从零 decoder-only
+        block）；M5（交叉熵/AdamW/warmup+cosine/梯度裁剪/混合精度）；M2（MLE/熵/交叉熵/幂律）；M3
+        PyTorch；已完成 nanoGPT。</p>
+        <h3 id="主题与要点-9">主题与要点</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>主题</th>
+        <th>关键点</th>
+        <th>为什么重要</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>预训练范式：自监督与基座诞生</strong>
+        <code>[全]</code></td>
+        <td>自监督=数据自身构造监督；基座只会续写，对话来自后训练；CLM/MLM/去噪对照；为何主流
+        decoder-only+CLM；"预训练学知识、后训练学对齐"</td>
+        <td>总纲世界观</td>
+        </tr>
+        <tr class="even">
+        <td><strong>自监督目标数学与实现</strong> <code>[全]</code></td>
+        <td>CLM 损失+困惑度=exp(平均CE)；MLM 15% 遮挡样本效率低；T5 span
+        corruption；<strong>target=input
+        右移一位</strong>；文档打包+跨文档 mask</td>
+        <td>决定模型学到什么</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>Tokenization（规模化工程）</strong>
+        <code>[全]</code></td>
+        <td>byte-level BPE 永不
+        OOV；词表大小权衡（32K–256K）；数字/代码/多语言压缩率；glitch
+        tokens；压缩率=有效上下文/成本</td>
+        <td><strong>M9
+        讲算法，此处只讲规模工程取舍（消除重复）</strong></td>
+        </tr>
+        <tr class="even">
+        <td><strong>★ 数据流水线（一等公民，吸收评审）</strong>
+        <code>[全]</code></td>
+        <td>来源（CC/Wiki/书/代码/The
+        Pile/FineWeb）；质量过滤（规则+分类器+困惑度）；<strong>精确+模糊去重
+        MinHash/LSH</strong>（降记忆/提样本效率）；<strong>数据配比</strong>（高质量上采样）；去污染；PII/安全；课程化退火；<strong>合成数据
+        synthetic
+        data</strong>；<strong>SFT/偏好数据构造方法学</strong>；<strong>数据版权与许可</strong></td>
+        <td>"数据 &gt; 架构"是 2024-26 共识</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>★ Scaling Laws</strong> <code>[全]</code></td>
+        <td>L 随 N/D/C 幂律；<strong>C≈6ND</strong>；Kaplan（偏参数）vs
+        <strong>Chinchilla（~20 tokens/参数）</strong>；训练最优 vs
+        推理最优（Llama
+        过度训练）；<strong>数据受限缩放、推理时缩放、蒸馏缩放（吸收评审，新范式）</strong>；局限（不预测涌现能力）</td>
+        <td>LLM 时代工程指南针</td>
+        </tr>
+        <tr class="even">
+        <td><strong>分布式训练</strong>
+        <code>[全]/[快略细节]</code></td>
+        <td>7B 需 ~100GB+；DP/TP/PP 切分维度；<strong>ZeRO
+        三阶段/FSDP</strong>（消除显存冗余）；Megatron TP；PP
+        micro-batch；3D 并行+activation
+        checkpointing+混合精度；通信瓶颈（TP 节点内、PP/DP 节点间）</td>
+        <td>"有想法"到"真能训出来"的鸿沟</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>混合专家 MoE</strong> <code>[全]</code></td>
+        <td>FFN→多专家+Top-k
+        路由（稀疏激活）；<strong>细粒度+共享专家（DeepSeek）</strong>；负载均衡（辅助损失/<strong>无辅助损失偏置调整</strong>）；Switch/Mixtral/DeepSeek-V3；激活参数定推理成本、总参定容量</td>
+        <td>前沿模型突破"参数=算力"瓶颈</td>
+        </tr>
+        <tr class="even">
+        <td><strong>上下文长度/成本/评测</strong> <code>[全]</code></td>
+        <td>注意力 O(L²)+KV 缓存线性；两阶段训练+RoPE
+        外推（<strong>位置插值/YaRN/NTK-aware</strong>）+FlashAttention+ring
+        attention；C≈6ND+MFU 估成本；loss spike
+        处理；困惑度局限；<strong>下游基准
+        MMLU/HellaSwag/GSM8K/HumanEval + 污染</strong>（呼应评测支线
+        M-E）</td>
+        <td>落到可计算/可验证/可预算的现实约束</td>
+        </tr>
+        </tbody>
+        </table>
+        <blockquote>
+        <p><strong>吸收评审（时效性）</strong>：缩放定律纳入数据受限/推理时/蒸馏缩放；MoE
+        纳入细粒度+共享+无辅助损失均衡；位置编码外推纳入
+        YaRN/位置插值/NTK-aware。</p>
+        </blockquote>
+        <h3 id="关键资源-10">关键资源</h3>
+        <ul>
+        <li><strong>Stanford CS336（从零造 LM）</strong> (course) —
+        最对口主线。</li>
+        <li><strong>Kaplan (2020) + Chinchilla (Hoffmann 2022)</strong>
+        (paper) — 缩放对照。</li>
+        <li><strong>GPT-3 (2020)</strong> (paper)。</li>
+        <li><strong>Llama / Llama 2 / Llama 3 技术报告</strong> (paper)
+        — 工程细节最丰富的真实案例。</li>
+        <li><strong>Karpathy《Build the GPT Tokenizer》+
+        nanoGPT/build-nanogpt</strong> (video/repo)。</li>
+        <li><strong>Lee et al. (2021) 去重</strong> (paper)。</li>
+        <li><strong>The Pile/RedPajama/Dolma/FineWeb 论文与博客</strong>
+        (blog) — FineWeb 尤其可复现。</li>
+        <li><strong>DeepSpeed ZeRO + Megatron-LM + PyTorch FSDP
+        文档</strong> (paper)。</li>
+        <li><strong>Switch/Mixtral/GShard</strong> (paper)。</li>
+        <li><strong>HF《Ultra-Scale Playbook》</strong> (blog) —
+        大规模训练实战。</li>
+        <li><strong>Eleuther lm-evaluation-harness</strong> (repo) —
+        评测标准库。</li>
+        </ul>
+        <h3 id="动手项目-10">动手项目</h3>
+        <ol type="1">
+        <li>从零 BPE
+        tokenizer（minBPE，对比不同词表压缩率，观察数字/中文切分）。</li>
+        <li><strong>复现 GPT-2 (124M)
+        预训练</strong>（build-nanogpt，FineWeb-Edu
+        子集，warmup+cosine+bf16+梯度累积，HellaSwag 对比）。</li>
+        <li>迷你 scaling law 实验（5M/15M/50M/150M 参数 loss vs
+        参数对数图，拟合幂律 + Chinchilla 小规模验证）。</li>
+        <li>mini 数据流水线（语言/质量过滤 + MinHash
+        去重，对比去重前后困惑度）。</li>
+        <li>从零 MoE FFN 层（8 专家 Top-2 路由 +
+        负载均衡损失，统计专家负载）。</li>
+        <li>FSDP 多卡训练（对比单卡 vs FSDP 显存，理解 ZeRO-3
+        分片；无多卡则估算 7B 显存账）。</li>
+        <li>lm-evaluation-harness 评测（HellaSwag/ARC/MMLU few-shot +
+        污染检查）。</li>
+        </ol>
+        <h3 id="常见误区-10">常见误区</h3>
+        <p>把"基座会聊天"当预训练产物；用
+        Kaplan"越大越好"指导现代实践（应 Chinchilla）；忽视 tokenizer
+        长期影响；跳过去重；评测不去污染；混淆激活参数与总参数（MoE）；低估分布式工程复杂度；只看困惑度判断好坏；过小
+        batch/忽略 warmup 训大模型。</p>
+        <h3 id="时间估计-10">时间估计</h3>
+        <p>4.5–6 周。自监督+tokenizer 约1周；数据流水线约1周；scaling
+        laws+迷你实验约1周；分布式+ZeRO/FSDP
+        约1–1.5周；MoE+长上下文/评测约1周；GPT-2 复现贯穿。研究路线
+        MoE/scaling +1–2 周。</p>
+        <h3 id="掌握自检-10">掌握自检</h3>
+        <p>能白板写 CLM/MLM/去噪损失+说清各自上下文/预测目标+为何
+        decoder-only+CLM；能从零实现 byte-level BPE+解释与
+        WordPiece/Unigram 差异+词表权衡；给定 C 能用 C≈6ND+~20
+        tokens/参数推 N/D，判断真实模型训练不足/过度训练+解释 Llama
+        过度训练；能画 DP/TP/PP+说清 ZeRO/FSDP 分摊+粗算 7B 显存；能解释
+        MoE Top-k 路由+负载均衡+总参 vs 激活参数；完成 GPT-2 复现展示
+        loss/困惑度曲线+HellaSwag
+        分数+说明去污染；能端到端复述基座诞生流程+指出每步易错处。</p>
+        <hr />
+        <h1 id="阶段-5--对齐微调应用与前沿追踪1014-周--长期">阶段 5 ·
+        对齐、微调应用与前沿追踪（10–14 周 + 长期）</h1>
+        <blockquote>
+        <p>完成从"会预训练"到"会用好并对齐"的最后一跃：理解后训练与对齐如何把基座变成有用/无害/诚实的助手；掌握
+        PEFT/LoRA、Prompt、RAG、Agent、推理优化等落地技术；最后建立持续追踪
+        2024–2026 前沿的能力与品味。M14 转入长期持续追踪（每周固定 2–3
+        小时读论文/复现，无终点）。</p>
+        </blockquote>
+        <h2 id="模块-12--后训练与对齐sft--rlhf--dpo">模块 12 ·
+        后训练与对齐（SFT / RLHF / DPO）</h2>
+        <p><strong>一句话</strong>：理解后训练如何把只会"续写"的基座变成有用、无害、诚实的对话助手：从
+        SFT 到 RLHF 的奖励模型+PPO
+        三段式，再到把偏好优化简化为分类损失的 DPO
+        及变体（IPO/KTO/ORPO），贯穿理解 KL
+        约束、奖励黑客与对齐本质。</p>
+        <h3 id="学习目标-11">学习目标</h3>
+        <ul>
+        <li>讲清"预训练→后训练"范式转变，说明为何纯预训练模型不能直接当助手。</li>
+        <li>从零写 SFT 训练循环并正确实现 loss masking（只在回答 token
+        算损失）。</li>
+        <li>画出 RLHF 三阶段，写出奖励模型 Bradley-Terry 损失，解释 PPO
+        目标里 KL 惩罚的来源与作用。</li>
+        <li>从"KL 约束下最大化奖励"最优解手推 DPO 损失，对比 RLHF vs DPO
+        目标函数差异。</li>
+        <li>说清 DPO 局限及 IPO/KTO/ORPO 变体动机。</li>
+        <li>区分 RLHF/RLAIF/Constitutional AI；用 HHH
+        框架分析对齐失败。</li>
+        <li>在偏好数据上跑通 DPO 微调并与 SFT 基线对比胜率。</li>
+        </ul>
+        <h3 id="先修-11">先修</h3>
+        <p>M11（预训练目标/tokenizer/解码）；M9（decoder-only
+        前向）；<strong>M2
+        的强化学习速成（MDP/策略梯度/actor-critic/GAE/PPO，吸收评审消除断层）</strong>；M2
+        概率/KL/MLE；M3 PyTorch+HF；M13 的 PEFT/LoRA 并行了解（消费级
+        GPU 几乎必用）。</p>
+        <h3 id="主题与要点-10">主题与要点</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>主题</th>
+        <th>关键点</th>
+        <th>为什么重要</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>什么是后训练</strong> <code>[全]</code></td>
+        <td>基座只学 P(next
+        token)=超强自动补全；后训练=SFT+偏好对齐；能力（预训练）vs
+        对齐（后训练引出）；base→instruct/chat；chat
+        template；InstructGPT 1.3B 胜 175B</td>
+        <td>整个模块世界观</td>
+        </tr>
+        <tr class="even">
+        <td><strong>SFT / 指令微调</strong> <code>[全]</code></td>
+        <td>SFT=指令-回答对上自回归；<strong>loss
+        masking</strong>（prompt 设
+        -100）；指令微调泛化；<strong>数据质量&gt;&gt;数量</strong>（LIMA
+        1000 条）；SFT 局限（只能模仿一个答案）；多轮打包/EOS</td>
+        <td>后训练第一步，80% 场景性价比最高</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>人类偏好与奖励模型</strong> <code>[全]</code></td>
+        <td>成对偏好
+        (prompt,chosen,rejected)；RM=标量头；<strong>Bradley-Terry 损失
+        −log σ(r_w−r_l)</strong>；RM=代理人类；RM 脆弱性→reward
+        hacking/Goodhart；HH-RLHF</td>
+        <td>DPO 推导前提，理解 KL 约束必要性</td>
+        </tr>
+        <tr class="even">
+        <td><strong>★ RLHF 与 PPO</strong> <code>[全]</code></td>
+        <td>三阶段（SFT→RM→PPO）；目标 max
+        E[r]−β·KL(π‖π_ref)；<strong>KL 约束防 reward
+        hacking</strong>（呼应 M2）；PPO 把生成建模成 token
+        级决策+裁剪；显存放 4 个模型；REINFORCE 类（RLOO/GRPO）简化</td>
+        <td>把 M2 KL 落到实处，理解对齐难/贵/不稳</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>★ DPO</strong> <code>[全]</code></td>
+        <td>KL 约束最优解 π*∝π_ref·exp(r/β)→反解 r=β·log(π/π_ref)；代回
+        Bradley-Terry <strong>消掉奖励模型</strong>；DPO
+        损失；离线/监督/单阶段/稳定；β=KL 强度；DPO 已知问题（降 chosen
+        绝对概率）</td>
+        <td>开源对齐事实标准，智识高潮，必须手推</td>
+        </tr>
+        <tr class="even">
+        <td><strong>DPO 变体 IPO/KTO/ORPO</strong>
+        <code>[全]/[研]</code></td>
+        <td>IPO（防确定性过拟合）；<strong>KTO（非成对好/坏标签，前景理论，贴近点赞/点踩）</strong>；ORPO（单阶段无
+        ref）；SimPO/cDPO；选型口诀</td>
+        <td>2024 后真实工程决策</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>RLAIF 与 Constitutional AI</strong>
+        <code>[全]</code></td>
+        <td>AI 充当偏好标注者；CAI
+        两阶段（自我批评-修正+RLAIF）；把"什么是无害"从海量标注变少量原则；与红队关系；通往可扩展监督</td>
+        <td>Claude 的训练范式，可扩展对齐方向</td>
+        </tr>
+        <tr class="even">
+        <td><strong>★ HHH、安全与红队（升级，吸收评审）</strong>
+        <code>[全]</code></td>
+        <td>HHH 三维张力；诚实/真实性/幻觉；<strong>谄媚
+        sycophancy</strong>（RLHF 副作用）；<strong>红队/越狱/prompt
+        injection</strong>；对齐评测（win
+        rate/AlpacaEval/MT-Bench，长度偏置）；对齐税</td>
+        <td><strong>从"怎么训"升华到"训成什么样、怎么验证"，呼应安全支线
+        M-S</strong></td>
+        </tr>
+        </tbody>
+        </table>
+        <blockquote>
+        <p><strong>吸收评审（升级安全）</strong>：本模块的安全内容与贯穿支线
+        <strong>M-S（伦理/安全/负责任 AI）</strong>
+        联动——偏见与公平、隐私与数据治理、版权合规、AI 治理（EU AI
+        Act）在 M-S 系统化，本模块聚焦对齐相关的越狱/谄媚/红队。</p>
+        </blockquote>
+        <h3 id="关键资源-11">关键资源</h3>
+        <ul>
+        <li><strong>InstructGPT (Ouyang 2022)</strong> (paper) — RLHF
+        三阶段奠基，读图1。</li>
+        <li><strong>DPO (Rafailov 2023)</strong> (paper) —
+        第4节推导必自推。</li>
+        <li><strong>Constitutional AI (Bai 2022)</strong> (paper)。</li>
+        <li><strong>Llama 2 (2023) 第3节</strong> (paper) — 工业级 RLHF
+        最佳实践。</li>
+        <li><strong>HF TRL 库（SFT/DPO/PPO/KTO/ORPO Trainer）</strong>
+        (repo) — 实操首选。</li>
+        <li><strong>HF Alignment Handbook（Zephyr 配方）</strong>
+        (repo)。</li>
+        <li><strong>KTO/ORPO/IPO 论文</strong> (paper)。</li>
+        <li><strong>CS224N/CS336 RLHF 讲座</strong> (course)。</li>
+        <li><strong>HF《Illustrating RLHF》+ Chip Huyen《RLHF》</strong>
+        (blog)。</li>
+        <li><strong>Anthropic HH-RLHF/UltraFeedback + Red Teaming
+        论文</strong> (repo/paper)。</li>
+        </ul>
+        <h3 id="动手项目-11">动手项目</h3>
+        <ol type="1">
+        <li><strong>SFT 最小实现</strong>（小 base 模型 + LoRA，手写
+        loss masking，对比去掉 masking 的退化）。</li>
+        <li>奖励模型 + Bradley-Terry
+        损失（HH-RLHF/UltraFeedback，测偏好预测准确率 +
+        分数分布）。</li>
+        <li><strong>DPO 复现（capstone 对应）</strong>（TRL
+        DPOTrainer，与 SFT 基线算胜率 + margin 曲线）。</li>
+        <li>手推+代码验证 DPO 损失（自写 vs TRL 对拍 &lt;1e-4）。</li>
+        <li>DPO vs KTO vs ORPO 小对比（胜率/稳定性/显存/时长 + 解释 ORPO
+        无需 ref）。</li>
+        <li>迷你 Constitutional AI 自我批评（纯推理构造 批评-修正
+        数据对）。</li>
+        <li>红队 + 谄媚探针（越狱/引导错误观点/诱导有害，记录失败 +
+        缓解方案）。</li>
+        </ol>
+        <h3 id="常见误区-11">常见误区</h3>
+        <p>SFT 忘 loss masking（学生成问题）；chat template 不一致；以为
+        RLHF/DPO 能教新知识；跳过/敷衍 SFT 阶段；忽视 KL/β 设置（reward
+        hacking 或语言崩坏）；DPO 只看 loss 不看绝对概率（同时压低
+        chosen）；RM/judge Goodhart
+        化（长度偏置）；把无害做过头变无用；完整 PPO 显存低估（4
+        模型）；谄媚/标注者偏差放大。</p>
+        <h3 id="时间估计-11">时间估计</h3>
+        <p>3–4 周（35–55h）。第1周后训练范式+SFT；第2周
+        RM+RLHF/PPO+KL（数学密集放慢）；第3周 DPO
+        推导+复现+变体（重头+capstone）；第4周
+        RLAIF/CAI+HHH/安全+对比报告。工程快速 2 周（PPO
+        只读不实现）；研究 +1 周。</p>
+        <h3 id="掌握自检-11">掌握自检</h3>
+        <p>能白板画 RLHF 三阶段+写各损失+解释 PPO KL
+        惩罚来源与去掉后果；能从 π*∝π_ref·exp(r/β) 推 DPO
+        损失并解释奖励模型如何消掉；能写 SFT loss masking 逻辑+指出缺失
+        masking 的 bug；能对比 RLHF vs DPO
+        目标差异+两优势两局限；能各一句话概括 IPO/KTO/ORPO 解决 DPO
+        哪个问题+按数据条件选；能区分 RLHF/RLAIF/CAI 反馈来源+描述 CAI
+        自我批评机制；跑通 DPO 展示与 SFT 胜率对比+解读 margin
+        曲线；能用 HHH 分析谄媚/越狱案例+提数据层缓解。</p>
+        <hr />
+        <h2
+        id="模块-13--微调与应用peft--prompt--rag--agent--推理优化">模块
+        13 · 微调与应用（PEFT / Prompt / RAG / Agent / 推理优化）</h2>
+        <p><strong>一句话</strong>：把"会预训练、会对齐"的基座真正用起来：以最小算力做
+        PEFT（LoRA/QLoRA），用提示工程榨干能力，用 RAG 接外部知识，用
+        Agent 调用工具完成多步任务，并用量化/KV
+        cache/FlashAttention/投机解码/vLLM 把推理成本压到可上线——把 LLM
+        从 demo 变成产品的工程总成。</p>
+        <h3 id="学习目标-12">学习目标</h3>
+        <ul>
+        <li>说清全参微调 vs PEFT 权衡，从"低秩假设"推导
+        LoRA：W'=W+(α/r)·BA。</li>
+        <li>消费级 GPU 用 LoRA/QLoRA 微调 7B 级模型，正确合并/部署
+        adapter。</li>
+        <li>掌握提示工程方法论（zero/few-shot/CoT/self-consistency/结构化输出），解释
+        ICL 为何"不更新权重也能学"。</li>
+        <li>从零搭生产 RAG（切块→嵌入→向量库→检索→重排→生成），用 RAGAS
+        评估诊断。</li>
+        <li>判断该用 RAG/微调/结合。</li>
+        <li>实现 Agent（function
+        calling/ReAct/MCP），搭会调工具、自我纠错的最小智能体。</li>
+        <li>掌握推理优化全栈（量化/KV
+        cache/FlashAttention/PagedAttention/连续批处理/投机解码），用
+        vLLM 部署。</li>
+        <li>做端到端成本/延迟/质量三角权衡分析。</li>
+        </ul>
+        <h3 id="先修-12">先修</h3>
+        <p><strong>M9 强先修</strong>（self-attention/KV cache/causal
+        mask）；M11（tokenizer/自回归/混合精度/参数量与显存）；M12（SFT
+        数据格式/chat template）；M3
+        PyTorch；M1/M2（矩阵秩/低秩分解/余弦相似度）；<strong>可用
+        GPU</strong>（≥16GB 或 Colab T4）。</p>
+        <h3 id="主题与要点-11">主题与要点</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>主题</th>
+        <th>关键点</th>
+        <th>为什么重要</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>微调谱系总览</strong> <code>[全]</code></td>
+        <td>全参（显存 12–16× 参数）vs PEFT（&lt;1%
+        参数）；四流派（加法/重参数化/前缀/选择）；低内在维度；决策维度（显存/数据/多任务/零延迟）</td>
+        <td>整个模块地图</td>
+        </tr>
+        <tr class="even">
+        <td><strong>★ LoRA 原理与实现</strong> <code>[全]</code></td>
+        <td>ΔW=BA（r 远小于 d,k）；h=Wx+(α/r)BAx；A 高斯/B
+        零初始化；参数从 70
+        亿降到几百万；r/α/target_modules/dropout；推理合并零延迟</td>
+        <td>2023 以来微调标准</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>QLoRA/Adapter/Prefix/Prompt Tuning</strong>
+        <code>[全]</code></td>
+        <td>QLoRA（4-bit NF4+双重量化+分页优化器，单卡微调
+        33B/65B）；Adapter（推理串行延迟）；Prefix/Prompt（软提示）；DoRA；选型口诀</td>
+        <td>QLoRA 让普通人微调大模型</td>
+        </tr>
+        <tr class="even">
+        <td><strong>提示工程与 ICL</strong> <code>[全]</code></td>
+        <td>ICL 不更新权重；zero vs few-shot（recency/majority label
+        bias）；<strong>CoT《Let's think step by
+        step》</strong>；self-consistency
+        投票；ReAct/ToT/Least-to-Most；结构化输出约束；与推理模型关系</td>
+        <td>零成本提升第一手段</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>★ RAG 一：嵌入/切块/向量库/检索</strong>
+        <code>[全]</code></td>
+        <td>RAG
+        动机（知识冻结/幻觉/私有数据）；嵌入（BGE/E5，bi-encoder）；<strong>切块策略+overlap（头号变量）</strong>；向量库（FAISS/Chroma/Qdrant/pgvector，ANN
+        HNSW/IVF）；<strong>混合检索（dense+BM25，RRF）</strong>；top-k
+        与上下文预算</td>
+        <td>企业落地最主流方案</td>
+        </tr>
+        <tr class="even">
+        <td><strong>★ RAG 二：重排/评估/诊断/RAG vs 微调</strong>
+        <code>[全]</code></td>
+        <td><strong>bi-encoder 召回+cross-encoder
+        重排</strong>（行业标准两段式）；查询改写（HyDE/multi-query/分解）；<strong>RAGAS（faithfulness/relevancy/context
+        precision-recall）分段评估</strong>；失败模式（召回失败/lost-in-the-middle/无关块致幻/多跳）；RAG
+        vs 微调决策框架；GraphRAG/agentic RAG</td>
+        <td>demo 易、靠谱难，分水岭</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>★ Agents：function calling/ReAct/MCP</strong>
+        <code>[全]</code></td>
+        <td>感知-推理-行动循环；function calling（JSON
+        schema）；<strong>ReAct（Thought-Action-Observation）</strong>；记忆/规划/反思/终止；<strong>MCP（AI
+        应用的 USB-C，解决 M×N
+        集成）</strong>；框架地形（先手写再用框架）；可靠性挑战（错误累积/成本爆炸）</td>
+        <td>LLM 从聊天走向干活的关键</td>
+        </tr>
+        <tr class="even">
+        <td><strong>★ 推理优化一：量化/KV cache/FlashAttention</strong>
+        <code>[全]</code></td>
+        <td><strong>推理是带宽受限</strong>（每 token
+        读全部权重）；量化（INT8/INT4/GPTQ/AWQ）；KV cache（O(n²)→逐
+        token O(n)）；MQA/GQA 压缩；<strong>FlashAttention</strong>（IO
+        感知 tiling/重计算）；PagedAttention</td>
+        <td>"跑得起但用不起"的关键</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>★ 推理优化二：投机解码/连续批处理/vLLM</strong>
+        <code>[全]</code></td>
+        <td>投机解码（草稿模型并行验证，2–3×）；Medusa/EAGLE；<strong>连续批处理</strong>（动态加入/移出）；<strong>vLLM</strong>（PagedAttention+连续批处理+OpenAI
+        兼容
+        API）；SGLang/TGI/llama.cpp/Ollama；吞吐/延迟（TTFT/TPOT）/质量/成本四角</td>
+        <td>推理成本降一个数量级的工程杠杆</td>
+        </tr>
+        </tbody>
+        </table>
+        <blockquote>
+        <p><strong>吸收评审（时效性 + MLOps/Agent
+        系统）</strong>：推理优化纳入
+        <strong>FlashAttention-3、prefill/decode 分离、KV cache
+        压缩（MLA）</strong> 等 2025-26 部署主流；Agent 部分补充
+        <strong>多 Agent
+        编排、记忆系统、工具学习可靠性与评测、安全沙箱</strong>（与 M14
+        联动）；MLOps 闭环（服务监控/A-B 测试/漂移检测/回归测试/可观测性
+        tracing/guardrails）在"概览补充"小节给出框架。</p>
+        </blockquote>
+        <h3 id="关键资源-12">关键资源</h3>
+        <ul>
+        <li><strong>LoRA (2021) / QLoRA (2023)</strong> (paper)。</li>
+        <li><strong>HuggingFace PEFT 库</strong> (repo)。</li>
+        <li><strong>CoT (Wei 2022) + Self-Consistency (Wang
+        2022)</strong> (paper)。</li>
+        <li><strong>OpenAI/Anthropic Prompt Engineering
+        官方指南</strong> (blog)。</li>
+        <li><strong>RAG (Lewis 2020) + Lost in the Middle (Liu
+        2023)</strong> (paper)。</li>
+        <li><strong>RAGAS 框架</strong> (repo)。</li>
+        <li><strong>ReAct (Yao 2022) + MCP 官方文档</strong>
+        (paper/blog)。</li>
+        <li><strong>FlashAttention (2022)/FA-2 + PagedAttention/vLLM
+        (Kwon 2023)</strong> (paper/repo)。</li>
+        <li><strong>CS336</strong> (course)。</li>
+        <li><strong>Lilian Weng《Prompt Engineering》/《LLM Powered
+        Autonomous Agents》</strong> (blog)。</li>
+        <li><strong>Sebastian Raschka《Build a LLM from Scratch》+ PEFT
+        博客</strong> (book)。</li>
+        </ul>
+        <h3 id="动手项目-12">动手项目</h3>
+        <ol type="1">
+        <li>LoRA 从零最小实现（自写 LoRALinear，替换 nanoGPT
+        线性层）。</li>
+        <li><strong>QLoRA 微调 7B 开源模型（capstone
+        第一部分）</strong>（单卡 ≤24GB，自构 SFT 数据，合并
+        adapter+vLLM 部署）。</li>
+        <li>提示工程消融（GSM8K 子集，zero/few-shot/CoT/self-consistency
+        准确率对比报告）。</li>
+        <li><strong>从零生产级 RAG（capstone
+        第二部分核心）</strong>（递归切块→BGE/E5→FAISS/Chroma→混合检索→重排→带引用生成，RAGAS
+        评估 + 诊断 3 种失败模式）。</li>
+        <li>手写 ReAct Agent（不依赖
+        LangChain，接计算器/检索/代码执行，防死循环+重试，可选 MCP
+        server）。</li>
+        <li>vLLM 部署与推理优化基准（开关量化/不同 batch
+        的吞吐/延迟，vLLM vs 朴素 HF generate）。</li>
+        <li>（整合 capstone）端到端 LLM 应用（QLoRA
+        模型+RAG+Agent+vLLM，作品集仓库）。</li>
+        </ol>
+        <h3 id="常见误区-12">常见误区</h3>
+        <p>把微调当万能药（多数先 prompt+RAG）；LoRA 超参乱设（r
+        过大过拟合）；SFT 数据/chat template 不一致；QLoRA
+        把基座也训练/合并出错；RAG 切块草率（头号原因）；RAG
+        只评最终答案不分段；只用向量忽视关键词与重排；Agent
+        过度工程化（先手写最小
+        ReAct）；忽视推理是带宽受限（优化错方向）；量化无脑最低 bit；KV
+        cache 显存爆炸被忽视；评估全靠肉眼。</p>
+        <h3 id="时间估计-12">时间估计</h3>
+        <p>7–9 周（80–120h）。PEFT+LoRA/QLoRA
+        约2.5周；提示工程约1周；RAG 约2周；Agent+MCP
+        约1.5周；推理优化+vLLM 约1.5周；整合 capstone 约1周。工程快速
+        5–6 周（精做 QLoRA+RAG+vLLM）；研究 +2 周。</p>
+        <h3 id="掌握自检-12">掌握自检</h3>
+        <p>能从低秩假设推 LoRA 公式+解释 A/B 初始化+α/r+合并；能 QLoRA
+        微调 7B 完成任务+正确处理 chat
+        template+部署，效果优于基座；给定场景能论证用
+        prompt/RAG/微调/组合；能从零搭含混合检索+重排的 RAG+RAGAS
+        分段评估+3 种失败模式诊断修复；能手写 ReAct Agent+解释 MCP
+        解决什么；能解释推理为何带宽受限+各优化针对哪个瓶颈；能用 vLLM
+        部署+产出吞吐/TTFT/TPOT 对比表；能读
+        LoRA/QLoRA/RAG/ReAct/FlashAttention
+        任一原论文复述贡献与局限。</p>
+        <hr />
+        <h2
+        id="模块-14--前沿进展20242026推理模型moe长上下文多模态agent-与模型版图">模块
+        14 ·
+        前沿进展（2024–2026）：推理模型、MoE、长上下文、多模态、Agent
+        与模型版图</h2>
+        <p><strong>一句话</strong>：把 M1–13 的地基汇聚到当下，理解
+        2024–2026 真正改变格局的几条主线（用 RL
+        造出"会思考"的推理模型、用稀疏 MoE
+        把参数做大算力做省、把上下文拉到百万级、走向原生多模态与能操作计算机的
+        agentic
+        系统、世界模型/视频生成、蒸馏小模型），并建立一套能长期自我更新、读懂并复现最新论文的方法论与品味。</p>
+        <h3 id="学习目标-13">学习目标</h3>
+        <ul>
+        <li>用统一语言解释"测试时计算 test-time
+        compute"范式与训练时缩放的关系。</li>
+        <li>讲清推理模型训练配方（o1/o3→DeepSeek-R1 纯
+        RL，GRPO/RLVR，冷启动→RL→拒绝采样蒸馏），指出长 CoT
+        何时有效/过度思考。</li>
+        <li>从架构解释稀疏
+        MoE（路由/Top-k/负载均衡/共享/细粒度专家）。</li>
+        <li>说清超长上下文（128K→1M+）实现要素与局限（needle ≠
+        长程推理，RULER/LongBench）。</li>
+        <li>描述原生多模态/全模态范式转变（GPT-4o 原生图像、Gemini
+        原生多模态、理解+生成统一）。</li>
+        <li>刻画 agentic 系统能力边界，用真实基准（SWE-bench
+        Verified/GAIA/OSWorld/τ-bench）判断 demo 与可靠落地差距。</li>
+        <li>概述世界模型/视频生成前沿，分清已实现与被夸大。</li>
+        <li>在高效化维度做工程取舍（蒸馏/量化/小模型）。</li>
+        <li><strong>画出 2026 年中开源 vs
+        闭源版图的判断框架（而非写死型号）</strong>，并建立可持续前沿追踪工作流。</li>
+        </ul>
+        <h3 id="先修-13">先修</h3>
+        <p>M9（self-attention/KV/位置编码）；M11（scaling
+        law/并行）；M12（SFT/RLHF/DPO + RL
+        速成）；M13（agent/推测解码/vLLM/量化）；扎实英文论文阅读能力。</p>
+        <h3 id="主题与要点-12">主题与要点</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>主题</th>
+        <th>关键点</th>
+        <th>为什么重要</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>范式总览：第二条缩放曲线</strong>
+        <code>[全]</code></td>
+        <td>训练时缩放遇数据墙；<strong>test-time compute</strong>（更长
+        CoT 换正确率）；三形态（串行长 CoT/并行投票
+        best-of-N/树迭代）；o1 算力对数线性提升；时间线</td>
+        <td>理解整个格局的总纲</td>
+        </tr>
+        <tr class="even">
+        <td><strong>推理模型 I：o1/o3 与长 CoT</strong>
+        <code>[全]</code></td>
+        <td>大规模 RL
+        优化隐藏推理链；reasoning_effort；数学/代码提升最大；自我反思/回溯涌现；过度思考；ARC-AGI
+        争议；快/慢双模型+thinking budget</td>
+        <td>推向主流的引爆点（<strong>区分官方声称 vs
+        推断</strong>）</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>★ 推理模型 II：DeepSeek-R1 开放配方</strong>
+        <code>[全]</code></td>
+        <td><strong>R1-Zero 纯 RL（无 SFT）涌现长
+        CoT</strong>；<strong>RLVR</strong>（可验证奖励）；完整流水线（冷启动
+        SFT→推理 RL→拒绝采样→再 SFT→对齐 RL）；<strong>GRPO（去
+        critic，组相对奖励，省显存）</strong>；推理蒸馏；open-r1/PRM vs
+        ORM</td>
+        <td><strong>最该亲手复现的部分，把 M12 RL
+        打通到前沿</strong></td>
+        </tr>
+        <tr class="even">
+        <td><strong>MoE 前沿</strong> <code>[全]</code></td>
+        <td>多专家+Top-k
+        路由（稀疏激活）；<strong>细粒度+共享专家（DeepSeek）</strong>；<strong>无辅助损失负载均衡</strong>；DeepSeek-V3(671B/激活37B)/Mixtral/Qwen3/Llama-4；激活参数定成本、总参定容量；显存/通信代价</td>
+        <td>前沿大模型几乎一致选择</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>超长上下文</strong> <code>[全]</code></td>
+        <td>O(n²)+KV 缓存瓶颈；<strong>RoPE
+        外推/位置插值/YaRN/NTK-aware</strong>；Ring Attention/MLA/KV
+        压缩；<strong>needle
+        通过≠长程多跳推理</strong>（RULER/LongBench/lost-in-the-middle）；Gemini
+        1M；长上下文 vs RAG</td>
+        <td>最易被数字游戏误导处</td>
+        </tr>
+        <tr class="even">
+        <td><strong>多模态/全模态/原生多模态</strong>
+        <code>[全]/[快略]</code></td>
+        <td>三代（拼接/原生/全模态 omni）；统一 token 化+early
+        fusion；<strong>GPT-4o
+        原生图像生成（理解+生成统一）</strong>；端到端语音；长视频理解</td>
+        <td>通向通用感知-行动智能体</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>Agentic 系统与计算机使用</strong>
+        <code>[全]</code></td>
+        <td>工具+规划+记忆+反馈循环；<strong>computer
+        use（Claude/Operator）</strong>；<strong>SWE-bench
+        Verified</strong>（自主修
+        bug）；真基准（GAIA/OSWorld/WebArena/τ-bench）；单步高≠长程高（误差按步指数衰减）；可靠性工程（错误累积/沙箱/human-in-loop）；MCP</td>
+        <td>产业押注最重方向</td>
+        </tr>
+        <tr class="even">
+        <td><strong>世界模型与视频生成</strong>
+        <code>[全]/[研]</code></td>
+        <td>Sora（DiT 时空
+        patch）/Veo/Kling；<strong>世界模型=动作条件可交互模拟器（vs
+        仅好看视频）</strong>；Genie/Genie
+        2；物理/因果先验假说（尚有争议）；现状校准（物理违和/长时漂移）</td>
+        <td>最具想象力也最易炒作</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>高效化：蒸馏/量化/小模型</strong>
+        <code>[全]</code></td>
+        <td><strong>推理蒸馏（大模型 CoT 数据 SFT
+        小模型）</strong>；量化（INT4 几乎无损）；<strong>Phi/Gemma/Qwen
+        小尺寸</strong>；成本/延迟/质量三角；小而专 vs 大而全</td>
+        <td>前沿不只更大，更小更省同样是前沿</td>
+        </tr>
+        <tr class="even">
+        <td><strong>★ 模型版图：判断框架（非型号清单）</strong>
+        <code>[全]</code></td>
+        <td>闭源（OpenAI/Anthropic/Google）vs
+        开放权重（Llama/Qwen/DeepSeek/Mistral/Gemma/Phi）；趋势（开闭差距收窄/推理标配/全面
+        MoE/降价/中国实验室主力）；<strong>开放权重≠开源+许可陷阱</strong>；<strong>用
+        LMArena/Artificial Analysis/垂直 benchmark
+        交叉校准</strong></td>
+        <td><strong>吸收评审：改造为"如何自行评估当下版图"，而非写死型号</strong></td>
+        </tr>
+        <tr class="odd">
+        <td><strong>★ 前沿追踪方法论</strong> <code>[全]</code></td>
+        <td>信息源分层（arXiv&gt;可信博客&gt;社交噪音）；每周 2–3h
+        读论文+复现；<strong>三遍法+批判清单</strong>（提升来自方法还是算力/数据？可复现？局限？）；区分真突破/刷榜/营销；最小复现（小模型核心机制）；评测素养（污染/作弊）</td>
+        <td><strong>本模块的真正产出：可持续自我更新的肌肉</strong></td>
+        </tr>
+        </tbody>
+        </table>
+        <blockquote>
+        <p><strong>吸收评审（时效性 + 评测）</strong>：推理模型确保涵盖
+        GRPO/RLVR/PRM；缩放纳入推理时缩放；MoE
+        纳入无辅助损失均衡；位置编码纳入 YaRN/位置插值/attention
+        sink；版图改成判断框架；推理优化跟进 FA-3/prefill-decode
+        分离/MLA；评测素养与贯穿支线 M-E 联动。</p>
+        </blockquote>
+        <h3 id="关键资源-13">关键资源</h3>
+        <ul>
+        <li><strong>DeepSeek-R1 (arXiv:2501.12948)</strong> (paper) —
+        最重要精读，可复现蓝本。</li>
+        <li><strong>DeepSeek-V3 (arXiv:2412.19437)</strong> (paper) —
+        前沿 MoE 标准参考。</li>
+        <li><strong>OpenAI《Learning to Reason with LLMs》(o1 博客) +
+        system cards</strong> (blog) — 区分声称 vs 推断。</li>
+        <li><strong>Lilian Weng《Why We Think》</strong> (blog) —
+        推理/test-time compute 综述。</li>
+        <li><strong>CS336</strong> (course)。</li>
+        <li><strong>Raschka《Build a LLM》+ ahead-of-AI 博客</strong>
+        (book)。</li>
+        <li><strong>Mixtral (2401.04088) + Switch Transformers
+        (2101.03961)</strong> (paper)。</li>
+        <li><strong>RULER (2404.06654) + Lost in the Middle
+        (2307.03172)</strong> (paper)。</li>
+        <li><strong>SWE-bench/SWE-bench Verified + GAIA/OSWorld/τ-bench
+        排行榜</strong> (repo)。</li>
+        <li><strong>Sora 技术报告 + DeepMind Genie/Genie 2</strong>
+        (paper)。</li>
+        <li><strong>HF Open-R1 + TRL GRPOTrainer</strong> (repo) —
+        动手主力。</li>
+        <li><strong>LMArena + Artificial Analysis + Stanford AI
+        Index</strong> (blog) — 交叉校准（引用带日期）。</li>
+        </ul>
+        <h3 id="动手项目-13">动手项目</h3>
+        <ol type="1">
+        <li><strong>核心·复现推理 RL</strong>（TRL GRPOTrainer + 1.5B
+        基座，GSM8K 子集 RLVR：答案正确+格式奖励，观察 CoT
+        变长/准确率上升/自我验证，复述 R1-Zero 现象）。</li>
+        <li><strong>MoE 从零</strong>（nanoGPT 某 block FFN 换最小
+        MoE，router+Top-2+负载均衡损失，统计专家负载，故意去掉均衡观察坍塌）。</li>
+        <li>推理蒸馏（用 R1-Distill 或上一步模型生成长 CoT
+        微调不会推理的同尺寸基座，验证提升）。</li>
+        <li>长上下文压力测试（needle-in-a-haystack + RULER
+        风格多针/多跳，画有效准确率 vs 位置/长度曲线，看
+        lost-in-the-middle）。</li>
+        <li>agent 真实评测（最小 code-agent 在 SWE-bench Lite
+        跑，记录成功率/失败模式/token 成本 +
+        反思步骤观察误差累积）。</li>
+        <li>版图与评测素养（3 个任务各挑开源+闭源模型盲测打分，与
+        LMArena/Artificial Analysis
+        对照，产出带日期与方法说明的"模型选型表"，每季度更新）。</li>
+        </ol>
+        <h3 id="常见误区-13">常见误区</h3>
+        <p>把 test-time compute 当万灵药（简单题过度思考）；误以为 o1/o3
+        训练细节公开（区分声称/推断/R1 验证）；混淆 RLHF 与 RLVR/推理
+        RL（奖励来源不同）；GRPO/PPO
+        栽在工程细节（奖励设计/KL/采样）；迷信长上下文宣称长度（needle≠长程推理）；MoE
+        参数数字误导（成本看激活参数）；用
+        demo/单榜判断能力；把"视频好看"等同"懂物理"；追新闻不追机制；忽视开放权重≠开源与许可陷阱。</p>
+        <h3 id="时间估计-13">时间估计</h3>
+        <p>作为有限学习单元 5–7 周（核心精读 + 2–3
+        动手项目），此后转入长期持续追踪（每周 2–3h，无终点）。先用 2
+        周吃透 test-time compute+R1+MoE 三主干，再 2–3
+        周覆盖长上下文/多模态/agent/世界模型/高效化，最后 1
+        周搭版图表与追踪工作流。</p>
+        <h3 id="掌握自检-13">掌握自检</h3>
+        <p>能白板画训练时 vs 测试时缩放两曲线+解释三形态+举长 CoT
+        有害场景；能复述 R1 完整流水线+RLVR/GRPO 各解决什么+GRPO 去
+        critic 好处；能从零实现含 router+Top-k+负载均衡的
+        MoE+按激活参数估成本；能解释 RoPE 外推/Ring Attention/MLA+用
+        needle+RULER 证明有效&lt;宣称+说清长上下文 vs
+        RAG；能区分三代多模态+解释 GPT-4o
+        原生图像为何"理解+生成统一";能用 ≥4 真实基准说明 agent
+        现状+解释单步高长程低的数学原因；能区分视频生成 vs
+        可交互世界模型+指出"懂物理"是愿景还是事实；能基于三角论证微调小模型+RAG/工具何时优于超大闭源；能画
+        2026
+        年中版图判断框架+说明用哪些榜单交叉校准；能用三遍法+批判清单读最新论文+设计最小复现实验。</p>
+        <hr />
+        <h1 id="第四部分--贯穿式支线吸收评审补全的横向能力">第四部分 ·
+        贯穿式支线（吸收评审补全的横向能力）</h1>
+        <blockquote>
+        <p>以下四块横向能力评审指出在原架构中散落或缺失，本课程把它们做成贯穿支线，在多个模块嵌入并在此统一框架。</p>
+        </blockquote>
+        <h2 id="支线-m-e--评测与方法论贯穿-m4m11m13m14">支线 M-E ·
+        评测与方法论（贯穿 M4/M11/M13/M14）</h2>
+        <p><strong>为什么单列</strong>：对一门"能读懂并复现前沿论文"的课程，评测是核心方法论。</p>
+        <ul>
+        <li><strong>经典指标</strong>（M4）：准确率/precision/recall/F1/ROC-AUC/RMSE/MAE。</li>
+        <li><strong>困惑度与内在指标</strong>（M7/M11）：perplexity
+        的定义、跨 tokenizer 不可比。</li>
+        <li><strong>LLM
+        基准与污染</strong>（M11/M14）：MMLU/HellaSwag/GSM8K/HumanEval；数据污染
+        contamination、去污染、基准饱和。</li>
+        <li><strong>LLM-as-judge / 胜率 /
+        Arena</strong>（M12/M14）：AlpacaEval/MT-Bench、长度偏置、LMArena
+        Elo、人类盲评方法学。</li>
+        <li><strong>推理模型评测</strong>（M14）：AIME/GPQA/SWE-bench
+        Verified/ARC-AGI、test-time 投入与方法功劳的区分。</li>
+        <li><strong>RAG/Agent
+        端到端评估</strong>（M13/M14）：RAGAS（faithfulness/context
+        precision-recall）分段评估、GAIA/OSWorld/τ-bench、单步 vs
+        长程成功率、pass@k。</li>
+        <li><strong>统一品味</strong>：私有/动态/人类盲评类评测优先于易被刷分的公开静态榜单。</li>
+        </ul>
+        <h2 id="支线-m-s--伦理安全与负责任-ai贯穿-m12独立成框架">支线
+        M-S · 伦理、安全与负责任 AI（贯穿 M12，独立成框架）</h2>
+        <p><strong>为什么升级</strong>：面向 2026 这是必备而非可选。</p>
+        <ul>
+        <li><strong>对齐相关</strong>（M12）：幻觉、越狱
+        jailbreak、prompt injection、谄媚 sycophancy、红队
+        red-teaming。</li>
+        <li><strong>偏见与公平
+        fairness</strong>：数据去偏、群体公平性指标。</li>
+        <li><strong>隐私与数据治理</strong>：PII
+        移除、训练数据合规、记忆与抽取攻击。</li>
+        <li><strong>版权与许可</strong>：训练数据版权、开放权重≠开源、商用许可（Apache/MIT
+        vs 社区许可）。</li>
+        <li><strong>AI 治理与监管</strong>：EU AI Act、模型卡 model
+        card、双用途/滥用风险。</li>
+        <li><strong>可扩展监督</strong>（M14）：弱到强泛化、欺骗性对齐
+        deceptive alignment 等开放问题。</li>
+        </ul>
+        <h2 id="支线-m-i--可解释性与可视化贯穿-m6m8m14">支线 M-I ·
+        可解释性与可视化（贯穿 M6/M8/M14）</h2>
+        <p><strong>为什么补</strong>：2024-26
+        研究热点，与"读懂前沿"目标直接相关。</p>
+        <ul>
+        <li><strong>CNN 可视化</strong>（M6）：卷积核、特征图。</li>
+        <li><strong>经典 ML
+        可解释性</strong>（M4）：SHAP、LIME、部分依赖图。</li>
+        <li><strong>LLM 可解释性</strong>（M14）：attention 分析、探针
+        probing、机制可解释性 mechanistic
+        interpretability、<strong>稀疏自编码器 SAE
+        分解残差流为单义特征</strong>（呼应 M8 稀疏 AE）。</li>
+        </ul>
+        <h2
+        id="概览补充评审指出的应用域工程闭环至少概览级">概览补充（评审指出的应用域/工程闭环，至少概览级）</h2>
+        <ul>
+        <li><strong>GNN / 推荐系统 / 表格深度学习</strong>（M4
+        概览）：工业主力，契合"归纳偏置随数据结构变化"哲学。GNN（消息传递/图卷积）、推荐（双塔召回/排序/向量检索）。</li>
+        <li><strong>经典 NLP 预备</strong>（M7 前最小铺垫）：n-gram
+        语言模型、文本表示、NER/POS、perplexity。</li>
+        <li><strong>生产/部署 MLOps 闭环</strong>（M13
+        概览）：服务监控、A/B 测试、漂移检测、回归测试、CI/CD for
+        models、LLM 可观测性（tracing/guardrails）。</li>
+        <li><strong>经典 RL 基础</strong>（M2
+        速成）：MDP/策略梯度/actor-critic/GAE/PPO（已并入 M2）。</li>
+        </ul>
+        <hr />
+        <h1 id="第五部分--贯穿全程的里程碑项目capstones">第五部分 ·
+        贯穿全程的里程碑项目（Capstones）</h1>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>阶段</th>
+        <th>里程碑</th>
+        <th>内容</th>
+        <th>验证</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>阶段 0</strong></td>
+        <td>手写自动微分引擎（micrograd）</td>
+        <td>纯 NumPy 矩阵求导链式法则；实现 micrograd
+        标量自动求导引擎并训玩具任务</td>
+        <td>数学+工程地基扎实（<strong>与阶段1 差异化</strong>）</td>
+        </tr>
+        <tr class="even">
+        <td><strong>阶段 1</strong></td>
+        <td>经典 ML 全家桶 + 深网络训练诊断</td>
+        <td>(1) 从零线性/逻辑回归/决策树/k-means 对比 sklearn；(2) 纯
+        NumPy 两层网+MNIST&gt;97%；(3) PyTorch 多层网络 CIFAR-10 +
+        训练技巧消融报告（初始化/BN/残差/优化器/正则化）</td>
+        <td>偏差-方差诊断与训练技巧掌握</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>阶段 2</strong></td>
+        <td>CNN 图像分类 + RNN 字符级语言模型</td>
+        <td>(1) mini-ResNet CIFAR-10&gt;90% + 可视化 + 复现退化；(2)
+        字符级 LSTM 语言模型 + Bahdanau attention（作为 Transformer
+        伏笔，<strong>明确这是定性预告而非要求实现
+        Transformer</strong>）</td>
+        <td>归纳偏置直觉 + RNN 瓶颈论证</td>
+        </tr>
+        <tr class="even">
+        <td><strong>阶段 3（核心分水岭）</strong></td>
+        <td>从零实现 nanoGPT</td>
+        <td>完全从零 PyTorch 实现多头自注意力/位置编码/Transformer
+        block/decoder-only GPT，tiny-shakespeare
+        训练采样，逐行解释。配套：VAE/GAN 在 MNIST 生成</td>
+        <td>彻底吃透 Transformer</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>阶段 4</strong></td>
+        <td>从零 DDPM + 迷你 scaling 实验</td>
+        <td>(1) 从零 DDPM 在 MNIST/CIFAR-10 采样；(2)
+        迷你预训练：训自己的 nanoGPT 验证小型 scaling
+        趋势（模型/数据规模 vs loss），写观察报告</td>
+        <td>扩散数学 + 缩放认知</td>
+        </tr>
+        <tr class="even">
+        <td><strong>阶段 5（终极）</strong></td>
+        <td>端到端 LLM 应用 + 对齐复现</td>
+        <td>(1) LoRA/QLoRA 微调开源模型完成特定任务（产出 SFT
+        数据+评测）；(2) 带检索的 RAG/Agent
+        应用（向量库+检索+重排+工具调用，RAGAS 诊断改进）；(3) 复现 DPO
+        并对比 SFT 基线胜率。整合成作品集仓库 + vLLM 部署</td>
+        <td>端到端能力闭环</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>阶段 5 进阶</strong></td>
+        <td>复现推理 RL（研究路线）</td>
+        <td>用 GRPO+RLVR 在 GSM8K 子集让小模型学会推理，复述 R1-Zero
+        现象</td>
+        <td>把 RL 打通到前沿</td>
+        </tr>
+        <tr class="even">
+        <td><strong>贯穿全程（研究路线）</strong></td>
+        <td>论文复现挑战</td>
+        <td>从阶段3 起每阶段复现 1
+        篇经典论文的核心结果或关键消融（attention 变体/RLHF-DPO
+        对比/2024-26 推理模型核心机制）</td>
+        <td>独立研究与复现能力</td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h1 id="第六部分--推荐总资源清单">第六部分 · 推荐总资源清单</h1>
+        <h2 id="课程一手优先">课程（一手优先）</h2>
+        <ul>
+        <li><strong>3Blue1Brown</strong>（线代/微积分/神经网络可视化）</li>
+        <li><strong>CS231n</strong>（视觉/CNN/反向传播）</li>
+        <li><strong>CS224n</strong>（NLP/序列/Transformer）</li>
+        <li><strong>CS229</strong>（经典 ML 严谨推导）</li>
+        <li><strong>CS336: Language Modeling from
+        Scratch</strong>（从零造 LLM，对接阶段4/5）</li>
+        <li><strong>MIT 18.06</strong>（线代）/ <strong>MIT
+        6.431x</strong>（概率）/ <strong>EE364A</strong>（凸优化）</li>
+        <li><strong>Hugging Face NLP Course + Deep RL
+        Course</strong></li>
+        <li><strong>Andrew Ng ML Specialization</strong></li>
+        <li><strong>OpenAI Spinning Up</strong>（RL/PPO）</li>
+        </ul>
+        <h2 id="书籍多数免费在线">书籍（多数免费在线）</h2>
+        <ul>
+        <li>《Mathematics for Machine Learning》、《Deep
+        Learning》（花书）、PRML/《Deep Learning: Foundations and
+        Concepts》(Bishop)</li>
+        <li>《An Introduction to Statistical
+        Learning》(ISLP)、《Hands-On ML》(Géron)</li>
+        <li>《Deep Learning with PyTorch》、Dive into Deep Learning
+        (D2L)</li>
+        <li>《Neural Networks and Deep Learning》(Nielsen)、Sutton &amp;
+        Barto《Reinforcement Learning》</li>
+        <li>《Build a LLM from Scratch》(Raschka)、《Interpretable
+        ML》(Molnar)</li>
+        </ul>
+        <h2 id="关键论文按主线">关键论文（按主线）</h2>
+        <ul>
+        <li><strong>基础架构</strong>：Attention Is All You
+        Need、ResNet、LSTM、Bahdanau attention、ViT、RoFormer(RoPE)</li>
+        <li><strong>生成模型</strong>：VAE、GAN、DDPM、DDIM、Score-based
+        SDE、Latent Diffusion、CFG、ControlNet</li>
+        <li><strong>表示/多模态</strong>：word2vec、GloVe、SimCLR、CLIP、LLaVA、BLIP-2</li>
+        <li><strong>预训练/缩放</strong>：GPT-3、Kaplan/Chinchilla、Llama
+        技术报告、Switch/Mixtral、DeepSeek-V3</li>
+        <li><strong>对齐</strong>：InstructGPT、DPO、Constitutional
+        AI、KTO/ORPO/IPO、Llama 2</li>
+        <li><strong>应用/推理</strong>：LoRA、QLoRA、RAG、Lost in the
+        Middle、ReAct、FlashAttention、PagedAttention</li>
+        <li><strong>前沿</strong>：DeepSeek-R1、Sora、Genie、RULER</li>
+        </ul>
+        <h2 id="博客工具仓库">博客/工具/仓库</h2>
+        <ul>
+        <li><strong>Karpathy 全系列</strong>：micrograd → makemore →
+        minGPT/nanoGPT → minbpe → build-nanogpt（implement-to-understand
+        脊柱）</li>
+        <li><strong>Lilian
+        Weng（lil'log）</strong>：扩散、对比学习、prompt、agent、推理综述</li>
+        <li><strong>Jay Alammar</strong>：Illustrated
+        Transformer/GPT-2/Word2vec</li>
+        <li><strong>The Annotated Transformer / Diffusion
+        Model</strong>（逐行实现）</li>
+        <li><strong>distill.pub / Seeing Theory / CNN Explainer /
+        bbycroft.net/llm</strong>（交互可视化）</li>
+        <li><strong>工具栈</strong>：PyTorch、Hugging Face
+        (transformers/datasets/peft/trl/diffusers/accelerate)、vLLM、W&amp;B/TensorBoard、FAISS/Chroma、RAGAS、lm-evaluation-harness、Open-R1</li>
+        </ul>
+        <hr />
+        <h1 id="第七部分--学完之后如何持续跟踪前沿">第七部分 ·
+        学完之后如何持续跟踪前沿</h1>
+        <blockquote>
+        <p>M14 没有终点——本课程的真正产出不是记住 2026
+        年某个排名，而是带走一套"读论文—复现—质疑"的肌肉，让你在
+        2027、2028 也能自己跟上。</p>
+        </blockquote>
+        <h2 id="1-建立固定节律">1. 建立固定节律</h2>
+        <ul>
+        <li>每周固定 <strong>2–3 小时</strong> 读论文 +
+        小复现，可持续性远胜单次冲刺。</li>
+        <li>维护一个第二大脑（Notion/Obsidian/Anki），记录推导、踩坑、论文要点，做间隔重复。</li>
+        </ul>
+        <h2 id="2-信息源分层">2. 信息源分层</h2>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>层级</th>
+        <th>来源</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td>一手（优先）</td>
+        <td>arXiv（cs.CL/cs.LG）、官方技术报告/system
+        card、模型权重页</td>
+        </tr>
+        <tr class="even">
+        <td>高质量二手</td>
+        <td>少数可信研究者博客/newsletter（Lilian Weng、Sebastian
+        Raschka、Sebastian Ruder）、会议 tutorial</td>
+        </tr>
+        <tr class="odd">
+        <td>噪音（警惕）</td>
+        <td>社交媒体热搜、营销稿、未经独立复现的"突破"</td>
+        </tr>
+        </tbody>
+        </table>
+        <h2 id="3-读论文三遍法--批判清单">3. 读论文"三遍法 +
+        批判清单"</h2>
+        <ol type="1">
+        <li>先读摘要+图表抓骨架 → 2. 读方法抓核心 → 3.
+        读细节能复现。</li>
+        </ol>
+        <ul>
+        <li><strong>批判清单</strong>：它解决什么问题？基线是否公平？提升来自方法还是更多算力/数据？是否可复现（有无代码/权重）？失败模式与未讨论的局限是什么？</li>
+        </ul>
+        <h2 id="4-区分真突破刷榜营销的启发式">4.
+        区分"真突破/刷榜/营销"的启发式</h2>
+        <ul>
+        <li>是否有独立复现、是否在多个独立 benchmark
+        一致、是否报告成本与失败案例、是否混淆 test-time compute
+        投入与方法本身的功劳。</li>
+        </ul>
+        <h2 id="5-最小复现策略">5. 最小复现策略</h2>
+        <ul>
+        <li>不追求复现全规模，在小模型/小数据上复现"核心机制"（如用 GRPO
+        在 GSM8K 子集让 0.5B–1.5B 模型学会推理；用 nanoGPT 加一个 MoE
+        层观察路由）。</li>
+        </ul>
+        <h2 id="6-评测素养">6. 评测素养</h2>
+        <ul>
+        <li>知道每个 benchmark
+        测什么、易被污染/作弊在哪，优先信任私有/动态/人类盲评类评测。</li>
+        </ul>
+        <h2 id="7-持续校准模型版图">7. 持续校准模型版图</h2>
+        <ul>
+        <li>用 <strong>LMArena（人类盲评 Elo）+ Artificial
+        Analysis（成本/速度/质量）+ 垂直
+        benchmark（SWE-bench/GPQA/AIME/RULER）</strong>
+        交叉看，不信单一榜单或厂商自报数字。每季度更新一次你自己的"模型选型表"（带日期与方法说明）。</li>
+        </ul>
+        <h2 id="8-选定方向深耕研究路线">8. 选定方向深耕（研究路线）</h2>
+        <ul>
+        <li>在对齐、长上下文、推理、多模态、可解释性、效率中选 1–2
+        个细分方向，持续产出复现与改进，形成自己的研究品味。</li>
+        </ul>
+        <blockquote>
+        <p><strong>终点不是学完，而是能就某一细分方向持续产出复现与改进。带着这套能力，你已经从"会调
+        API"升级为"能读懂、复现、评判并推进前沿"的人。</strong></p>
+        </blockquote>
+  </main>
+  <footer>
+    <div class="shell">learn.fanghao.top · FangHao Learn</div>
+  </footer>
+</body>
+</html>
