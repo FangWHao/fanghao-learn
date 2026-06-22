@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块3 · 第1课 · Python 科学计算栈与环境工程</title>
+<script src="../assets/theme.js"></script>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue-bg:#eff6ff;
+--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--pink:#db2777;
+--red:#dc2626;--red-bg:#fef2f2;--bg:#ffffff;--soft:#f8fafc;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);
+font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.85;font-size:17px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:840px;margin:0 auto;padding:0 22px 100px;}
+header.top{background:#fff;border-bottom:1px solid var(--line);padding:26px 22px 22px;margin-bottom:14px;}
+header.top .inner{max-width:840px;margin:0 auto;}
+.crumb{color:var(--muted);font-size:14px;letter-spacing:.3px;margin-bottom:6px;}
+h1{font-size:30px;line-height:1.3;margin:.1em 0 .2em;}
+.sub{color:var(--muted);font-size:15px;}
+article{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:30px 34px;margin-top:18px;}
+h2{font-size:23px;margin:1.7em 0 .6em;padding-bottom:.25em;border-bottom:2px solid var(--line);}
+h2:first-child{margin-top:.2em;}
+h3{font-size:19px;margin:1.3em 0 .4em;color:#0f172a;}
+h4{margin:.2em 0 .5em;font-size:16px;}
+p{margin:.7em 0;}
+ul,ol{padding-left:1.3em;margin:.6em 0;}
+li{margin:.32em 0;}
+code{background:#f1f5f9;padding:.12em .4em;border-radius:5px;font-size:.9em;
+font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a;}
+pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 18px;overflow:auto;font-size:14px;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0;}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:15.5px;}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+thead th{background:var(--soft);}
+figure.fig{margin:1.4em 0;text-align:center;}
+figure.fig svg{max-width:100%;height:auto;}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
+.note,.ml,.key,.pitfall,.example{border-radius:10px;padding:14px 18px;margin:1.2em 0;border:1px solid var(--line);}
+.note{background:var(--soft);border-left:4px solid #94a3b8;}
+.example{background:#fff;border-left:4px solid var(--blue);}
+.ml{background:var(--green-bg);border-left:4px solid var(--green);}
+.key{background:var(--amber-bg);border-left:4px solid var(--amber);}
+.pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.goals{background:var(--blue-bg);border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:10px;padding:14px 20px;margin:.2em 0 1.5em;}
+.goals h4{margin:.1em 0 .5em;color:#1e3a8a;}
+.goals ul{margin:.3em 0;}
+.skip{background:var(--soft);border:1px solid var(--line);border-left:4px solid #94a3b8;border-radius:10px;padding:14px 20px;margin:1.8em 0 0;color:#475569;}
+.skip h4{margin:.1em 0 .5em;color:#475569;}
+.tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
+.toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
+.toc h3{margin:.1em 0 .7em;}
+.toc ol{list-style:none;padding:0;}
+.toc li{padding:7px 10px;border-radius:8px;color:#334155;border:1px solid transparent;}
+.toc li a{color:inherit;text-decoration:none;display:block;}
+.toc li .ln{display:inline-block;min-width:54px;color:var(--muted);font-size:13px;}
+.toc li.cur{background:var(--blue-bg);border-color:#bfdbfe;font-weight:600;color:#1e3a8a;}
+.toc li:not(.cur):hover{background:var(--soft);}
+.navbtns{display:flex;justify-content:space-between;margin-top:22px;gap:12px;}
+.navbtns a{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--ink);}
+.navbtns a:hover{border-color:var(--blue);}
+.navbtns .nlabel{color:var(--muted);font-size:13px;}
+.navbtns .ntitle{font-weight:600;margin-top:3px;}
+.navbtns .next{text-align:right;}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.here{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:6px 0 4px;font-size:15px;color:#1e3a8a;line-height:1.7;}
+.here b{font-weight:700;}
+.cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
+.card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
+.card:hover{border-color:var(--blue);}
+.card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
+.card .ct{font-size:18px;font-weight:600;}
+.card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+.card .cap{margin-left:40px;margin-top:7px;font-size:13px;color:#1e3a8a;}
+.card .cap .lbl{display:inline-block;background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;margin-right:7px;}
+
+.card.soon{opacity:.6;cursor:default;}
+.card.soon:hover{border-color:var(--line);}
+.badge{display:inline-block;background:#e2e8f0;color:#475569;font-size:11px;font-weight:600;padding:1px 8px;border-radius:20px;margin-left:8px;vertical-align:middle;}
+.toc li.soon{color:#94a3b8;}
+.toc li.soon .badge{margin-left:4px;}
+</style>
+<link rel="stylesheet" href="../assets/annotator.css">
+<link rel="stylesheet" href="../assets/theme.css">
+</head>
+<body>
+<header class="top"><div class="inner">
+<div class="crumb"><a href="../index.html" style="color:inherit">首页</a>　/　<a href="index.html" style="color:inherit">模块 3 · Python、NumPy、PyTorch 与实验工程</a>　/　第 1 课（共 10 课）</div>
+<h1>Python 科学计算栈与环境工程</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　阶段0：数学与工具基础　·　<strong>能力点：</strong>环境工程——让&quot;跑不出来&quot;不再是元凶（隔离环境/锁版本/逃出 notebook 隐藏状态）</div>
+</div></header>
+<div class="wrap">
+<article>
+<p>模块 1 和模块 2 里你已经把线性代数、微积分、概率与优化的数学推导走了一遍。从这一课起，我们把这些数学搬到机器上跑起来。但在写第一行张量（tensor）代码之前，有一个反复劝退新手的拦路虎要先解决：环境。本模块的目标是"能从零写出一个训练循环"，而训练循环跑不起来时，十有八九不是你的数学错了，而是版本对不上、变量是上次残留的、或者你根本不知道哪一行炸了。这一课就是把这些"跑不出来"的元凶逐个拆掉，给后面四课（NumPy 广播、PyTorch 张量、Autograd、nn.Module）铺好一块稳的地基。</p>
+
+<div class="goals"><h4>读完这一课，你将能够</h4>
+<ul>
+<li>说清为什么同一台机器要建多个隔离环境，并用 <code>environment.yml</code> 或 <code>requirements.txt</code> 锁住版本。</li>
+<li>一句话讲出 NumPy / SciPy / Pandas / Matplotlib / scikit-learn 各自管什么。</li>
+<li>识别 Jupyter/Colab 的"隐藏状态"陷阱，判断一段乱序执行的代码到底输出什么。</li>
+<li>判断一个项目何时该从 notebook 毕业到 <code>.py</code> + <code>argparse</code>。</li>
+<li>用 assert / breakpoint() / print 三件套定位一个 shape 不符的 bug。</li>
+</ul>
+</div>
+
+<h2>为什么要隔离环境与锁版本</h2>
+
+<p><strong>机制直觉。</strong>你的电脑上同时有项目 A（去年的代码，依赖 PyTorch 1.13）和项目 B（这学期的课，要 PyTorch 2.x）。如果所有库都装在同一个全局 Python 里，给 B 升级 PyTorch 的那一刻，A 就坏了——它们共用同一份 <code>site-packages</code>，一个版本号只能有一份。隔离环境（isolated environment）的本质是：给每个项目一份独立的 <code>site-packages</code> 目录，互不污染。</p>
+
+<ul>
+<li><strong>venv</strong>：Python 自带，只管 Python 包。轻量，适合纯 Python 项目。</li>
+<li><strong>conda</strong>：除了 Python 包，还能管非 Python 的二进制依赖（CUDA、MKL、编译器），ML 里常用，因为 PyTorch/GPU 栈牵扯大量系统级库。</li>
+</ul>
+
+<p><strong>锁版本</strong>是隔离的另一半。"在我机器上能跑"几乎总是因为：你装的是 <code>numpy</code> 最新版，同伴装的是半年前的版本，某个函数的默认参数变了。把确切版本号写进文件，别人（和三个月后的你）才能复刻出一模一样的环境。</p>
+
+<figure class="fig"><svg viewBox="0 0 820 480" xmlns="http://www.w3.org/2000/svg" role="img" font-family="system-ui, -apple-system, sans-serif">
+  <title>Python 科学计算栈分工图</title>
+  <desc>NumPy 是地基，SciPy、Pandas、Matplotlib、scikit-learn 四个上层库都依赖它的数组结构。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+  <line x1="175" y1="118" x2="345" y2="358" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="645" y1="118" x2="475" y2="358" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="160" y1="248" x2="335" y2="380" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="660" y1="248" x2="485" y2="380" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="60" y="58" width="230" height="60" rx="12" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+  <text x="175" y="82" text-anchor="middle" font-size="17" font-weight="700" fill="#1e3a8a">SciPy</text>
+  <text x="175" y="104" text-anchor="middle" font-size="12" fill="#1f2937">科学算法：优化 · 积分 · 分解</text>
+  <text x="175" y="135" text-anchor="middle" font-size="11" fill="#64748b">depends on ↓</text>
+  <rect x="530" y="58" width="230" height="60" rx="12" fill="#ecfdf5" stroke="#16a34a" stroke-width="2"/>
+  <text x="645" y="82" text-anchor="middle" font-size="17" font-weight="700" fill="#166534">Pandas</text>
+  <text x="645" y="104" text-anchor="middle" font-size="12" fill="#1f2937">带标签的表格 DataFrame</text>
+  <text x="645" y="135" text-anchor="middle" font-size="11" fill="#64748b">depends on ↓</text>
+  <rect x="45" y="188" width="230" height="60" rx="12" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
+  <text x="160" y="212" text-anchor="middle" font-size="17" font-weight="700" fill="#9a3412">Matplotlib</text>
+  <text x="160" y="234" text-anchor="middle" font-size="12" fill="#1f2937">画图：曲线 · 散点 · 直方</text>
+  <text x="160" y="265" text-anchor="middle" font-size="11" fill="#64748b">depends on ↓</text>
+  <rect x="545" y="188" width="230" height="60" rx="12" fill="#fdf2f8" stroke="#db2777" stroke-width="2"/>
+  <text x="660" y="212" text-anchor="middle" font-size="17" font-weight="700" fill="#9d174d">scikit-learn</text>
+  <text x="660" y="234" text-anchor="middle" font-size="12" fill="#1f2937">经典机器学习</text>
+  <text x="660" y="265" text-anchor="middle" font-size="11" fill="#64748b">depends on ↓</text>
+  <rect x="280" y="358" width="260" height="74" rx="14" fill="#2563eb" stroke="#1e40af" stroke-width="2"/>
+  <text x="410" y="390" text-anchor="middle" font-size="24" font-weight="800" fill="#ffffff">NumPy</text>
+  <text x="410" y="414" text-anchor="middle" font-size="12.5" fill="#dbeafe">数值数组 · 整个栈的地基</text>
+  <text x="410" y="466" text-anchor="middle" font-size="13" fill="#1f2937">Python 科学计算栈分工：NumPy 是地基，上层四个库都依赖它的数组结构。</text>
+</svg>
+<figcaption>Python 科学计算栈分工：NumPy 是地基，上层四个库都依赖它的数组结构。</figcaption></figure>
+
+<p><strong>真实命令当指针。</strong>建环境、装包、锁版本的标准流程：</p>
+
+<pre class="ref" data-lang="conda"><code># 建一个独立环境，指定 Python 版本
+conda create -n ml-course python=3.11
+conda activate ml-course
+
+# 装包
+pip install numpy scipy pandas matplotlib scikit-learn
+
+# 把当前环境的确切版本号导出（锁版本）
+pip freeze > requirements.txt          # pip 路线
+conda env export > environment.yml      # conda 路线</code></pre>
+
+<pre class="ref" data-lang="Shell"><code># 别人拿到你的项目后，一键复刻环境
+pip install -r requirements.txt
+# 或
+conda env create -f environment.yml</code></pre>
+
+<p><code>requirements.txt</code> 里会是 <code>numpy==2.2.5</code> 这样钉死的行——<code>==</code> 是锁版本的关键，没有它就等于没锁。</p>
+
+<h2>科学计算栈：五个库各管什么</h2>
+
+<p>整个 Python 科学计算栈以 <strong>NumPy</strong> 为地基，其他库几乎都建在它的数组（array）之上。一句话分工：</p>
+
+<table>
+<thead><tr><th>库</th><th>管什么</th><th>典型一行</th></tr></thead>
+<tbody>
+<tr><td><strong>NumPy</strong></td><td>数值数组与向量化运算，整个栈的地基</td><td><code>a @ b</code>（矩阵乘）</td></tr>
+<tr><td><strong>SciPy</strong></td><td>科学算法：优化、积分、线性代数分解、统计分布</td><td><code>scipy.optimize.minimize</code></td></tr>
+<tr><td><strong>Pandas</strong></td><td>带行列标签的表格数据（DataFrame），读 CSV、清洗、分组</td><td><code>df.groupby("y").mean()</code></td></tr>
+<tr><td><strong>Matplotlib</strong></td><td>画图：曲线、散点、直方图</td><td><code>plt.plot(x, y)</code></td></tr>
+<tr><td><strong>scikit-learn</strong></td><td>经典（非深度）机器学习：回归、聚类、SVM、预处理</td><td><code>LinearRegression().fit(X, y)</code></td></tr>
+</tbody>
+</table>
+
+<p>记住依赖方向：Pandas/Matplotlib/scikit-learn/SciPy 内部都把数据存成或转成 NumPy 数组。所以先把 NumPy 学透（第 2 课），其他库才不是黑盒。深度学习里 PyTorch 张量接替了数组的地基角色，但二者 API 高度相似，NumPy 仍然是最好的跳板——这正是我们先把 NumPy 学透的原因，而不是说 NumPy 被淘汰了。</p>
+
+<h2>Jupyter/Colab 的隐藏状态陷阱</h2>
+
+<p><strong>机制直觉。</strong>notebook 的每个单元格（cell）共享同一个 Python 内核（kernel）的全局命名空间。你看到的代码是按"书写顺序"从上往下排的，但单元格可以按任意"执行顺序"反复跑。变量的真实值取决于<em>最后一次执行</em>了哪些单元格，而不是它们在屏幕上的排列。于是会出现"代码看起来对、跑出来却错"的鬼故事：上方单元格写着 <code>x = 10</code>，但下方某个单元格偷偷把 <code>x</code> 改成了别的值，你回头重跑上方的单元格时，它读到的是被改过的残留值。</p>
+
+<figure class="fig"><svg viewBox="0 0 760 460" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <marker id="arrSolid" orient="auto-start-reverse" markerWidth="9" markerHeight="9" refX="7" refY="3.5" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L8,3.5 L0,7 Z" fill="#1f2937"/>
+    </marker>
+    <marker id="arrGreen" orient="auto-start-reverse" markerWidth="11" markerHeight="11" refX="8" refY="4" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L9,4 L0,8 Z" fill="#059669"/>
+    </marker>
+    <marker id="arrRed" orient="auto-start-reverse" markerWidth="11" markerHeight="11" refX="8" refY="4" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L9,4 L0,8 Z" fill="#d97706"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="380" y="26" text-anchor="middle" font-size="16" font-weight="700" fill="#1f2937">notebook 隐藏状态：书写顺序 ≠ 执行顺序</text>
+
+  <!-- Column headers -->
+  <text x="170" y="58" text-anchor="middle" font-size="13" font-weight="600" fill="#1f2937">书写顺序（屏幕上看到的）</text>
+  <text x="565" y="58" text-anchor="middle" font-size="13" font-weight="600" fill="#1f2937">执行顺序（内核真实跑的）</text>
+
+  <!-- divider -->
+  <line x1="335" y1="68" x2="335" y2="408" stroke="#94a3b8" stroke-width="1" stroke-dasharray="2 4"/>
+
+  <!-- ===== LEFT: static cells ===== -->
+  <!-- Cell A -->
+  <rect x="70" y="80" width="200" height="48" rx="6" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="84" y="100" font-size="11" font-weight="600" fill="#64748b">Cell A</text>
+  <text x="84" y="118" font-size="13" font-family="ui-monospace, monospace" fill="#1f2937">x = 10</text>
+
+  <!-- static dashed connector -->
+  <line x1="170" y1="128" x2="170" y2="158" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="3 4"/>
+
+  <!-- Cell B (the highlighted one) -->
+  <rect id="cellB" x="70" y="158" width="200" height="48" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+  <text x="84" y="178" font-size="11" font-weight="700" fill="#2563eb">Cell B</text>
+  <text x="84" y="196" font-size="13" font-family="ui-monospace, monospace" fill="#1f2937">print(x)</text>
+
+  <line x1="170" y1="206" x2="170" y2="236" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="3 4"/>
+
+  <!-- Cell C -->
+  <rect x="70" y="236" width="200" height="48" rx="6" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="84" y="256" font-size="11" font-weight="600" fill="#64748b">Cell C</text>
+  <text x="84" y="274" font-size="13" font-family="ui-monospace, monospace" fill="#1f2937">x = 999</text>
+
+  <text x="170" y="306" text-anchor="middle" font-size="11" fill="#64748b" font-style="italic">静态排列，不代表运行先后</text>
+
+  <!-- ===== RIGHT: execution steps ===== -->
+  <!-- ① -->
+  <g>
+    <circle cx="430" cy="98" r="13" fill="#1f2937"/>
+    <text x="430" y="103" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">1</text>
+    <rect x="455" y="82" width="240" height="32" rx="5" fill="#ffffff" stroke="#94a3b8" stroke-width="1.3"/>
+    <text x="468" y="103" font-size="12.5" fill="#1f2937">跑 A  →  x = 10</text>
+  </g>
+  <line x1="430" y1="111" x2="430" y2="143" stroke="#1f2937" stroke-width="1.5" marker-end="url(#arrSolid)"/>
+
+  <!-- ② -->
+  <g>
+    <circle cx="430" cy="160" r="13" fill="#059669"/>
+    <text x="430" y="165" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">2</text>
+    <rect x="455" y="144" width="240" height="32" rx="5" fill="#ecfdf5" stroke="#059669" stroke-width="1.3"/>
+    <text x="468" y="165" font-size="12.5" fill="#1f2937">跑 B  →  打印 <tspan font-weight="700" fill="#059669">10</tspan></text>
+  </g>
+  <line x1="430" y1="173" x2="430" y2="205" stroke="#1f2937" stroke-width="1.5" marker-end="url(#arrSolid)"/>
+
+  <!-- ③ warning highlight -->
+  <g>
+    <circle cx="430" cy="222" r="13" fill="#d97706"/>
+    <text x="430" y="227" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">3</text>
+    <rect x="455" y="206" width="240" height="32" rx="5" fill="#fff7ed" stroke="#d97706" stroke-width="1.6"/>
+    <text x="468" y="227" font-size="12.5" fill="#1f2937">跑 C  →  x = <tspan font-weight="700" fill="#d97706">999</tspan></text>
+  </g>
+  <text x="455" y="252" font-size="11" font-weight="600" fill="#d97706">⚠ 偷偷改了 x</text>
+  <line x1="430" y1="235" x2="430" y2="277" stroke="#1f2937" stroke-width="1.5" marker-end="url(#arrSolid)"/>
+
+  <!-- ④ -->
+  <g>
+    <circle cx="430" cy="294" r="13" fill="#d97706"/>
+    <text x="430" y="299" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">4</text>
+    <rect x="455" y="278" width="240" height="32" rx="5" fill="#fff7ed" stroke="#d97706" stroke-width="1.6"/>
+    <text x="468" y="299" font-size="12.5" fill="#1f2937">重跑 B  →  打印 <tspan font-weight="700" fill="#d97706">999</tspan></text>
+  </g>
+
+  <!-- ===== curved arrows back to Cell B ===== -->
+  <!-- from ② (green) to Cell B -->
+  <path d="M 455,166 C 360,182 320,200 272,184" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#arrGreen)"/>
+  <text x="350" y="222" text-anchor="middle" font-size="11" font-weight="600" fill="#059669">x=10</text>
+
+  <!-- from ④ (orange/warn) to same Cell B -->
+  <path d="M 455,300 C 340,300 300,240 272,196" fill="none" stroke="#d97706" stroke-width="2" stroke-dasharray="5 3" marker-end="url(#arrRed)"/>
+  <text x="350" y="262" text-anchor="middle" font-size="11" font-weight="700" fill="#d97706">x=999</text>
+
+  <!-- 同一段代码 label -->
+  <text x="171" y="346" text-anchor="middle" font-size="11.5" font-weight="600" fill="#2563eb">↑ 同一段代码（Cell B），两次结果不同 ↑</text>
+
+  <!-- bottom note -->
+  <line x1="40" y1="420" x2="720" y2="420" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="380" y="442" text-anchor="middle" font-size="12.5" font-weight="600" fill="#1f2937">变量值取决于<tspan fill="#db2777">执行顺序</tspan>，不是<tspan fill="#94a3b8">屏幕顺序</tspan></text>
+</svg><figcaption>notebook 隐藏状态:左列是屏幕上的书写顺序,右列是真实执行顺序;同一个单元格 B 在乱序下读到不同的 x。</figcaption></figure>
+
+<p><strong>最小可跑复现。</strong>下面用纯 Python 模拟 notebook：每个"单元格"是一段源码字符串，<code>run()</code> 在共享的 <code>state</code> 字典里执行它，正是内核共享命名空间的样子。注意书写顺序和执行顺序不一致时，同一个单元格 B 两次跑出不同结果。<strong>试着先不看下面的输出，自己推断两次 <code>run(cellB)</code> 各打印什么，再对答案。</strong></p>
+
+<pre><code>import time
+
+state = {}                       # 模拟内核共享的全局命名空间
+def run(cell):                   # 模拟"执行一个单元格"
+    exec(cell, state)
+
+# 屏幕上的书写顺序是 A、B、C：
+cellA = "x = 10"
+cellB = "print('B 看到的 x =', x)"
+cellC = "x = 999"                # C 偷偷改了 x
+
+# 但实际执行顺序乱了：A -> B -> C -> 又回头重跑 B
+run(cellA)   # x = 10
+run(cellB)   # B 看到 10
+run(cellC)   # x 被改成 999
+run(cellB)   # 重跑 B：现在看到 999，可源码里 B 上方仍写着 x = 10
+</code></pre>
+
+<p>输出是：</p>
+<pre class="ref" data-lang="输出"><code>B 看到的 x = 10
+B 看到的 x = 999</code></pre>
+
+<p>同一段 <code>print(x)</code>，源码一个字没改，却先后打印 10 和 999。这就是隐藏状态：屏幕上的代码骗了你。<strong>自救招数</strong>：怀疑结果时，<code>Kernel → Restart &amp; Run All</code>，强制按书写顺序从头跑一遍；这是验证 notebook 真的可复现的唯一可靠办法。</p>
+
+<h2>何时从 notebook 毕业到 .py + argparse</h2>
+
+<p>notebook 适合探索：边写边看图、快速试一个想法。但当你需要<strong>可复现、可版本控制、可批量跑</strong>时，就该把代码搬进 <code>.py</code> 文件。出现下面任一信号，就是毕业时刻：</p>
+
+<ul>
+<li>同一份实验要换不同超参数跑很多遍（学习率、batch size）——需要命令行传参，而不是手动改单元格。</li>
+<li>代码要进 git，和别人协作——notebook 的 <code>.ipynb</code> 是 JSON，diff 难读，还混进了输出和执行计数。</li>
+<li>要在没有界面的服务器上后台批跑、或排进定时任务。</li>
+<li>逻辑稳定下来、要被别处 <code>import</code> 复用。</li>
+</ul>
+
+<p><code>argparse</code> 是标准库里把脚本变成命令行工具的方式：把超参数变成 <code>--lr 0.01</code> 这样的开关，跑不同配置不用改一行代码。下面是脚手架（这里不在浏览器跑，因为它要从命令行接参数）：</p>
+
+<pre class="ref" data-lang="脚手架"><code>import argparse
+
+def main(args):
+    print(f"用 lr={args.lr}, epochs={args.epochs} 开跑")
+    # 这里以后会放训练循环（第 6 课）
+
+if __name__ == "__main__":
+    p = argparse.ArgumentParser()
+    p.add_argument("--lr", type=float, default=1e-3)
+    p.add_argument("--epochs", type=int, default=10)
+    p.add_argument("--seed", type=int, default=0)
+    args = p.parse_args()
+    main(args)
+
+# 命令行调用：
+#   python train.py --lr 0.01 --epochs 50</code></pre>
+
+<p><code>if __name__ == "__main__":</code> 这一行的意思是"只有当这个文件被直接运行、而不是被 import 时，才执行下面的代码"——它让同一个文件既能当脚本跑，又能被别处复用。</p>
+
+<h2>调试三件套：assert / breakpoint() / print</h2>
+
+<p>ML 代码里最常见的 bug 不是逻辑错，而是<strong>形状（shape）对不上</strong>：你以为是 (N, D) 的矩阵其实是 (D, N)，矩阵乘法要么直接报错，要么更可怕地靠广播"凑"出一个错误结果还不报错。三件套各有定位场景：</p>
+
+<ul>
+<li><strong>assert</strong>：在关键位置写下你对 shape/数值的假设，假设一旦被打破立刻在<em>出错的源头</em>炸出来，而不是几十行后才报一个莫名其妙的错。最适合卡 shape。</li>
+<li><strong>breakpoint()</strong>：调用它会进入 pdb（Python 调试器），程序在此暂停，你能交互式查看任何变量、单步执行。适合"我不知道这里到底发生了什么"。</li>
+<li><strong>print</strong>：最朴素，打印 <code>x.shape</code>、<code>x.dtype</code>、几个数值。适合快速确认"流到这里的东西长什么样"。三者里它写起来最省事，也最容易留下垃圾，记得清理。</li>
+</ul>
+
+<p><strong>最小可跑：用 assert 抓住 shape 不符。</strong>下面写一个最小的全连接层 <code>relu_layer</code>，在矩阵乘之前 assert 检查维度，故意喂一个错 shape 看它被当场抓住。</p>
+
+<pre><code>import numpy as np
+
+def relu_layer(X, W, b):
+    # 断言我的假设：X 的列数必须等于 W 的行数，否则 X @ W 没意义
+    assert X.shape[1] == W.shape[0], \
+        f"shape 不符: X 是 {X.shape}, W 是 {W.shape}"
+    Z = X @ W + b
+    return np.maximum(Z, 0.0)        # ReLU
+
+N, D, H = 4, 3, 5                    # batch=4, 输入维=3, 隐藏=5
+X = np.random.randn(N, D)
+W = np.random.randn(D, H)           # 正常的 W 是 (3, 5)
+b = np.zeros(H)
+print("正常输出 shape:", relu_layer(X, W, b).shape)   # (4, 5)
+
+# 故意把 W 的行数从 3 改成 4，X @ W 不再合法
+try:
+    bad_W = np.random.randn(D + 1, H)               # (4, 5)，行数不对
+    relu_layer(X, bad_W, b)
+except AssertionError as e:
+    print("被 assert 抓住:", e)
+</code></pre>
+
+<p>输出会是：</p>
+<pre class="ref" data-lang="输出"><code>正常输出 shape: (4, 5)
+被 assert 抓住: shape 不符: X 是 (4, 3), W 是 (4, 5)</code></pre>
+
+<p>真实调试里，把 <code>relu_layer</code> 第一行换成 <code>breakpoint()</code>，运行时会停在那里，你可以敲 <code>X.shape</code>、<code>W.shape</code> 当场查。</p>
+
+<pre class="ref" data-lang="PyTorch"><code># PyTorch 里完全一样的思路；张量也有 .shape
+import torch
+x = torch.randn(4, 3)
+assert x.shape == (4, 3), x.shape
+# breakpoint()  # 同样能停下来交互式查张量
+</code></pre>
+
+<h2>调一调，观察现象</h2>
+
+<p><strong>微任务 1：感受向量化 vs Python 循环的差距。</strong>把 <code>N</code> 从 100000 改成 1000000，预期：循环耗时大致线性涨 10 倍，而 NumPy 向量化几乎不变，加速比更夸张。为什么：Python 的 <code>for</code> 每次迭代都有解释器开销，而 <code>.sum()</code> 在底层 C 里一次性算完。这正是第 2 课"为什么要向量化"的引子。</p>
+
+<pre><code>import numpy as np, time
+
+N = 100_000
+a = np.random.rand(N)
+
+t0 = time.perf_counter()
+s = 0.0
+for x in a:              # 纯 Python 循环
+    s += x
+loop_t = time.perf_counter() - t0
+
+t0 = time.perf_counter()
+s2 = a.sum()             # NumPy 向量化
+vec_t = time.perf_counter() - t0
+
+print(f"循环:   {loop_t*1e3:.2f} ms")
+print(f"向量化: {vec_t*1e3:.3f} ms")
+print(f"加速比: {loop_t/max(vec_t,1e-9):.0f}x")
+</code></pre>
+
+<p><strong>微任务 2：让隐藏状态咬你一口。</strong>在下面把最后一次 <code>run(cellB)</code> 删掉再加回来，或调换 <code>run(cellC)</code> 与第二个 <code>run(cellB)</code> 的顺序，预期：B 打印的值随之改变。为什么：变量值只取决于执行顺序，与代码在屏幕上的位置无关——这就是 notebook 乱序执行的本质。</p>
+
+<pre><code>state = {}
+def run(cell): exec(cell, state)
+
+cellA = "x = 10"
+cellB = "print('B 看到 x =', x)"
+cellC = "x = 999"
+
+run(cellA)
+run(cellB)      # 试试调换下面两行的顺序
+run(cellC)
+run(cellB)
+</code></pre>
+
+<p><strong>微任务 3：让广播"静默吞掉"一个错误。</strong>下面这段刻意去掉了 assert 守门。两个一维数组 <code>a</code>（形状 <code>(3,)</code>）和列向量 <code>b</code>（形状 <code>(3, 1)</code>）相加，你直觉里会以为得到一个长度为 3 的向量。把它跑出来看实际形状，再试着把 <code>b</code> 的 <code>reshape(3, 1)</code> 去掉对比。预期：结果不是 <code>(3,)</code>，而是意外的 <code>(3, 3)</code> 方阵，且全程不报错。为什么：NumPy 广播（broadcasting）会"好心"地把两个操作数在<em>不同的轴</em>上各自拉伸对齐——<code>(3,)</code> 在前面补成 <code>(1, 3)</code> 与 <code>(3, 1)</code> 撞出 <code>(3, 3)</code>，错误被悄悄吞掉。这正说明为什么 assert 比"等它自己报错"更早、更可靠地定位问题：广播经常根本不报错。</p>
+
+<pre><code>import numpy as np
+
+a = np.arange(3)              # 形状 (3,)，你以为是一个长度 3 的向量
+b = np.arange(3).reshape(3, 1)  # 形状 (3, 1)，一个列向量
+
+out = a + b                   # 没有任何 assert / shape 检查守门
+print("a 的 shape:", a.shape)
+print("b 的 shape:", b.shape)
+print("意外的输出 shape:", out.shape)   # 不是 (3,)，而是 (3, 3)
+</code></pre>
+
+<h2>动手练习</h2>
+
+<ol>
+<li><strong>锁一个环境。</strong>在本机用 <code>python -m venv .venv</code> 建一个虚拟环境，激活后 <code>pip install numpy</code>，再 <code>pip freeze > requirements.txt</code>。打开这个文件，确认里面的 <code>numpy==…</code> 带着确切版本号。然后用 <code>python -c "import numpy; print(numpy.__version__)"</code> 验证版本与文件一致。</li>
+<li><strong>抓一个 shape bug。</strong>写一个函数 <code>batch_matmul(A, B)</code> 计算 <code>A @ B</code>，在开头用 assert 同时检查 <code>A.ndim == 2</code>、<code>B.ndim == 2</code> 和 <code>A.shape[1] == B.shape[0]</code>，每条 assert 带上信息量足够的报错信息。喂三组输入：一组正常、一组维度不匹配、一组传了 1 维数组，确认每种错误都被对应的 assert 当场抓住。</li>
+<li><strong>给隐藏状态做一次复盘。</strong>用本课的 <code>state</code>/<code>run</code> 模拟器，写出一个 4 个单元格的序列，使得"按书写顺序从头跑"和"按某个乱序跑"对同一个变量打印出不同的值。这复刻了 <code>Restart &amp; Run All</code> 能救你于何处。</li>
+</ol>
+
+<h2>掌握自检</h2>
+<ul>
+<li>我能解释为什么不该把所有项目都装进同一个全局 Python，并能说出 <code>requirements.txt</code> 里 <code>==</code> 的作用。</li>
+<li>给我 NumPy/SciPy/Pandas/Matplotlib/scikit-learn 任意一个，我能一句话说出它管什么、以及谁依赖谁。</li>
+<li>给我一段乱序执行的 notebook 单元格，我能推断出每个变量最后的真实值，而不是被屏幕顺序骗到。</li>
+<li>我能列出至少两个"该从 notebook 毕业到 .py"的信号，并知道 <code>argparse</code> 解决了什么。</li>
+<li>遇到一个 shape 报错，我知道先用 assert/print 在哪里卡住假设，必要时用 breakpoint() 进 pdb 交互查变量。</li>
+</ul>
+
+<div class="skip"><h4>可以先放过的点</h4>
+<ul>
+<li><strong>conda vs venv 的深度对比、conda-forge 频道、CUDA 版本匹配</strong>：现在只需会"建环境 + 锁版本"两个动作。等你真要上 GPU 跑 PyTorch（本模块学到 PyTorch 张量那一课、并开始上手训练之后）再回来研究 CUDA 对齐。</li>
+<li><strong>pdb 的全部命令</strong>：记住 <code>breakpoint()</code> 能停下来、能打印变量就够了。<code>n/s/c/q</code> 等命令等你真的在调一个复杂 bug 时查一次就会了。</li>
+<li><strong>SciPy/Pandas/sklearn 的具体 API</strong>：本课只要求知道它们各管什么这一层。深度学习训练循环主要用 NumPy 思维 + PyTorch，这些库到需要时再深入，不必现在啃。</li>
+</ul>
+</div>
+</article>
+<div class="navbtns"><a class="prev" href="index.html"><div class="nlabel">←</div><div class="ntitle">模块目录</div></a><a class="next" href="lesson-02-numpy-vectorization-broadcasting.html"><div class="nlabel">下一课 →</div><div class="ntitle">第2课 · NumPy 数组、向量化与广播</div></a></div>
+<nav class="toc"><h3>本模块课程表</h3><ol>
+<li class="cur"><span class="ln">第1课</span>Python 科学计算栈与环境工程</li>
+<li><a href="lesson-02-numpy-vectorization-broadcasting.html"><span class="ln">第2课</span>NumPy 数组、向量化与广播</a></li>
+<li><a href="lesson-03-pytorch-tensors-device-dtype.html"><span class="ln">第3课</span>PyTorch 张量、设备与 dtype</a></li>
+<li><a href="lesson-04-autograd.html"><span class="ln">第4课</span>Autograd 自动微分</a></li>
+<li><a href="lesson-05-nn-module.html"><span class="ln">第5课</span>nn.Module 与模型构建</a></li>
+<li class="soon"><span class="ln">第6课</span>从零写训练循环（核心）　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第7课</span>数据加载 Dataset 与 DataLoader　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第8课</span>GPU/CUDA 与混合精度　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第9课</span>实验管理、可复现与调试方法论　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第10课</span>Hugging Face 生态入门　<span class="badge">即将上线</span></li>
+</ol></nav>
+</div>
+<style>
+.pr-cell{border:1px solid #334155;border-radius:10px;margin:1.2em 0;overflow:hidden;background:#0f172a;}
+.pr-head{display:flex;align-items:center;gap:8px;background:#1e293b;color:#cbd5e1;padding:6px 10px;font-size:13px;font-family:system-ui,-apple-system,sans-serif;}
+.pr-title{flex:1;font-weight:600;}
+.pr-status{font-size:12px;color:#94a3b8;white-space:nowrap;max-width:50%;overflow:hidden;text-overflow:ellipsis;}
+.pr-btn{cursor:pointer;border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:6px;padding:3px 11px;font-size:13px;line-height:1.4;}
+.pr-btn:hover{background:#0b1220;}
+.pr-run{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:600;}
+.pr-run:hover{background:#1d4ed8;}
+.pr-cell.collapsed .pr-body{display:none;}
+.pr-editor{position:relative;background:#0f172a;}
+.pr-code,.pr-edit{display:block;width:100%;min-height:68px;border:none;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.55;padding:12px 14px;box-sizing:border-box;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:4;}
+.pr-code{position:absolute;inset:0;margin:0;overflow:hidden;background:#0f172a;color:#dbeafe;pointer-events:none;}
+.pr-edit{position:relative;background:transparent;color:transparent;caret-color:#e2e8f0;resize:vertical;outline:none;-webkit-text-fill-color:transparent;}
+.pr-edit::selection{background:rgba(96,165,250,.34);}
+.tok-kw{color:#c084fc;font-weight:700;}
+.tok-fn{color:#67e8f9;}
+.tok-num{color:#fbbf24;}
+.tok-str{color:#86efac;}
+.tok-comment{color:#94a3b8;font-style:italic;}
+.pr-out{margin:0;padding:10px 14px;border-top:1px solid #334155;background:#0b1220;color:#cbd5e1;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.5;white-space:pre-wrap;max-height:340px;overflow:auto;}
+.pr-out:empty{display:none;}
+.pr-out.err{color:#fca5a5;}
+.pr-cell.ref-cell{border-color:#475569;}
+.pr-cell.ref-cell .pr-head{background:#172033;color:#cbd5e1;}
+.pr-cell.ref-cell .pr-status{color:#fbbf24;font-style:italic;}
+.pr-code.pr-static{position:static;pointer-events:auto;overflow:auto;min-height:auto;background:#0f172a;color:#dbeafe;}
+#pr-fab{position:fixed;right:18px;bottom:18px;z-index:9998;background:#2563eb;color:#fff;border:none;border-radius:999px;padding:10px 17px;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.22);font-family:system-ui,sans-serif;}
+#pr-fab:hover{background:#1d4ed8;}
+#pr-lab{position:fixed;right:18px;bottom:66px;z-index:9999;width:400px;max-width:92vw;background:#0f172a;border:1px solid #334155;border-radius:12px;display:none;flex-direction:column;box-shadow:0 14px 38px rgba(0,0,0,.4);overflow:hidden;}
+#pr-lab.open{display:flex;}
+#pr-lab .pr-edit,#pr-lab .pr-code{min-height:150px;}
+</style>
+<script>
+(function(){
+  var PYBASE="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+  var pyReady=null;
+  function loadPy(status){
+    if(pyReady)return pyReady;
+    pyReady=(async function(){
+      status("正在加载 Python 运行时（首次约 10 秒，需联网）…");
+      await new Promise(function(res,rej){
+        var s=document.createElement("script");s.src=PYBASE+"pyodide.js";
+        s.onload=res;s.onerror=function(){rej(new Error("无法加载 Pyodide（首次运行需要联网）"));};
+        document.head.appendChild(s);
+      });
+      var py=await loadPyodide({indexURL:PYBASE});
+      status("正在加载 NumPy …");
+      await py.loadPackage("numpy");
+      status("Python 就绪 ✓");
+      return py;
+    })();
+    return pyReady;
+  }
+  async function run(code,outEl,statusEl){
+    var setS=function(m){if(statusEl)statusEl.textContent=m;};
+    outEl.classList.remove("err");outEl.textContent="";
+    var py;
+    try{py=await loadPy(setS);}
+    catch(e){outEl.classList.add("err");outEl.textContent="加载失败："+e.message;return;}
+    var buf="";
+    py.setStdout({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    py.setStderr({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    try{
+      var result=await py.runPythonAsync(code);
+      if(result!==undefined&&result!==null){
+        var r;try{r=result.toString();}catch(_){r=String(result);}
+        if(r!=="None")buf+=(buf&&!buf.endsWith("\n")?"\n":"")+r;
+        if(result&&result.destroy)result.destroy();
+      }
+      outEl.textContent=buf||"（运行成功，无输出。用 print(...) 查看结果）";
+    }catch(e){
+      outEl.classList.add("err");
+      outEl.textContent=buf+(buf?"\n":"")+String((e&&e.message)||e);
+    }
+  }
+  var KW={False:1,None:1,True:1,and:1,as:1,assert:1,async:1,await:1,break:1,class:1,continue:1,def:1,del:1,elif:1,else:1,except:1,finally:1,for:1,from:1,global:1,if:1,import:1,in:1,is:1,lambda:1,nonlocal:1,not:1,or:1,pass:1,raise:1,return:1,try:1,while:1,with:1,yield:1};
+  var FN={abs:1,all:1,any:1,array:1,bool:1,dict:1,enumerate:1,float:1,int:1,len:1,list:1,max:1,min:1,np:1,numpy:1,print:1,range:1,round:1,set:1,str:1,sum:1,tuple:1,zip:1,torch:1,nn:1,tensor:1,F:1,super:1,isinstance:1,getattr:1,setattr:1,hasattr:1,sorted:1,type:1,object:1,property:1};
+  function esc(s){return s.replace(/[&<>]/g,function(c){return c==="&"?"&amp;":c==="<"?"&lt;":"&gt;";});}
+  function colorLine(line){
+    var out="",i=0;
+    while(i<line.length){
+      var ch=line[i];
+      if(ch==="#"){out+='<span class="tok-comment">'+esc(line.slice(i))+"</span>";break;}
+      if(ch==="'"||ch==='"'){
+        var q=ch,triple=line.slice(i,i+3)===q+q+q,end=i+(triple?3:1),done=false;
+        while(end<line.length){
+          if(!triple&&line[end]==="\\"){end+=2;continue;}
+          if(triple&&line.slice(end,end+3)===q+q+q){end+=3;done=true;break;}
+          if(!triple&&line[end]===q){end+=1;done=true;break;}
+          end+=1;
+        }
+        out+='<span class="tok-str">'+esc(line.slice(i,done?end:line.length))+"</span>";
+        i=done?end:line.length;
+        continue;
+      }
+      if(/[0-9]/.test(ch)||(ch==="."&&/[0-9]/.test(line[i+1]||""))){
+        var m=line.slice(i).match(/^(?:0[xX][0-9a-fA-F]+|\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?/);
+        out+='<span class="tok-num">'+esc(m[0])+"</span>";i+=m[0].length;continue;
+      }
+      if(/[A-Za-z_]/.test(ch)){
+        var id=line.slice(i).match(/^[A-Za-z_][A-Za-z0-9_]*/)[0];
+        if(KW[id])out+='<span class="tok-kw">'+id+"</span>";
+        else if(FN[id])out+='<span class="tok-fn">'+id+"</span>";
+        else out+=id;
+        i+=id.length;continue;
+      }
+      out+=esc(ch);i+=1;
+    }
+    return out;
+  }
+  function paint(ta){
+    var pre=ta.closest(".pr-editor").querySelector(".pr-code");
+    pre.innerHTML=ta.value.split("\n").map(colorLine).join("\n")+(ta.value.endsWith("\n")?"\n":"");
+    pre.style.height=ta.style.height;
+    pre.scrollTop=ta.scrollTop;pre.scrollLeft=ta.scrollLeft;
+  }
+  function autosize(ta){ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight+2,460)+"px";}
+  function tune(ta){autosize(ta);paint(ta);}
+  function tabKey(e){
+    if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();var b=this.closest(".pr-cell,#pr-lab").querySelector(".pr-run");if(b)b.click();return;}
+    if(e.key==="Tab"){
+      e.preventDefault();
+      var s=this.selectionStart,en=this.selectionEnd,v=this.value,lineStart=v.lastIndexOf("\n",s-1)+1,lineEnd=v.indexOf("\n",en);
+      if(lineEnd<0)lineEnd=v.length;
+      if(s!==en||e.shiftKey){
+        var block=v.slice(lineStart,lineEnd),lines=block.split("\n"),delta=0;
+        if(e.shiftKey){
+          lines=lines.map(function(line){
+            if(line.startsWith("    ")){delta-=4;return line.slice(4);}
+            if(line.startsWith("\t")){delta-=1;return line.slice(1);}
+            return line;
+          });
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=Math.max(lineStart,s+(s===lineStart?0:Math.max(delta/Math.max(lines.length,1),-4)));
+          this.selectionEnd=Math.max(this.selectionStart,en+delta);
+        }else{
+          lines=lines.map(function(line){delta+=4;return "    "+line;});
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=s+4;
+          this.selectionEnd=en+delta;
+        }
+      }else{
+        this.value=v.slice(0,s)+"    "+v.slice(en);this.selectionStart=this.selectionEnd=s+4;
+      }
+      tune(this);
+      return;
+    }
+    if(e.key==="Enter"){
+      e.preventDefault();
+      var a=this.selectionStart,b=this.selectionEnd,text=this.value,start=text.lastIndexOf("\n",a-1)+1;
+      var prefix=text.slice(start,a),indent=(prefix.match(/^\s*/)||[""])[0],code=prefix.replace(/#.*$/,"").trimEnd();
+      var add="\n"+indent+(/:\s*$/.test(code)?"    ":"");
+      this.value=text.slice(0,a)+add+text.slice(b);
+      this.selectionStart=this.selectionEnd=a+add.length;
+      tune(this);
+      return;
+    }
+  }
+  function makeCell(code){
+    var cell=document.createElement("div");cell.className="pr-cell";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">可运行 · Python (NumPy)</span><span class="pr-status"></span><button class="pr-btn pr-toggle">收起</button><button class="pr-btn pr-run">▶ 运行</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    var ta=cell.querySelector(".pr-edit");ta.value=code;
+    var out=cell.querySelector(".pr-out"),st=cell.querySelector(".pr-status");
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    cell.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    var tog=cell.querySelector(".pr-toggle");
+    tog.onclick=function(){cell.classList.toggle("collapsed");tog.textContent=cell.classList.contains("collapsed")?"展开":"收起";};
+    setTimeout(function(){tune(ta);},0);
+    return cell;
+  }
+  function makeRef(code,lang){
+    var cell=document.createElement("div");cell.className="pr-cell ref-cell";
+    var L=lang||"参考";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">参考代码 · '+esc(L)+'</span><span class="pr-status">不在浏览器运行</span></div><pre class="pr-code pr-static"></pre>';
+    cell.querySelector(".pr-static").innerHTML=code.split("\n").map(colorLine).join("\n");
+    return cell;
+  }
+  function enhance(){
+    document.querySelectorAll("article pre").forEach(function(pre){
+      if(pre.closest(".pr-cell"))return;
+      var codeEl=pre.querySelector("code")||pre;
+      var code=codeEl.textContent.replace(/\s+$/,"");
+      if(!code)return;
+      if(pre.classList.contains("ref")){
+        pre.replaceWith(makeRef(code,pre.getAttribute("data-lang")));
+      }else{
+        pre.replaceWith(makeCell(code));
+      }
+    });
+  }
+  function lab(){
+    var fab=document.createElement("button");fab.id="pr-fab";fab.textContent="▶ Python 实验台";
+    var panel=document.createElement("div");panel.id="pr-lab";
+    panel.innerHTML='<div class="pr-head"><span class="pr-title">Python 实验台 · NumPy</span><span class="pr-status"></span><button class="pr-btn pr-run">▶ 运行</button><button class="pr-btn pr-min">收起</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    document.body.appendChild(fab);document.body.appendChild(panel);
+    var ta=panel.querySelector(".pr-edit");
+    ta.value="import numpy as np\na = np.array([3, 2])\nb = np.array([1, 4])\nprint(\"a + b =\", a + b)\nprint(\"a . b =\", a @ b)\nprint(\"|a|  =\", np.linalg.norm(a))\ncos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))\nprint(\"cos =\", round(float(cos), 4))";
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    var out=panel.querySelector(".pr-out"),st=panel.querySelector(".pr-status");
+    panel.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    fab.onclick=function(){panel.classList.toggle("open");};
+    panel.querySelector(".pr-min").onclick=function(){panel.classList.remove("open");};
+    setTimeout(function(){tune(ta);},0);
+  }
+  function init(){enhance();lab();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+<script src="../assets/annotator.js"></script>
+</body>
+</html>

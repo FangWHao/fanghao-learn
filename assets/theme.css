@@ -229,6 +229,126 @@ html[data-theme="dark"] figure.fig svg {
   border-radius: 8px;
 }
 
+html[data-theme="dark"] figure.fig svg [fill="#ffffff"],
+html[data-theme="dark"] figure.fig svg [fill="#fff"],
+html[data-theme="dark"] figure.fig svg [fill="#f8fafc"],
+html[data-theme="dark"] figure.fig svg [fill="#f1f5f9"] {
+  fill: #111827 !important;
+}
+
+html[data-theme="dark"] figure.fig svg [fill="#eff6ff"],
+html[data-theme="dark"] figure.fig svg [fill="#dbeafe"] {
+  fill: #0d2a47 !important;
+}
+
+html[data-theme="dark"] figure.fig svg [fill="#ecfdf5"] {
+  fill: #062d26 !important;
+}
+
+html[data-theme="dark"] figure.fig svg [fill="#d1fae5"],
+html[data-theme="dark"] figure.fig svg [fill="#f0fdf4"],
+html[data-theme="dark"] figure.fig svg [fill="#dcfce7"],
+html[data-theme="dark"] figure.fig svg [fill="#bbf7d0"],
+html[data-theme="dark"] figure.fig svg [fill="#a7f3d0"],
+html[data-theme="dark"] figure.fig svg [fill="#e7f6ef"] {
+  fill: #06382e !important;
+}
+
+html[data-theme="dark"] figure.fig svg [fill="#fff7ed"],
+html[data-theme="dark"] figure.fig svg [fill="#fffbeb"],
+html[data-theme="dark"] figure.fig svg [fill="#fef3c7"],
+html[data-theme="dark"] figure.fig svg [fill="#fde68a"],
+html[data-theme="dark"] figure.fig svg [fill="#fed7aa"],
+html[data-theme="dark"] figure.fig svg [fill="#fde9d0"] {
+  fill: #352507 !important;
+}
+
+html[data-theme="dark"] figure.fig svg [fill="#fdf2f8"],
+html[data-theme="dark"] figure.fig svg [fill="#fef2f8"],
+html[data-theme="dark"] figure.fig svg [fill="#fff1f2"],
+html[data-theme="dark"] figure.fig svg [fill="#fde7f1"],
+html[data-theme="dark"] figure.fig svg [fill="#fce7f3"],
+html[data-theme="dark"] figure.fig svg [fill="#fbcfe8"],
+html[data-theme="dark"] figure.fig svg [fill="#fbd6e8"] {
+  fill: #351424 !important;
+}
+
+html[data-theme="dark"] figure.fig svg [fill="#fef2f2"],
+html[data-theme="dark"] figure.fig svg [fill="#fca5a5"] {
+  fill: #3a1518 !important;
+}
+
+html[data-theme="dark"] figure.fig svg [fill="#dbe4ee"],
+html[data-theme="dark"] figure.fig svg [fill="#eef2f7"] {
+  fill: #111827 !important;
+}
+
+html[data-theme="dark"] figure.fig svg [fill="#1f2937"],
+html[data-theme="dark"] figure.fig svg [fill="#0f172a"],
+html[data-theme="dark"] figure.fig svg [fill="#111827"],
+html[data-theme="dark"] figure.fig svg [fill="#334155"],
+html[data-theme="dark"] figure.fig svg [fill="#475569"],
+html[data-theme="dark"] figure.fig svg [fill="#4b5563"],
+html[data-theme="dark"] figure.fig svg [fill="#6b7280"] {
+  fill: #e5edf8 !important;
+}
+
+html[data-theme="dark"] figure.fig svg [fill="#64748b"],
+html[data-theme="dark"] figure.fig svg [fill="#94a3b8"] {
+  fill: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] figure.fig svg [fill="#1e3a8a"],
+html[data-theme="dark"] figure.fig svg [fill="#1e40af"],
+html[data-theme="dark"] figure.fig svg [fill="#1d4ed8"],
+html[data-theme="dark"] figure.fig svg [fill="#1e3a5f"] {
+  fill: #bfdbfe !important;
+}
+
+html[data-theme="dark"] figure.fig svg [fill="#065f46"],
+html[data-theme="dark"] figure.fig svg [fill="#047857"],
+html[data-theme="dark"] figure.fig svg [fill="#166534"] {
+  fill: #86efac !important;
+}
+
+html[data-theme="dark"] figure.fig svg [fill="#9a3412"],
+html[data-theme="dark"] figure.fig svg [fill="#92400e"],
+html[data-theme="dark"] figure.fig svg [fill="#92600a"],
+html[data-theme="dark"] figure.fig svg [fill="#b45309"] {
+  fill: #fdba74 !important;
+}
+
+html[data-theme="dark"] figure.fig svg [fill="#9d174d"],
+html[data-theme="dark"] figure.fig svg [fill="#831843"],
+html[data-theme="dark"] figure.fig svg [fill="#be185d"] {
+  fill: #f9a8d4 !important;
+}
+
+html[data-theme="dark"] figure.fig svg [fill="#7f1d1d"] {
+  fill: #fca5a5 !important;
+}
+
+html[data-theme="dark"] figure.fig svg [stroke="#1f2937"],
+html[data-theme="dark"] figure.fig svg [stroke="#0f172a"],
+html[data-theme="dark"] figure.fig svg [stroke="#111827"],
+html[data-theme="dark"] figure.fig svg [stroke="#334155"],
+html[data-theme="dark"] figure.fig svg [stroke="#475569"],
+html[data-theme="dark"] figure.fig svg [stroke="#4b5563"],
+html[data-theme="dark"] figure.fig svg [stroke="#6b7280"] {
+  stroke: #e5edf8 !important;
+}
+
+html[data-theme="dark"] figure.fig svg [stroke="#e2e8f0"],
+html[data-theme="dark"] figure.fig svg [stroke="#cbd5e1"],
+html[data-theme="dark"] figure.fig svg [stroke="#94a3b8"],
+html[data-theme="dark"] figure.fig svg [stroke="#64748b"] {
+  stroke: #475569 !important;
+}
+
+html[data-theme="dark"] figure.fig svg [stroke="#1e40af"] {
+  stroke: #93c5fd !important;
+}
+
 html {
   overflow-x: hidden;
 }

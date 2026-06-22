@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块3 · 第2课 · NumPy 数组、向量化与广播</title>
+<script src="../assets/theme.js"></script>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue-bg:#eff6ff;
+--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--pink:#db2777;
+--red:#dc2626;--red-bg:#fef2f2;--bg:#ffffff;--soft:#f8fafc;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);
+font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.85;font-size:17px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:840px;margin:0 auto;padding:0 22px 100px;}
+header.top{background:#fff;border-bottom:1px solid var(--line);padding:26px 22px 22px;margin-bottom:14px;}
+header.top .inner{max-width:840px;margin:0 auto;}
+.crumb{color:var(--muted);font-size:14px;letter-spacing:.3px;margin-bottom:6px;}
+h1{font-size:30px;line-height:1.3;margin:.1em 0 .2em;}
+.sub{color:var(--muted);font-size:15px;}
+article{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:30px 34px;margin-top:18px;}
+h2{font-size:23px;margin:1.7em 0 .6em;padding-bottom:.25em;border-bottom:2px solid var(--line);}
+h2:first-child{margin-top:.2em;}
+h3{font-size:19px;margin:1.3em 0 .4em;color:#0f172a;}
+h4{margin:.2em 0 .5em;font-size:16px;}
+p{margin:.7em 0;}
+ul,ol{padding-left:1.3em;margin:.6em 0;}
+li{margin:.32em 0;}
+code{background:#f1f5f9;padding:.12em .4em;border-radius:5px;font-size:.9em;
+font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a;}
+pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 18px;overflow:auto;font-size:14px;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0;}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:15.5px;}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+thead th{background:var(--soft);}
+figure.fig{margin:1.4em 0;text-align:center;}
+figure.fig svg{max-width:100%;height:auto;}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
+.note,.ml,.key,.pitfall,.example{border-radius:10px;padding:14px 18px;margin:1.2em 0;border:1px solid var(--line);}
+.note{background:var(--soft);border-left:4px solid #94a3b8;}
+.example{background:#fff;border-left:4px solid var(--blue);}
+.ml{background:var(--green-bg);border-left:4px solid var(--green);}
+.key{background:var(--amber-bg);border-left:4px solid var(--amber);}
+.pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.goals{background:var(--blue-bg);border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:10px;padding:14px 20px;margin:.2em 0 1.5em;}
+.goals h4{margin:.1em 0 .5em;color:#1e3a8a;}
+.goals ul{margin:.3em 0;}
+.skip{background:var(--soft);border:1px solid var(--line);border-left:4px solid #94a3b8;border-radius:10px;padding:14px 20px;margin:1.8em 0 0;color:#475569;}
+.skip h4{margin:.1em 0 .5em;color:#475569;}
+.tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
+.toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
+.toc h3{margin:.1em 0 .7em;}
+.toc ol{list-style:none;padding:0;}
+.toc li{padding:7px 10px;border-radius:8px;color:#334155;border:1px solid transparent;}
+.toc li a{color:inherit;text-decoration:none;display:block;}
+.toc li .ln{display:inline-block;min-width:54px;color:var(--muted);font-size:13px;}
+.toc li.cur{background:var(--blue-bg);border-color:#bfdbfe;font-weight:600;color:#1e3a8a;}
+.toc li:not(.cur):hover{background:var(--soft);}
+.navbtns{display:flex;justify-content:space-between;margin-top:22px;gap:12px;}
+.navbtns a{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--ink);}
+.navbtns a:hover{border-color:var(--blue);}
+.navbtns .nlabel{color:var(--muted);font-size:13px;}
+.navbtns .ntitle{font-weight:600;margin-top:3px;}
+.navbtns .next{text-align:right;}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.here{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:6px 0 4px;font-size:15px;color:#1e3a8a;line-height:1.7;}
+.here b{font-weight:700;}
+.cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
+.card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
+.card:hover{border-color:var(--blue);}
+.card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
+.card .ct{font-size:18px;font-weight:600;}
+.card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+.card .cap{margin-left:40px;margin-top:7px;font-size:13px;color:#1e3a8a;}
+.card .cap .lbl{display:inline-block;background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;margin-right:7px;}
+
+.card.soon{opacity:.6;cursor:default;}
+.card.soon:hover{border-color:var(--line);}
+.badge{display:inline-block;background:#e2e8f0;color:#475569;font-size:11px;font-weight:600;padding:1px 8px;border-radius:20px;margin-left:8px;vertical-align:middle;}
+.toc li.soon{color:#94a3b8;}
+.toc li.soon .badge{margin-left:4px;}
+</style>
+<link rel="stylesheet" href="../assets/annotator.css">
+<link rel="stylesheet" href="../assets/theme.css">
+</head>
+<body>
+<header class="top"><div class="inner">
+<div class="crumb"><a href="../index.html" style="color:inherit">首页</a>　/　<a href="index.html" style="color:inherit">模块 3 · Python、NumPy、PyTorch 与实验工程</a>　/　第 2 课（共 10 课）</div>
+<h1>NumPy 数组、向量化与广播</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　阶段0：数学与工具基础　·　<strong>能力点：</strong>NumPy 向量化与广播——张量心智模型，1:1 迁移到 PyTorch（性能与隐形 bug 的根）</div>
+</div></header>
+<div class="wrap">
+<article>
+<p>上一课你把环境搭好了：conda 环境、解释器、能跑代码的编辑器。现在地基要从"能运行"升级到"能高效地处理一整块数据"。本模块的终点是从零写出一个训练循环，而训练循环的每一步——前向、损失、反向——本质上都是在操作一个个多维数组。这一课我们建立"张量（tensor）心智模型"：数据是带形状（shape）和类型（dtype）的内存块，运算尽量整块地做、不写 Python 循环。这套心智模型会 1:1 迁移到下一课的 PyTorch 张量上——届时你只是把 <code>np</code> 换成 <code>torch</code>、再加上"设备"和"梯度"两个新维度而已。</p>
+
+<div class="goals"><h4>读完这一课，你将能够</h4><ul>
+<li>判断一个数组操作返回的是视图（view，共享内存）还是拷贝（copy），并预测就地修改会不会"串改"原数组。</li>
+<li>把一个 Python 循环改写成向量化（vectorized）数组运算，并用 <code>perf_counter</code> 量出至少一个数量级的加速比（具体倍数随机器/环境而变，关注量级即可）。</li>
+<li>用尾部对齐规则手推任意两个 shape 能否广播（broadcast）、结果是什么 shape，并认出 <code>(N,1)-(N,)→(N,N)</code> 这个隐形 bug。</li>
+<li>正确使用布尔掩码、花式索引、<code>axis</code> 与 <code>keepdims</code>，写出按行归一化这类操作。</li>
+<li>解释 softmax 为什么要减最大值，并写出数值稳定的版本。</li>
+</ul></div>
+
+<h2>ndarray：shape 与 dtype 是张量的"身份证"</h2>
+<p>一个 NumPy 数组（<code>ndarray</code>）= 一块连续内存缓冲区 + 一个描述如何解读它的"头部"（header）。头部里最重要的两项是 <strong>shape</strong>（每一维多长，写成 <code>(N, D)</code> 这样的元组）和 <strong>dtype</strong>（每个元素的类型，如 <code>float64</code>、<code>int64</code>）。同一块缓冲区，配不同的头部，就能被解读成不同形状——这正是 <code>reshape</code> 几乎免费的原因，也是下面"视图"的关键。</p>
+<ul>
+<li><strong>shape</strong> 决定广播和矩阵乘法能不能对上。ML 里 99% 的 bug 是 shape 不对，养成随手 <code>print(x.shape)</code> 的习惯。</li>
+<li><strong>dtype</strong> 决定精度与显存。深度学习默认 <code>float32</code>（而非 NumPy 默认的 <code>float64</code>），因为省一半显存、且对训练足够。整数索引必须是整型 dtype。</li>
+</ul>
+
+<h2>view vs copy：切片是视图，就地改会"串"到原数组</h2>
+<p>机制直觉：<strong>切片返回视图</strong>——一个新头部，指向<em>同一块</em>内存缓冲区。所以对切片就地赋值，改的是底层那块内存，原数组跟着变。而 <code>.copy()</code> 会另开一块缓冲区，互不影响。这不是 NumPy 的怪癖，而是性能设计：切一个亿级数组若每次都拷贝就太慢了。代价是你必须时刻清楚手里是视图还是拷贝。</p>
+<p>先给一个判断技巧的直觉：每个数组都有个 <code>.base</code> 属性，它就是"我这块内存是从谁那借来的"的指针——借来的（视图）就指向原数组，自己新开内存的就是 <code>None</code>。</p>
+<figure class="fig"><svg viewBox="0 0 720 470" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif">
+  <defs>
+    <marker id="arrBlue" orient="auto-start-reverse" markerWidth="8" markerHeight="8" refX="6.5" refY="3.5" markerUnits="strokeWidth">
+      <path d="M0,0 L7,3.5 L0,7 Z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrGreen" orient="auto-start-reverse" markerWidth="8" markerHeight="8" refX="6.5" refY="3.5" markerUnits="strokeWidth">
+      <path d="M0,0 L7,3.5 L0,7 Z" fill="#059669"/>
+    </marker>
+  </defs>
+
+  <!-- title -->
+  <text x="360" y="26" text-anchor="middle" font-size="15" font-weight="600" fill="#1f2937">视图与拷贝的内存模型</text>
+
+  <!-- divider -->
+  <line x1="360" y1="48" x2="360" y2="438" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 4"/>
+
+  <!-- ============ LEFT: view ============ -->
+  <text x="175" y="66" text-anchor="middle" font-size="13" font-weight="600" fill="#2563eb">view（视图）</text>
+
+  <!-- two headers -->
+  <rect x="40" y="84" width="140" height="42" rx="5" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="110" y="102" text-anchor="middle" font-size="11.5" font-weight="600" fill="#1f2937">a.header</text>
+  <text x="110" y="118" text-anchor="middle" font-size="11" fill="#1f2937">shape=(10,)</text>
+
+  <rect x="200" y="84" width="160" height="42" rx="5" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="280" y="102" text-anchor="middle" font-size="11.5" font-weight="600" fill="#1f2937">b.header</text>
+  <text x="280" y="118" text-anchor="middle" font-size="11" fill="#1f2937">shape=(9,), offset=1</text>
+
+  <!-- buffer cells (8 cells), x from 40, width 320, cell 40 -->
+  <g>
+    <rect x="40" y="218" width="40" height="40" fill="#ffffff" stroke="#2563eb" stroke-width="1.3"/>
+    <rect x="80" y="218" width="40" height="40" fill="#fde68a" stroke="#d97706" stroke-width="2"/>
+    <rect x="120" y="218" width="40" height="40" fill="#ffffff" stroke="#2563eb" stroke-width="1.3"/>
+    <rect x="160" y="218" width="40" height="40" fill="#ffffff" stroke="#2563eb" stroke-width="1.3"/>
+    <rect x="200" y="218" width="40" height="40" fill="#ffffff" stroke="#2563eb" stroke-width="1.3"/>
+    <rect x="240" y="218" width="40" height="40" fill="#ffffff" stroke="#2563eb" stroke-width="1.3"/>
+    <rect x="280" y="218" width="40" height="40" fill="#ffffff" stroke="#2563eb" stroke-width="1.3"/>
+    <rect x="320" y="218" width="40" height="40" fill="#ffffff" stroke="#2563eb" stroke-width="1.3"/>
+    <text x="60" y="244" text-anchor="middle" font-size="13" fill="#1f2937">0</text>
+    <text x="100" y="244" text-anchor="middle" font-size="13" font-weight="700" fill="#d97706">99</text>
+    <text x="140" y="244" text-anchor="middle" font-size="13" fill="#1f2937">2</text>
+    <text x="180" y="244" text-anchor="middle" font-size="13" fill="#1f2937">3</text>
+    <text x="220" y="244" text-anchor="middle" font-size="13" fill="#1f2937">4</text>
+    <text x="260" y="244" text-anchor="middle" font-size="13" fill="#1f2937">5</text>
+    <text x="300" y="244" text-anchor="middle" font-size="13" fill="#1f2937">6</text>
+    <text x="340" y="244" text-anchor="middle" font-size="13" fill="#94a3b8">…</text>
+  </g>
+  <text x="40" y="210" font-size="11.5" font-weight="600" fill="#1f2937">同一块内存缓冲区 buffer: [0, 99, 2, 3, …]</text>
+
+  <!-- arrows from headers to buffer (shared) -->
+  <line x1="100" y1="126" x2="60" y2="216" stroke="#2563eb" stroke-width="2" marker-end="url(#arrBlue)"/>
+  <line x1="280" y1="126" x2="82" y2="216" stroke="#2563eb" stroke-width="2" marker-end="url(#arrBlue)"/>
+  <text x="175" y="180" text-anchor="middle" font-size="11" fill="#2563eb">两个 header 共享同一 buffer</text>
+
+  <!-- note -->
+  <rect x="40" y="284" width="320" height="34" rx="5" fill="#fef3c7" stroke="#d97706" stroke-width="1"/>
+  <text x="200" y="305" text-anchor="middle" font-size="11.5" fill="#1f2937">b[0]=99 写入共享内存 → a 也跟着变</text>
+
+  <!-- ============ RIGHT: copy ============ -->
+  <text x="545" y="66" text-anchor="middle" font-size="13" font-weight="600" fill="#059669">copy（拷贝）</text>
+
+  <!-- header a -->
+  <rect x="400" y="84" width="120" height="36" rx="5" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+  <text x="460" y="106" text-anchor="middle" font-size="11.5" font-weight="600" fill="#1f2937">a.header</text>
+
+  <!-- header c -->
+  <rect x="560" y="84" width="120" height="36" rx="5" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+  <text x="620" y="106" text-anchor="middle" font-size="11.5" font-weight="600" fill="#1f2937">c.header</text>
+
+  <!-- buffer a (top) -->
+  <text x="400" y="170" font-size="11.5" font-weight="600" fill="#1f2937">buffer a: [0, 1, 2, …]</text>
+  <g>
+    <rect x="400" y="178" width="40" height="36" fill="#ffffff" stroke="#059669" stroke-width="1.3"/>
+    <rect x="440" y="178" width="40" height="36" fill="#ffffff" stroke="#059669" stroke-width="1.3"/>
+    <rect x="480" y="178" width="40" height="36" fill="#ffffff" stroke="#059669" stroke-width="1.3"/>
+    <text x="420" y="202" text-anchor="middle" font-size="13" fill="#1f2937">0</text>
+    <text x="460" y="202" text-anchor="middle" font-size="13" fill="#1f2937">1</text>
+    <text x="500" y="202" text-anchor="middle" font-size="13" fill="#94a3b8">…</text>
+  </g>
+  <line x1="460" y1="120" x2="430" y2="176" stroke="#059669" stroke-width="2" marker-end="url(#arrGreen)"/>
+
+  <!-- buffer c (bottom) -->
+  <text x="560" y="248" font-size="11.5" font-weight="600" fill="#1f2937">buffer c: [-1, 2, 3, …]</text>
+  <g>
+    <rect x="560" y="256" width="40" height="36" fill="#fdf2f8" stroke="#db2777" stroke-width="1.3"/>
+    <rect x="600" y="256" width="40" height="36" fill="#ffffff" stroke="#db2777" stroke-width="1.3"/>
+    <rect x="640" y="256" width="40" height="36" fill="#ffffff" stroke="#db2777" stroke-width="1.3"/>
+    <text x="580" y="280" text-anchor="middle" font-size="13" font-weight="700" fill="#db2777">-1</text>
+    <text x="620" y="280" text-anchor="middle" font-size="13" fill="#1f2937">2</text>
+    <text x="660" y="280" text-anchor="middle" font-size="13" fill="#94a3b8">…</text>
+  </g>
+  <line x1="620" y1="120" x2="600" y2="254" stroke="#059669" stroke-width="2" marker-end="url(#arrGreen)"/>
+
+  <!-- break symbol between two buffers -->
+  <g stroke="#94a3b8" stroke-width="1.5" fill="none">
+    <path d="M510 220 L530 220 L522 232 L538 232 L528 244 L548 244"/>
+  </g>
+  <text x="565" y="226" font-size="11" fill="#94a3b8">独立内存</text>
+
+  <!-- note -->
+  <rect x="400" y="304" width="280" height="34" rx="5" fill="#ecfdf5" stroke="#059669" stroke-width="1"/>
+  <text x="540" y="325" text-anchor="middle" font-size="11.5" fill="#1f2937">各拥独立缓冲区，修改 c 互不影响 a</text>
+
+  <!-- caption -->
+  <text x="360" y="380" text-anchor="middle" font-size="11.5" fill="#1f2937">视图 = 另一个 header 指向同一缓冲区，就地修改会串改原数组；</text>
+  <text x="360" y="398" text-anchor="middle" font-size="11.5" fill="#1f2937">拷贝 = 拥有独立缓冲区，两者互不干扰。</text>
+
+  <!-- legend -->
+  <line x1="220" y1="424" x2="250" y2="424" stroke="#2563eb" stroke-width="2"/>
+  <text x="256" y="428" font-size="11" fill="#2563eb">共享</text>
+  <line x1="400" y1="424" x2="430" y2="424" stroke="#059669" stroke-width="2"/>
+  <text x="436" y="428" font-size="11" fill="#059669">独立</text>
+</svg><figcaption>视图与拷贝的内存模型：视图是另一个头部指向同一块缓冲区，就地修改会串改原数组；拷贝拥有独立缓冲区。</figcaption></figure>
+<pre><code>import numpy as np
+a = np.arange(10)
+b = a[1:]          # 切片 -> 视图，和 a 共享内存
+b[0] = 99          # 就地改 b 的第 0 个元素
+print("a =", a)              # a 也变了！a[1] 现在是 99
+print("b is view:", b.base is a)   # True：b 的底层缓冲就是 a
+
+# 注意：a 此刻已是 [0 99 2 3 ...]。下面演示 copy，用一个全新的数组避免混淆
+a2 = np.arange(10)
+c = a2[1:].copy()  # 显式拷贝 -> 新缓冲区
+c[0] = -1
+print("c base is None:", c.base is None)  # True：拷贝自己新开内存
+print("a2 after copy edit:", a2)          # a2 不受影响：[0 1 2 3 ...]</code></pre>
+<p>运行结果：第一段里 <code>a = [ 0 99 2 3 ... ]</code>（视图被改，原数组跟着变）；而对 <code>copy</code> 出来的 <code>c</code> 就地改写，全新的 <code>a2</code> 纹丝不动。判断技巧：<code>arr.base is not None</code> 通常意味着它是某个数组的视图（注意 <code>reshape</code> 等也会令 <code>base</code> 非 <code>None</code>，所以是"通常"而非绝对）。<strong>基本切片返回视图；花式索引和布尔掩码返回拷贝</strong>（见后文）。这条规则到 PyTorch 完全一样——下一课你会看到 <code>torch</code> 也区分 view 与 contiguous。</p>
+<pre class="ref" data-lang="PyTorch"><code>import torch
+a = torch.arange(10)
+b = a[1:]          # 同样是视图，共享 storage
+b[0] = 99
+print(a)           # tensor([ 0, 99, 2, ...])
+c = a[1:].clone()  # PyTorch 用 .clone() 而非 .copy()</code></pre>
+
+<h2>向量化：把 for 循环交给底层 C/SIMD</h2>
+<p>机制直觉：Python 的 <code>for</code> 循环每次迭代都要做动态类型检查、对象拆箱，开销巨大。向量化是把整块数组交给 NumPy 内部的 C 实现一次性算完，那里数据是紧密排列的同类型机器数，可以用 SIMD（单指令多数据，Single Instruction Multiple Data，一条指令同时算一排数）并行处理。结果常常快一个数量级以上。规则很简单：<strong>看到对数组元素逐个循环做同一件事，就想办法用数组运算整体表达</strong>。</p>
+<p>下面用欧氏距离做对比：对 <code>(N, D)</code> 的每一行算它到查询向量 <code>q</code> 的距离。</p>
+<figure class="fig"><svg viewBox="0 0 720 360" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif">
+  <!-- title -->
+  <text x="40" y="34" font-size="18" font-weight="700" fill="#1f2937">向量化加速：同样的结果，差一个数量级</text>
+  <text x="40" y="56" font-size="12" fill="#64748b">Python 循环 vs NumPy 向量化求欧氏距离的耗时对比（对数刻度）</text>
+
+  <!-- log-scale axis geometry -->
+  <!-- x maps log10(ms): 1ms->x0, 10ms->x0+span, 100ms->x0+2span ; plot starts at 0.1ms -->
+  <!-- x0(1ms)=110, span(decade)=180 ; 0.1ms at 110-180=-70 (offscreen, bars start at left margin) -->
+
+  <!-- grid lines for ticks 1,10,100 ms -->
+  <g stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 3">
+    <line x1="110" y1="90" x2="110" y2="270"/>
+    <line x1="290" y1="90" x2="290" y2="270"/>
+    <line x1="470" y1="90" x2="470" y2="270"/>
+  </g>
+
+  <!-- bar baseline / left edge -->
+  <line x1="110" y1="90" x2="110" y2="290" stroke="#94a3b8" stroke-width="1.5"/>
+
+  <!-- Python 循环 bar: 37ms -> x = 110 + log10(37)*180 = 110 + 1.568*180 = 392.3 -->
+  <rect x="110" y="110" width="282.3" height="46" rx="4" fill="#d97706"/>
+  <text x="118" y="138" font-size="14" font-weight="600" fill="#ffffff">Python 循环</text>
+  <text x="402" y="138" font-size="14" font-weight="700" fill="#d97706">~37 ms</text>
+
+  <!-- NumPy 向量化 bar: 3.4ms -> x = 110 + log10(3.4)*180 = 110 + 0.5315*180 = 205.7 -->
+  <rect x="110" y="194" width="95.7" height="46" rx="4" fill="#2563eb"/>
+  <text x="118" y="222" font-size="14" font-weight="600" fill="#ffffff">NumPy 向量化</text>
+  <text x="215" y="222" font-size="14" font-weight="700" fill="#2563eb">~3.4 ms</text>
+
+  <!-- x axis -->
+  <line x1="110" y1="290" x2="560" y2="290" stroke="#1f2937" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="535" y="312" font-size="12" fill="#1f2937">耗时</text>
+
+  <!-- x tick labels (log scale) -->
+  <g font-size="12" fill="#475569" text-anchor="middle">
+    <text x="110" y="308">1 ms</text>
+    <text x="290" y="308">10 ms</text>
+    <text x="470" y="308">100 ms</text>
+  </g>
+  <text x="110" y="328" font-size="11" fill="#94a3b8" text-anchor="middle">（对数刻度 log scale）</text>
+
+  <!-- speedup callout -->
+  <g>
+    <rect x="470" y="150" width="210" height="60" rx="10" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+    <text x="575" y="183" font-size="26" font-weight="800" fill="#059669" text-anchor="middle">≈ 11× 更快</text>
+    <text x="575" y="201" font-size="11" fill="#047857" text-anchor="middle">37 ms ÷ 3.4 ms ≈ 11</text>
+  </g>
+
+  <!-- arrow marker -->
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#1f2937"/>
+    </marker>
+  </defs>
+</svg><figcaption>向量化加速：Python 循环 vs NumPy 向量化求欧氏距离的耗时对比（对数刻度，约 10× 差距）。</figcaption></figure>
+<pre><code>import numpy as np, time
+rng = np.random.default_rng(0)
+N, D = 2000, 64
+X = rng.standard_normal((N, D)); q = rng.standard_normal(D)
+
+t0 = time.perf_counter()
+out_loop = [sum((X[i,j]-q[j])**2 for j in range(D))**0.5 for i in range(N)]
+t1 = time.perf_counter()
+
+out_vec = np.sqrt(((X - q)**2).sum(axis=1))   # 一行搞定，全程无 Python 循环
+t2 = time.perf_counter()
+
+loop_t, vec_t = t1-t0, t2-t1
+print(f"loop  : {loop_t*1000:.1f} ms")
+print(f"vec   : {vec_t*1000:.3f} ms")
+print(f"speedup: {loop_t/vec_t:.0f}x")   # 不同机器/环境数字会变，关注的是数量级而非确切倍数
+print("max diff:", np.max(np.abs(np.array(out_loop)-out_vec)))  # ~1e-15，结果一致</code></pre>
+<p>注意 <code>X - q</code> 这一步：<code>X</code> 是 <code>(2000, 64)</code>，<code>q</code> 是 <code>(64,)</code>，却能直接相减——这就是广播在起作用。<code>max diff</code> 在 <code>1e-15</code> 量级，说明向量化版本和循环版本数值上等价，只是快了一个数量级。你跑出来的具体倍数会随机器和环境（桌面 CPython、Pyodide 等）波动，跑出 7× 还是 300× 都正常，别因此怀疑自己写错——关注量级即可。规格里要求用 <code>%timeit</code> 的场景，我们一律用 <code>time.perf_counter</code> 手写计时（Pyodide 里没有 IPython 魔法命令）。</p>
+
+<h2>广播：尾部对齐规则</h2>
+<p>广播让不同 shape 的数组也能逐元素运算，省去显式复制数据。规则只有一条，<strong>从最后一维（最右）开始向左逐维比较</strong>：</p>
+<ul>
+<li>两维相等 → 这一维 OK；</li>
+<li>其中一维是 1 → 把那个 1 "拉伸"到另一个的长度（不真复制，只是重复读取）；</li>
+<li>否则 → 报错，不能广播。</li>
+<li>维数不同时，短的那个在<em>左侧</em>补 1，再按上面比较。</li>
+</ul>
+<p>经典例子：<code>(N,1)</code> 与 <code>(1,M)</code> 对齐 → <code>(N,M)</code>，这是构造距离矩阵、外积的常用手法。</p>
+<figure class="fig"><svg viewBox="0 0 720 760" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif">
+  <defs>
+    <marker id="bx-arrow" orient="auto-start-reverse" markerWidth="8" markerHeight="8" refX="6" refY="3" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#d97706"/>
+    </marker>
+    <marker id="bx-arrow-r" orient="auto-start-reverse" markerWidth="8" markerHeight="8" refX="6" refY="3" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#db2777"/>
+    </marker>
+  </defs>
+
+  <!-- Caption -->
+  <text x="360" y="26" text-anchor="middle" font-size="16" font-weight="700" fill="#1f2937">广播的尾部对齐规则</text>
+  <text x="360" y="48" text-anchor="middle" font-size="12" fill="#4b5563">两个 shape 右对齐 · 长度为 1 的维被拉伸到对方长度 · 得到结果 shape</text>
+
+  <!-- ============ 案例 A ============ -->
+  <rect x="16" y="66" width="688" height="318" rx="10" fill="#f0fdf4" stroke="#059669" stroke-width="1.5"/>
+  <text x="32" y="92" font-size="14" font-weight="700" fill="#059669">案例 A · 正确广播</text>
+  <text x="32" y="112" font-size="13" fill="#1f2937" font-weight="600">(3,1)  与  (1,4)  →  (3,4)</text>
+
+  <!-- 右对齐两行格子 (左侧机制) -->
+  <!-- 列标签 -->
+  <text x="92" y="150" text-anchor="middle" font-size="11" fill="#94a3b8">轴0</text>
+  <text x="152" y="150" text-anchor="middle" font-size="11" fill="#94a3b8">轴1（最右）</text>
+  <line x1="182" y1="135" x2="182" y2="300" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 3"/>
+  <text x="186" y="146" font-size="10" fill="#94a3b8">↑右对齐基准</text>
+
+  <!-- 第一行 (3,1) -->
+  <text x="36" y="180" font-size="11" fill="#4b5563">(3,1)</text>
+  <rect x="62" y="160" width="60" height="34" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="92" y="182" text-anchor="middle" font-size="15" fill="#1f2937" font-weight="700">3</text>
+  <rect x="122" y="160" width="60" height="34" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+  <text x="152" y="182" text-anchor="middle" font-size="15" fill="#1f2937" font-weight="700">1</text>
+
+  <!-- 第二行 (1,4) -->
+  <text x="36" y="222" font-size="11" fill="#4b5563">(1,4)</text>
+  <rect x="62" y="202" width="60" height="34" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+  <text x="92" y="224" text-anchor="middle" font-size="15" fill="#1f2937" font-weight="700">1</text>
+  <rect x="122" y="202" width="60" height="34" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="152" y="224" text-anchor="middle" font-size="15" fill="#1f2937" font-weight="700">4</text>
+
+  <!-- 拉伸双向箭头 (轴0列: 1 被拉伸到 3) -->
+  <line x1="78" y1="248" x2="106" y2="248" stroke="#d97706" stroke-width="1.5" marker-start="url(#bx-arrow)" marker-end="url(#bx-arrow)"/>
+  <text x="92" y="263" text-anchor="middle" font-size="10" fill="#d97706">1→3 拉伸</text>
+  <!-- 拉伸双向箭头 (轴1列: 1 被拉伸到 4) -->
+  <line x1="138" y1="248" x2="166" y2="248" stroke="#d97706" stroke-width="1.5" marker-start="url(#bx-arrow)" marker-end="url(#bx-arrow)"/>
+  <text x="152" y="263" text-anchor="middle" font-size="10" fill="#d97706">1→4 拉伸</text>
+
+  <!-- 结果行高亮 (3,4) -->
+  <text x="36" y="294" font-size="11" fill="#059669" font-weight="700">结果</text>
+  <rect x="62" y="274" width="60" height="34" fill="#bbf7d0" stroke="#059669" stroke-width="2"/>
+  <text x="92" y="296" text-anchor="middle" font-size="15" fill="#065f46" font-weight="700">3</text>
+  <rect x="122" y="274" width="60" height="34" fill="#bbf7d0" stroke="#059669" stroke-width="2"/>
+  <text x="152" y="296" text-anchor="middle" font-size="15" fill="#065f46" font-weight="700">4</text>
+  <text x="222" y="296" font-size="13" fill="#059669" font-weight="700">→ (3,4)</text>
+
+  <!-- 右侧网格示意 -->
+  <!-- (3,1) 列向量 沿水平复制 -->
+  <text x="332" y="150" font-size="11" fill="#2563eb" font-weight="600">(3,1) 列向量</text>
+  <text x="332" y="166" font-size="10" fill="#94a3b8">沿水平复制成 3×4</text>
+  <g>
+    <rect x="332" y="174" width="22" height="22" fill="#dbeafe" stroke="#2563eb"/>
+    <rect x="332" y="196" width="22" height="22" fill="#dbeafe" stroke="#2563eb"/>
+    <rect x="332" y="218" width="22" height="22" fill="#dbeafe" stroke="#2563eb"/>
+    <!-- 复制虚影 -->
+    <g opacity="0.4">
+      <rect x="354" y="174" width="22" height="22" fill="#dbeafe" stroke="#2563eb" stroke-dasharray="2 2"/>
+      <rect x="376" y="174" width="22" height="22" fill="#dbeafe" stroke="#2563eb" stroke-dasharray="2 2"/>
+      <rect x="398" y="174" width="22" height="22" fill="#dbeafe" stroke="#2563eb" stroke-dasharray="2 2"/>
+      <rect x="354" y="196" width="22" height="22" fill="#dbeafe" stroke="#2563eb" stroke-dasharray="2 2"/>
+      <rect x="376" y="196" width="22" height="22" fill="#dbeafe" stroke="#2563eb" stroke-dasharray="2 2"/>
+      <rect x="398" y="196" width="22" height="22" fill="#dbeafe" stroke="#2563eb" stroke-dasharray="2 2"/>
+      <rect x="354" y="218" width="22" height="22" fill="#dbeafe" stroke="#2563eb" stroke-dasharray="2 2"/>
+      <rect x="376" y="218" width="22" height="22" fill="#dbeafe" stroke="#2563eb" stroke-dasharray="2 2"/>
+      <rect x="398" y="218" width="22" height="22" fill="#dbeafe" stroke="#2563eb" stroke-dasharray="2 2"/>
+    </g>
+    <line x1="356" y1="252" x2="418" y2="252" stroke="#2563eb" stroke-width="1.2" marker-end="url(#bx-arrow)"/>
+  </g>
+
+  <!-- (1,4) 行向量 沿竖直复制 -->
+  <text x="452" y="150" font-size="11" fill="#2563eb" font-weight="600">(1,4) 行向量</text>
+  <text x="452" y="166" font-size="10" fill="#94a3b8">沿竖直复制成 3×4</text>
+  <g>
+    <rect x="452" y="174" width="22" height="22" fill="#dbeafe" stroke="#2563eb"/>
+    <rect x="474" y="174" width="22" height="22" fill="#dbeafe" stroke="#2563eb"/>
+    <rect x="496" y="174" width="22" height="22" fill="#dbeafe" stroke="#2563eb"/>
+    <rect x="518" y="174" width="22" height="22" fill="#dbeafe" stroke="#2563eb"/>
+    <g opacity="0.4">
+      <rect x="452" y="196" width="22" height="22" fill="#dbeafe" stroke="#2563eb" stroke-dasharray="2 2"/>
+      <rect x="474" y="196" width="22" height="22" fill="#dbeafe" stroke="#2563eb" stroke-dasharray="2 2"/>
+      <rect x="496" y="196" width="22" height="22" fill="#dbeafe" stroke="#2563eb" stroke-dasharray="2 2"/>
+      <rect x="518" y="196" width="22" height="22" fill="#dbeafe" stroke="#2563eb" stroke-dasharray="2 2"/>
+      <rect x="452" y="218" width="22" height="22" fill="#dbeafe" stroke="#2563eb" stroke-dasharray="2 2"/>
+      <rect x="474" y="218" width="22" height="22" fill="#dbeafe" stroke="#2563eb" stroke-dasharray="2 2"/>
+      <rect x="496" y="218" width="22" height="22" fill="#dbeafe" stroke="#2563eb" stroke-dasharray="2 2"/>
+      <rect x="518" y="218" width="22" height="22" fill="#dbeafe" stroke="#2563eb" stroke-dasharray="2 2"/>
+    </g>
+    <line x1="540" y1="178" x2="540" y2="236" stroke="#2563eb" stroke-width="1.2" marker-end="url(#bx-arrow)"/>
+  </g>
+
+  <!-- 叠加得 3x4 -->
+  <line x1="556" y1="207" x2="588" y2="207" stroke="#059669" stroke-width="1.5" marker-end="url(#bx-arrow)"/>
+  <text x="572" y="200" text-anchor="middle" font-size="14" fill="#059669" font-weight="700">叠加</text>
+  <text x="640" y="155" text-anchor="middle" font-size="11" fill="#059669" font-weight="700">结果 3×4</text>
+  <g>
+    <g fill="#bbf7d0" stroke="#059669">
+      <rect x="596" y="174" width="20" height="20"/><rect x="616" y="174" width="20" height="20"/><rect x="636" y="174" width="20" height="20"/><rect x="656" y="174" width="20" height="20"/>
+      <rect x="596" y="194" width="20" height="20"/><rect x="616" y="194" width="20" height="20"/><rect x="636" y="194" width="20" height="20"/><rect x="656" y="194" width="20" height="20"/>
+      <rect x="596" y="214" width="20" height="20"/><rect x="616" y="214" width="20" height="20"/><rect x="636" y="214" width="20" height="20"/><rect x="656" y="214" width="20" height="20"/>
+    </g>
+  </g>
+
+  <text x="32" y="350" font-size="11" fill="#4b5563">机制：从最右轴往左逐一对齐；某轴一方为 1 时，被拉伸到另一方的长度（这里轴1: 1↔4，轴0: 3↔1）。</text>
+  <text x="32" y="370" font-size="11" fill="#4b5563">两轴都可对齐 → 合法广播，结果取每轴的较大长度 = (3,4)。</text>
+
+  <!-- ============ 案例 B ============ -->
+  <rect x="16" y="400" width="688" height="340" rx="10" fill="#fff1f2" stroke="#db2777" stroke-width="2"/>
+  <text x="32" y="426" font-size="14" font-weight="700" fill="#db2777">案例 B · 隐形 bug</text>
+  <text x="32" y="446" font-size="13" fill="#1f2937" font-weight="600">(3,1)  与  (3,)  →  (3,3)  而非预期的逐元素</text>
+
+  <!-- 右对齐两行 -->
+  <text x="220" y="476" text-anchor="middle" font-size="11" fill="#94a3b8">轴0</text>
+  <text x="280" y="476" text-anchor="middle" font-size="11" fill="#94a3b8">轴1（最右）</text>
+  <line x1="310" y1="462" x2="310" y2="636" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 3"/>
+  <text x="314" y="473" font-size="10" fill="#94a3b8">↑右对齐基准</text>
+
+  <!-- 第一行 (3,1) -->
+  <text x="120" y="506" font-size="11" fill="#4b5563">(3,1)</text>
+  <rect x="190" y="486" width="60" height="34" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="220" y="508" text-anchor="middle" font-size="15" fill="#1f2937" font-weight="700">3</text>
+  <rect x="250" y="486" width="60" height="34" fill="#fce7f3" stroke="#db2777" stroke-width="1.5"/>
+  <text x="280" y="508" text-anchor="middle" font-size="15" fill="#1f2937" font-weight="700">1</text>
+
+  <!-- 第二行 (3,) → 左侧补 1 -->
+  <text x="120" y="548" font-size="11" fill="#4b5563">(3,) 维度不足</text>
+  <rect x="190" y="528" width="60" height="34" fill="#fde68a" stroke="#d97706" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <text x="220" y="550" text-anchor="middle" font-size="15" fill="#92400e" font-weight="700">1</text>
+  <text x="220" y="582" text-anchor="middle" font-size="9.5" fill="#d97706">左侧自动补1</text>
+  <rect x="250" y="528" width="60" height="34" fill="#fce7f3" stroke="#db2777" stroke-width="1.5"/>
+  <text x="280" y="550" text-anchor="middle" font-size="15" fill="#1f2937" font-weight="700">3</text>
+  <text x="375" y="548" font-size="11" fill="#4b5563">(3,) 补成 (1,3)</text>
+
+  <!-- 拉伸箭头: 轴0 1→3, 轴1 1→3 -->
+  <line x1="206" y1="596" x2="234" y2="596" stroke="#db2777" stroke-width="1.5" marker-start="url(#bx-arrow-r)" marker-end="url(#bx-arrow-r)"/>
+  <text x="220" y="611" text-anchor="middle" font-size="10" fill="#db2777">1→3 拉伸</text>
+  <line x1="266" y1="596" x2="294" y2="596" stroke="#db2777" stroke-width="1.5" marker-start="url(#bx-arrow-r)" marker-end="url(#bx-arrow-r)"/>
+  <text x="280" y="611" text-anchor="middle" font-size="10" fill="#db2777">1→3 拉伸</text>
+
+  <!-- 结果行 (3,3) -->
+  <text x="120" y="646" font-size="11" fill="#db2777" font-weight="700">结果</text>
+  <rect x="190" y="626" width="60" height="34" fill="#fbcfe8" stroke="#db2777" stroke-width="2"/>
+  <text x="220" y="648" text-anchor="middle" font-size="15" fill="#831843" font-weight="700">3</text>
+  <rect x="250" y="626" width="60" height="34" fill="#fbcfe8" stroke="#db2777" stroke-width="2"/>
+  <text x="280" y="648" text-anchor="middle" font-size="15" fill="#831843" font-weight="700">3</text>
+  <text x="345" y="648" font-size="13" fill="#db2777" font-weight="700">→ (3,3)</text>
+
+  <!-- 红色感叹号 + 注释 -->
+  <circle cx="455" cy="500" r="20" fill="#db2777"/>
+  <text x="455" y="509" text-anchor="middle" font-size="26" fill="#ffffff" font-weight="700">!</text>
+  <rect x="490" y="478" width="200" height="78" rx="8" fill="#ffffff" stroke="#db2777" stroke-width="1.5"/>
+  <text x="500" y="500" font-size="12" fill="#db2777" font-weight="700">以为得到 (3,)</text>
+  <text x="500" y="520" font-size="12" fill="#db2777" font-weight="700">实际得到 3×3 矩阵！</text>
+  <text x="500" y="542" font-size="10.5" fill="#4b5563">少一维 → 补1后被双向拉伸</text>
+
+  <!-- 小结果网格 3x3 -->
+  <text x="560" y="588" text-anchor="middle" font-size="11" fill="#db2777" font-weight="700">意外的 3×3</text>
+  <g fill="#fbcfe8" stroke="#db2777">
+    <rect x="500" y="596" width="22" height="22"/><rect x="522" y="596" width="22" height="22"/><rect x="544" y="596" width="22" height="22"/>
+    <rect x="500" y="618" width="22" height="22"/><rect x="522" y="618" width="22" height="22"/><rect x="544" y="618" width="22" height="22"/>
+    <rect x="500" y="640" width="22" height="22"/><rect x="522" y="640" width="22" height="22"/><rect x="544" y="640" width="22" height="22"/>
+  </g>
+
+  <text x="32" y="700" font-size="11" fill="#4b5563">陷阱：维数不同时，NumPy 在 *左侧* 给短 shape 补 1（(3,) → (1,3)），而非右侧。</text>
+  <text x="32" y="720" font-size="11" fill="#4b5563">于是 (3,1) 与 (1,3) 两轴各被拉伸，逐元素意图变成外积式的 3×3。需用 reshape/显式对齐避免。</text>
+</svg><figcaption>广播的尾部对齐规则：两个 shape 右对齐，长度为 1 的维被拉伸到对方长度，得到结果 shape。</figcaption></figure>
+
+<h3>务必看清的隐形 bug：(N,1) - (N,) → (N,N)</h3>
+<p>这是新手最常踩、且不会报错的坑。你想做"逐元素相减"得到 <code>(N,)</code>，结果悄悄变成了 <code>(N,N)</code> 的矩阵，后续计算全错却不报异常。原因：把 <code>(N,)</code> 左侧补 1 变成 <code>(1,N)</code>，再和 <code>(N,1)</code> 对齐 → <code>(N,N)</code>。</p>
+<pre><code>import numpy as np
+x = np.array([1.0, 2.0, 3.0]).reshape(3, 1)   # (3,1)，列向量
+y = np.array([1.0, 2.0, 3.0])                  # (3,)，一维
+print("x.shape", x.shape, "y.shape", y.shape)
+print("(x - y).shape:", (x - y).shape)         # 期望 (3,) 却得到 (3,3)！
+print(x - y)
+# 修复：让两边维度一致，都压成 (3,)
+print("correct:", x.ravel() - y)               # [0. 0. 0.]</code></pre>
+<p>防身习惯：相减/相加前先 <code>print</code> 两个操作数的 shape；想逐元素就保证两边 shape 完全相同（或刻意只让该广播的那一维为 1）。</p>
+
+<h2>布尔掩码、花式索引、axis 与 keepdims</h2>
+<p><strong>布尔掩码</strong>：<code>a[a&gt;0]</code> 用一个同形状的布尔数组挑出满足条件的元素，返回一维<em>拷贝</em>。<strong>花式索引</strong>：<code>a[[0,2,4]]</code> 用整数数组按下标取元素，也返回拷贝。两者都不是视图——这点和切片相反，要记牢。</p>
+<p><strong>axis</strong> 指定沿哪一维做归约（reduction）：<code>A.sum(axis=1)</code> 把每一行的列加起来，<code>(3,4)→(3,)</code>，那一维"塌缩"消失了。<strong>keepdims=True</strong> 让被归约的维度保留为长度 1：<code>(3,4)→(3,1)</code>。为什么要保留？因为接下来往往要把归约结果<em>广播</em>回原形状（如按行归一化），<code>(3,1)</code> 能和 <code>(3,4)</code> 干净对齐，而 <code>(3,)</code> 会触发上面的尾部对齐错误。</p>
+<pre><code>import numpy as np
+A = np.arange(12).reshape(3, 4).astype(float)
+s1 = A.sum(axis=1)                 # (3,)
+s2 = A.sum(axis=1, keepdims=True)  # (3,1)
+print("no keepdims:", s1.shape, "| keepdims:", s2.shape)
+print("row-normalized OK:\n", A / s2)   # (3,4)/(3,1) -> 每行和为 1
+try:
+    print(A / s1)                  # (3,4)/(3,) -> 尾部对齐失败
+except ValueError as e:
+    print("broadcast error:", e)
+
+v = np.array([-3, 5, -1, 8, 0])
+print("mask v>0:", v[v > 0])       # [5 8]，布尔掩码
+print("fancy idx:", v[[0, 2, 4]])  # [-3 -1 0]，花式索引</code></pre>
+<p>记忆口诀：<strong>沿 axis 归约后想广播回去，就加 keepdims</strong>。这条在 PyTorch 里写作 <code>keepdim=True</code>（少个 <code>s</code>），机制完全一致。</p>
+
+<h2>数值稳定：softmax 为什么要减最大值</h2>
+<p>softmax 把一组实数 \(z\) 变成概率分布：\(\mathrm{softmax}(z)_i = e^{z_i} / \sum_j e^{z_j}\)。直接套公式有个致命问题：<code>float</code> 的指数会溢出。<code>exp(1000)</code> 就是 <code>inf</code>，<code>inf/inf = nan</code>，整个输出全是 <code>nan</code>。</p>
+<p>关键观察：给所有 \(z_i\) 减去同一个常数 \(c\)，softmax 的值<em>完全不变</em>（分子分母同乘 \(e^{-c}\) 约掉）。取 \(c=\max_i z_i\)，则最大的指数变成 <code>exp(0)=1</code>，绝不会上溢。这就是"减最大值"的全部道理。</p>
+<pre><code>import numpy as np
+z = np.array([1000.0, 1001.0, 1002.0])
+# 朴素版：直接 exp，溢出
+naive = np.exp(z) / np.exp(z).sum()
+print("naive :", naive)              # [nan nan nan]
+# 稳定版：减最大值，结果不变但不溢出
+zs = z - z.max()
+stable = np.exp(zs) / np.exp(zs).sum()
+print("stable:", stable)             # [0.090 0.245 0.665]
+# logsumexp 思想：稳定地算 log(sum(exp(z)))
+lse = z.max() + np.log(np.exp(z - z.max()).sum())
+print("logsumexp:", lse)             # 1002.41，不溢出</code></pre>
+<p><strong>logsumexp</strong> 是同一招的推广：要算 \(\log\sum_i e^{z_i}\)（交叉熵损失里到处都是它），就提出最大值 \(\log\sum_i e^{z_i} = c + \log\sum_i e^{z_i-c}\)，其中 \(c=\max z\)。先放下细节，记住"凡是 exp/log 大数，先把最大值提出来"这个动作即可。PyTorch 直接提供 <code>torch.logsumexp</code> 和数值稳定的 <code>F.log_softmax</code>，你不必自己写——但要知道它们在背后做了这件事。</p>
+<pre class="ref" data-lang="PyTorch"><code>import torch
+import torch.nn.functional as F
+z = torch.tensor([1000., 1001., 1002.])
+print(F.softmax(z, dim=0))     # 稳定，内部已减最大值
+print(torch.logsumexp(z, 0))   # tensor(1002.41)</code></pre>
+
+<h2>调一调，观察现象</h2>
+
+<p><strong>微任务 1：把视图改成拷贝，观察"串改"消失。</strong> 这是两次独立运行的对比：先按原样跑一次（看到 <code>a = [0 99 2 3 4]</code>，视图被串改），再把第 3 行从 <code>b = a[1:]</code> 改成 <code>b = a[1:].copy()</code> 跑第二次（看到 <code>a = [0 1 2 3 4]</code>，原数组没动）。预期现象：改成拷贝后 <code>a</code> 不再被改动。为什么：<code>.copy()</code> 另开缓冲区，<code>b[0]=99</code> 写的是新内存，与 <code>a</code> 无关。</p>
+<pre><code>import numpy as np
+a = np.arange(5)
+b = a[1:]          # 第二次运行时改成 a[1:].copy() 再对比
+b[0] = 99
+print("a =", a)    # 第一次(视图)看到 [0 99 2 3 4]；改成 .copy() 第二次看到 [0 1 2 3 4]</code></pre>
+
+<p><strong>微任务 2：给 reshape 加/去一个 1，看广播结果从 (N,) 变 (N,N)。</strong> 把 <code>y</code> 从 <code>(3,)</code> 改成 <code>y.reshape(1,3)</code> 或把 <code>x</code> 改成 <code>(3,)</code>，观察结果 shape。预期现象：只要有一边是二维且另一边长度对不上，就得到 <code>(3,3)</code>；两边都压成 <code>(3,)</code> 才得逐元素的 <code>(3,)</code>。为什么：尾部对齐时 1 被拉伸。</p>
+<pre><code>import numpy as np
+x = np.array([10., 20., 30.]).reshape(3, 1)
+y = np.array([1., 2., 3.])          # 试试 .reshape(1,3) 或保持 (3,)
+res = x - y
+print("shape:", res.shape)          # (3,3)
+print(res)</code></pre>
+
+<p><strong>微任务 3：把 softmax 的输入整体加 500，看朴素版崩、稳定版稳。</strong> 改 <code>z = base + np.array([0.,1.,2.])</code> 里的 <code>base</code>，从 0 调到 800。预期现象：<code>base</code> 大到一定程度朴素版变 <code>nan</code>，稳定版始终输出同一组概率。为什么：softmax 平移不变，减最大值消除了溢出。</p>
+<pre><code>import numpy as np
+base = 800.0                         # 调成 0 / 50 / 800 各跑一次
+z = base + np.array([0., 1., 2.])
+naive = np.exp(z) / np.exp(z).sum()
+zs = z - z.max()
+stable = np.exp(zs) / np.exp(zs).sum()
+print("naive :", naive)
+print("stable:", stable)             # 始终 [0.090 0.245 0.665]</code></pre>
+
+<h2>动手练习</h2>
+<ol>
+<li><strong>欧氏距离矩阵（向量化）。</strong> 给定 <code>A</code> 形状 <code>(N, D)</code>、<code>B</code> 形状 <code>(M, D)</code>，不写任何 Python 循环，算出距离矩阵 <code>Dist</code> 形状 <code>(N, M)</code>，其中 <code>Dist[i,j]</code> 是 <code>A[i]</code> 与 <code>B[j]</code> 的欧氏距离。提示：用 <code>A[:, None, :] - B[None, :, :]</code> 触发 <code>(N,1,D)</code> 与 <code>(1,M,D)</code> 广播得到 <code>(N,M,D)</code>，再沿最后一维 <code>sum</code> 后开方。和双重循环版对比 <code>perf_counter</code> 与最大误差。</li>
+<li><strong>稳定 softmax（按行）。</strong> 写 <code>softmax(Z)</code>，输入 <code>(N, K)</code>，对<em>每一行</em>做 softmax，输出 <code>(N, K)</code> 且每行和为 1。关键点：<code>Z.max(axis=1, keepdims=True)</code> 和归一化都要用 <code>keepdims=True</code>，想清楚去掉会怎样。用 <code>print(out.sum(axis=1))</code> 验证全是 1。</li>
+<li><strong>（可选）一维卷积（valid）。</strong> 给信号 <code>x</code>（长 <code>L</code>）和核 <code>w</code>（长 <code>k</code>），向量化算 valid 卷积，输出长 <code>L-k+1</code>。先写循环版当正确性基准——这步最重要，向量化只是加速。挑战的向量化思路：用双重广播构造一个 <code>(L-k+1, k)</code> 的滑动窗口下标矩阵，即 <code>idx = np.arange(L-k+1)[:, None] + np.arange(k)[None, :]</code>（行偏移 + 列内偏移），再用 <code>x[idx]</code> 取出所有窗口，最后与 <code>w</code> 相乘并沿最后一维求和。如果广播还不熟，先把循环版跑对就够了，向量化留作挑战。</li>
+</ol>
+
+<h2>掌握自检</h2>
+<ul>
+<li>我能说出：切片返回______（视图/拷贝），布尔掩码和花式索引返回______，并能用 <code>.base</code> 验证。</li>
+<li>给我两个 shape，比如 <code>(8,1,6)</code> 和 <code>(7,6)</code>，我能口算出能否广播、结果 shape 是什么。</li>
+<li>我能立刻指出 <code>(N,1) - (N,)</code> 的结果是 <code>(N,N)</code> 而非 <code>(N,)</code>，并说明怎么修。</li>
+<li>我能解释为什么 <code>A / A.sum(axis=1)</code> 报错而 <code>A / A.sum(axis=1, keepdims=True)</code> 正确。</li>
+<li>我能在不查资料的情况下写出数值稳定的 softmax，并说出"减最大值"为什么不改变结果。</li>
+<li>我能把一个逐元素的 Python 循环改写成向量化版本，并量出加速比。</li>
+</ul>
+
+<div class="skip"><h4>可以先放过的点</h4>
+<ul>
+<li><strong>strides（步幅）与内存布局（C-order vs F-order）、<code>np.ascontiguousarray</code></strong>：知道"reshape/切片几乎免费是因为只改头部"就够了。等你遇到 PyTorch 报 "view size is not compatible" 或性能调优时再回来看 strides。</li>
+<li><strong>logsumexp 的完整推导与它在交叉熵里的位置</strong>：现在记住"exp 大数前先提最大值"这个动作即可，等模块4写损失函数时自然会重逢。</li>
+<li><strong>一维卷积练习</strong>：如果广播还不熟，先把前两题吃透，卷积题等你做完模块的 CNN 部分再回来会轻松得多。</li>
+<li><strong>float32 vs float64 的精度权衡、混合精度</strong>：本课用默认 dtype 即可，设备与精度的工程细节留到下一课 PyTorch 张量。</li>
+</ul>
+</div>
+</article>
+<div class="navbtns"><a class="prev" href="lesson-01-env-scientific-stack.html"><div class="nlabel">← 上一课</div><div class="ntitle">第1课 · Python 科学计算栈与环境工程</div></a><a class="next" href="lesson-03-pytorch-tensors-device-dtype.html"><div class="nlabel">下一课 →</div><div class="ntitle">第3课 · PyTorch 张量、设备与 dtype</div></a></div>
+<nav class="toc"><h3>本模块课程表</h3><ol>
+<li><a href="lesson-01-env-scientific-stack.html"><span class="ln">第1课</span>Python 科学计算栈与环境工程</a></li>
+<li class="cur"><span class="ln">第2课</span>NumPy 数组、向量化与广播</li>
+<li><a href="lesson-03-pytorch-tensors-device-dtype.html"><span class="ln">第3课</span>PyTorch 张量、设备与 dtype</a></li>
+<li><a href="lesson-04-autograd.html"><span class="ln">第4课</span>Autograd 自动微分</a></li>
+<li><a href="lesson-05-nn-module.html"><span class="ln">第5课</span>nn.Module 与模型构建</a></li>
+<li class="soon"><span class="ln">第6课</span>从零写训练循环（核心）　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第7课</span>数据加载 Dataset 与 DataLoader　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第8课</span>GPU/CUDA 与混合精度　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第9课</span>实验管理、可复现与调试方法论　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第10课</span>Hugging Face 生态入门　<span class="badge">即将上线</span></li>
+</ol></nav>
+</div>
+<style>
+.pr-cell{border:1px solid #334155;border-radius:10px;margin:1.2em 0;overflow:hidden;background:#0f172a;}
+.pr-head{display:flex;align-items:center;gap:8px;background:#1e293b;color:#cbd5e1;padding:6px 10px;font-size:13px;font-family:system-ui,-apple-system,sans-serif;}
+.pr-title{flex:1;font-weight:600;}
+.pr-status{font-size:12px;color:#94a3b8;white-space:nowrap;max-width:50%;overflow:hidden;text-overflow:ellipsis;}
+.pr-btn{cursor:pointer;border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:6px;padding:3px 11px;font-size:13px;line-height:1.4;}
+.pr-btn:hover{background:#0b1220;}
+.pr-run{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:600;}
+.pr-run:hover{background:#1d4ed8;}
+.pr-cell.collapsed .pr-body{display:none;}
+.pr-editor{position:relative;background:#0f172a;}
+.pr-code,.pr-edit{display:block;width:100%;min-height:68px;border:none;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.55;padding:12px 14px;box-sizing:border-box;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:4;}
+.pr-code{position:absolute;inset:0;margin:0;overflow:hidden;background:#0f172a;color:#dbeafe;pointer-events:none;}
+.pr-edit{position:relative;background:transparent;color:transparent;caret-color:#e2e8f0;resize:vertical;outline:none;-webkit-text-fill-color:transparent;}
+.pr-edit::selection{background:rgba(96,165,250,.34);}
+.tok-kw{color:#c084fc;font-weight:700;}
+.tok-fn{color:#67e8f9;}
+.tok-num{color:#fbbf24;}
+.tok-str{color:#86efac;}
+.tok-comment{color:#94a3b8;font-style:italic;}
+.pr-out{margin:0;padding:10px 14px;border-top:1px solid #334155;background:#0b1220;color:#cbd5e1;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.5;white-space:pre-wrap;max-height:340px;overflow:auto;}
+.pr-out:empty{display:none;}
+.pr-out.err{color:#fca5a5;}
+.pr-cell.ref-cell{border-color:#475569;}
+.pr-cell.ref-cell .pr-head{background:#172033;color:#cbd5e1;}
+.pr-cell.ref-cell .pr-status{color:#fbbf24;font-style:italic;}
+.pr-code.pr-static{position:static;pointer-events:auto;overflow:auto;min-height:auto;background:#0f172a;color:#dbeafe;}
+#pr-fab{position:fixed;right:18px;bottom:18px;z-index:9998;background:#2563eb;color:#fff;border:none;border-radius:999px;padding:10px 17px;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.22);font-family:system-ui,sans-serif;}
+#pr-fab:hover{background:#1d4ed8;}
+#pr-lab{position:fixed;right:18px;bottom:66px;z-index:9999;width:400px;max-width:92vw;background:#0f172a;border:1px solid #334155;border-radius:12px;display:none;flex-direction:column;box-shadow:0 14px 38px rgba(0,0,0,.4);overflow:hidden;}
+#pr-lab.open{display:flex;}
+#pr-lab .pr-edit,#pr-lab .pr-code{min-height:150px;}
+</style>
+<script>
+(function(){
+  var PYBASE="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+  var pyReady=null;
+  function loadPy(status){
+    if(pyReady)return pyReady;
+    pyReady=(async function(){
+      status("正在加载 Python 运行时（首次约 10 秒，需联网）…");
+      await new Promise(function(res,rej){
+        var s=document.createElement("script");s.src=PYBASE+"pyodide.js";
+        s.onload=res;s.onerror=function(){rej(new Error("无法加载 Pyodide（首次运行需要联网）"));};
+        document.head.appendChild(s);
+      });
+      var py=await loadPyodide({indexURL:PYBASE});
+      status("正在加载 NumPy …");
+      await py.loadPackage("numpy");
+      status("Python 就绪 ✓");
+      return py;
+    })();
+    return pyReady;
+  }
+  async function run(code,outEl,statusEl){
+    var setS=function(m){if(statusEl)statusEl.textContent=m;};
+    outEl.classList.remove("err");outEl.textContent="";
+    var py;
+    try{py=await loadPy(setS);}
+    catch(e){outEl.classList.add("err");outEl.textContent="加载失败："+e.message;return;}
+    var buf="";
+    py.setStdout({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    py.setStderr({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    try{
+      var result=await py.runPythonAsync(code);
+      if(result!==undefined&&result!==null){
+        var r;try{r=result.toString();}catch(_){r=String(result);}
+        if(r!=="None")buf+=(buf&&!buf.endsWith("\n")?"\n":"")+r;
+        if(result&&result.destroy)result.destroy();
+      }
+      outEl.textContent=buf||"（运行成功，无输出。用 print(...) 查看结果）";
+    }catch(e){
+      outEl.classList.add("err");
+      outEl.textContent=buf+(buf?"\n":"")+String((e&&e.message)||e);
+    }
+  }
+  var KW={False:1,None:1,True:1,and:1,as:1,assert:1,async:1,await:1,break:1,class:1,continue:1,def:1,del:1,elif:1,else:1,except:1,finally:1,for:1,from:1,global:1,if:1,import:1,in:1,is:1,lambda:1,nonlocal:1,not:1,or:1,pass:1,raise:1,return:1,try:1,while:1,with:1,yield:1};
+  var FN={abs:1,all:1,any:1,array:1,bool:1,dict:1,enumerate:1,float:1,int:1,len:1,list:1,max:1,min:1,np:1,numpy:1,print:1,range:1,round:1,set:1,str:1,sum:1,tuple:1,zip:1,torch:1,nn:1,tensor:1,F:1,super:1,isinstance:1,getattr:1,setattr:1,hasattr:1,sorted:1,type:1,object:1,property:1};
+  function esc(s){return s.replace(/[&<>]/g,function(c){return c==="&"?"&amp;":c==="<"?"&lt;":"&gt;";});}
+  function colorLine(line){
+    var out="",i=0;
+    while(i<line.length){
+      var ch=line[i];
+      if(ch==="#"){out+='<span class="tok-comment">'+esc(line.slice(i))+"</span>";break;}
+      if(ch==="'"||ch==='"'){
+        var q=ch,triple=line.slice(i,i+3)===q+q+q,end=i+(triple?3:1),done=false;
+        while(end<line.length){
+          if(!triple&&line[end]==="\\"){end+=2;continue;}
+          if(triple&&line.slice(end,end+3)===q+q+q){end+=3;done=true;break;}
+          if(!triple&&line[end]===q){end+=1;done=true;break;}
+          end+=1;
+        }
+        out+='<span class="tok-str">'+esc(line.slice(i,done?end:line.length))+"</span>";
+        i=done?end:line.length;
+        continue;
+      }
+      if(/[0-9]/.test(ch)||(ch==="."&&/[0-9]/.test(line[i+1]||""))){
+        var m=line.slice(i).match(/^(?:0[xX][0-9a-fA-F]+|\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?/);
+        out+='<span class="tok-num">'+esc(m[0])+"</span>";i+=m[0].length;continue;
+      }
+      if(/[A-Za-z_]/.test(ch)){
+        var id=line.slice(i).match(/^[A-Za-z_][A-Za-z0-9_]*/)[0];
+        if(KW[id])out+='<span class="tok-kw">'+id+"</span>";
+        else if(FN[id])out+='<span class="tok-fn">'+id+"</span>";
+        else out+=id;
+        i+=id.length;continue;
+      }
+      out+=esc(ch);i+=1;
+    }
+    return out;
+  }
+  function paint(ta){
+    var pre=ta.closest(".pr-editor").querySelector(".pr-code");
+    pre.innerHTML=ta.value.split("\n").map(colorLine).join("\n")+(ta.value.endsWith("\n")?"\n":"");
+    pre.style.height=ta.style.height;
+    pre.scrollTop=ta.scrollTop;pre.scrollLeft=ta.scrollLeft;
+  }
+  function autosize(ta){ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight+2,460)+"px";}
+  function tune(ta){autosize(ta);paint(ta);}
+  function tabKey(e){
+    if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();var b=this.closest(".pr-cell,#pr-lab").querySelector(".pr-run");if(b)b.click();return;}
+    if(e.key==="Tab"){
+      e.preventDefault();
+      var s=this.selectionStart,en=this.selectionEnd,v=this.value,lineStart=v.lastIndexOf("\n",s-1)+1,lineEnd=v.indexOf("\n",en);
+      if(lineEnd<0)lineEnd=v.length;
+      if(s!==en||e.shiftKey){
+        var block=v.slice(lineStart,lineEnd),lines=block.split("\n"),delta=0;
+        if(e.shiftKey){
+          lines=lines.map(function(line){
+            if(line.startsWith("    ")){delta-=4;return line.slice(4);}
+            if(line.startsWith("\t")){delta-=1;return line.slice(1);}
+            return line;
+          });
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=Math.max(lineStart,s+(s===lineStart?0:Math.max(delta/Math.max(lines.length,1),-4)));
+          this.selectionEnd=Math.max(this.selectionStart,en+delta);
+        }else{
+          lines=lines.map(function(line){delta+=4;return "    "+line;});
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=s+4;
+          this.selectionEnd=en+delta;
+        }
+      }else{
+        this.value=v.slice(0,s)+"    "+v.slice(en);this.selectionStart=this.selectionEnd=s+4;
+      }
+      tune(this);
+      return;
+    }
+    if(e.key==="Enter"){
+      e.preventDefault();
+      var a=this.selectionStart,b=this.selectionEnd,text=this.value,start=text.lastIndexOf("\n",a-1)+1;
+      var prefix=text.slice(start,a),indent=(prefix.match(/^\s*/)||[""])[0],code=prefix.replace(/#.*$/,"").trimEnd();
+      var add="\n"+indent+(/:\s*$/.test(code)?"    ":"");
+      this.value=text.slice(0,a)+add+text.slice(b);
+      this.selectionStart=this.selectionEnd=a+add.length;
+      tune(this);
+      return;
+    }
+  }
+  function makeCell(code){
+    var cell=document.createElement("div");cell.className="pr-cell";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">可运行 · Python (NumPy)</span><span class="pr-status"></span><button class="pr-btn pr-toggle">收起</button><button class="pr-btn pr-run">▶ 运行</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    var ta=cell.querySelector(".pr-edit");ta.value=code;
+    var out=cell.querySelector(".pr-out"),st=cell.querySelector(".pr-status");
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    cell.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    var tog=cell.querySelector(".pr-toggle");
+    tog.onclick=function(){cell.classList.toggle("collapsed");tog.textContent=cell.classList.contains("collapsed")?"展开":"收起";};
+    setTimeout(function(){tune(ta);},0);
+    return cell;
+  }
+  function makeRef(code,lang){
+    var cell=document.createElement("div");cell.className="pr-cell ref-cell";
+    var L=lang||"参考";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">参考代码 · '+esc(L)+'</span><span class="pr-status">不在浏览器运行</span></div><pre class="pr-code pr-static"></pre>';
+    cell.querySelector(".pr-static").innerHTML=code.split("\n").map(colorLine).join("\n");
+    return cell;
+  }
+  function enhance(){
+    document.querySelectorAll("article pre").forEach(function(pre){
+      if(pre.closest(".pr-cell"))return;
+      var codeEl=pre.querySelector("code")||pre;
+      var code=codeEl.textContent.replace(/\s+$/,"");
+      if(!code)return;
+      if(pre.classList.contains("ref")){
+        pre.replaceWith(makeRef(code,pre.getAttribute("data-lang")));
+      }else{
+        pre.replaceWith(makeCell(code));
+      }
+    });
+  }
+  function lab(){
+    var fab=document.createElement("button");fab.id="pr-fab";fab.textContent="▶ Python 实验台";
+    var panel=document.createElement("div");panel.id="pr-lab";
+    panel.innerHTML='<div class="pr-head"><span class="pr-title">Python 实验台 · NumPy</span><span class="pr-status"></span><button class="pr-btn pr-run">▶ 运行</button><button class="pr-btn pr-min">收起</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    document.body.appendChild(fab);document.body.appendChild(panel);
+    var ta=panel.querySelector(".pr-edit");
+    ta.value="import numpy as np\na = np.array([3, 2])\nb = np.array([1, 4])\nprint(\"a + b =\", a + b)\nprint(\"a . b =\", a @ b)\nprint(\"|a|  =\", np.linalg.norm(a))\ncos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))\nprint(\"cos =\", round(float(cos), 4))";
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    var out=panel.querySelector(".pr-out"),st=panel.querySelector(".pr-status");
+    panel.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    fab.onclick=function(){panel.classList.toggle("open");};
+    panel.querySelector(".pr-min").onclick=function(){panel.classList.remove("open");};
+    setTimeout(function(){tune(ta);},0);
+  }
+  function init(){enhance();lab();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+<script src="../assets/annotator.js"></script>
+</body>
+</html>

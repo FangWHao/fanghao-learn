@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块3 · 第5课 · nn.Module 与模型构建</title>
+<script src="../assets/theme.js"></script>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue-bg:#eff6ff;
+--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--pink:#db2777;
+--red:#dc2626;--red-bg:#fef2f2;--bg:#ffffff;--soft:#f8fafc;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);
+font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.85;font-size:17px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:840px;margin:0 auto;padding:0 22px 100px;}
+header.top{background:#fff;border-bottom:1px solid var(--line);padding:26px 22px 22px;margin-bottom:14px;}
+header.top .inner{max-width:840px;margin:0 auto;}
+.crumb{color:var(--muted);font-size:14px;letter-spacing:.3px;margin-bottom:6px;}
+h1{font-size:30px;line-height:1.3;margin:.1em 0 .2em;}
+.sub{color:var(--muted);font-size:15px;}
+article{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:30px 34px;margin-top:18px;}
+h2{font-size:23px;margin:1.7em 0 .6em;padding-bottom:.25em;border-bottom:2px solid var(--line);}
+h2:first-child{margin-top:.2em;}
+h3{font-size:19px;margin:1.3em 0 .4em;color:#0f172a;}
+h4{margin:.2em 0 .5em;font-size:16px;}
+p{margin:.7em 0;}
+ul,ol{padding-left:1.3em;margin:.6em 0;}
+li{margin:.32em 0;}
+code{background:#f1f5f9;padding:.12em .4em;border-radius:5px;font-size:.9em;
+font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a;}
+pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 18px;overflow:auto;font-size:14px;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0;}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:15.5px;}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+thead th{background:var(--soft);}
+figure.fig{margin:1.4em 0;text-align:center;}
+figure.fig svg{max-width:100%;height:auto;}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
+.note,.ml,.key,.pitfall,.example{border-radius:10px;padding:14px 18px;margin:1.2em 0;border:1px solid var(--line);}
+.note{background:var(--soft);border-left:4px solid #94a3b8;}
+.example{background:#fff;border-left:4px solid var(--blue);}
+.ml{background:var(--green-bg);border-left:4px solid var(--green);}
+.key{background:var(--amber-bg);border-left:4px solid var(--amber);}
+.pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.goals{background:var(--blue-bg);border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:10px;padding:14px 20px;margin:.2em 0 1.5em;}
+.goals h4{margin:.1em 0 .5em;color:#1e3a8a;}
+.goals ul{margin:.3em 0;}
+.skip{background:var(--soft);border:1px solid var(--line);border-left:4px solid #94a3b8;border-radius:10px;padding:14px 20px;margin:1.8em 0 0;color:#475569;}
+.skip h4{margin:.1em 0 .5em;color:#475569;}
+.tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
+.toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
+.toc h3{margin:.1em 0 .7em;}
+.toc ol{list-style:none;padding:0;}
+.toc li{padding:7px 10px;border-radius:8px;color:#334155;border:1px solid transparent;}
+.toc li a{color:inherit;text-decoration:none;display:block;}
+.toc li .ln{display:inline-block;min-width:54px;color:var(--muted);font-size:13px;}
+.toc li.cur{background:var(--blue-bg);border-color:#bfdbfe;font-weight:600;color:#1e3a8a;}
+.toc li:not(.cur):hover{background:var(--soft);}
+.navbtns{display:flex;justify-content:space-between;margin-top:22px;gap:12px;}
+.navbtns a{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--ink);}
+.navbtns a:hover{border-color:var(--blue);}
+.navbtns .nlabel{color:var(--muted);font-size:13px;}
+.navbtns .ntitle{font-weight:600;margin-top:3px;}
+.navbtns .next{text-align:right;}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.here{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:6px 0 4px;font-size:15px;color:#1e3a8a;line-height:1.7;}
+.here b{font-weight:700;}
+.cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
+.card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
+.card:hover{border-color:var(--blue);}
+.card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
+.card .ct{font-size:18px;font-weight:600;}
+.card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+.card .cap{margin-left:40px;margin-top:7px;font-size:13px;color:#1e3a8a;}
+.card .cap .lbl{display:inline-block;background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;margin-right:7px;}
+
+.card.soon{opacity:.6;cursor:default;}
+.card.soon:hover{border-color:var(--line);}
+.badge{display:inline-block;background:#e2e8f0;color:#475569;font-size:11px;font-weight:600;padding:1px 8px;border-radius:20px;margin-left:8px;vertical-align:middle;}
+.toc li.soon{color:#94a3b8;}
+.toc li.soon .badge{margin-left:4px;}
+</style>
+<link rel="stylesheet" href="../assets/annotator.css">
+<link rel="stylesheet" href="../assets/theme.css">
+</head>
+<body>
+<header class="top"><div class="inner">
+<div class="crumb"><a href="../index.html" style="color:inherit">首页</a>　/　<a href="index.html" style="color:inherit">模块 3 · Python、NumPy、PyTorch 与实验工程</a>　/　第 5 课（共 10 课）</div>
+<h1>nn.Module 与模型构建</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　阶段0：数学与工具基础　·　<strong>能力点：</strong>nn.Module——把张量运算组织成可保存/迁移的模型（注册机制是关键）</div>
+</div></header>
+<div class="wrap">
+<article>
+<p>上一课你用一个手写的标量自动微分引擎（micrograd）看清了反向传播：每个张量都记着自己怎么来的，<code>.backward()</code> 顺着这张图把梯度一路累加回去。但真实模型有成百上千个参数，你不可能手动 <code>w1, b1, w2, b2 = ...</code> 一个个拎着它们走——优化器要知道"该更新哪些张量"，保存模型要知道"该存哪些张量"，换设备（GPU）要知道"该搬哪些张量"。这一课讲的 <code>nn.Module</code> 就是这套"参数账本"的标准答案：它替你登记、收集、保存所有参数。把这一课啃透，下一课的训练循环里 <code>optimizer.step()</code> 才不会是黑魔法。</p>
+
+<div class="goals">
+<h4>读完这一课，你将能够</h4>
+<ul>
+<li>解释 <code>nn.Module</code> 为什么能"自动找到"所有参数——也就是 <code>__setattr__</code> 拦截注册机制。</li>
+<li>手写一个迷你 Module 基类，实现 <code>parameters()</code> 递归收集和 <code>state_dict()</code> 雏形。</li>
+<li>指出用普通 Python list 装子模块的后果，并改用 <code>nn.ModuleList</code> 修复。</li>
+<li>区分 <code>model(x)</code> 与 <code>model.forward(x)</code>，说出 <code>train()</code>/<code>eval()</code> 分别影响什么。</li>
+<li>用 <code>state_dict()</code> 保存与加载一个模型的权重。</li>
+</ul>
+</div>
+
+<h2>nn.Module 的心智模型：__init__ 注册，forward 算账</h2>
+
+<p>一个 <code>nn.Module</code> 子类只有两件核心职责，分工清晰：</p>
+<ul>
+<li><strong><code>__init__</code></strong>：登记"这个模型由哪些零件组成"——子模块（submodule，如 <code>nn.Linear</code>）和可学习参数（parameter）。这一步只是建账本，不算数。</li>
+<li><strong><code>forward</code></strong>：定义"给定输入 x，怎么一步步算出输出"。这一步是纯计算，用到的零件都在 <code>__init__</code> 里登记好了。</li>
+</ul>
+
+<p>一个关键习惯：<strong>调用 <code>model(x)</code> 而不是 <code>model.forward(x)</code></strong>。两者算出的结果一样，但 <code>model(x)</code> 会触发 <code>nn.Module</code> 的 <code>__call__</code>，它在调你的 <code>forward</code> 前后还做了别的事——比如执行注册的钩子（hook）。直接调 <code>forward</code> 会绕过这些机制；很多调试工具、可视化、量化都靠钩子工作，绕过它们的 bug 极难排查。把"模型当函数调"当成肌肉记忆。</p>
+
+<p>模型天然是<strong>树形结构</strong>：根 Module 下挂子 Module，子 Module 下还能挂子 Module，叶子上挂着参数。下图是一个两层网络的样子——注意右边那个用普通 list 装着的子模块是"游离"的。</p>
+
+<figure class="fig"><svg viewBox="0 0 960 600" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, -apple-system, sans-serif" role="img" aria-labelledby="t d">
+<title id="t">nn.Module 是一棵树</title>
+<desc id="d">根 Module 挂子模块，子模块挂参数；用普通 list 装的子模块游离在注册账本之外。</desc>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" fill="#1f2937"/>
+</marker>
+<marker id="arrowGray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/>
+</marker>
+</defs>
+<text x="480" y="30" text-anchor="middle" font-size="20" font-weight="700" fill="#1f2937">nn.Module 是一棵树：根挂子模块，子模块挂参数</text>
+<text x="480" y="52" text-anchor="middle" font-size="12" fill="#94a3b8">右侧虚线灰色 = 用普通 Python list 装的子模块，游离在账本之外（parameters() / .to() / state_dict() 都看不见它）</text>
+<text x="22" y="330" text-anchor="middle" font-size="12.5" fill="#2563eb" font-weight="600" transform="rotate(-90 22 330)">parameters() 只递归走实线分支（fc1/fc2 共 4 个参数）</text>
+<rect x="280" y="78" width="150" height="44" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="355" y="100" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">MLP</text>
+<text x="355" y="116" text-anchor="middle" font-size="10.5" fill="#2563eb">（根 Module）</text>
+<line x1="320" y1="122" x2="200" y2="166" stroke="#1f2937" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="390" y1="122" x2="495" y2="166" stroke="#1f2937" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M430,104 C620,104 720,120 800,164" fill="none" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrowGray)"/>
+<text x="640" y="116" text-anchor="middle" font-size="10.5" fill="#94a3b8" font-style="italic">self.extra = [Linear(...)]  ← 普通 list</text>
+<rect x="120" y="170" width="150" height="44" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="195" y="192" text-anchor="middle" font-size="13" font-weight="700" fill="#1f2937">fc1: Linear</text>
+<text x="195" y="208" text-anchor="middle" font-size="10" fill="#2563eb">子模块</text>
+<rect x="426" y="170" width="150" height="44" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="501" y="192" text-anchor="middle" font-size="13" font-weight="700" fill="#1f2937">fc2: Linear</text>
+<text x="501" y="208" text-anchor="middle" font-size="10" fill="#2563eb">子模块</text>
+<rect x="730" y="170" width="160" height="44" rx="10" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 5"/>
+<text x="810" y="192" text-anchor="middle" font-size="13" font-weight="700" fill="#64748b">extra[0]: Linear</text>
+<text x="810" y="208" text-anchor="middle" font-size="10" fill="#94a3b8">未注册</text>
+<line x1="170" y1="214" x2="118" y2="264" stroke="#1f2937" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="220" y1="214" x2="262" y2="264" stroke="#1f2937" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="476" y1="214" x2="430" y2="264" stroke="#1f2937" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="526" y1="214" x2="574" y2="264" stroke="#1f2937" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="780" y1="214" x2="726" y2="264" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrowGray)"/>
+<line x1="840" y1="214" x2="869" y2="264" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrowGray)"/>
+<ellipse cx="112" cy="288" rx="56" ry="24" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+<text x="112" y="285" text-anchor="middle" font-size="12" font-weight="600" fill="#065f46">weight</text>
+<text x="112" y="299" text-anchor="middle" font-size="11" fill="#059669">(4, 3)</text>
+<ellipse cx="268" cy="288" rx="56" ry="24" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+<text x="268" y="285" text-anchor="middle" font-size="12" font-weight="600" fill="#065f46">bias</text>
+<text x="268" y="299" text-anchor="middle" font-size="11" fill="#059669">(4,)</text>
+<ellipse cx="424" cy="288" rx="56" ry="24" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+<text x="424" y="285" text-anchor="middle" font-size="12" font-weight="600" fill="#065f46">weight</text>
+<text x="424" y="299" text-anchor="middle" font-size="11" fill="#059669">(1, 4)</text>
+<ellipse cx="580" cy="288" rx="56" ry="24" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+<text x="580" y="285" text-anchor="middle" font-size="12" font-weight="600" fill="#065f46">bias</text>
+<text x="580" y="299" text-anchor="middle" font-size="11" fill="#059669">(1,)</text>
+<ellipse cx="720" cy="288" rx="56" ry="24" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 5"/>
+<text x="720" y="285" text-anchor="middle" font-size="12" font-weight="600" fill="#64748b">weight</text>
+<text x="720" y="299" text-anchor="middle" font-size="11" fill="#94a3b8">(2, 1)</text>
+<ellipse cx="875" cy="288" rx="56" ry="24" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 5"/>
+<text x="875" y="285" text-anchor="middle" font-size="12" font-weight="600" fill="#64748b">bias</text>
+<text x="875" y="299" text-anchor="middle" font-size="11" fill="#94a3b8">(2,)</text>
+<line x1="650" y1="150" x2="650" y2="322" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="3 6"/>
+<text x="650" y="340" text-anchor="middle" font-size="10.5" fill="#94a3b8">↑ 账本边界</text>
+<text x="180" y="360" text-anchor="middle" font-size="11.5" fill="#1f2937" font-weight="600">已注册子树（实线）</text>
+<text x="800" y="360" text-anchor="middle" font-size="11.5" fill="#94a3b8" font-weight="600">未注册（游离在外）</text>
+<rect x="120" y="402" width="720" height="150" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="140" y="428" font-size="13" font-weight="700" fill="#1f2937">图例</text>
+<line x1="150" y1="454" x2="200" y2="454" stroke="#1f2937" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="212" y="458" font-size="12" fill="#1f2937">实线箭头 = 已注册（被 parameters() / .to() / state_dict() 遍历）</text>
+<line x1="150" y1="484" x2="200" y2="484" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrowGray)"/>
+<text x="212" y="488" font-size="12" fill="#1f2937">灰色虚线箭头 = 未注册（参数存在却收不到）</text>
+<rect x="150" y="505" width="40" height="22" rx="7" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="212" y="521" font-size="12" fill="#1f2937">圆角矩形 = Module</text>
+<ellipse cx="510" cy="516" rx="26" ry="12" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+<text x="548" y="521" font-size="12" fill="#1f2937">椭圆 = Parameter 叶子</text>
+</svg>
+<figcaption>nn.Module 是一棵树：根模块下挂子模块，子模块挂参数。用普通 list 装的子模块（右侧虚线灰色）游离在账本之外——parameters()、.to()、state_dict() 都看不见它。</figcaption></figure>
+
+<h2>注册机制：手写一个迷你 Module 讲透"参数怎么被找到的"</h2>
+
+<p>核心问题：你在 <code>__init__</code> 里写 <code>self.fc1 = Linear(3, 4)</code>，为什么之后 <code>parameters()</code> 就能把 <code>fc1</code> 里的 weight、bias 都吐出来？魔法藏在 <code>__setattr__</code>：每当你给 <code>self</code> 的某个属性赋值，Python 都会调用 <code>__setattr__</code>。<code>nn.Module</code> 重写了它——<strong>赋值时偷看一眼，如果你赋的是 Parameter 或子 Module，就顺手记进一本内部账本</strong>。下面这个迷你框架只用纯 Python + NumPy，把这套机制完整复刻出来。其中 <code>state_dict()</code> 返回的就是一本"参数名字符串 → 张量"的字典（保存模型时存的正是它，下面"初始化与保存"节会再用到），并故意埋一个"普通 list 装子模块"的坑：</p>
+
+<pre><code>import numpy as np
+
+class Parameter:
+    def __init__(self, data):
+        self.data = np.asarray(data, dtype=float)
+
+class Module:
+    def __init__(self):
+        # 用 object.__setattr__ 绕过下面拦截，先把两本账本建好
+        object.__setattr__(self, "_params", {})
+        object.__setattr__(self, "_modules", {})
+
+    def __setattr__(self, name, value):       # 赋值时拦截
+        if isinstance(value, Parameter):
+            self._params[name] = value        # 是参数 -> 记进参数账本
+        elif isinstance(value, Module):
+            self._modules[name] = value        # 是子模块 -> 记进子模块账本
+        object.__setattr__(self, name, value)  # 照常真正赋值
+
+    def parameters(self):                      # 递归收集所有参数
+        for p in self._params.values():
+            yield p
+        for m in self._modules.values():
+            yield from m.parameters()
+
+    def state_dict(self, prefix=""):           # 参数名字符串 -> 张量
+        sd = {}
+        for name, p in self._params.items():
+            sd[prefix + name] = p.data
+        for name, m in self._modules.items():
+            sd.update(m.state_dict(prefix + name + "."))
+        return sd
+
+    # 基类不实现 forward，留给子类定义；__call__ 调的就是子类的 forward
+    def __call__(self, x):                     # 让 model(x) 等价于 forward
+        return self.forward(x)
+
+class Linear(Module):
+    def __init__(self, d_in, d_out):
+        super().__init__()
+        self.weight = Parameter(np.random.randn(d_out, d_in) * 0.1)
+        self.bias = Parameter(np.zeros(d_out))
+    def forward(self, x):
+        return x @ self.weight.data.T + self.bias.data
+
+class MLP(Module):
+    def __init__(self):
+        super().__init__()
+        self.fc1 = Linear(3, 4)
+        self.fc2 = Linear(4, 1)
+        self.extra = [Linear(1, 1)]            # 经典坑：list 装子模块！
+    def forward(self, x):
+        h = np.maximum(self.fc1(x), 0)         # ReLU
+        return self.fc2(h)
+
+np.random.seed(0)
+net = MLP()
+x = np.random.randn(2, 3)
+y = net(x)
+print("输出形状:", y.shape)
+print("注册到的参数个数:", sum(1 for _ in net.parameters()))
+print("state_dict 的键:", list(net.state_dict().keys()))
+print("list 里的 Linear 被注册了吗:", any(
+    p is net.extra[0].weight for p in net.parameters()))</code></pre>
+
+<p>运行输出：</p>
+<pre class="ref" data-lang="输出"><code>输出形状: (2, 1)
+注册到的参数个数: 4
+state_dict 的键: ['fc1.weight', 'fc1.bias', 'fc2.weight', 'fc2.bias']
+list 里的 Linear 被注册了吗: False</code></pre>
+
+<p>读懂这段输出，本课就过了一大半：</p>
+<ul>
+<li><strong>4 个参数</strong>：fc1 的 weight/bias + fc2 的 weight/bias。<code>parameters()</code> 沿着子模块账本递归走了一遍，自动找全。优化器要更新的就是这一串。</li>
+<li><strong>键名 <code>'fc1.weight'</code></strong>：注意那个点号——它是父模块名拼上子参数名得来的。模型多深，键名就多长（如 <code>'block.0.attn.weight'</code>），但永远能唯一定位一个张量。</li>
+<li><strong>list 里的 Linear 没被注册</strong>：因为 <code>self.extra = [Linear(1,1)]</code> 赋的是一个 <em>list</em>，不是 Parameter 也不是 Module，<code>__setattr__</code> 看一眼就放过了。它的参数对 <code>parameters()</code> 和 <code>state_dict()</code> 完全隐形——这就是下一节那个经典坑的根因。</li>
+</ul>
+
+<h2>经典坑：普通 list 装子模块会"消失"</h2>
+
+<p>真实 <code>nn.Module</code> 的 <code>__setattr__</code> 和上面那个迷你版一模一样：只认 <code>nn.Parameter</code> 和 <code>nn.Module</code>，不认普通 <code>list</code>/<code>dict</code>。所以下面这段在 PyTorch 里看似无害的代码，藏着一个会让你 debug 一下午的 bug：</p>
+
+<pre class="ref" data-lang="PyTorch"><code>import torch.nn as nn
+
+class BadNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.layers = [nn.Linear(4, 4) for _ in range(3)]   # 错！普通 list
+    def forward(self, x):
+        for layer in self.layers:
+            x = layer(x)
+        return x
+
+net = BadNet()
+print(len(list(net.parameters())))   # 0 —— 一个参数都没有！</code></pre>
+
+<p>后果是连锁的，全都源于"没被注册进账本"：</p>
+<ul>
+<li><code>parameters()</code> 看不到 → 优化器拿到空列表 → <strong>这三层永远不会被训练</strong>，loss 卡住不降。</li>
+<li><code>model.to(device)</code> 搬不动它们 → 模型搬到 GPU，这三层还赖在 CPU → forward 时报 device mismatch。</li>
+<li><code>state_dict()</code> 不收它们 → 保存的权重文件里缺了这三层 → 加载后模型行为不对。</li>
+</ul>
+
+<p>修复只需把容器换成会注册的版本——<code>nn.ModuleList</code>（按下标用）或 <code>nn.ModuleDict</code>（按名字用）。它们内部对每个元素都走了一遍注册：</p>
+
+<pre class="ref" data-lang="PyTorch"><code>class GoodNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.layers = nn.ModuleList([nn.Linear(4, 4) for _ in range(3)])
+    def forward(self, x):
+        for layer in self.layers:
+            x = layer(x)
+        return x
+
+print(len(list(GoodNet().parameters())))   # 6 = 3 层 × (weight + bias)</code></pre>
+
+<p>记一条规则：<strong>凡是要装"会学习的零件"的容器，必须用 <code>nn.ModuleList</code>/<code>nn.ModuleDict</code>，绝不用裸 <code>list</code>/<code>dict</code></strong>。如果是装多个张量参数，对应的是 <code>nn.ParameterList</code>/<code>nn.ParameterDict</code>。</p>
+
+<h2>nn.Parameter：什么样的张量算"可学习的"</h2>
+
+<p>在迷你框架里，我们用一个 <code>Parameter</code> 类来标记"这是要学的张量"。真实 PyTorch 里 <code>nn.Parameter</code> 是 <code>Tensor</code> 的子类，被赋给 Module 属性时自动登记进 <code>parameters()</code>、自动 <code>requires_grad=True</code>、会被优化器更新、会进 <code>state_dict</code>。普通 <code>torch.Tensor</code> 赋给属性则<strong>不会</strong>被当成参数。</p>
+
+<p>那"需要随模型搬设备、要存档，但又不该被优化器更新"的张量怎么办（比如 BatchNorm 的滑动均值）？用 <code>register_buffer</code> 注册成缓冲区（buffer）：进 <code>state_dict</code>、随 <code>.to()</code> 搬，但不进 <code>parameters()</code>、不被梯度更新。</p>
+
+<pre class="ref" data-lang="PyTorch"><code>import torch, torch.nn as nn
+
+class Affine(nn.Module):
+    def __init__(self, d):
+        super().__init__()
+        self.scale = nn.Parameter(torch.ones(d))     # 学习
+        self.register_buffer("running_mean", torch.zeros(d))  # 存档不学习
+    def forward(self, x):
+        return (x - self.running_mean) * self.scale</code></pre>
+
+<h2>train() / eval()：一个开关，两种行为</h2>
+
+<p>有些层在训练和推理时行为不同，最典型的是 <strong>Dropout</strong>（训练时随机丢弃一部分激活以防过拟合，推理时全部保留）和 <strong>BatchNorm</strong>（训练时用当前 batch 的统计量，推理时用累计的滑动统计量）。<code>nn.Module</code> 用一个布尔标志 <code>self.training</code> 控制，<code>model.train()</code> 把整棵树设为 <code>True</code>，<code>model.eval()</code> 设为 <code>False</code>。下面用 NumPy 手写 Dropout，看清这个开关到底改变了什么：</p>
+
+<pre><code>import numpy as np
+
+def dropout(x, p, training):
+    if not training:
+        return x                                  # 推理：原样通过
+    mask = (np.random.rand(*x.shape) > p) / (1 - p)  # 训练：随机丢 + 放大补偿
+    return x * mask
+
+np.random.seed(0)
+x = np.ones((1, 10000))
+train_out = dropout(x, p=0.5, training=True)
+eval_out  = dropout(x, p=0.5, training=False)
+print("training=True  输出均值:", round(float(train_out.mean()), 3))
+print("training=False 输出均值:", round(float(eval_out.mean()), 3))
+print("两次 training=True 的输出相同吗:",
+      np.allclose(dropout(x, 0.5, True), dropout(x, 0.5, True)))</code></pre>
+
+<pre class="ref" data-lang="输出"><code>training=True  输出均值: 0.987
+training=False 输出均值: 1.0
+两次 training=True 的输出相同吗: False</code></pre>
+
+<p>注意 <code>training=True</code> 时输出均值仍接近 1（因为存活的激活被除以 <code>1-p</code> 放大补偿了），但每次都不一样——它是随机的。<strong>这就是为什么验证/推理前必须 <code>model.eval()</code></strong>：忘了切，模型在验证时还在随机丢神经元，每次预测都抖动，验证 loss 虚高且不可复现；BatchNorm 还会用单个 batch 的统计量算出错误结果。这个坑下一课写训练循环时会再踩一遍——记住验证段的标准开头是 <code>model.eval()</code>，并配 <code>with torch.no_grad():</code>。</p>
+
+<h2>初始化与保存：nn.init 和 state_dict</h2>
+
+<p>参数的初始值不是小事。如果权重太大，前向传播时激活值会层层放大直至爆炸；太小则层层衰减到几乎为零，梯度也跟着消失。下面把初始化标准差从"随便取 1"换成"按维度缩放"（Xavier/He 的思想：让每层输出方差大致保持不变），跑 10 层就能看到天壤之别：</p>
+
+<pre><code>import numpy as np
+np.random.seed(0)
+d = 100
+naive  = np.random.randn(d, d) * 1.0                  # 标准差 1，太大
+scaled = np.random.randn(d, d) * np.sqrt(2.0 / d)     # He 初始化(配 ReLU)
+h_n = h_s = np.random.randn(1, d)
+for _ in range(10):
+    h_n = np.maximum(h_n @ naive,  0)                 # 10 层 ReLU
+    h_s = np.maximum(h_s @ scaled, 0)
+print("朴素初始化 10层后 激活均方根:", round(float(np.sqrt((h_n**2).mean())), 2))
+print("缩放初始化 10层后 激活均方根:", round(float(np.sqrt((h_s**2).mean())), 2))</code></pre>
+
+<pre class="ref" data-lang="输出"><code>朴素初始化 10层后 激活均方根: 99664490.48
+缩放初始化 10层后 激活均方根: 1.24</code></pre>
+
+<p>朴素初始化的激活在 10 层后已飙到约 1e8（数值溢出的前兆，再深下去就会爆掉），而缩放后的稳定在 1.24——也就是 O(1) 的合理量级（不是无限缩小，而是"既没爆炸也没消失"）。PyTorch 的 <code>nn.init</code> 提供了现成的初始化函数；<code>nn.Linear</code> 等层也内置了合理的默认初始化，多数时候你不必手动调，但要知道"初始化坏了"是训练不动的常见原因之一。</p>
+
+<pre class="ref" data-lang="PyTorch"><code>import torch.nn as nn
+
+layer = nn.Linear(100, 100)
+nn.init.kaiming_normal_(layer.weight, nonlinearity="relu")  # He 初始化
+nn.init.zeros_(layer.bias)</code></pre>
+
+<p>训练好的模型靠 <code>state_dict</code>（参数名字符串 → 张量 的字典，就是迷你框架里那本账本）保存和加载。注意保存的是 <code>state_dict</code> 而非整个模型对象——后者依赖类定义和文件路径，脆弱且不安全。下图展示这张映射表的样子：</p>
+
+<figure class="fig"><svg viewBox="0 0 720 560" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <marker id="arr" orient="auto-start-reverse" markerWidth="9" markerHeight="9" refX="7.5" refY="4" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8"/>
+    </marker>
+    <marker id="arrLead" orient="auto-start-reverse" markerWidth="9" markerHeight="9" refX="7.5" refY="4" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#d97706"/>
+    </marker>
+  </defs>
+
+  <!-- title bands -->
+  <text x="140" y="118" text-anchor="middle" font-size="14" font-weight="600" fill="#2563eb">键（字符串）</text>
+  <text x="565" y="118" text-anchor="middle" font-size="14" font-weight="600" fill="#059669">值（张量 Tensor）</text>
+  <text x="360" y="40" text-anchor="middle" font-size="17" font-weight="700" fill="#1f2937">state_dict</text>
+  <text x="360" y="62" text-anchor="middle" font-size="12" fill="#64748b">OrderedDict： 参数名 → 张量</text>
+
+  <!-- ===== Row 1: fc1.weight -> (4,3) ===== -->
+  <g>
+    <rect x="40" y="150" width="200" height="34" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="56" y="172" font-size="13" font-family="ui-monospace, Menlo, monospace" fill="#1f2937">'fc1<tspan fill="#d97706" font-weight="700">.</tspan>weight'</text>
+  </g>
+  <line x1="248" y1="167" x2="430" y2="167" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+  <!-- tensor (4,3) grid -->
+  <g>
+    <g fill="#ecfdf5" stroke="#059669" stroke-width="1">
+      <rect x="440" y="150" width="16" height="16"/><rect x="456" y="150" width="16" height="16"/><rect x="472" y="150" width="16" height="16"/>
+      <rect x="440" y="166" width="16" height="16"/><rect x="456" y="166" width="16" height="16"/><rect x="472" y="166" width="16" height="16"/>
+      <rect x="440" y="182" width="16" height="16"/><rect x="456" y="182" width="16" height="16"/><rect x="472" y="182" width="16" height="16"/>
+      <rect x="440" y="198" width="16" height="16"/><rect x="456" y="198" width="16" height="16"/><rect x="472" y="198" width="16" height="16"/>
+    </g>
+    <text x="500" y="186" font-size="13" font-family="ui-monospace, Menlo, monospace" fill="#059669" font-weight="600">(4, 3)</text>
+  </g>
+
+  <!-- ===== Row 2: fc1.bias -> (4,) ===== -->
+  <g>
+    <rect x="40" y="240" width="200" height="34" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="56" y="262" font-size="13" font-family="ui-monospace, Menlo, monospace" fill="#1f2937">'fc1<tspan fill="#d97706" font-weight="700">.</tspan>bias'</text>
+  </g>
+  <line x1="248" y1="257" x2="430" y2="257" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+  <!-- tensor (4,) strip -->
+  <g>
+    <g fill="#ecfdf5" stroke="#059669" stroke-width="1">
+      <rect x="440" y="249" width="16" height="16"/><rect x="456" y="249" width="16" height="16"/><rect x="472" y="249" width="16" height="16"/><rect x="488" y="249" width="16" height="16"/>
+    </g>
+    <text x="516" y="262" font-size="13" font-family="ui-monospace, Menlo, monospace" fill="#059669" font-weight="600">(4,)</text>
+  </g>
+
+  <!-- ===== Row 3: fc2.weight -> (1,4) ===== -->
+  <g>
+    <rect x="40" y="320" width="200" height="34" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="56" y="342" font-size="13" font-family="ui-monospace, Menlo, monospace" fill="#1f2937">'fc2<tspan fill="#d97706" font-weight="700">.</tspan>weight'</text>
+  </g>
+  <line x1="248" y1="337" x2="430" y2="337" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+  <!-- tensor (1,4) grid -->
+  <g>
+    <g fill="#ecfdf5" stroke="#059669" stroke-width="1">
+      <rect x="440" y="329" width="16" height="16"/><rect x="456" y="329" width="16" height="16"/><rect x="472" y="329" width="16" height="16"/><rect x="488" y="329" width="16" height="16"/>
+    </g>
+    <text x="516" y="342" font-size="13" font-family="ui-monospace, Menlo, monospace" fill="#059669" font-weight="600">(1, 4)</text>
+  </g>
+
+  <!-- ===== Row 4: fc2.bias -> (1,) ===== -->
+  <g>
+    <rect x="40" y="400" width="200" height="34" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="56" y="422" font-size="13" font-family="ui-monospace, Menlo, monospace" fill="#1f2937">'fc2<tspan fill="#d97706" font-weight="700">.</tspan>bias'</text>
+  </g>
+  <line x1="248" y1="417" x2="430" y2="417" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+  <!-- tensor (1,) strip -->
+  <g>
+    <rect x="440" y="409" width="16" height="16" fill="#ecfdf5" stroke="#059669" stroke-width="1"/>
+    <text x="468" y="422" font-size="13" font-family="ui-monospace, Menlo, monospace" fill="#059669" font-weight="600">(1,)</text>
+  </g>
+
+  <!-- ===== highlight bubble on fc1.weight decomposition ===== -->
+  <g>
+    <rect x="285" y="440" width="350" height="58" rx="10" fill="#fffbeb" stroke="#d97706" stroke-width="1.5"/>
+    <text x="460" y="465" text-anchor="middle" font-size="13" fill="#1f2937">
+      <tspan font-family="ui-monospace, Menlo, monospace" font-weight="700" fill="#2563eb">'fc1'</tspan>
+      <tspan fill="#64748b">（父模块名）</tspan>
+    </text>
+    <text x="460" y="487" text-anchor="middle" font-size="13" fill="#1f2937">
+      <tspan font-family="ui-monospace, Menlo, monospace" font-weight="700" fill="#d97706"> + '.' + </tspan>
+      <tspan font-family="ui-monospace, Menlo, monospace" font-weight="700" fill="#2563eb">'weight'</tspan>
+      <tspan fill="#64748b">（参数名）</tspan>
+    </text>
+    <!-- leader line pointing to the dot in fc1.weight key -->
+    <path d="M285,460 C200,440 145,300 121,184" fill="none" stroke="#d97706" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrLead)"/>
+    <text x="305" y="425" font-size="11" fill="#d97706" font-weight="600">点号 = 父子层级的分隔符</text>
+  </g>
+
+  <!-- bottom note -->
+  <line x1="40" y1="522" x2="680" y2="522" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="360" y="544" text-anchor="middle" font-size="12" fill="#64748b">
+    <tspan font-family="ui-monospace, Menlo, monospace" fill="#1f2937">torch.save(model.state_dict(), ...)</tspan> 存的就是这张表
+  </text>
+</svg><figcaption>state_dict 是一张「参数名字符串 → 张量」的映射表。键名由父模块名用点号拼接子参数名得来，因此能唯一定位树中任意一个张量。</figcaption></figure>
+
+<pre class="ref" data-lang="PyTorch"><code>import torch
+
+# 保存：只存权重字典
+torch.save(model.state_dict(), "model.pt")
+
+# 加载：先构建结构相同的模型，再灌入权重
+model = MyModel()
+model.load_state_dict(torch.load("model.pt"))
+model.eval()      # 推理前别忘了切换模式</code></pre>
+
+<h2>调一调，观察现象</h2>
+
+<p><strong>微任务 1：把 list 换成 ModuleList（在迷你框架里模拟）。</strong>预期现象：用普通 list 装的那个对象 <code>parameters()</code> 数到 <strong>0 个</strong>，用 <code>ModuleList</code> 装的数到 <strong>2 个</strong>（= 1 层 ×（weight + bias））。为什么：list 不被 <code>__setattr__</code> 识别；只要让容器里每个子模块都注册进 <code>_modules</code> 账本，<code>parameters()</code> 就能递归收到它们。（把这个 0→2 的修复推广到上面三层的 MLP，注册数就会从 4 变成 6。）</p>
+
+<pre><code>import numpy as np
+
+class Parameter:
+    def __init__(self, data): self.data = np.asarray(data, float)
+
+class Module:
+    def __init__(self):
+        object.__setattr__(self, "_params", {})
+        object.__setattr__(self, "_modules", {})
+    def __setattr__(self, name, value):
+        if isinstance(value, Parameter): self._params[name] = value
+        elif isinstance(value, Module):  self._modules[name] = value
+        object.__setattr__(self, name, value)
+    def parameters(self):
+        for p in self._params.values(): yield p
+        for m in self._modules.values(): yield from m.parameters()
+
+class ModuleList(Module):                       # 关键：注册每个子模块
+    def __init__(self, mods):
+        super().__init__()
+        for i, m in enumerate(mods):
+            setattr(self, str(i), m)            # 触发 __setattr__ 注册
+
+class Linear(Module):
+    def __init__(self, a, b):
+        super().__init__()
+        self.weight = Parameter(np.zeros((b, a)))
+        self.bias = Parameter(np.zeros(b))
+
+bad = Module(); bad.layers = [Linear(2,2)]                  # list
+good = Module(); good.layers = ModuleList([Linear(2,2)])    # ModuleList
+print("list 装:", sum(1 for _ in bad.parameters()), "个参数")
+print("ModuleList 装:", sum(1 for _ in good.parameters()), "个参数")</code></pre>
+
+<pre class="ref" data-lang="输出"><code>list 装: 0 个参数
+ModuleList 装: 2 个参数</code></pre>
+
+<p><strong>微任务 2：把 Dropout 概率 p 从 0.5 调到 0.9。</strong>预期现象：<code>training=True</code> 时大量激活被置零，但输出均值仍接近 1。为什么：存活概率只有 <code>1-p=0.1</code>，但每个存活的激活被除以 0.1 放大了 10 倍，期望上正好补偿，所以均值不变、方差暴涨。</p>
+
+<pre><code>import numpy as np
+np.random.seed(1)
+def dropout(x, p, training):
+    if not training: return x
+    return x * (np.random.rand(*x.shape) > p) / (1 - p)
+x = np.ones((1, 10000))
+for p in [0.1, 0.5, 0.9]:
+    out = dropout(x, p, training=True)
+    print(f"p={p}: 被置零比例≈{round(float((out==0).mean()),2)}, 输出均值≈{round(float(out.mean()),3)}")</code></pre>
+
+<pre class="ref" data-lang="输出"><code>p=0.1: 被置零比例≈0.1, 输出均值≈1.0
+p=0.5: 被置零比例≈0.49, 输出均值≈1.02
+p=0.9: 被置零比例≈0.9, 输出均值≈1.03</code></pre>
+
+<p><strong>微任务 3：把初始化标准差从 He 缩放改回 1.0，层数从 10 调到 30。</strong>预期现象：朴素初始化 30 层后激活均方根飙到约 1e24 量级（一个极大但仍有限的数，指数级膨胀；再往深堆几十层就会溢出成 <code>inf</code>），而 He 缩放仍稳定在约 1.15。为什么：每层把激活放大约固定倍数，层数越多指数累积越猛，足够深就会超出浮点数表示范围。</p>
+
+<pre><code>import numpy as np
+np.random.seed(0)
+d = 100
+for scale, tag in [(1.0, "朴素"), (np.sqrt(2.0/d), "He缩放")]:
+    W = np.random.randn(d, d) * scale
+    h = np.random.randn(1, d)
+    for _ in range(30):
+        h = np.maximum(h @ W, 0)
+    print(f"{tag}初始化 30层后 激活均方根:", round(float(np.sqrt((h**2).mean())), 2))</code></pre>
+
+<pre class="ref" data-lang="输出"><code>朴素初始化 30层后 激活均方根: 2.2656832467872677e+24
+He缩放初始化 30层后 激活均方根: 1.15</code></pre>
+
+<h2>动手练习</h2>
+
+<ul>
+<li><strong>练习 1（给迷你框架加 buffer）：</strong>给本课的迷你 <code>Module</code> 加一个 <code>register_buffer(name, tensor)</code> 方法和一本 <code>_buffers</code> 账本。要求：buffer 进 <code>state_dict()</code>（键名带前缀），但<strong>不</strong>进 <code>parameters()</code>。写个小测试验证：一个含 1 个 Parameter + 1 个 buffer 的模块，<code>parameters()</code> 数到 1，<code>state_dict()</code> 的键有 2 个。</li>
+<li><strong>练习 2（复现并解释 device bug 的成因，用注册机制论证）：</strong>不用 PyTorch，在迷你框架里给 <code>Module</code> 加一个 <code>apply_to_all(fn)</code> 方法，模拟 <code>.to(device)</code>：它对所有<em>已注册</em>参数的 <code>.data</code> 施加 <code>fn</code>（比如 <code>lambda a: a * 0</code> 代表"搬走")。然后构造一个用普通 list 装子模块的模型，调用 <code>apply_to_all</code> 后检查：list 里那个子模块的参数是否被改动？用一句话解释这正对应"<code>model.to(device)</code> 搬不动未注册子模块"。</li>
+<li><strong>练习 3（写出键名）：</strong>不运行代码，仅凭注册规则，手写出下面这个 PyTorch 模型 <code>state_dict()</code> 的全部键名，然后口头验证（参考块，不必跑）：
+<pre class="ref" data-lang="PyTorch"><code>class Net(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.enc = nn.Linear(4, 8)
+        self.blocks = nn.ModuleList([nn.Linear(8, 8) for _ in range(2)])
+        self.head = nn.Linear(8, 2)</code></pre>
+（提示：每个 Linear 各有 weight 和 bias；ModuleList 用下标当名字。）</li>
+</ul>
+
+<h2>掌握自检</h2>
+
+<ul>
+<li>我能说出 <code>nn.Module</code> 靠 <code>__setattr__</code> 拦截赋值来注册 Parameter 和子 Module，并能在纸上画出参数被 <code>parameters()</code> 递归收集的路径。</li>
+<li>看到 <code>self.layers = [nn.Linear(...) ...]</code> 我能立刻指出"这些层不会被训练/搬设备/保存"，并知道改成 <code>nn.ModuleList</code> 修复。</li>
+<li>我能解释为什么用 <code>model(x)</code> 而非 <code>model.forward(x)</code>（钩子机制）。</li>
+<li>我能说出 <code>train()</code>/<code>eval()</code> 各影响 Dropout 和 BatchNorm 的什么行为，以及验证时忘了 <code>eval()</code> 的具体后果。</li>
+<li>我能区分 <code>nn.Parameter</code>（学习+存档）、缓冲区 buffer（存档不学习）、普通 Tensor 属性（都不算）。</li>
+<li>我能用 <code>state_dict()</code> + <code>torch.save</code>/<code>load_state_dict</code> 保存和恢复模型权重，并知道键名里的点号怎么来的。</li>
+</ul>
+
+<div class="skip">
+<h4>可以先放过的点</h4>
+<ul>
+<li><strong>钩子（hook）的具体用法</strong>：知道"<code>model(x)</code> 比 <code>forward</code> 多做了事、所以总用前者"就够了。等你需要做特征可视化、梯度裁剪或模型量化时再回来学 <code>register_forward_hook</code>。</li>
+<li><strong>BatchNorm 的滑动统计细节</strong>：现在只需记住"它在 train/eval 行为不同、有需要存档的 buffer"。等学到归一化层那一课再深究动量、<code>track_running_stats</code> 这些。</li>
+<li><strong>初始化的数学推导</strong>：Xavier/He 的方差公式（\(\mathrm{Var}=2/n_\text{in}\) 之类）现在不必背，理解"按维度缩放以防激活爆炸/消失"的直觉即可。真正手算推导留到你自己实现一个深层网络、发现训练不动时。</li>
+<li><strong>保存整个模型 vs 只存 state_dict 的取舍、<code>map_location</code>、跨版本兼容</strong>：先用"存 state_dict"这一条路就好，部署和断点续训时再补。</li>
+</ul>
+</div>
+</article>
+<div class="navbtns"><a class="prev" href="lesson-04-autograd.html"><div class="nlabel">← 上一课</div><div class="ntitle">第4课 · Autograd 自动微分</div></a><a class="next" href="index.html"><div class="nlabel">→</div><div class="ntitle">已是当前最后一课 · 回目录</div></a></div>
+<nav class="toc"><h3>本模块课程表</h3><ol>
+<li><a href="lesson-01-env-scientific-stack.html"><span class="ln">第1课</span>Python 科学计算栈与环境工程</a></li>
+<li><a href="lesson-02-numpy-vectorization-broadcasting.html"><span class="ln">第2课</span>NumPy 数组、向量化与广播</a></li>
+<li><a href="lesson-03-pytorch-tensors-device-dtype.html"><span class="ln">第3课</span>PyTorch 张量、设备与 dtype</a></li>
+<li><a href="lesson-04-autograd.html"><span class="ln">第4课</span>Autograd 自动微分</a></li>
+<li class="cur"><span class="ln">第5课</span>nn.Module 与模型构建</li>
+<li class="soon"><span class="ln">第6课</span>从零写训练循环（核心）　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第7课</span>数据加载 Dataset 与 DataLoader　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第8课</span>GPU/CUDA 与混合精度　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第9课</span>实验管理、可复现与调试方法论　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第10课</span>Hugging Face 生态入门　<span class="badge">即将上线</span></li>
+</ol></nav>
+</div>
+<style>
+.pr-cell{border:1px solid #334155;border-radius:10px;margin:1.2em 0;overflow:hidden;background:#0f172a;}
+.pr-head{display:flex;align-items:center;gap:8px;background:#1e293b;color:#cbd5e1;padding:6px 10px;font-size:13px;font-family:system-ui,-apple-system,sans-serif;}
+.pr-title{flex:1;font-weight:600;}
+.pr-status{font-size:12px;color:#94a3b8;white-space:nowrap;max-width:50%;overflow:hidden;text-overflow:ellipsis;}
+.pr-btn{cursor:pointer;border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:6px;padding:3px 11px;font-size:13px;line-height:1.4;}
+.pr-btn:hover{background:#0b1220;}
+.pr-run{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:600;}
+.pr-run:hover{background:#1d4ed8;}
+.pr-cell.collapsed .pr-body{display:none;}
+.pr-editor{position:relative;background:#0f172a;}
+.pr-code,.pr-edit{display:block;width:100%;min-height:68px;border:none;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.55;padding:12px 14px;box-sizing:border-box;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:4;}
+.pr-code{position:absolute;inset:0;margin:0;overflow:hidden;background:#0f172a;color:#dbeafe;pointer-events:none;}
+.pr-edit{position:relative;background:transparent;color:transparent;caret-color:#e2e8f0;resize:vertical;outline:none;-webkit-text-fill-color:transparent;}
+.pr-edit::selection{background:rgba(96,165,250,.34);}
+.tok-kw{color:#c084fc;font-weight:700;}
+.tok-fn{color:#67e8f9;}
+.tok-num{color:#fbbf24;}
+.tok-str{color:#86efac;}
+.tok-comment{color:#94a3b8;font-style:italic;}
+.pr-out{margin:0;padding:10px 14px;border-top:1px solid #334155;background:#0b1220;color:#cbd5e1;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.5;white-space:pre-wrap;max-height:340px;overflow:auto;}
+.pr-out:empty{display:none;}
+.pr-out.err{color:#fca5a5;}
+.pr-cell.ref-cell{border-color:#475569;}
+.pr-cell.ref-cell .pr-head{background:#172033;color:#cbd5e1;}
+.pr-cell.ref-cell .pr-status{color:#fbbf24;font-style:italic;}
+.pr-code.pr-static{position:static;pointer-events:auto;overflow:auto;min-height:auto;background:#0f172a;color:#dbeafe;}
+#pr-fab{position:fixed;right:18px;bottom:18px;z-index:9998;background:#2563eb;color:#fff;border:none;border-radius:999px;padding:10px 17px;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.22);font-family:system-ui,sans-serif;}
+#pr-fab:hover{background:#1d4ed8;}
+#pr-lab{position:fixed;right:18px;bottom:66px;z-index:9999;width:400px;max-width:92vw;background:#0f172a;border:1px solid #334155;border-radius:12px;display:none;flex-direction:column;box-shadow:0 14px 38px rgba(0,0,0,.4);overflow:hidden;}
+#pr-lab.open{display:flex;}
+#pr-lab .pr-edit,#pr-lab .pr-code{min-height:150px;}
+</style>
+<script>
+(function(){
+  var PYBASE="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+  var pyReady=null;
+  function loadPy(status){
+    if(pyReady)return pyReady;
+    pyReady=(async function(){
+      status("正在加载 Python 运行时（首次约 10 秒，需联网）…");
+      await new Promise(function(res,rej){
+        var s=document.createElement("script");s.src=PYBASE+"pyodide.js";
+        s.onload=res;s.onerror=function(){rej(new Error("无法加载 Pyodide（首次运行需要联网）"));};
+        document.head.appendChild(s);
+      });
+      var py=await loadPyodide({indexURL:PYBASE});
+      status("正在加载 NumPy …");
+      await py.loadPackage("numpy");
+      status("Python 就绪 ✓");
+      return py;
+    })();
+    return pyReady;
+  }
+  async function run(code,outEl,statusEl){
+    var setS=function(m){if(statusEl)statusEl.textContent=m;};
+    outEl.classList.remove("err");outEl.textContent="";
+    var py;
+    try{py=await loadPy(setS);}
+    catch(e){outEl.classList.add("err");outEl.textContent="加载失败："+e.message;return;}
+    var buf="";
+    py.setStdout({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    py.setStderr({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    try{
+      var result=await py.runPythonAsync(code);
+      if(result!==undefined&&result!==null){
+        var r;try{r=result.toString();}catch(_){r=String(result);}
+        if(r!=="None")buf+=(buf&&!buf.endsWith("\n")?"\n":"")+r;
+        if(result&&result.destroy)result.destroy();
+      }
+      outEl.textContent=buf||"（运行成功，无输出。用 print(...) 查看结果）";
+    }catch(e){
+      outEl.classList.add("err");
+      outEl.textContent=buf+(buf?"\n":"")+String((e&&e.message)||e);
+    }
+  }
+  var KW={False:1,None:1,True:1,and:1,as:1,assert:1,async:1,await:1,break:1,class:1,continue:1,def:1,del:1,elif:1,else:1,except:1,finally:1,for:1,from:1,global:1,if:1,import:1,in:1,is:1,lambda:1,nonlocal:1,not:1,or:1,pass:1,raise:1,return:1,try:1,while:1,with:1,yield:1};
+  var FN={abs:1,all:1,any:1,array:1,bool:1,dict:1,enumerate:1,float:1,int:1,len:1,list:1,max:1,min:1,np:1,numpy:1,print:1,range:1,round:1,set:1,str:1,sum:1,tuple:1,zip:1,torch:1,nn:1,tensor:1,F:1,super:1,isinstance:1,getattr:1,setattr:1,hasattr:1,sorted:1,type:1,object:1,property:1};
+  function esc(s){return s.replace(/[&<>]/g,function(c){return c==="&"?"&amp;":c==="<"?"&lt;":"&gt;";});}
+  function colorLine(line){
+    var out="",i=0;
+    while(i<line.length){
+      var ch=line[i];
+      if(ch==="#"){out+='<span class="tok-comment">'+esc(line.slice(i))+"</span>";break;}
+      if(ch==="'"||ch==='"'){
+        var q=ch,triple=line.slice(i,i+3)===q+q+q,end=i+(triple?3:1),done=false;
+        while(end<line.length){
+          if(!triple&&line[end]==="\\"){end+=2;continue;}
+          if(triple&&line.slice(end,end+3)===q+q+q){end+=3;done=true;break;}
+          if(!triple&&line[end]===q){end+=1;done=true;break;}
+          end+=1;
+        }
+        out+='<span class="tok-str">'+esc(line.slice(i,done?end:line.length))+"</span>";
+        i=done?end:line.length;
+        continue;
+      }
+      if(/[0-9]/.test(ch)||(ch==="."&&/[0-9]/.test(line[i+1]||""))){
+        var m=line.slice(i).match(/^(?:0[xX][0-9a-fA-F]+|\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?/);
+        out+='<span class="tok-num">'+esc(m[0])+"</span>";i+=m[0].length;continue;
+      }
+      if(/[A-Za-z_]/.test(ch)){
+        var id=line.slice(i).match(/^[A-Za-z_][A-Za-z0-9_]*/)[0];
+        if(KW[id])out+='<span class="tok-kw">'+id+"</span>";
+        else if(FN[id])out+='<span class="tok-fn">'+id+"</span>";
+        else out+=id;
+        i+=id.length;continue;
+      }
+      out+=esc(ch);i+=1;
+    }
+    return out;
+  }
+  function paint(ta){
+    var pre=ta.closest(".pr-editor").querySelector(".pr-code");
+    pre.innerHTML=ta.value.split("\n").map(colorLine).join("\n")+(ta.value.endsWith("\n")?"\n":"");
+    pre.style.height=ta.style.height;
+    pre.scrollTop=ta.scrollTop;pre.scrollLeft=ta.scrollLeft;
+  }
+  function autosize(ta){ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight+2,460)+"px";}
+  function tune(ta){autosize(ta);paint(ta);}
+  function tabKey(e){
+    if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();var b=this.closest(".pr-cell,#pr-lab").querySelector(".pr-run");if(b)b.click();return;}
+    if(e.key==="Tab"){
+      e.preventDefault();
+      var s=this.selectionStart,en=this.selectionEnd,v=this.value,lineStart=v.lastIndexOf("\n",s-1)+1,lineEnd=v.indexOf("\n",en);
+      if(lineEnd<0)lineEnd=v.length;
+      if(s!==en||e.shiftKey){
+        var block=v.slice(lineStart,lineEnd),lines=block.split("\n"),delta=0;
+        if(e.shiftKey){
+          lines=lines.map(function(line){
+            if(line.startsWith("    ")){delta-=4;return line.slice(4);}
+            if(line.startsWith("\t")){delta-=1;return line.slice(1);}
+            return line;
+          });
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=Math.max(lineStart,s+(s===lineStart?0:Math.max(delta/Math.max(lines.length,1),-4)));
+          this.selectionEnd=Math.max(this.selectionStart,en+delta);
+        }else{
+          lines=lines.map(function(line){delta+=4;return "    "+line;});
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=s+4;
+          this.selectionEnd=en+delta;
+        }
+      }else{
+        this.value=v.slice(0,s)+"    "+v.slice(en);this.selectionStart=this.selectionEnd=s+4;
+      }
+      tune(this);
+      return;
+    }
+    if(e.key==="Enter"){
+      e.preventDefault();
+      var a=this.selectionStart,b=this.selectionEnd,text=this.value,start=text.lastIndexOf("\n",a-1)+1;
+      var prefix=text.slice(start,a),indent=(prefix.match(/^\s*/)||[""])[0],code=prefix.replace(/#.*$/,"").trimEnd();
+      var add="\n"+indent+(/:\s*$/.test(code)?"    ":"");
+      this.value=text.slice(0,a)+add+text.slice(b);
+      this.selectionStart=this.selectionEnd=a+add.length;
+      tune(this);
+      return;
+    }
+  }
+  function makeCell(code){
+    var cell=document.createElement("div");cell.className="pr-cell";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">可运行 · Python (NumPy)</span><span class="pr-status"></span><button class="pr-btn pr-toggle">收起</button><button class="pr-btn pr-run">▶ 运行</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    var ta=cell.querySelector(".pr-edit");ta.value=code;
+    var out=cell.querySelector(".pr-out"),st=cell.querySelector(".pr-status");
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    cell.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    var tog=cell.querySelector(".pr-toggle");
+    tog.onclick=function(){cell.classList.toggle("collapsed");tog.textContent=cell.classList.contains("collapsed")?"展开":"收起";};
+    setTimeout(function(){tune(ta);},0);
+    return cell;
+  }
+  function makeRef(code,lang){
+    var cell=document.createElement("div");cell.className="pr-cell ref-cell";
+    var L=lang||"参考";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">参考代码 · '+esc(L)+'</span><span class="pr-status">不在浏览器运行</span></div><pre class="pr-code pr-static"></pre>';
+    cell.querySelector(".pr-static").innerHTML=code.split("\n").map(colorLine).join("\n");
+    return cell;
+  }
+  function enhance(){
+    document.querySelectorAll("article pre").forEach(function(pre){
+      if(pre.closest(".pr-cell"))return;
+      var codeEl=pre.querySelector("code")||pre;
+      var code=codeEl.textContent.replace(/\s+$/,"");
+      if(!code)return;
+      if(pre.classList.contains("ref")){
+        pre.replaceWith(makeRef(code,pre.getAttribute("data-lang")));
+      }else{
+        pre.replaceWith(makeCell(code));
+      }
+    });
+  }
+  function lab(){
+    var fab=document.createElement("button");fab.id="pr-fab";fab.textContent="▶ Python 实验台";
+    var panel=document.createElement("div");panel.id="pr-lab";
+    panel.innerHTML='<div class="pr-head"><span class="pr-title">Python 实验台 · NumPy</span><span class="pr-status"></span><button class="pr-btn pr-run">▶ 运行</button><button class="pr-btn pr-min">收起</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    document.body.appendChild(fab);document.body.appendChild(panel);
+    var ta=panel.querySelector(".pr-edit");
+    ta.value="import numpy as np\na = np.array([3, 2])\nb = np.array([1, 4])\nprint(\"a + b =\", a + b)\nprint(\"a . b =\", a @ b)\nprint(\"|a|  =\", np.linalg.norm(a))\ncos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))\nprint(\"cos =\", round(float(cos), 4))";
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    var out=panel.querySelector(".pr-out"),st=panel.querySelector(".pr-status");
+    panel.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    fab.onclick=function(){panel.classList.toggle("open");};
+    panel.querySelector(".pr-min").onclick=function(){panel.classList.remove("open");};
+    setTimeout(function(){tune(ta);},0);
+  }
+  function init(){enhance();lab();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+<script src="../assets/annotator.js"></script>
+</body>
+</html>

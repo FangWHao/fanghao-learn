@@ -1,0 +1,69 @@
+<svg viewBox="0 0 960 600" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, -apple-system, sans-serif" role="img" aria-labelledby="t d">
+<title id="t">nn.Module 是一棵树</title>
+<desc id="d">根 Module 挂子模块，子模块挂参数；用普通 list 装的子模块游离在注册账本之外。</desc>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" fill="#1f2937"/>
+</marker>
+<marker id="arrowGray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/>
+</marker>
+</defs>
+<text x="480" y="30" text-anchor="middle" font-size="20" font-weight="700" fill="#1f2937">nn.Module 是一棵树：根挂子模块，子模块挂参数</text>
+<text x="480" y="52" text-anchor="middle" font-size="12" fill="#94a3b8">右侧虚线灰色 = 用普通 Python list 装的子模块，游离在账本之外（parameters() / .to() / state_dict() 都看不见它）</text>
+<text x="22" y="330" text-anchor="middle" font-size="12.5" fill="#2563eb" font-weight="600" transform="rotate(-90 22 330)">parameters() 只递归走实线分支（fc1/fc2 共 4 个参数）</text>
+<rect x="280" y="78" width="150" height="44" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="355" y="100" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">MLP</text>
+<text x="355" y="116" text-anchor="middle" font-size="10.5" fill="#2563eb">（根 Module）</text>
+<line x1="320" y1="122" x2="200" y2="166" stroke="#1f2937" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="390" y1="122" x2="495" y2="166" stroke="#1f2937" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M430,104 C620,104 720,120 800,164" fill="none" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrowGray)"/>
+<text x="640" y="116" text-anchor="middle" font-size="10.5" fill="#94a3b8" font-style="italic">self.extra = [Linear(...)]  ← 普通 list</text>
+<rect x="120" y="170" width="150" height="44" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="195" y="192" text-anchor="middle" font-size="13" font-weight="700" fill="#1f2937">fc1: Linear</text>
+<text x="195" y="208" text-anchor="middle" font-size="10" fill="#2563eb">子模块</text>
+<rect x="426" y="170" width="150" height="44" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="501" y="192" text-anchor="middle" font-size="13" font-weight="700" fill="#1f2937">fc2: Linear</text>
+<text x="501" y="208" text-anchor="middle" font-size="10" fill="#2563eb">子模块</text>
+<rect x="730" y="170" width="160" height="44" rx="10" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 5"/>
+<text x="810" y="192" text-anchor="middle" font-size="13" font-weight="700" fill="#64748b">extra[0]: Linear</text>
+<text x="810" y="208" text-anchor="middle" font-size="10" fill="#94a3b8">未注册</text>
+<line x1="170" y1="214" x2="118" y2="264" stroke="#1f2937" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="220" y1="214" x2="262" y2="264" stroke="#1f2937" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="476" y1="214" x2="430" y2="264" stroke="#1f2937" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="526" y1="214" x2="574" y2="264" stroke="#1f2937" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="780" y1="214" x2="726" y2="264" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrowGray)"/>
+<line x1="840" y1="214" x2="869" y2="264" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrowGray)"/>
+<ellipse cx="112" cy="288" rx="56" ry="24" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+<text x="112" y="285" text-anchor="middle" font-size="12" font-weight="600" fill="#065f46">weight</text>
+<text x="112" y="299" text-anchor="middle" font-size="11" fill="#059669">(4, 3)</text>
+<ellipse cx="268" cy="288" rx="56" ry="24" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+<text x="268" y="285" text-anchor="middle" font-size="12" font-weight="600" fill="#065f46">bias</text>
+<text x="268" y="299" text-anchor="middle" font-size="11" fill="#059669">(4,)</text>
+<ellipse cx="424" cy="288" rx="56" ry="24" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+<text x="424" y="285" text-anchor="middle" font-size="12" font-weight="600" fill="#065f46">weight</text>
+<text x="424" y="299" text-anchor="middle" font-size="11" fill="#059669">(1, 4)</text>
+<ellipse cx="580" cy="288" rx="56" ry="24" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+<text x="580" y="285" text-anchor="middle" font-size="12" font-weight="600" fill="#065f46">bias</text>
+<text x="580" y="299" text-anchor="middle" font-size="11" fill="#059669">(1,)</text>
+<ellipse cx="720" cy="288" rx="56" ry="24" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 5"/>
+<text x="720" y="285" text-anchor="middle" font-size="12" font-weight="600" fill="#64748b">weight</text>
+<text x="720" y="299" text-anchor="middle" font-size="11" fill="#94a3b8">(2, 1)</text>
+<ellipse cx="875" cy="288" rx="56" ry="24" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 5"/>
+<text x="875" y="285" text-anchor="middle" font-size="12" font-weight="600" fill="#64748b">bias</text>
+<text x="875" y="299" text-anchor="middle" font-size="11" fill="#94a3b8">(2,)</text>
+<line x1="650" y1="150" x2="650" y2="322" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="3 6"/>
+<text x="650" y="340" text-anchor="middle" font-size="10.5" fill="#94a3b8">↑ 账本边界</text>
+<text x="180" y="360" text-anchor="middle" font-size="11.5" fill="#1f2937" font-weight="600">已注册子树（实线）</text>
+<text x="800" y="360" text-anchor="middle" font-size="11.5" fill="#94a3b8" font-weight="600">未注册（游离在外）</text>
+<rect x="120" y="402" width="720" height="150" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="140" y="428" font-size="13" font-weight="700" fill="#1f2937">图例</text>
+<line x1="150" y1="454" x2="200" y2="454" stroke="#1f2937" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="212" y="458" font-size="12" fill="#1f2937">实线箭头 = 已注册（被 parameters() / .to() / state_dict() 遍历）</text>
+<line x1="150" y1="484" x2="200" y2="484" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrowGray)"/>
+<text x="212" y="488" font-size="12" fill="#1f2937">灰色虚线箭头 = 未注册（参数存在却收不到）</text>
+<rect x="150" y="505" width="40" height="22" rx="7" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="212" y="521" font-size="12" fill="#1f2937">圆角矩形 = Module</text>
+<ellipse cx="510" cy="516" rx="26" ry="12" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+<text x="548" y="521" font-size="12" fill="#1f2937">椭圆 = Parameter 叶子</text>
+</svg>

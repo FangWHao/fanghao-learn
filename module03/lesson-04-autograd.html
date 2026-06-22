@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块3 · 第4课 · Autograd 自动微分</title>
+<script src="../assets/theme.js"></script>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue-bg:#eff6ff;
+--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--pink:#db2777;
+--red:#dc2626;--red-bg:#fef2f2;--bg:#ffffff;--soft:#f8fafc;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);
+font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.85;font-size:17px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:840px;margin:0 auto;padding:0 22px 100px;}
+header.top{background:#fff;border-bottom:1px solid var(--line);padding:26px 22px 22px;margin-bottom:14px;}
+header.top .inner{max-width:840px;margin:0 auto;}
+.crumb{color:var(--muted);font-size:14px;letter-spacing:.3px;margin-bottom:6px;}
+h1{font-size:30px;line-height:1.3;margin:.1em 0 .2em;}
+.sub{color:var(--muted);font-size:15px;}
+article{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:30px 34px;margin-top:18px;}
+h2{font-size:23px;margin:1.7em 0 .6em;padding-bottom:.25em;border-bottom:2px solid var(--line);}
+h2:first-child{margin-top:.2em;}
+h3{font-size:19px;margin:1.3em 0 .4em;color:#0f172a;}
+h4{margin:.2em 0 .5em;font-size:16px;}
+p{margin:.7em 0;}
+ul,ol{padding-left:1.3em;margin:.6em 0;}
+li{margin:.32em 0;}
+code{background:#f1f5f9;padding:.12em .4em;border-radius:5px;font-size:.9em;
+font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a;}
+pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 18px;overflow:auto;font-size:14px;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0;}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:15.5px;}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+thead th{background:var(--soft);}
+figure.fig{margin:1.4em 0;text-align:center;}
+figure.fig svg{max-width:100%;height:auto;}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
+.note,.ml,.key,.pitfall,.example{border-radius:10px;padding:14px 18px;margin:1.2em 0;border:1px solid var(--line);}
+.note{background:var(--soft);border-left:4px solid #94a3b8;}
+.example{background:#fff;border-left:4px solid var(--blue);}
+.ml{background:var(--green-bg);border-left:4px solid var(--green);}
+.key{background:var(--amber-bg);border-left:4px solid var(--amber);}
+.pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.goals{background:var(--blue-bg);border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:10px;padding:14px 20px;margin:.2em 0 1.5em;}
+.goals h4{margin:.1em 0 .5em;color:#1e3a8a;}
+.goals ul{margin:.3em 0;}
+.skip{background:var(--soft);border:1px solid var(--line);border-left:4px solid #94a3b8;border-radius:10px;padding:14px 20px;margin:1.8em 0 0;color:#475569;}
+.skip h4{margin:.1em 0 .5em;color:#475569;}
+.tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
+.toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
+.toc h3{margin:.1em 0 .7em;}
+.toc ol{list-style:none;padding:0;}
+.toc li{padding:7px 10px;border-radius:8px;color:#334155;border:1px solid transparent;}
+.toc li a{color:inherit;text-decoration:none;display:block;}
+.toc li .ln{display:inline-block;min-width:54px;color:var(--muted);font-size:13px;}
+.toc li.cur{background:var(--blue-bg);border-color:#bfdbfe;font-weight:600;color:#1e3a8a;}
+.toc li:not(.cur):hover{background:var(--soft);}
+.navbtns{display:flex;justify-content:space-between;margin-top:22px;gap:12px;}
+.navbtns a{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--ink);}
+.navbtns a:hover{border-color:var(--blue);}
+.navbtns .nlabel{color:var(--muted);font-size:13px;}
+.navbtns .ntitle{font-weight:600;margin-top:3px;}
+.navbtns .next{text-align:right;}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.here{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:6px 0 4px;font-size:15px;color:#1e3a8a;line-height:1.7;}
+.here b{font-weight:700;}
+.cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
+.card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
+.card:hover{border-color:var(--blue);}
+.card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
+.card .ct{font-size:18px;font-weight:600;}
+.card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+.card .cap{margin-left:40px;margin-top:7px;font-size:13px;color:#1e3a8a;}
+.card .cap .lbl{display:inline-block;background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;margin-right:7px;}
+
+.card.soon{opacity:.6;cursor:default;}
+.card.soon:hover{border-color:var(--line);}
+.badge{display:inline-block;background:#e2e8f0;color:#475569;font-size:11px;font-weight:600;padding:1px 8px;border-radius:20px;margin-left:8px;vertical-align:middle;}
+.toc li.soon{color:#94a3b8;}
+.toc li.soon .badge{margin-left:4px;}
+</style>
+<link rel="stylesheet" href="../assets/annotator.css">
+<link rel="stylesheet" href="../assets/theme.css">
+</head>
+<body>
+<header class="top"><div class="inner">
+<div class="crumb"><a href="../index.html" style="color:inherit">首页</a>　/　<a href="index.html" style="color:inherit">模块 3 · Python、NumPy、PyTorch 与实验工程</a>　/　第 4 课（共 10 课）</div>
+<h1>Autograd 自动微分</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　阶段0：数学与工具基础　·　<strong>能力点：</strong>Autograd——亲手写一个 micrograd 把&quot;自动微分魔法&quot;拆开（接 M1 反向传播）</div>
+</div></header>
+<div class="wrap">
+<article>
+<p>上一课你把数据装进了张量（tensor），学会了在不同设备和 dtype 之间搬运。但训练一个模型，光有前向计算还不够——你需要梯度（gradient）。模块 1 里你已经手推过链式法则（chain rule），知道反向传播（backpropagation）数学上不过是链式求导的层层相乘。这一课不重推数学，而是把镜头对准工程机制：PyTorch 是怎么"记住"你做了哪些运算、又怎么在你调用 <code>.backward()</code> 的一瞬间把梯度算回去的？理解这套机制，是你下一课写 <code>nn.Module</code>、第六课写训练循环时不被"梯度怎么是 0/怎么爆显存"卡住的前提。</p>
+
+<div class="goals"><h4>读完这一课，你将能够</h4>
+<ul>
+<li>用纯 Python 从零实现一个标量自动微分引擎（<code>Value</code> 类），跑通 <code>(a*b+c).backward()</code> 并与手算梯度对上。</li>
+<li>解释动态计算图（dynamic computation graph）里 <code>requires_grad</code>、叶子节点（leaf）、<code>grad_fn</code> 三者的关系。</li>
+<li>说清 <code>.grad</code> 为什么是"累加"而非"覆盖"，并演示漏掉 <code>zero_grad</code> 会让梯度翻倍。</li>
+<li>区分 <code>torch.no_grad()</code> / <code>.detach()</code> / <code>requires_grad=False</code> 三种场景各自的用途。</li>
+<li>识别"循环里累加带梯度张量"导致显存泄漏的坑，并写出正确写法。</li>
+</ul>
+</div>
+
+<h2>动态计算图：前向时偷偷记账</h2>
+
+<p><strong>机制直觉。</strong>当你写 <code>L = a * b + c</code>，PyTorch 不只是算出数值，它在背后顺手搭了一张图：每个中间结果都记下"我是由哪个运算、从哪些输入算出来的"。这张图是有向无环图（DAG, directed acyclic graph），节点是张量，边是运算。它叫"动态"图，因为它在每次前向（forward）时即时构建——你用 Python 的 <code>if</code>/<code>for</code> 怎么算，它就怎么连，跑完一次 <code>backward</code> 就丢弃，下次重建。记账时，它给每个张量贴三类标签：</p>
+
+<ul>
+<li><code>requires_grad=True</code>：告诉 PyTorch"这个张量我要算梯度，请记账"。模型参数默认开启。</li>
+<li><strong>叶子节点（leaf）</strong>：你直接创建、不是由运算得来的张量（如参数、输入）。梯度最终累加到叶子的 <code>.grad</code> 上。</li>
+<li><code>grad_fn</code>（出生证明）：非叶子张量带的"出生证明"，记录它由哪个反向函数负责求导（如 <code>AddBackward</code>、<code>MulBackward</code>）。叶子节点的 <code>grad_fn</code> 是 <code>None</code>。</li>
+</ul>
+
+<figure class="fig"><svg viewBox="0 0 760 440" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <marker id="fwd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1f2937"/>
+    </marker>
+    <marker id="bwd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#d94a1f"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="760" height="440" fill="#f8fafc"/>
+
+  <!-- ===== forward edges (solid, left->right) ===== -->
+  <!-- a -> Mul -->
+  <line x1="118" y1="118" x2="288" y2="158" stroke="#1f2937" stroke-width="2" marker-end="url(#fwd)"/>
+  <!-- b -> Mul -->
+  <line x1="118" y1="222" x2="288" y2="186" stroke="#1f2937" stroke-width="2" marker-end="url(#fwd)"/>
+  <!-- Mul(u) -> Add -->
+  <line x1="382" y1="172" x2="498" y2="208" stroke="#1f2937" stroke-width="2" marker-end="url(#fwd)"/>
+  <!-- c -> Add -->
+  <line x1="118" y1="326" x2="498" y2="240" stroke="#1f2937" stroke-width="2" marker-end="url(#fwd)"/>
+  <!-- Add -> L -->
+  <line x1="592" y1="224" x2="648" y2="224" stroke="#1f2937" stroke-width="2" marker-end="url(#fwd)"/>
+
+  <!-- ===== backward edges (dashed orange, right->left) ===== -->
+  <!-- L -> Add region (u branch) : from Add back to Mul -->
+  <line x1="496" y1="200" x2="386" y2="166" stroke="#d94a1f" stroke-width="2.2" stroke-dasharray="7 5" marker-end="url(#bwd)"/>
+  <!-- Add back to c -->
+  <line x1="496" y1="246" x2="120" y2="334" stroke="#d94a1f" stroke-width="2.2" stroke-dasharray="7 5" marker-end="url(#bwd)"/>
+  <!-- L -> Add -->
+  <line x1="646" y1="234" x2="594" y2="234" stroke="#d94a1f" stroke-width="2.2" stroke-dasharray="7 5" marker-end="url(#bwd)"/>
+  <!-- Mul back to a -->
+  <line x1="286" y1="152" x2="120" y2="112" stroke="#d94a1f" stroke-width="2.2" stroke-dasharray="7 5" marker-end="url(#bwd)"/>
+  <!-- Mul back to b -->
+  <line x1="286" y1="190" x2="120" y2="226" stroke="#d94a1f" stroke-width="2.2" stroke-dasharray="7 5" marker-end="url(#bwd)"/>
+
+  <!-- ===== backward edge labels (local gradients) ===== -->
+  <text x="206" y="103" font-size="11.5" fill="#d94a1f" text-anchor="middle">&#8706;u/&#8706;a=b=-3</text>
+  <text x="196" y="221" font-size="11.5" fill="#d94a1f" text-anchor="middle">&#8706;u/&#8706;b=a=2</text>
+  <text x="436" y="172" font-size="11.5" fill="#d94a1f" text-anchor="middle">&#8706;L/&#8706;u=1</text>
+  <text x="372" y="306" font-size="11.5" fill="#d94a1f" text-anchor="middle">&#8706;L/&#8706;c=1</text>
+
+  <!-- ===== leaf nodes ===== -->
+  <!-- a -->
+  <circle cx="90" cy="110" r="30" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text x="90" y="106" font-size="14" font-weight="700" fill="#1f2937" text-anchor="middle">a</text>
+  <text x="90" y="122" font-size="10.5" fill="#1f2937" text-anchor="middle">data=2</text>
+  <text x="90" y="160" font-size="10" fill="#64748b" text-anchor="middle">requires_grad</text>
+  <text x="90" y="172" font-size="10" fill="#64748b" text-anchor="middle">grad_fn=None</text>
+  <text x="90" y="186" font-size="11.5" font-weight="700" fill="#d94a1f" text-anchor="middle">a.grad = -3</text>
+
+  <!-- b -->
+  <circle cx="90" cy="224" r="30" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text x="90" y="220" font-size="14" font-weight="700" fill="#1f2937" text-anchor="middle">b</text>
+  <text x="90" y="236" font-size="10.5" fill="#1f2937" text-anchor="middle">data=-3</text>
+  <text x="90" y="266" font-size="10" fill="#64748b" text-anchor="middle">grad_fn=None</text>
+  <text x="90" y="280" font-size="11.5" font-weight="700" fill="#d94a1f" text-anchor="middle">b.grad = 2</text>
+
+  <!-- c -->
+  <circle cx="90" cy="338" r="30" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text x="90" y="334" font-size="14" font-weight="700" fill="#1f2937" text-anchor="middle">c</text>
+  <text x="90" y="350" font-size="10.5" fill="#1f2937" text-anchor="middle">data=10</text>
+  <text x="90" y="380" font-size="10" fill="#64748b" text-anchor="middle">grad_fn=None</text>
+  <text x="90" y="394" font-size="11.5" font-weight="700" fill="#d94a1f" text-anchor="middle">c.grad = 1</text>
+
+  <!-- ===== op node: Mul ===== -->
+  <rect x="288" y="146" width="96" height="52" rx="6" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+  <text x="336" y="170" font-size="13" font-weight="700" fill="#1f2937" text-anchor="middle">&#215;</text>
+  <text x="336" y="186" font-size="10" fill="#1f2937" text-anchor="middle">MulBackward</text>
+  <text x="336" y="216" font-size="10.5" fill="#1f2937" text-anchor="middle">u = a*b = -6</text>
+  <text x="336" y="230" font-size="10" fill="#64748b" text-anchor="middle">grad_fn=MulBackward</text>
+
+  <!-- ===== op node: Add ===== -->
+  <rect x="498" y="198" width="96" height="52" rx="6" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+  <text x="546" y="222" font-size="13" font-weight="700" fill="#1f2937" text-anchor="middle">+</text>
+  <text x="546" y="238" font-size="10" fill="#1f2937" text-anchor="middle">AddBackward</text>
+  <text x="546" y="270" font-size="10" fill="#64748b" text-anchor="middle">grad_fn=AddBackward</text>
+
+  <!-- ===== output node: L ===== -->
+  <circle cx="682" cy="224" r="32" fill="#fce7f3" stroke="#db2777" stroke-width="2"/>
+  <text x="682" y="220" font-size="15" font-weight="700" fill="#1f2937" text-anchor="middle">L</text>
+  <text x="682" y="236" font-size="10.5" fill="#1f2937" text-anchor="middle">data=4</text>
+  <text x="682" y="276" font-size="11.5" font-weight="700" fill="#d94a1f" text-anchor="middle">&#8706;L/&#8706;L=1</text>
+  <text x="682" y="290" font-size="9.5" fill="#64748b" text-anchor="middle">(反向起点)</text>
+
+  <!-- ===== title / caption ===== -->
+  <text x="20" y="26" font-size="14" font-weight="700" fill="#1f2937">动态计算图与反向梯度流</text>
+  <text x="20" y="44" font-size="11" fill="#64748b">前向(实线)记录每个运算的 grad_fn 构成 DAG；反向(虚线)按链式法则逆向把局部梯度相乘传回叶子。</text>
+
+  <!-- ===== legend ===== -->
+  <rect x="500" y="358" width="248" height="62" rx="6" fill="#ffffff" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="514" y1="378" x2="556" y2="378" stroke="#1f2937" stroke-width="2" marker-end="url(#fwd)"/>
+  <text x="564" y="382" font-size="11" fill="#1f2937">实线 = 前向构图 (forward)</text>
+  <line x1="514" y1="402" x2="556" y2="402" stroke="#d94a1f" stroke-width="2.2" stroke-dasharray="7 5" marker-end="url(#bwd)"/>
+  <text x="564" y="406" font-size="11" fill="#1f2937">虚线 = 反向梯度流 (backward)</text>
+</svg><figcaption>动态计算图与反向梯度流：前向（实线）记录每个运算的 grad_fn 构成 DAG，反向（虚线箭头）按链式法则逆向把局部梯度相乘传回叶子节点。</figcaption></figure>
+
+<p><strong>真实 API 当指针。</strong>下面这段在 PyTorch 里打印 <code>grad_fn</code>，让你直观看到图的存在（浏览器跑不了 torch，看即可；下方注释为示意，具体结构因 PyTorch 版本而异）。</p>
+
+<pre class="ref" data-lang="PyTorch"><code>import torch
+a = torch.tensor(2.0, requires_grad=True)
+b = torch.tensor(-3.0, requires_grad=True)
+c = torch.tensor(10.0, requires_grad=True)
+L = a * b + c
+print(L.grad_fn)            # 大致形如 &lt;AddBackward0 object ...&gt;
+print(L.grad_fn.next_functions)  # 指向 MulBackward 和 c 的 AccumulateGrad（叶子梯度累加器）
+print(a.is_leaf, L.is_leaf)      # True False
+L.backward()
+print(a.grad, b.grad, c.grad)    # 大致形如 tensor(-3.) tensor(2.) tensor(1.)</code></pre>
+
+<p>注意 <code>next_functions</code> 里放的不是张量本身：叶子 <code>c</code> 对应的是它的 <code>AccumulateGrad</code> 节点（梯度累加器），梯度最终就由它累加到 <code>c.grad</code> 上。</p>
+
+<h2>从零写一个自动微分引擎（本课主线）</h2>
+
+<p><strong>机制直觉。</strong>autograd 的全部魔法可以浓缩成三件事：(1) 每个运算除了算出 <code>data</code>，还要存下"如何把上游梯度传给我的输入"这段逻辑——我们用一个闭包 <code>_backward</code> 装它；(2) 每个结果记住自己的父节点，连成图；(3) <code>.backward()</code> 时按拓扑序（topological order）从输出往输入走，逐个调用 <code>_backward</code>，把梯度<strong>累加</strong>到每个节点的 <code>.grad</code>。理解了这 30 行，你就理解了 PyTorch autograd 的灵魂——它只是同样的思路扩展到张量并用 C++ 加速。</p>
+
+<p><strong>最小可跑实现。</strong>下面是一个 micrograd 式标量引擎，支持 <code>+</code>、<code>*</code>、<code>tanh</code>，并实现拓扑排序的反向传播。它真能跑：</p>
+
+<pre><code>import math
+
+class Value:
+    def __init__(self, data, _children=(), _op=''):
+        self.data = data
+        self.grad = 0.0              # 梯度槽，初始为 0
+        self._backward = lambda: None  # 默认啥也不做（叶子）
+        self._prev = set(_children)  # 父节点（图的边）
+        self._op = _op               # 记一下是什么运算，方便看
+
+    def __add__(self, other):
+        other = other if isinstance(other, Value) else Value(other)
+        out = Value(self.data + other.data, (self, other), '+')
+        def _backward():             # 加法：上游梯度原样分给两个输入
+            self.grad  += 1.0 * out.grad
+            other.grad += 1.0 * out.grad
+        out._backward = _backward
+        return out
+
+    def __mul__(self, other):
+        other = other if isinstance(other, Value) else Value(other)
+        out = Value(self.data * other.data, (self, other), '*')
+        def _backward():             # 乘法：各自乘上对方的 data
+            self.grad  += other.data * out.grad
+            other.grad += self.data  * out.grad
+        out._backward = _backward
+        return out
+
+    def tanh(self):
+        t = math.tanh(self.data)
+        out = Value(t, (self,), 'tanh')
+        def _backward():             # tanh'(x) = 1 - tanh(x)^2
+            self.grad += (1 - t**2) * out.grad
+        out._backward = _backward
+        return out
+
+    def backward(self):
+        topo, visited = [], set()
+        def build(v):                # 拓扑排序：先父后子
+            if v not in visited:
+                visited.add(v)
+                for child in v._prev:
+                    build(child)
+                topo.append(v)
+        build(self)
+        self.grad = 1.0              # dL/dL = 1，反向起点
+        for v in reversed(topo):     # 从输出往输入走
+            v._backward()
+
+# 最小例子：L = a*b + c
+a, b, c = Value(2.0), Value(-3.0), Value(10.0)
+L = a * b + c
+L.backward()
+print("L    =", L.data)            # 4.0
+print("a.grad =", a.grad, "(=b=-3)")  # -3.0
+print("b.grad =", b.grad, "(=a= 2)")  #  2.0
+print("c.grad =", c.grad, "(=  1)")   #  1.0</code></pre>
+
+<p>手算对照：\(L=ab+c\)，\(\partial L/\partial a = b = -3\)、\(\partial L/\partial b = a = 2\)、\(\partial L/\partial c = 1\)。和打印完全一致。注意三个关键点：<code>_backward</code> 里用的是 <code>+=</code>（累加，下一节细说）；<code>build</code> 保证调用顺序——一个节点的 <code>_backward</code> 跑之前，它的 <code>out.grad</code> 必须已被所有下游填好；起点 <code>self.grad = 1.0</code> 就是数学里那个 \(\partial L/\partial L = 1\)。</p>
+
+<p><strong>真实 API 当指针。</strong>PyTorch 的 <code>torch.autograd</code> 做的是同一件事：每个张量运算注册一个 <code>Backward</code> 节点（对应我们的 <code>_backward</code>），<code>tensor.backward()</code> 内部也是拓扑排序后逆序调用。区别只是它处理的是张量、用 C++/CUDA 加速、且默认要求标量起点（否则要传 <code>gradient=</code> 参数）。</p>
+
+<h2>梯度累加：为什么必须 zero_grad</h2>
+
+<p><strong>机制直觉。</strong>注意上面 <code>_backward</code> 里写的是 <code>self.grad += ...</code>。为什么累加而不是覆盖？因为一个节点可能被多条路径用到（比如 <code>x</code> 同时喂给两个分支），它的总梯度是各路径梯度之和——这正是多元链式法则。累加是<strong>对的</strong>。但副作用是：<code>.grad</code> 不会自动清零，你再调一次 <code>backward</code>，新梯度会加到旧的上面。所以训练循环每步必须先手动清零（PyTorch 里是 <code>optimizer.zero_grad()</code> 或 <code>model.zero_grad()</code>）。</p>
+
+<p><strong>最小可跑演示。</strong>用纯 numpy 模拟"梯度槽不清零会翻倍"。设 \(f(w)=\sum w_i^2\)，则 \(\nabla f = 2w\)：</p>
+
+<pre><code>import numpy as np
+
+def grad_of_f(w):
+    return 2 * w                      # f = sum(w^2) 的梯度
+
+w = np.array([1.0, 2.0, 3.0])
+
+# 错误：忘了清零，梯度槽一直累加
+grad_buf = np.zeros_like(w)
+for step in range(2):
+    grad_buf += grad_of_f(w)          # 漏掉 reset
+    print(f"step {step}: grad = {grad_buf}")
+
+print("--- 正确做法：每步先清零 ---")
+grad_buf = np.zeros_like(w)
+for step in range(2):
+    grad_buf[:] = 0                   # zero_grad！
+    grad_buf += grad_of_f(w)
+    print(f"step {step}: grad = {grad_buf}")</code></pre>
+
+<p>输出会看到错误版第二步是 <code>[4. 8. 12.]</code>（翻倍），正确版始终是 <code>[2. 4. 6.]</code>。在真实训练里，漏掉 <code>zero_grad</code> 的典型症状是：loss 不降反而乱跳、或一步迈得过大直接发散——因为你用的"梯度"其实是历史梯度的累积和。</p>
+
+<figure class="fig"><svg viewBox="0 0 720 560" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <marker id="arrBlue" orient="auto-start-reverse" markerWidth="9" markerHeight="9" refX="7" refY="4.5" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L9,4.5 L0,9 z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrGrey" orient="auto-start-reverse" markerWidth="9" markerHeight="9" refX="7" refY="4.5" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/>
+    </marker>
+    <marker id="arrGreen" orient="auto-start-reverse" markerWidth="9" markerHeight="9" refX="7" refY="4.5" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L9,4.5 L0,9 z" fill="#059669"/>
+    </marker>
+  </defs>
+
+  <!-- ===================== TOP PANEL: WRONG ===================== -->
+  <rect x="8" y="10" width="704" height="248" rx="10" fill="#fef2f2" stroke="#fca5a5" stroke-width="1"/>
+  <text x="28" y="38" font-size="16" font-weight="700" fill="#db2777">错误：忘记 zero_grad</text>
+
+  <!-- time labels -->
+  <text x="118" y="62" font-size="12" fill="#64748b" text-anchor="middle">时刻 0</text>
+  <text x="360" y="62" font-size="12" fill="#64748b" text-anchor="middle">时刻 1</text>
+  <text x="602" y="62" font-size="12" fill="#64748b" text-anchor="middle">时刻 2</text>
+
+  <!-- .grad label -->
+  <text x="118" y="148" font-size="11" fill="#475569" text-anchor="middle">.grad 槽</text>
+  <text x="360" y="148" font-size="11" fill="#475569" text-anchor="middle">.grad 槽</text>
+  <text x="602" y="148" font-size="11" fill="#475569" text-anchor="middle">.grad 槽</text>
+
+  <!-- ---- t0: empty slot ---- -->
+  <rect x="48" y="120" width="140" height="22" rx="4" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="118" y="135" font-size="12" fill="#94a3b8" text-anchor="middle">0  (空)</text>
+
+  <!-- backward inject arrow t0 -> t1 -->
+  <line x1="118" y1="80" x2="118" y2="116" stroke="#2563eb" stroke-width="2" marker-end="url(#arrBlue)"/>
+  <text x="118" y="98" font-size="11" fill="#2563eb" text-anchor="middle">backward() 注入 g</text>
+
+  <!-- ---- t1: half full = g ---- -->
+  <rect x="290" y="120" width="140" height="22" rx="4" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/>
+  <rect x="291" y="121" width="69" height="20" rx="3" fill="#bfdbfe"/>
+  <text x="325" y="135" font-size="12" fill="#1e40af" text-anchor="middle" font-weight="600">g</text>
+
+  <!-- backward inject arrow t1 -> t2 (accumulate) -->
+  <line x1="448" y1="131" x2="500" y2="131" stroke="#2563eb" stroke-width="2" marker-end="url(#arrBlue)"/>
+  <text x="474" y="120" font-size="11" fill="#2563eb" text-anchor="middle">再 backward()</text>
+  <text x="474" y="158" font-size="11" fill="#2563eb" text-anchor="middle">累加 +g</text>
+
+  <!-- ---- t2: overflow = 2g ---- -->
+  <rect x="532" y="120" width="140" height="22" rx="4" fill="#fff" stroke="#db2777" stroke-width="2"/>
+  <rect x="533" y="121" width="138" height="20" rx="3" fill="#fca5a5"/>
+  <!-- overflow chunk spilling over right edge -->
+  <rect x="672" y="118" width="22" height="26" rx="3" fill="#ef4444"/>
+  <text x="602" y="135" font-size="12" fill="#7f1d1d" text-anchor="middle" font-weight="700">2g 溢出</text>
+
+  <text x="360" y="226" font-size="14" fill="#dc2626" text-anchor="middle" font-weight="700">梯度翻倍 g→2g  →  更新过大 / 训练发散</text>
+
+  <!-- ===================== BOTTOM PANEL: RIGHT ===================== -->
+  <rect x="8" y="300" width="704" height="252" rx="10" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1"/>
+  <text x="28" y="328" font-size="16" font-weight="700" fill="#059669">正确：每步先 zero_grad</text>
+
+  <text x="118" y="352" font-size="12" fill="#64748b" text-anchor="middle">时刻 0</text>
+  <text x="360" y="352" font-size="12" fill="#64748b" text-anchor="middle">时刻 1</text>
+  <text x="602" y="352" font-size="12" fill="#64748b" text-anchor="middle">时刻 2</text>
+
+  <text x="118" y="438" font-size="11" fill="#475569" text-anchor="middle">.grad 槽</text>
+  <text x="360" y="438" font-size="11" fill="#475569" text-anchor="middle">.grad 槽</text>
+  <text x="602" y="438" font-size="11" fill="#475569" text-anchor="middle">.grad 槽</text>
+
+  <!-- ---- t0: empty ---- -->
+  <rect x="48" y="410" width="140" height="22" rx="4" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="118" y="425" font-size="12" fill="#94a3b8" text-anchor="middle">0  (空)</text>
+
+  <!-- t0->t1: zero_grad reset + backward -->
+  <line x1="118" y1="368" x2="118" y2="406" stroke="#475569" stroke-width="2" marker-end="url(#arrGrey)"/>
+  <text x="118" y="383" font-size="11" fill="#475569" text-anchor="middle">zero_grad() 复位 0</text>
+  <text x="118" y="397" font-size="11" fill="#059669" text-anchor="middle">→ backward() 注入 g</text>
+
+  <!-- ---- t1: g ---- -->
+  <rect x="290" y="410" width="140" height="22" rx="4" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/>
+  <rect x="291" y="411" width="69" height="20" rx="3" fill="#a7f3d0"/>
+  <text x="325" y="425" font-size="12" fill="#065f46" text-anchor="middle" font-weight="600">g</text>
+
+  <!-- t1->t2: zero_grad reset to 0 then backward -->
+  <line x1="448" y1="421" x2="500" y2="421" stroke="#059669" stroke-width="2" marker-end="url(#arrGreen)"/>
+  <text x="474" y="402" font-size="11" fill="#475569" text-anchor="middle">先 zero_grad 清回 0</text>
+  <text x="474" y="446" font-size="11" fill="#059669" text-anchor="middle">再注入 g</text>
+
+  <!-- ---- t2: g (clean), green check ---- -->
+  <rect x="532" y="410" width="140" height="22" rx="4" fill="#fff" stroke="#059669" stroke-width="2"/>
+  <rect x="533" y="411" width="69" height="20" rx="3" fill="#a7f3d0"/>
+  <text x="567" y="425" font-size="12" fill="#065f46" text-anchor="middle" font-weight="600">g</text>
+  <!-- check mark -->
+  <path d="M640,420 l8,8 l16,-18" fill="none" stroke="#059669" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <text x="360" y="516" font-size="14" fill="#059669" text-anchor="middle" font-weight="700">每步都是干净的 g  →  更新稳定</text>
+</svg><figcaption>梯度累加陷阱：.grad 槽不会自动清零，连续两次 backward 会把梯度从 g 累加成 2g；正确做法是每步先 zero_grad 把槽复位为 0。</figcaption></figure>
+
+<p><strong>真实 API 当指针。</strong></p>
+
+<pre class="ref" data-lang="PyTorch"><code># 训练循环里的标准三连（第6课会完整讲）
+optimizer.zero_grad()   # 清空所有参数的 .grad（否则累加）
+loss.backward()         # 反向：把梯度累加进 .grad
+optimizer.step()        # 用 .grad 更新参数</code></pre>
+
+<h2>no_grad / detach / 冻结参数：三种"别记账"</h2>
+
+<p><strong>机制直觉。</strong>记账（建图）是有成本的——它要保存中间结果以备反向。有三种场景你想关掉它，目的各不相同：</p>
+
+<table>
+<thead><tr><th>手段</th><th>做什么</th><th>典型场景</th></tr></thead>
+<tbody>
+<tr><td><code>torch.no_grad()</code></td><td>上下文内所有运算都不建图、不存中间值</td><td>推理（inference）/ 验证：省显存、提速，反正不反传</td></tr>
+<tr><td><code>x.detach()</code></td><td>返回一个与原张量共享数据、但从图上"剪断"的新张量</td><td>只想取某个中间值参与计算但不让梯度流过它（如目标值、教师网络输出）</td></tr>
+<tr><td><code>p.requires_grad=False</code></td><td>让某个参数不再要梯度</td><td>冻结（freeze）层：迁移学习时固定骨干网络，只训练新加的头</td></tr>
+</tbody>
+</table>
+
+<p>区别一句话：<code>no_grad</code> 是按<strong>时间段</strong>关（一整块代码），<code>detach</code> 是按<strong>张量</strong>切（在图中某点断开），<code>requires_grad=False</code> 是按<strong>参数</strong>关（这个权重永久不学）。</p>
+
+<p><strong>真实 API 当指针。</strong></p>
+
+<pre class="ref" data-lang="PyTorch"><code># 1) 推理省显存：整块不建图
+with torch.no_grad():
+    preds = model(x_val)            # 不会保存中间激活
+
+# 2) detach 切断图：y_target 不参与梯度
+loss = mse(pred, target.detach())
+
+# 3) 冻结骨干，只训分类头
+for p in model.backbone.parameters():
+    p.requires_grad = False        # 这些参数 .grad 永远是 None</code></pre>
+
+<p><strong>retain_graph / create_graph（简述，参考即可）。</strong>默认 <code>backward()</code> 跑完就释放图（省内存）；若你要在同一张图上反传第二次，需 <code>backward(retain_graph=True)</code>。若你要对梯度<strong>再求导</strong>（二阶导，如某些元学习/正则项），需 <code>create_graph=True</code>，它会把反向过程本身也建成图。新手阶段几乎用不到，遇到 <code>RuntimeError: Trying to backward through the graph a second time</code> 时再回来。</p>
+
+<pre class="ref" data-lang="PyTorch"><code>loss.backward(retain_graph=True)   # 保留图，准备再反传一次
+loss.backward()                    # 第二次（默认会顺手释放）</code></pre>
+
+<h2>工程坑：循环里累加带梯度的张量 → 显存泄漏</h2>
+
+<p><strong>机制直觉。</strong>记得吗？只要一个张量 <code>requires_grad</code>，对它的运算就会建图、保存中间值。如果你在循环里写 <code>total_loss += loss</code>（<code>loss</code> 是带梯度的张量），那么 <code>total_loss</code> 会把每一步的整张计算图都挂在自己身上不放——循环跑得越久，累积的图越大，显存（GPU memory）一路涨直到 OOM（out of memory）。这是新手最常见的显存泄漏来源。</p>
+
+<p>修复只需一字之差：累加用于<strong>记录/打印</strong>的标量时，先用 <code>.item()</code>（取出 Python 数值，脱离图）或 <code>.detach()</code>。只有真正要参与反传的那一项才保留梯度。</p>
+
+<figure class="fig"><svg viewBox="0 0 760 560" xmlns="http://www.w3.org/2000/svg" font-family="system-ui">
+  <defs>
+    <marker id="arrR" orient="auto-start-reverse" markerWidth="9" markerHeight="9" refX="7" refY="3" markerUnits="userSpaceOnUse" viewBox="0 0 9 9">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#db2777"/>
+    </marker>
+    <marker id="arrG" orient="auto-start-reverse" markerWidth="9" markerHeight="9" refX="7" refY="3" markerUnits="userSpaceOnUse" viewBox="0 0 9 9">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#059669"/>
+    </marker>
+    <marker id="arrGray" orient="auto-start-reverse" markerWidth="8" markerHeight="8" refX="6" refY="2.5" markerUnits="userSpaceOnUse" viewBox="0 0 8 8">
+      <path d="M0,0 L7,2.5 L0,5 Z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <!-- divider -->
+  <line x1="380" y1="44" x2="380" y2="540" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 4"/>
+
+  <!-- ===================== LEFT : WRONG ===================== -->
+  <text x="20" y="28" font-size="15" font-weight="700" fill="#db2777">错误：total += loss</text>
+  <text x="20" y="42" font-size="11" fill="#6b7280">循环每步把整张计算图挂在 total 上</text>
+
+  <!-- step labels + loss icons + mini graphs -->
+  <!-- generic mini computation graph drawn 3 times -->
+  <!-- STEP 1 -->
+  <text x="22" y="84" font-size="11" fill="#1f2937">step1</text>
+  <g>
+    <rect x="20" y="92" width="92" height="30" rx="5" fill="#fde7f1" stroke="#db2777"/>
+    <text x="66" y="106" font-size="10.5" fill="#1f2937" text-anchor="middle">loss</text>
+    <text x="66" y="118" font-size="9" fill="#db2777" text-anchor="middle">grad_fn</text>
+    <!-- mini graph nodes -->
+    <circle cx="128" cy="98" r="6" fill="#fff" stroke="#db2777"/>
+    <circle cx="148" cy="110" r="6" fill="#fff" stroke="#db2777"/>
+    <circle cx="128" cy="122" r="6" fill="#fff" stroke="#db2777"/>
+    <circle cx="168" cy="110" r="6" fill="#fff" stroke="#db2777"/>
+    <line x1="134" y1="98" x2="142" y2="106" stroke="#db2777" stroke-width="1"/>
+    <line x1="134" y1="122" x2="142" y2="114" stroke="#db2777" stroke-width="1"/>
+    <line x1="154" y1="110" x2="162" y2="110" stroke="#db2777" stroke-width="1"/>
+  </g>
+  <!-- STEP 2 -->
+  <text x="22" y="148" font-size="11" fill="#1f2937">step2</text>
+  <g>
+    <rect x="20" y="156" width="92" height="30" rx="5" fill="#fde7f1" stroke="#db2777"/>
+    <text x="66" y="170" font-size="10.5" fill="#1f2937" text-anchor="middle">loss</text>
+    <text x="66" y="182" font-size="9" fill="#db2777" text-anchor="middle">grad_fn</text>
+    <circle cx="128" cy="162" r="6" fill="#fff" stroke="#db2777"/>
+    <circle cx="148" cy="174" r="6" fill="#fff" stroke="#db2777"/>
+    <circle cx="128" cy="186" r="6" fill="#fff" stroke="#db2777"/>
+    <circle cx="168" cy="174" r="6" fill="#fff" stroke="#db2777"/>
+    <line x1="134" y1="162" x2="142" y2="170" stroke="#db2777" stroke-width="1"/>
+    <line x1="134" y1="186" x2="142" y2="178" stroke="#db2777" stroke-width="1"/>
+    <line x1="154" y1="174" x2="162" y2="174" stroke="#db2777" stroke-width="1"/>
+  </g>
+  <!-- STEP 3 -->
+  <text x="22" y="212" font-size="11" fill="#1f2937">step3</text>
+  <g>
+    <rect x="20" y="220" width="92" height="30" rx="5" fill="#fde7f1" stroke="#db2777"/>
+    <text x="66" y="234" font-size="10.5" fill="#1f2937" text-anchor="middle">loss</text>
+    <text x="66" y="246" font-size="9" fill="#db2777" text-anchor="middle">grad_fn</text>
+    <circle cx="128" cy="226" r="6" fill="#fff" stroke="#db2777"/>
+    <circle cx="148" cy="238" r="6" fill="#fff" stroke="#db2777"/>
+    <circle cx="128" cy="250" r="6" fill="#fff" stroke="#db2777"/>
+    <circle cx="168" cy="238" r="6" fill="#fff" stroke="#db2777"/>
+    <line x1="134" y1="226" x2="142" y2="234" stroke="#db2777" stroke-width="1"/>
+    <line x1="134" y1="250" x2="142" y2="242" stroke="#db2777" stroke-width="1"/>
+    <line x1="154" y1="238" x2="162" y2="238" stroke="#db2777" stroke-width="1"/>
+  </g>
+
+  <!-- lines: every graph stays attached to total_loss container -->
+  <path d="M174,110 C230,110 250,250 286,272" fill="none" stroke="#db2777" stroke-width="1.5" marker-end="url(#arrR)"/>
+  <path d="M174,174 C230,174 250,260 286,280" fill="none" stroke="#db2777" stroke-width="1.5" marker-end="url(#arrR)"/>
+  <path d="M174,238 C230,238 250,272 286,288" fill="none" stroke="#db2777" stroke-width="1.5" marker-end="url(#arrR)"/>
+
+  <!-- swelling total_loss container -->
+  <rect x="286" y="252" width="74" height="86" rx="6" fill="#fde7f1" stroke="#db2777" stroke-width="2.5"/>
+  <text x="323" y="270" font-size="10.5" font-weight="700" fill="#1f2937" text-anchor="middle">total_loss</text>
+  <text x="323" y="286" font-size="9" fill="#db2777" text-anchor="middle">+图1</text>
+  <text x="323" y="300" font-size="9" fill="#db2777" text-anchor="middle">+图2</text>
+  <text x="323" y="314" font-size="9" fill="#db2777" text-anchor="middle">+图3</text>
+  <text x="323" y="330" font-size="9" fill="#db2777" text-anchor="middle">膨胀...</text>
+
+  <!-- GPU memory bar filling red -->
+  <text x="40" y="300" font-size="11" fill="#1f2937">GPU memory</text>
+  <rect x="40" y="308" width="34" height="150" rx="4" fill="#f1f5f9" stroke="#94a3b8"/>
+  <rect x="40" y="320" width="34" height="138" rx="0" fill="#db2777" opacity="0.85"/>
+  <rect x="40" y="308" width="34" height="150" rx="4" fill="none" stroke="#94a3b8"/>
+  <text x="57" y="473" font-size="9" fill="#db2777" text-anchor="middle">满</text>
+
+  <!-- OOM caption -->
+  <text x="200" y="500" font-size="12.5" font-weight="700" fill="#db2777" text-anchor="middle">OOM 显存爆炸：N 张图全被挂住</text>
+
+  <!-- ===================== RIGHT : CORRECT ===================== -->
+  <text x="400" y="28" font-size="15" font-weight="700" fill="#059669">正确：total += loss.item()</text>
+  <text x="400" y="42" font-size="11" fill="#6b7280">.item() 取标量，图当步即回收</text>
+
+  <!-- STEP 1 -->
+  <text x="402" y="84" font-size="11" fill="#1f2937">step1</text>
+  <g>
+    <rect x="400" y="92" width="78" height="30" rx="5" fill="#e7f6ef" stroke="#059669"/>
+    <text x="439" y="106" font-size="10.5" fill="#1f2937" text-anchor="middle">loss</text>
+    <text x="439" y="118" font-size="9" fill="#059669" text-anchor="middle">grad_fn</text>
+    <!-- released graph: gray + cross -->
+    <g opacity="0.5">
+      <circle cx="494" cy="98" r="6" fill="#fff" stroke="#94a3b8"/>
+      <circle cx="510" cy="110" r="6" fill="#fff" stroke="#94a3b8"/>
+      <circle cx="494" cy="122" r="6" fill="#fff" stroke="#94a3b8"/>
+      <line x1="486" y1="92" x2="518" y2="126" stroke="#94a3b8" stroke-width="1.5"/>
+      <line x1="518" y1="92" x2="486" y2="126" stroke="#94a3b8" stroke-width="1.5"/>
+    </g>
+    <text x="502" y="138" font-size="8.5" fill="#94a3b8" text-anchor="middle">图已释放</text>
+  </g>
+  <!-- gate .item() -->
+  <rect x="540" y="92" width="46" height="30" rx="5" fill="#fff" stroke="#059669"/>
+  <text x="563" y="111" font-size="10" fill="#059669" text-anchor="middle">.item()</text>
+  <line x1="478" y1="107" x2="538" y2="107" stroke="#059669" stroke-width="1.5" marker-end="url(#arrG)"/>
+  <text x="612" y="111" font-size="12" font-weight="700" fill="#1f2937">0.83</text>
+  <line x1="586" y1="107" x2="600" y2="107" stroke="#059669" stroke-width="1.5" marker-end="url(#arrG)"/>
+
+  <!-- STEP 2 -->
+  <text x="402" y="148" font-size="11" fill="#1f2937">step2</text>
+  <g>
+    <rect x="400" y="156" width="78" height="30" rx="5" fill="#e7f6ef" stroke="#059669"/>
+    <text x="439" y="170" font-size="10.5" fill="#1f2937" text-anchor="middle">loss</text>
+    <text x="439" y="182" font-size="9" fill="#059669" text-anchor="middle">grad_fn</text>
+    <g opacity="0.5">
+      <circle cx="494" cy="162" r="6" fill="#fff" stroke="#94a3b8"/>
+      <circle cx="510" cy="174" r="6" fill="#fff" stroke="#94a3b8"/>
+      <circle cx="494" cy="186" r="6" fill="#fff" stroke="#94a3b8"/>
+      <line x1="486" y1="156" x2="518" y2="190" stroke="#94a3b8" stroke-width="1.5"/>
+      <line x1="518" y1="156" x2="486" y2="190" stroke="#94a3b8" stroke-width="1.5"/>
+    </g>
+  </g>
+  <rect x="540" y="156" width="46" height="30" rx="5" fill="#fff" stroke="#059669"/>
+  <text x="563" y="175" font-size="10" fill="#059669" text-anchor="middle">.item()</text>
+  <line x1="478" y1="171" x2="538" y2="171" stroke="#059669" stroke-width="1.5" marker-end="url(#arrG)"/>
+  <text x="612" y="175" font-size="12" font-weight="700" fill="#1f2937">0.71</text>
+  <line x1="586" y1="171" x2="600" y2="171" stroke="#059669" stroke-width="1.5" marker-end="url(#arrG)"/>
+
+  <!-- STEP 3 -->
+  <text x="402" y="212" font-size="11" fill="#1f2937">step3</text>
+  <g>
+    <rect x="400" y="220" width="78" height="30" rx="5" fill="#e7f6ef" stroke="#059669"/>
+    <text x="439" y="234" font-size="10.5" fill="#1f2937" text-anchor="middle">loss</text>
+    <text x="439" y="246" font-size="9" fill="#059669" text-anchor="middle">grad_fn</text>
+    <g opacity="0.5">
+      <circle cx="494" cy="226" r="6" fill="#fff" stroke="#94a3b8"/>
+      <circle cx="510" cy="238" r="6" fill="#fff" stroke="#94a3b8"/>
+      <circle cx="494" cy="250" r="6" fill="#fff" stroke="#94a3b8"/>
+      <line x1="486" y1="220" x2="518" y2="254" stroke="#94a3b8" stroke-width="1.5"/>
+      <line x1="518" y1="220" x2="486" y2="254" stroke="#94a3b8" stroke-width="1.5"/>
+    </g>
+  </g>
+  <rect x="540" y="220" width="46" height="30" rx="5" fill="#fff" stroke="#059669"/>
+  <text x="563" y="239" font-size="10" fill="#059669" text-anchor="middle">.item()</text>
+  <line x1="478" y1="235" x2="538" y2="235" stroke="#059669" stroke-width="1.5" marker-end="url(#arrG)"/>
+  <text x="612" y="239" font-size="12" font-weight="700" fill="#1f2937">0.64</text>
+  <line x1="586" y1="235" x2="600" y2="235" stroke="#059669" stroke-width="1.5" marker-end="url(#arrG)"/>
+
+  <!-- total_loss as plain number sum -->
+  <line x1="630" y1="118" x2="650" y2="255" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 3" marker-end="url(#arrGray)"/>
+  <line x1="630" y1="182" x2="650" y2="262" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 3" marker-end="url(#arrGray)"/>
+  <line x1="630" y1="246" x2="650" y2="270" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 3" marker-end="url(#arrGray)"/>
+  <rect x="600" y="272" width="120" height="56" rx="6" fill="#e7f6ef" stroke="#059669" stroke-width="2"/>
+  <text x="660" y="292" font-size="10.5" font-weight="700" fill="#1f2937" text-anchor="middle">total_loss</text>
+  <text x="660" y="308" font-size="11" fill="#059669" text-anchor="middle">0.83+0.71+0.64</text>
+  <text x="660" y="322" font-size="9.5" fill="#6b7280" text-anchor="middle">只是数字累加</text>
+
+  <!-- GPU memory bar low green -->
+  <text x="420" y="300" font-size="11" fill="#1f2937">GPU memory</text>
+  <rect x="420" y="308" width="34" height="150" rx="4" fill="#f1f5f9" stroke="#94a3b8"/>
+  <rect x="420" y="440" width="34" height="18" rx="0" fill="#059669" opacity="0.85"/>
+  <rect x="420" y="308" width="34" height="150" rx="4" fill="none" stroke="#94a3b8"/>
+  <text x="437" y="430" font-size="9" fill="#059669" text-anchor="middle">低</text>
+
+  <!-- green caption -->
+  <text x="580" y="500" font-size="12.5" font-weight="700" fill="#059669" text-anchor="middle">只存数值，图及时回收</text>
+</svg><figcaption>循环里累加带梯度张量导致显存泄漏：total += loss 把每步整张计算图都挂住不释放；改成 total += loss.item() 取出标量数值，图即可回收。</figcaption></figure>
+
+<pre class="ref" data-lang="PyTorch"><code># 错误：total 拖着 N 张计算图，显存爆炸
+total_loss = 0
+for x, y in loader:
+    loss = criterion(model(x), y)
+    total_loss += loss              # loss 带 grad_fn，整张图被挂住
+
+# 正确：要记录就取标量值（三连顺序与上一节一致：先清零）
+total_loss = 0.0
+for x, y in loader:
+    optimizer.zero_grad()
+    loss = criterion(model(x), y)
+    loss.backward()                 # 这一步才需要图
+    optimizer.step()
+    total_loss += loss.item()       # 只取数值，图可被释放</code></pre>
+
+<h2>调一调，观察现象</h2>
+
+<p><strong>微任务 1：把 tanh 换成 relu，观察"死区"梯度为 0。</strong>预期现象：当输入为负，relu 的局部梯度是 0，反向传回去的梯度也是 0。为什么：relu 在负半轴是平的，导数为 0，梯度被"卡断"——这正是 dead ReLU 现象（神经元死亡 / 死区）的根源。</p>
+
+<pre><code>import math
+
+class Value:
+    def __init__(self, data, _children=(), _op=''):
+        self.data = data; self.grad = 0.0
+        self._backward = lambda: None
+        self._prev = set(_children); self._op = _op
+    def __mul__(self, other):
+        other = other if isinstance(other, Value) else Value(other)
+        out = Value(self.data * other.data, (self, other), '*')
+        def _b():
+            self.grad += other.data * out.grad
+            other.grad += self.data * out.grad
+        out._backward = _b; return out
+    def relu(self):
+        out = Value(self.data if self.data > 0 else 0.0, (self,), 'relu')
+        def _b():
+            self.grad += (1.0 if self.data > 0 else 0.0) * out.grad
+        out._backward = _b; return out
+    def backward(self):
+        topo, vis = [], set()
+        def build(v):
+            if v not in vis:
+                vis.add(v)
+                for ch in v._prev: build(ch)
+                topo.append(v)
+        build(self); self.grad = 1.0
+        for v in reversed(topo): v._backward()
+
+for x0 in [3.0, -3.0]:              # 改这个数试试正负
+    x = Value(x0); w = Value(2.0)
+    y = (x * w).relu()
+    y.backward()
+    print(f"x={x0:+.1f}  y={y.data}  x.grad={x.grad}  w.grad={w.grad}")</code></pre>
+
+<p><strong>微任务 2：故意连续 backward 两次不清零。</strong>预期现象：第二次打印的 grad 正好是第一次的两倍。为什么：<code>_backward</code> 用 <code>+=</code> 累加，没清零的旧梯度还在槽里。注意 <code>backward()</code> 开头的 <code>self.grad=1.0</code> 只重置了起点（输出）节点 <code>L</code>，叶子节点 <code>a</code>、<code>b</code> 的 <code>.grad</code> 槽没人清，所以它们才累加翻倍——这正好呼应 PyTorch 里 <code>zero_grad</code> 清的是参数（叶子）而非 loss。</p>
+
+<pre><code>import math
+class Value:
+    def __init__(self, data, _children=(), _op=''):
+        self.data = data; self.grad = 0.0
+        self._backward = lambda: None
+        self._prev = set(_children); self._op = _op
+    def __mul__(self, other):
+        other = other if isinstance(other, Value) else Value(other)
+        out = Value(self.data*other.data, (self, other), '*')
+        def _b():
+            self.grad += other.data*out.grad
+            other.grad += self.data*out.grad
+        out._backward=_b; return out
+    def backward(self):
+        topo, vis = [], set()
+        def build(v):
+            if v not in vis:
+                vis.add(v)
+                for ch in v._prev: build(ch)
+                topo.append(v)
+        build(self); self.grad=1.0
+        for v in reversed(topo): v._backward()
+
+a, b = Value(2.0), Value(-3.0)
+L = a * b
+L.backward(); print("第1次 a.grad =", a.grad)
+L.backward(); print("第2次 a.grad =", a.grad, "(翻倍了！)")
+# 试试：在第二次 backward 前加 a.grad=0; b.grad=0 看看</code></pre>
+
+<p><strong>微任务 3：一个节点被用两次，看梯度如何相加。</strong>预期现象：<code>f = x*x</code> 时 <code>x.grad = 2x</code>。为什么：乘法的 <code>_backward</code> 闭包里 <code>self</code> 和 <code>other</code> 都绑定到同一个 <code>x</code>，于是在同一次闭包调用内对 <code>x.grad</code> 先以 <code>self</code> 身份累加一次（加 <code>other.data*out.grad</code>）、再以 <code>other</code> 身份累加一次（加 <code>self.data*out.grad</code>），两次相加得 \(2x\)。这正是 <code>+=</code> 累加在"同一节点被同一运算多次引用"上的体现。（小细节：因为 <code>_prev</code> 是集合，<code>self</code> 与 <code>other</code> 是同一对象时会去重，<code>f._prev</code> 实际只有一条边；梯度翻两份靠的是闭包里两次 <code>+=</code>，不是两条边。）</p>
+
+<pre><code>class Value:
+    def __init__(self, data, _children=(), _op=''):
+        self.data=data; self.grad=0.0
+        self._backward=lambda:None
+        self._prev=set(_children); self._op=_op
+    def __mul__(self, other):
+        other = other if isinstance(other, Value) else Value(other)
+        out = Value(self.data*other.data, (self, other), '*')
+        def _b():
+            self.grad += other.data*out.grad
+            other.grad += self.data*out.grad
+        out._backward=_b; return out
+    def backward(self):
+        topo, vis=[], set()
+        def build(v):
+            if v not in vis:
+                vis.add(v)
+                for ch in v._prev: build(ch)
+                topo.append(v)
+        build(self); self.grad=1.0
+        for v in reversed(topo): v._backward()
+
+x = Value(5.0)
+f = x * x                  # self 与 other 都绑定到同一个 x
+f.backward()
+print("f =", f.data, " x.grad =", x.grad, "(应为 2x = 10)")</code></pre>
+
+<h2>动手练习</h2>
+
+<ol>
+<li><strong>给引擎加 <code>__pow__</code>。</strong>实现 <code>Value.__pow__(self, k)</code>（<code>k</code> 为常数），其 <code>_backward</code> 应为 <code>self.grad += k * self.data**(k-1) * out.grad</code>。用 <code>x**2</code> 验证 <code>x=3</code> 时 <code>x.grad==6</code>。</li>
+<li><strong>autograd 透视实验（项目映射）。</strong>用主线的 <code>Value</code> 引擎搭一个两输入的小表达式（如 <code>(a*b + a).tanh()</code>），打印每个节点的 <code>_op</code> 和反向后的 <code>.grad</code>；手算对照。再试：第二次 backward 前不清零，记录 grad 如何变化。（若你已装好 PyTorch，可在本地对照打印真实张量的 <code>grad_fn</code> 与 <code>.grad</code>，体会 <code>.detach()</code> 后 <code>grad_fn</code> 消失、<code>requires_grad=False</code> 后 <code>.grad</code> 为 <code>None</code> 的差别。）</li>
+<li><strong>写出错误与正确两版"累加 loss"。</strong>不用真跑，用注释解释为什么 <code>total += loss</code> 会拖图、而 <code>total += loss.item()</code> 不会。这道题检验你是否真懂"带梯度张量 = 挂着一张图"。</li>
+</ol>
+
+<h2>掌握自检</h2>
+
+<ul>
+<li>我能不看讲义，写出 <code>Value</code> 的 <code>__add__</code>、<code>__mul__</code> 的 <code>_backward</code> 闭包，并说出每行对应哪条求导规则。</li>
+<li>我能解释为什么 <code>.backward()</code> 必须按拓扑序逆向遍历，而不能随便挑节点先算。</li>
+<li>我能说出 <code>.grad</code> 用 <code>+=</code> 累加的两个后果：一个是对的（多路径求和），一个是坑（漏 zero_grad 致翻倍）。</li>
+<li>给我一段代码，我能判断 <code>no_grad</code> / <code>detach</code> / <code>requires_grad=False</code> 哪个合适。</li>
+<li>我一眼能看出 <code>total_loss += loss</code> 是显存泄漏，并改成 <code>.item()</code>。</li>
+</ul>
+
+<div class="skip"><h4>可以先放过的点</h4>
+<ul>
+<li><strong>retain_graph / create_graph 的细节</strong>：等你真遇到二阶导（高阶优化、某些正则项）或"backward 第二次报错"时再回来，现在知道它们存在即可。</li>
+<li><strong>张量版 autograd 里的广播与求和如何反向</strong>：标量引擎已讲透机制；张量情形下 <code>backward</code> 要对广播维度求和，这属于实现细节，下一课用到 <code>nn.Module</code> 时 PyTorch 会替你处理。</li>
+<li><strong>自定义 <code>autograd.Function</code></strong>：写自定义反向算子是进阶需求，等你需要一个 PyTorch 没有的可微操作时再学。</li>
+</ul>
+</div>
+</article>
+<div class="navbtns"><a class="prev" href="lesson-03-pytorch-tensors-device-dtype.html"><div class="nlabel">← 上一课</div><div class="ntitle">第3课 · PyTorch 张量、设备与 dtype</div></a><a class="next" href="lesson-05-nn-module.html"><div class="nlabel">下一课 →</div><div class="ntitle">第5课 · nn.Module 与模型构建</div></a></div>
+<nav class="toc"><h3>本模块课程表</h3><ol>
+<li><a href="lesson-01-env-scientific-stack.html"><span class="ln">第1课</span>Python 科学计算栈与环境工程</a></li>
+<li><a href="lesson-02-numpy-vectorization-broadcasting.html"><span class="ln">第2课</span>NumPy 数组、向量化与广播</a></li>
+<li><a href="lesson-03-pytorch-tensors-device-dtype.html"><span class="ln">第3课</span>PyTorch 张量、设备与 dtype</a></li>
+<li class="cur"><span class="ln">第4课</span>Autograd 自动微分</li>
+<li><a href="lesson-05-nn-module.html"><span class="ln">第5课</span>nn.Module 与模型构建</a></li>
+<li class="soon"><span class="ln">第6课</span>从零写训练循环（核心）　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第7课</span>数据加载 Dataset 与 DataLoader　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第8课</span>GPU/CUDA 与混合精度　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第9课</span>实验管理、可复现与调试方法论　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第10课</span>Hugging Face 生态入门　<span class="badge">即将上线</span></li>
+</ol></nav>
+</div>
+<style>
+.pr-cell{border:1px solid #334155;border-radius:10px;margin:1.2em 0;overflow:hidden;background:#0f172a;}
+.pr-head{display:flex;align-items:center;gap:8px;background:#1e293b;color:#cbd5e1;padding:6px 10px;font-size:13px;font-family:system-ui,-apple-system,sans-serif;}
+.pr-title{flex:1;font-weight:600;}
+.pr-status{font-size:12px;color:#94a3b8;white-space:nowrap;max-width:50%;overflow:hidden;text-overflow:ellipsis;}
+.pr-btn{cursor:pointer;border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:6px;padding:3px 11px;font-size:13px;line-height:1.4;}
+.pr-btn:hover{background:#0b1220;}
+.pr-run{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:600;}
+.pr-run:hover{background:#1d4ed8;}
+.pr-cell.collapsed .pr-body{display:none;}
+.pr-editor{position:relative;background:#0f172a;}
+.pr-code,.pr-edit{display:block;width:100%;min-height:68px;border:none;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.55;padding:12px 14px;box-sizing:border-box;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:4;}
+.pr-code{position:absolute;inset:0;margin:0;overflow:hidden;background:#0f172a;color:#dbeafe;pointer-events:none;}
+.pr-edit{position:relative;background:transparent;color:transparent;caret-color:#e2e8f0;resize:vertical;outline:none;-webkit-text-fill-color:transparent;}
+.pr-edit::selection{background:rgba(96,165,250,.34);}
+.tok-kw{color:#c084fc;font-weight:700;}
+.tok-fn{color:#67e8f9;}
+.tok-num{color:#fbbf24;}
+.tok-str{color:#86efac;}
+.tok-comment{color:#94a3b8;font-style:italic;}
+.pr-out{margin:0;padding:10px 14px;border-top:1px solid #334155;background:#0b1220;color:#cbd5e1;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.5;white-space:pre-wrap;max-height:340px;overflow:auto;}
+.pr-out:empty{display:none;}
+.pr-out.err{color:#fca5a5;}
+.pr-cell.ref-cell{border-color:#475569;}
+.pr-cell.ref-cell .pr-head{background:#172033;color:#cbd5e1;}
+.pr-cell.ref-cell .pr-status{color:#fbbf24;font-style:italic;}
+.pr-code.pr-static{position:static;pointer-events:auto;overflow:auto;min-height:auto;background:#0f172a;color:#dbeafe;}
+#pr-fab{position:fixed;right:18px;bottom:18px;z-index:9998;background:#2563eb;color:#fff;border:none;border-radius:999px;padding:10px 17px;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.22);font-family:system-ui,sans-serif;}
+#pr-fab:hover{background:#1d4ed8;}
+#pr-lab{position:fixed;right:18px;bottom:66px;z-index:9999;width:400px;max-width:92vw;background:#0f172a;border:1px solid #334155;border-radius:12px;display:none;flex-direction:column;box-shadow:0 14px 38px rgba(0,0,0,.4);overflow:hidden;}
+#pr-lab.open{display:flex;}
+#pr-lab .pr-edit,#pr-lab .pr-code{min-height:150px;}
+</style>
+<script>
+(function(){
+  var PYBASE="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+  var pyReady=null;
+  function loadPy(status){
+    if(pyReady)return pyReady;
+    pyReady=(async function(){
+      status("正在加载 Python 运行时（首次约 10 秒，需联网）…");
+      await new Promise(function(res,rej){
+        var s=document.createElement("script");s.src=PYBASE+"pyodide.js";
+        s.onload=res;s.onerror=function(){rej(new Error("无法加载 Pyodide（首次运行需要联网）"));};
+        document.head.appendChild(s);
+      });
+      var py=await loadPyodide({indexURL:PYBASE});
+      status("正在加载 NumPy …");
+      await py.loadPackage("numpy");
+      status("Python 就绪 ✓");
+      return py;
+    })();
+    return pyReady;
+  }
+  async function run(code,outEl,statusEl){
+    var setS=function(m){if(statusEl)statusEl.textContent=m;};
+    outEl.classList.remove("err");outEl.textContent="";
+    var py;
+    try{py=await loadPy(setS);}
+    catch(e){outEl.classList.add("err");outEl.textContent="加载失败："+e.message;return;}
+    var buf="";
+    py.setStdout({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    py.setStderr({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    try{
+      var result=await py.runPythonAsync(code);
+      if(result!==undefined&&result!==null){
+        var r;try{r=result.toString();}catch(_){r=String(result);}
+        if(r!=="None")buf+=(buf&&!buf.endsWith("\n")?"\n":"")+r;
+        if(result&&result.destroy)result.destroy();
+      }
+      outEl.textContent=buf||"（运行成功，无输出。用 print(...) 查看结果）";
+    }catch(e){
+      outEl.classList.add("err");
+      outEl.textContent=buf+(buf?"\n":"")+String((e&&e.message)||e);
+    }
+  }
+  var KW={False:1,None:1,True:1,and:1,as:1,assert:1,async:1,await:1,break:1,class:1,continue:1,def:1,del:1,elif:1,else:1,except:1,finally:1,for:1,from:1,global:1,if:1,import:1,in:1,is:1,lambda:1,nonlocal:1,not:1,or:1,pass:1,raise:1,return:1,try:1,while:1,with:1,yield:1};
+  var FN={abs:1,all:1,any:1,array:1,bool:1,dict:1,enumerate:1,float:1,int:1,len:1,list:1,max:1,min:1,np:1,numpy:1,print:1,range:1,round:1,set:1,str:1,sum:1,tuple:1,zip:1,torch:1,nn:1,tensor:1,F:1,super:1,isinstance:1,getattr:1,setattr:1,hasattr:1,sorted:1,type:1,object:1,property:1};
+  function esc(s){return s.replace(/[&<>]/g,function(c){return c==="&"?"&amp;":c==="<"?"&lt;":"&gt;";});}
+  function colorLine(line){
+    var out="",i=0;
+    while(i<line.length){
+      var ch=line[i];
+      if(ch==="#"){out+='<span class="tok-comment">'+esc(line.slice(i))+"</span>";break;}
+      if(ch==="'"||ch==='"'){
+        var q=ch,triple=line.slice(i,i+3)===q+q+q,end=i+(triple?3:1),done=false;
+        while(end<line.length){
+          if(!triple&&line[end]==="\\"){end+=2;continue;}
+          if(triple&&line.slice(end,end+3)===q+q+q){end+=3;done=true;break;}
+          if(!triple&&line[end]===q){end+=1;done=true;break;}
+          end+=1;
+        }
+        out+='<span class="tok-str">'+esc(line.slice(i,done?end:line.length))+"</span>";
+        i=done?end:line.length;
+        continue;
+      }
+      if(/[0-9]/.test(ch)||(ch==="."&&/[0-9]/.test(line[i+1]||""))){
+        var m=line.slice(i).match(/^(?:0[xX][0-9a-fA-F]+|\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?/);
+        out+='<span class="tok-num">'+esc(m[0])+"</span>";i+=m[0].length;continue;
+      }
+      if(/[A-Za-z_]/.test(ch)){
+        var id=line.slice(i).match(/^[A-Za-z_][A-Za-z0-9_]*/)[0];
+        if(KW[id])out+='<span class="tok-kw">'+id+"</span>";
+        else if(FN[id])out+='<span class="tok-fn">'+id+"</span>";
+        else out+=id;
+        i+=id.length;continue;
+      }
+      out+=esc(ch);i+=1;
+    }
+    return out;
+  }
+  function paint(ta){
+    var pre=ta.closest(".pr-editor").querySelector(".pr-code");
+    pre.innerHTML=ta.value.split("\n").map(colorLine).join("\n")+(ta.value.endsWith("\n")?"\n":"");
+    pre.style.height=ta.style.height;
+    pre.scrollTop=ta.scrollTop;pre.scrollLeft=ta.scrollLeft;
+  }
+  function autosize(ta){ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight+2,460)+"px";}
+  function tune(ta){autosize(ta);paint(ta);}
+  function tabKey(e){
+    if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();var b=this.closest(".pr-cell,#pr-lab").querySelector(".pr-run");if(b)b.click();return;}
+    if(e.key==="Tab"){
+      e.preventDefault();
+      var s=this.selectionStart,en=this.selectionEnd,v=this.value,lineStart=v.lastIndexOf("\n",s-1)+1,lineEnd=v.indexOf("\n",en);
+      if(lineEnd<0)lineEnd=v.length;
+      if(s!==en||e.shiftKey){
+        var block=v.slice(lineStart,lineEnd),lines=block.split("\n"),delta=0;
+        if(e.shiftKey){
+          lines=lines.map(function(line){
+            if(line.startsWith("    ")){delta-=4;return line.slice(4);}
+            if(line.startsWith("\t")){delta-=1;return line.slice(1);}
+            return line;
+          });
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=Math.max(lineStart,s+(s===lineStart?0:Math.max(delta/Math.max(lines.length,1),-4)));
+          this.selectionEnd=Math.max(this.selectionStart,en+delta);
+        }else{
+          lines=lines.map(function(line){delta+=4;return "    "+line;});
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=s+4;
+          this.selectionEnd=en+delta;
+        }
+      }else{
+        this.value=v.slice(0,s)+"    "+v.slice(en);this.selectionStart=this.selectionEnd=s+4;
+      }
+      tune(this);
+      return;
+    }
+    if(e.key==="Enter"){
+      e.preventDefault();
+      var a=this.selectionStart,b=this.selectionEnd,text=this.value,start=text.lastIndexOf("\n",a-1)+1;
+      var prefix=text.slice(start,a),indent=(prefix.match(/^\s*/)||[""])[0],code=prefix.replace(/#.*$/,"").trimEnd();
+      var add="\n"+indent+(/:\s*$/.test(code)?"    ":"");
+      this.value=text.slice(0,a)+add+text.slice(b);
+      this.selectionStart=this.selectionEnd=a+add.length;
+      tune(this);
+      return;
+    }
+  }
+  function makeCell(code){
+    var cell=document.createElement("div");cell.className="pr-cell";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">可运行 · Python (NumPy)</span><span class="pr-status"></span><button class="pr-btn pr-toggle">收起</button><button class="pr-btn pr-run">▶ 运行</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    var ta=cell.querySelector(".pr-edit");ta.value=code;
+    var out=cell.querySelector(".pr-out"),st=cell.querySelector(".pr-status");
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    cell.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    var tog=cell.querySelector(".pr-toggle");
+    tog.onclick=function(){cell.classList.toggle("collapsed");tog.textContent=cell.classList.contains("collapsed")?"展开":"收起";};
+    setTimeout(function(){tune(ta);},0);
+    return cell;
+  }
+  function makeRef(code,lang){
+    var cell=document.createElement("div");cell.className="pr-cell ref-cell";
+    var L=lang||"参考";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">参考代码 · '+esc(L)+'</span><span class="pr-status">不在浏览器运行</span></div><pre class="pr-code pr-static"></pre>';
+    cell.querySelector(".pr-static").innerHTML=code.split("\n").map(colorLine).join("\n");
+    return cell;
+  }
+  function enhance(){
+    document.querySelectorAll("article pre").forEach(function(pre){
+      if(pre.closest(".pr-cell"))return;
+      var codeEl=pre.querySelector("code")||pre;
+      var code=codeEl.textContent.replace(/\s+$/,"");
+      if(!code)return;
+      if(pre.classList.contains("ref")){
+        pre.replaceWith(makeRef(code,pre.getAttribute("data-lang")));
+      }else{
+        pre.replaceWith(makeCell(code));
+      }
+    });
+  }
+  function lab(){
+    var fab=document.createElement("button");fab.id="pr-fab";fab.textContent="▶ Python 实验台";
+    var panel=document.createElement("div");panel.id="pr-lab";
+    panel.innerHTML='<div class="pr-head"><span class="pr-title">Python 实验台 · NumPy</span><span class="pr-status"></span><button class="pr-btn pr-run">▶ 运行</button><button class="pr-btn pr-min">收起</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    document.body.appendChild(fab);document.body.appendChild(panel);
+    var ta=panel.querySelector(".pr-edit");
+    ta.value="import numpy as np\na = np.array([3, 2])\nb = np.array([1, 4])\nprint(\"a + b =\", a + b)\nprint(\"a . b =\", a @ b)\nprint(\"|a|  =\", np.linalg.norm(a))\ncos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))\nprint(\"cos =\", round(float(cos), 4))";
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    var out=panel.querySelector(".pr-out"),st=panel.querySelector(".pr-status");
+    panel.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    fab.onclick=function(){panel.classList.toggle("open");};
+    panel.querySelector(".pr-min").onclick=function(){panel.classList.remove("open");};
+    setTimeout(function(){tune(ta);},0);
+  }
+  function init(){enhance();lab();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+<script src="../assets/annotator.js"></script>
+</body>
+</html>

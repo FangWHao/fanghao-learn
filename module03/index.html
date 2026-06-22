@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块3 · Python、NumPy、PyTorch 与实验工程 · 课程目录</title>
+<script src="../assets/theme.js"></script>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<style>
+:root{--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue-bg:#eff6ff;
+--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--pink:#db2777;
+--red:#dc2626;--red-bg:#fef2f2;--bg:#ffffff;--soft:#f8fafc;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);
+font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.85;font-size:17px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:840px;margin:0 auto;padding:0 22px 100px;}
+header.top{background:#fff;border-bottom:1px solid var(--line);padding:26px 22px 22px;margin-bottom:14px;}
+header.top .inner{max-width:840px;margin:0 auto;}
+.crumb{color:var(--muted);font-size:14px;letter-spacing:.3px;margin-bottom:6px;}
+h1{font-size:30px;line-height:1.3;margin:.1em 0 .2em;}
+.sub{color:var(--muted);font-size:15px;}
+article{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:30px 34px;margin-top:18px;}
+h2{font-size:23px;margin:1.7em 0 .6em;padding-bottom:.25em;border-bottom:2px solid var(--line);}
+h2:first-child{margin-top:.2em;}
+h3{font-size:19px;margin:1.3em 0 .4em;color:#0f172a;}
+h4{margin:.2em 0 .5em;font-size:16px;}
+p{margin:.7em 0;}
+ul,ol{padding-left:1.3em;margin:.6em 0;}
+li{margin:.32em 0;}
+code{background:#f1f5f9;padding:.12em .4em;border-radius:5px;font-size:.9em;
+font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a;}
+pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 18px;overflow:auto;font-size:14px;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0;}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:15.5px;}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+thead th{background:var(--soft);}
+figure.fig{margin:1.4em 0;text-align:center;}
+figure.fig svg{max-width:100%;height:auto;}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
+.note,.ml,.key,.pitfall,.example{border-radius:10px;padding:14px 18px;margin:1.2em 0;border:1px solid var(--line);}
+.note{background:var(--soft);border-left:4px solid #94a3b8;}
+.example{background:#fff;border-left:4px solid var(--blue);}
+.ml{background:var(--green-bg);border-left:4px solid var(--green);}
+.key{background:var(--amber-bg);border-left:4px solid var(--amber);}
+.pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.goals{background:var(--blue-bg);border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:10px;padding:14px 20px;margin:.2em 0 1.5em;}
+.goals h4{margin:.1em 0 .5em;color:#1e3a8a;}
+.goals ul{margin:.3em 0;}
+.skip{background:var(--soft);border:1px solid var(--line);border-left:4px solid #94a3b8;border-radius:10px;padding:14px 20px;margin:1.8em 0 0;color:#475569;}
+.skip h4{margin:.1em 0 .5em;color:#475569;}
+.tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
+.toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
+.toc h3{margin:.1em 0 .7em;}
+.toc ol{list-style:none;padding:0;}
+.toc li{padding:7px 10px;border-radius:8px;color:#334155;border:1px solid transparent;}
+.toc li a{color:inherit;text-decoration:none;display:block;}
+.toc li .ln{display:inline-block;min-width:54px;color:var(--muted);font-size:13px;}
+.toc li.cur{background:var(--blue-bg);border-color:#bfdbfe;font-weight:600;color:#1e3a8a;}
+.toc li:not(.cur):hover{background:var(--soft);}
+.navbtns{display:flex;justify-content:space-between;margin-top:22px;gap:12px;}
+.navbtns a{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--ink);}
+.navbtns a:hover{border-color:var(--blue);}
+.navbtns .nlabel{color:var(--muted);font-size:13px;}
+.navbtns .ntitle{font-weight:600;margin-top:3px;}
+.navbtns .next{text-align:right;}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.here{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:6px 0 4px;font-size:15px;color:#1e3a8a;line-height:1.7;}
+.here b{font-weight:700;}
+.cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
+.card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
+.card:hover{border-color:var(--blue);}
+.card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
+.card .ct{font-size:18px;font-weight:600;}
+.card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+.card .cap{margin-left:40px;margin-top:7px;font-size:13px;color:#1e3a8a;}
+.card .cap .lbl{display:inline-block;background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;margin-right:7px;}
+
+.card.soon{opacity:.6;cursor:default;}
+.card.soon:hover{border-color:var(--line);}
+.badge{display:inline-block;background:#e2e8f0;color:#475569;font-size:11px;font-weight:600;padding:1px 8px;border-radius:20px;margin-left:8px;vertical-align:middle;}
+.toc li.soon{color:#94a3b8;}
+.toc li.soon .badge{margin-left:4px;}
+</style>
+<link rel="stylesheet" href="../assets/annotator.css">
+<link rel="stylesheet" href="../assets/theme.css">
+</head>
+<body>
+<header class="top"><div class="inner">
+<div class="crumb"><a href="../index.html" style="color:inherit">首页</a>　/　从零到前沿 ML 自学课程　·　阶段0：数学与工具基础</div>
+<h1>模块 3 · Python、NumPy、PyTorch 与实验工程</h1>
+<div class="sub">从科学计算栈与环境工程出发 → NumPy 向量化/广播建立张量心智 → PyTorch 张量/Autograd/nn.Module → 第6课起从零写训练循环、数据加载、混合精度、实验管理与调试、Hugging Face。主线是"<b>能从零写出完整、可复现的训练循环</b>"。</div>
+</div></header>
+<div class="wrap">
+<article>
+<div class="here"><b>📍 你在这里：</b>当前 = <b>阶段0 · 模块3</b>（Python/NumPy/PyTorch 与实验工程）。本轮先放出 <b>前 5 课</b>（环境工程 → NumPy 向量化/广播 → PyTorch 张量 → Autograd → nn.Module），它们是"<b>写训练循环之前你必须先会的地基</b>"。第6课起进入核心的"从零写训练循环"。代码用浏览器内 Python（Pyodide，NumPy 可跑）：<b>可运行格</b>能直接改了跑；PyTorch/命令行等以<b>参考代码</b>形式给出（不在浏览器运行，但 API 正确）。</div>
+<p>每课结构：<strong>学习产出（开头）→ 机制讲解 + 最小可跑/手写实现 + 真实 API 当指针 + 示意图 → 调一调观察现象（可改可跑）→ 动手练习 → 掌握自检 → 可以先放过的点（结尾）</strong>，并逐课做代码对抗校验（可运行代码心算重跑、PyTorch 参考代码核对 API 正确性）。右下角"Python 实验台"小窗可随手验证。</p>
+<div class="cards">
+<a class="card" href="lesson-01-env-scientific-stack.html"><span class="num">1</span><span class="ct">Python 科学计算栈与环境工程</span><div class="cb">conda/venv 隔离、版本锁定、栈分工、notebook 隐藏状态、何时毕业到 .py</div><div class="cap"><span class="lbl">能力点</span>环境工程——让&quot;跑不出来&quot;不再是元凶（隔离环境/锁版本/逃出 notebook 隐藏状态）</div></a>
+<a class="card" href="lesson-02-numpy-vectorization-broadcasting.html"><span class="num">2</span><span class="ct">NumPy 数组、向量化与广播</span><div class="cb">view vs copy、向量化 10–100×、广播尾部对齐、keepdims、softmax 数值稳定</div><div class="cap"><span class="lbl">能力点</span>NumPy 向量化与广播——张量心智模型，1:1 迁移到 PyTorch（性能与隐形 bug 的根）</div></a>
+<a class="card" href="lesson-03-pytorch-tensors-device-dtype.html"><span class="num">3</span><span class="ct">PyTorch 张量、设备与 dtype</span><div class="cb">Tensor=ndarray+三属性、from_numpy 零拷贝、view vs reshape/contiguous、.to(device)</div><div class="cap"><span class="lbl">能力点</span>PyTorch 张量——device/dtype/requires_grad 三属性；吃掉最高频报错</div></a>
+<a class="card" href="lesson-04-autograd.html"><span class="num">4</span><span class="ct">Autograd 自动微分</span><div class="cb">动态计算图、手写 micrograd、.grad 累加→zero_grad、no_grad/detach/冻结</div><div class="cap"><span class="lbl">能力点</span>Autograd——亲手写一个 micrograd 把&quot;自动微分魔法&quot;拆开（接 M1 反向传播）</div></a>
+<a class="card" href="lesson-05-nn-module.html"><span class="num">5</span><span class="ct">nn.Module 与模型构建</span><div class="cb">注册机制、手写迷你 Module、nn.Parameter/ModuleList、train/eval、state_dict</div><div class="cap"><span class="lbl">能力点</span>nn.Module——把张量运算组织成可保存/迁移的模型（注册机制是关键）</div></a>
+<div class="card soon"><span class="num">6</span><span class="ct">从零写训练循环（核心）</span><span class="badge">即将上线</span><div class="cb">五步骨架、CrossEntropyLoss 喂 logits、训练/验证分离、调度器</div><div class="cap"><span class="lbl">能力点</span>从零训练循环（核心）——阶段0 硬指标，后续所有模型共用</div></div>
+<div class="card soon"><span class="num">7</span><span class="ct">数据加载 Dataset 与 DataLoader</span><span class="badge">即将上线</span><div class="cb">__len__/__getitem__、batch/shuffle/num_workers、collate_fn 变长 padding</div><div class="cap"><span class="lbl">能力点</span>数据加载——Dataset/DataLoader/collate_fn，数据管线是隐形瓶颈</div></div>
+<div class="card soon"><span class="num">8</span><span class="ct">GPU/CUDA 与混合精度</span><span class="badge">即将上线</span><div class="cb">显存构成、避免同步、AMP autocast+GradScaler、bf16 vs fp16</div><div class="cap"><span class="lbl">能力点</span>GPU 与混合精度——AMP+GradScaler 省一半显存提速（LoRA/QLoRA 前提）</div></div>
+<div class="card soon"><span class="num">9</span><span class="ct">实验管理、可复现与调试方法论</span><span class="badge">即将上线</span><div class="cb">W&amp;B/TensorBoard、可复现清单、故障诊断树、先过拟合一个 batch</div><div class="cap"><span class="lbl">能力点</span>实验管理与调试——可复现清单 + 故障诊断树（真实训练 90% 时间在调试）</div></div>
+<div class="card soon"><span class="num">10</span><span class="ct">Hugging Face 生态入门</span><span class="badge">即将上线</span><div class="cb">AutoModel/Tokenizer/pipeline、datasets.map、Trainer 内部就是手写循环</div><div class="cap"><span class="lbl">能力点</span>Hugging Face——先会手写循环再用 Trainer，通往阶段5 的工具桥梁</div></div>
+</div>
+</article>
+</div>
+<script src="../assets/annotator.js"></script>
+</body>
+</html>

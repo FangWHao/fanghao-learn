@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块3 · 第3课 · PyTorch 张量、设备与 dtype</title>
+<script src="../assets/theme.js"></script>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue-bg:#eff6ff;
+--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--pink:#db2777;
+--red:#dc2626;--red-bg:#fef2f2;--bg:#ffffff;--soft:#f8fafc;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);
+font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.85;font-size:17px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:840px;margin:0 auto;padding:0 22px 100px;}
+header.top{background:#fff;border-bottom:1px solid var(--line);padding:26px 22px 22px;margin-bottom:14px;}
+header.top .inner{max-width:840px;margin:0 auto;}
+.crumb{color:var(--muted);font-size:14px;letter-spacing:.3px;margin-bottom:6px;}
+h1{font-size:30px;line-height:1.3;margin:.1em 0 .2em;}
+.sub{color:var(--muted);font-size:15px;}
+article{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:30px 34px;margin-top:18px;}
+h2{font-size:23px;margin:1.7em 0 .6em;padding-bottom:.25em;border-bottom:2px solid var(--line);}
+h2:first-child{margin-top:.2em;}
+h3{font-size:19px;margin:1.3em 0 .4em;color:#0f172a;}
+h4{margin:.2em 0 .5em;font-size:16px;}
+p{margin:.7em 0;}
+ul,ol{padding-left:1.3em;margin:.6em 0;}
+li{margin:.32em 0;}
+code{background:#f1f5f9;padding:.12em .4em;border-radius:5px;font-size:.9em;
+font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a;}
+pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 18px;overflow:auto;font-size:14px;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0;}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:15.5px;}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+thead th{background:var(--soft);}
+figure.fig{margin:1.4em 0;text-align:center;}
+figure.fig svg{max-width:100%;height:auto;}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
+.note,.ml,.key,.pitfall,.example{border-radius:10px;padding:14px 18px;margin:1.2em 0;border:1px solid var(--line);}
+.note{background:var(--soft);border-left:4px solid #94a3b8;}
+.example{background:#fff;border-left:4px solid var(--blue);}
+.ml{background:var(--green-bg);border-left:4px solid var(--green);}
+.key{background:var(--amber-bg);border-left:4px solid var(--amber);}
+.pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.goals{background:var(--blue-bg);border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:10px;padding:14px 20px;margin:.2em 0 1.5em;}
+.goals h4{margin:.1em 0 .5em;color:#1e3a8a;}
+.goals ul{margin:.3em 0;}
+.skip{background:var(--soft);border:1px solid var(--line);border-left:4px solid #94a3b8;border-radius:10px;padding:14px 20px;margin:1.8em 0 0;color:#475569;}
+.skip h4{margin:.1em 0 .5em;color:#475569;}
+.tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
+.toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
+.toc h3{margin:.1em 0 .7em;}
+.toc ol{list-style:none;padding:0;}
+.toc li{padding:7px 10px;border-radius:8px;color:#334155;border:1px solid transparent;}
+.toc li a{color:inherit;text-decoration:none;display:block;}
+.toc li .ln{display:inline-block;min-width:54px;color:var(--muted);font-size:13px;}
+.toc li.cur{background:var(--blue-bg);border-color:#bfdbfe;font-weight:600;color:#1e3a8a;}
+.toc li:not(.cur):hover{background:var(--soft);}
+.navbtns{display:flex;justify-content:space-between;margin-top:22px;gap:12px;}
+.navbtns a{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--ink);}
+.navbtns a:hover{border-color:var(--blue);}
+.navbtns .nlabel{color:var(--muted);font-size:13px;}
+.navbtns .ntitle{font-weight:600;margin-top:3px;}
+.navbtns .next{text-align:right;}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.here{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:6px 0 4px;font-size:15px;color:#1e3a8a;line-height:1.7;}
+.here b{font-weight:700;}
+.cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
+.card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
+.card:hover{border-color:var(--blue);}
+.card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
+.card .ct{font-size:18px;font-weight:600;}
+.card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+.card .cap{margin-left:40px;margin-top:7px;font-size:13px;color:#1e3a8a;}
+.card .cap .lbl{display:inline-block;background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;margin-right:7px;}
+
+.card.soon{opacity:.6;cursor:default;}
+.card.soon:hover{border-color:var(--line);}
+.badge{display:inline-block;background:#e2e8f0;color:#475569;font-size:11px;font-weight:600;padding:1px 8px;border-radius:20px;margin-left:8px;vertical-align:middle;}
+.toc li.soon{color:#94a3b8;}
+.toc li.soon .badge{margin-left:4px;}
+</style>
+<link rel="stylesheet" href="../assets/annotator.css">
+<link rel="stylesheet" href="../assets/theme.css">
+</head>
+<body>
+<header class="top"><div class="inner">
+<div class="crumb"><a href="../index.html" style="color:inherit">首页</a>　/　<a href="index.html" style="color:inherit">模块 3 · Python、NumPy、PyTorch 与实验工程</a>　/　第 3 课（共 10 课）</div>
+<h1>PyTorch 张量、设备与 dtype</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　阶段0：数学与工具基础　·　<strong>能力点：</strong>PyTorch 张量——device/dtype/requires_grad 三属性；吃掉最高频报错</div>
+</div></header>
+<div class="wrap">
+<article>
+<p>上一课你把循环里的 Python 慢操作改写成了 NumPy 的向量化与广播。现在我们把同样的"数组直觉"搬到 PyTorch 的张量（tensor）上——这是从零写训练循环之前的最后一块工程地基。好消息是：张量的索引、广播、向量化几乎就是 NumPy；坏消息是，它多了三个会让你反复栽跟头的属性——<code>device</code>（设备）、<code>dtype</code>（数据类型）、<code>requires_grad</code>（是否记录梯度）。本课就专门吃掉这三者引发的最高频报错，下一课再用 <code>requires_grad</code> 进入 autograd。</p>
+
+<div class="goals">
+<h4>读完这一课，你将能够</h4>
+<ul>
+<li>说清张量比 ndarray 多了哪三个属性，并在代码里读出它们。</li>
+<li>判断一个操作（切片 / <code>from_numpy</code> / transpose）是否共享内存，预测改一个会不会动另一个。</li>
+<li>解释为什么 transpose 后 <code>.view</code> 会报错，并用 <code>.contiguous()</code> 或 <code>.reshape</code> 修复。</li>
+<li>用 <code>.to(device)</code> 把张量和模型搬到同一设备，避免"设备不匹配"错误。</li>
+<li>选对 <code>dtype</code>（float32 / bf16 / int64），并用 NumSpy 演示预判 dtype 提升 / 截断 / 精度丢失会发生什么；同时知道 PyTorch 的提升规则与 NumPy 略有不同。</li>
+</ul>
+</div>
+
+<h2>张量 = ndarray + 三个属性</h2>
+
+<p><strong>机制直觉。</strong>把张量想成一块连续的数字内存（buffer）加上一套"怎么读它"的元数据：形状（shape）、步长（stride）、起点。NumPy 的 ndarray 已经是这个结构了。PyTorch 在它之上挂了三个新标签：</p>
+
+<ul>
+<li><strong><code>device</code>（设备）</strong>：这块内存在哪——CPU 内存还是某张 GPU 的显存（<code>cpu</code> / <code>cuda:0</code>）。</li>
+<li><strong><code>dtype</code>（数据类型）</strong>：每个元素几个字节、怎么解释（<code>float32</code> / <code>bfloat16</code> / <code>int64</code> …）。NumPy 也有，但在深度学习里它直接关系到显存和精度。</li>
+<li><strong><code>requires_grad</code>（是否记录梯度）</strong>：要不要为这个张量记录计算图、以便反向传播求梯度。这是 NumPy 完全没有的，下一课主角。</li>
+</ul>
+
+<figure class="fig"><svg viewBox="0 0 720 560" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <marker id="arr" orient="auto-start-reverse" markerWidth="9" markerHeight="9" refX="7" refY="4" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#475569"/>
+    </marker>
+    <marker id="arrBlue" orient="auto-start-reverse" markerWidth="9" markerHeight="9" refX="7" refY="4" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <!-- caption -->
+  <text x="360" y="26" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2937">张量 = 一块数字内存 + 三个 PyTorch 专属标签</text>
+  <text x="360" y="46" text-anchor="middle" font-size="12" fill="#475569">device、dtype、requires_grad · 其余数组操作与 NumPy 一致</text>
+
+  <!-- ===== TOP CARD: device ===== -->
+  <g>
+    <rect x="268" y="72" width="184" height="58" rx="8" fill="#fff7ed" stroke="#d97706" stroke-width="1.5"/>
+    <!-- chip icon -->
+    <g stroke="#d97706" stroke-width="1.4" fill="none">
+      <rect x="283" y="92" width="20" height="20" rx="2" fill="#fde9d0"/>
+      <line x1="288" y1="92" x2="288" y2="86"/><line x1="293" y1="92" x2="293" y2="86"/><line x1="298" y1="92" x2="298" y2="86"/>
+      <line x1="288" y1="112" x2="288" y2="118"/><line x1="293" y1="112" x2="293" y2="118"/><line x1="298" y1="112" x2="298" y2="118"/>
+      <line x1="283" y1="97" x2="277" y2="97"/><line x1="283" y1="107" x2="277" y2="107"/>
+      <line x1="303" y1="97" x2="309" y2="97"/><line x1="303" y1="107" x2="309" y2="107"/>
+    </g>
+    <text x="320" y="92" font-size="13" font-weight="700" fill="#d97706">device</text>
+    <text x="320" y="109" font-size="12" fill="#1f2937">数据放在哪</text>
+    <text x="320" y="124" font-size="12" font-weight="600" fill="#9a3412">cpu / cuda:0</text>
+  </g>
+  <line x1="332" y1="200" x2="350" y2="132" stroke="#475569" stroke-width="1.6" marker-end="url(#arr)"/>
+
+  <!-- ===== RIGHT CARD: dtype ===== -->
+  <g>
+    <rect x="500" y="230" width="200" height="74" rx="8" fill="#fef2f8" stroke="#db2777" stroke-width="1.5"/>
+    <!-- ruler icon (bytes-per-cell) -->
+    <g stroke="#db2777" stroke-width="1.3" fill="none">
+      <rect x="513" y="252" width="34" height="14" rx="2" fill="#fbd6e8"/>
+      <line x1="520" y1="252" x2="520" y2="259"/><line x1="527" y1="252" x2="527" y2="259"/>
+      <line x1="534" y1="252" x2="534" y2="259"/><line x1="541" y1="252" x2="541" y2="259"/>
+    </g>
+    <text x="557" y="248" font-size="13" font-weight="700" fill="#db2777">dtype</text>
+    <text x="557" y="264" font-size="11" fill="#475569">每格几字节</text>
+    <text x="513" y="284" font-size="12" font-weight="600" fill="#9d174d">float32 / bf16 / int64</text>
+    <text x="513" y="299" font-size="11" fill="#64748b">数值精度 · 占用内存</text>
+  </g>
+  <line x1="408" y1="262" x2="500" y2="266" stroke="#475569" stroke-width="1.6" marker-end="url(#arr)"/>
+
+  <!-- ===== BOTTOM CARD: requires_grad (faded grey) ===== -->
+  <g>
+    <rect x="248" y="440" width="240" height="66" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5 3"/>
+    <text x="268" y="462" font-size="13" font-weight="700" fill="#64748b">requires_grad</text>
+    <text x="268" y="480" font-size="12" font-weight="600" fill="#475569">True / False</text>
+    <text x="268" y="497" font-size="11" fill="#94a3b8">是否记录梯度（下一课展开，本课先不深入）</text>
+  </g>
+  <line x1="350" y1="328" x2="345" y2="440" stroke="#475569" stroke-width="1.6" marker-end="url(#arr)"/>
+
+  <!-- ===== LEFT GREY CARD: NumPy-shared ===== -->
+  <g>
+    <rect x="24" y="232" width="150" height="86" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+    <text x="99" y="254" text-anchor="middle" font-size="12" font-weight="700" fill="#334155">数组本体</text>
+    <text x="99" y="273" text-anchor="middle" font-size="12" fill="#475569">shape / stride</text>
+    <text x="99" y="290" text-anchor="middle" font-size="12" fill="#475569">索引 / 广播</text>
+    <text x="99" y="309" text-anchor="middle" font-size="10.5" fill="#64748b">与 NumPy ndarray 相同</text>
+  </g>
+  <line x1="174" y1="270" x2="250" y2="262" stroke="#94a3b8" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrBlue)"/>
+
+  <!-- ===== CENTER: tensor data buffer (2x3 grid, isometric-ish) ===== -->
+  <g>
+    <!-- depth shadow blocks -->
+    <rect x="262" y="208" width="138" height="112" rx="4" fill="#cbd5e1" opacity="0.5"/>
+    <rect x="258" y="204" width="138" height="112" rx="4" fill="#94a3b8" opacity="0.55"/>
+    <!-- front face -->
+    <rect x="254" y="200" width="138" height="112" rx="4" fill="#eef2f7" stroke="#475569" stroke-width="1.8"/>
+    <!-- cells 2 rows x 3 cols -->
+    <g font-size="13" font-weight="600" text-anchor="middle" fill="#1e3a5f">
+      <rect x="261" y="207" width="42" height="48" fill="#dbe4ee" stroke="#94a3b8" stroke-width="1"/>
+      <text x="282" y="236">0.5</text>
+      <rect x="305" y="207" width="42" height="48" fill="#dbe4ee" stroke="#94a3b8" stroke-width="1"/>
+      <text x="326" y="236">-1.2</text>
+      <rect x="349" y="207" width="36" height="48" fill="#dbe4ee" stroke="#94a3b8" stroke-width="1"/>
+      <text x="367" y="236">3.0</text>
+      <rect x="261" y="257" width="42" height="48" fill="#dbe4ee" stroke="#94a3b8" stroke-width="1"/>
+      <text x="282" y="286">0.0</text>
+      <rect x="305" y="257" width="42" height="48" fill="#dbe4ee" stroke="#94a3b8" stroke-width="1"/>
+      <text x="326" y="286">2.7</text>
+      <rect x="349" y="257" width="36" height="48" fill="#dbe4ee" stroke="#94a3b8" stroke-width="1"/>
+      <text x="367" y="286">-0.4</text>
+    </g>
+    <text x="323" y="190" text-anchor="middle" font-size="12" font-weight="700" fill="#2563eb">torch.Tensor · 一块数字内存</text>
+  </g>
+
+  <!-- footer -->
+  <text x="360" y="536" text-anchor="middle" font-size="11.5" fill="#64748b">相同的数组本体 + 三个新挂件 → 这就是张量与 ndarray 的全部差别</text>
+</svg><figcaption>张量 = 一块数字内存 + 三个 PyTorch 专属标签：device、dtype、requires_grad。其余数组操作与 NumSPy 一致。</figcaption></figure>
+
+<p>除了这三个标签，张量的"数组操作"和 NumPy 几乎一一对应。下面这格用 NumPy 复习几个会原样迁移过来的操作——把它当成"张量也是这样"的预演。</p>
+
+<pre><code>import numpy as np
+
+x = np.arange(12).reshape(3, 4)   # 形状 (3, 4)
+print("shape:", x.shape, "dtype:", x.dtype)
+
+# 索引 / 切片 —— torch 写法完全一样
+print("第0行:", x[0])
+print("最后一列:", x[:, -1])
+
+# 广播：(3,4) 与 (4,) 相加，行向量自动复制到每一行
+bias = np.array([10, 20, 30, 40])
+print("广播加法:\n", x + bias)
+
+# 向量化归约
+print("按列求和:", x.sum(axis=0))
+print("按行均值:", x.mean(axis=1))</code></pre>
+
+<p><strong>真实 API（指针）。</strong>把上面的 <code>np.</code> 换成 <code>torch.</code>、<code>axis=</code> 换成 <code>dim=</code>，几乎就是 PyTorch。差别全在那三个新属性上：</p>
+
+<pre class="ref" data-lang="PyTorch"><code>import torch
+
+x = torch.arange(12).reshape(3, 4)        # 默认 dtype=int64, device=cpu
+print(x.shape, x.dtype, x.device, x.requires_grad)
+# torch.Size([3, 4]) torch.int64 cpu False
+
+# 创建浮点张量并要求梯度
+w = torch.randn(3, 4, dtype=torch.float32, requires_grad=True)
+print(w.dim(), w.sum(dim=0))               # dim 替代 numpy 的 axis
+
+# 三个属性都能在创建时指定
+t = torch.zeros(2, 2, dtype=torch.float32, device="cpu")</code></pre>
+
+<h2>from_numpy 的零拷贝陷阱</h2>
+
+<p><strong>机制直觉。</strong>很多"为什么我没改它它却变了"的 bug，本质都是<em>两个变量指向同一块内存</em>。NumPy 里切片返回的是视图（view）而不是副本，这正好可以用来建立"共享内存"的直觉——<code>torch.from_numpy</code> 干的就是同一件事。</p>
+
+<pre><code>import numpy as np
+
+a = np.array([1, 2, 3, 4], dtype=np.float32)
+b = a[1:3]              # 切片 = view，与 a 共享同一块内存
+b[0] = 99               # 改 b
+print("a =", a)         # a[1] 也变成 99 ！
+print("b =", b)
+print("共享内存?", np.shares_memory(a, b))   # True
+
+c = a.copy()            # 显式拷贝才独立
+c[0] = -1
+print("copy 后 a 不变:", a)</code></pre>
+
+<p>跑一下：<code>a</code> 变成 <code>[1, 99, 3, 4]</code>。这就是"共享内存"的感觉——<code>b</code> 不是新数组，只是同一块内存的另一种读法。</p>
+
+<p><strong>真实 API（指针）。</strong><code>torch.from_numpy(a)</code> 与 <code>a</code> 共享内存，改一个动另一个；想要独立副本就显式 <code>.clone()</code> 或 <code>torch.tensor(a)</code>（后者会拷贝）。</p>
+
+<pre class="ref" data-lang="PyTorch"><code>import numpy as np, torch
+
+a = np.array([1.0, 2.0, 3.0], dtype=np.float32)
+t = torch.from_numpy(a)     # 零拷贝：t 和 a 共享内存
+t[0] = 99.0
+print(a)                    # [99.  2.  3.]  —— numpy 数组也变了！
+
+# 反方向同理
+t.numpy()[1] = -1.0
+print(a)                    # [99. -1.  3.]
+
+# 想要独立副本：
+t2 = torch.tensor(a)        # 拷贝一份
+t3 = torch.from_numpy(a).clone()</code></pre>
+
+<ul>
+<li>注意 <code>from_numpy</code> 只在 CPU 上、且 dtype 能直接对应（numpy 数组本身是该 dtype 的原生连续数组）时共享内存。一旦 <code>.to("cuda")</code> 或 <code>.to(torch.float64)</code> 触发了类型/设备转换，就会产生新内存，不再共享。</li>
+<li>三个易混入口对比：<code>torch.from_numpy(a)</code> 在可行时共享；<code>torch.tensor(a)</code> <em>总是拷贝</em>；<code>torch.as_tensor(a)</code> 则在可行时共享、否则拷贝。不确定就用 <code>torch.tensor</code>，要省内存且确定能共享才用前两者。</li>
+</ul>
+
+<h2>连续性（contiguous）：view 要求连续，reshape 不一定</h2>
+
+<p><strong>机制直觉。</strong>张量逻辑上是多维的，物理上却是一条一维内存。默认按"行优先"（C order）摆放：先放完第 0 行，再放第 1 行……<code>transpose</code> / <code>permute</code> 这类操作<em>只改步长（stride）、不动内存</em>——逻辑视图转置了，物理顺序原封不动。<code>.view</code> 要求"内存顺序正好就是新形状想要的顺序"，所以转置后的张量不连续，<code>.view</code> 会拒绝；<code>.reshape</code> 则在必要时悄悄帮你拷贝一份连续内存。</p>
+
+<figure class="fig"><svg viewBox="0 0 760 520" xmlns="http://www.w3.org/2000/svg" font-family="system-ui">
+  <defs>
+    <marker id="arrGreen" orient="auto-start-reverse" markerWidth="9" markerHeight="9" refX="7" refY="4.5">
+      <path d="M0,0 L9,4.5 L0,9 z" fill="#059669"/>
+    </marker>
+    <marker id="arrRed" orient="auto-start-reverse" markerWidth="9" markerHeight="9" refX="7" refY="4.5">
+      <path d="M0,0 L9,4.5 L0,9 z" fill="#db2777"/>
+    </marker>
+  </defs>
+
+  <!-- column dividers -->
+  <line x1="250" y1="40" x2="250" y2="430" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 4"/>
+  <line x1="500" y1="40" x2="500" y2="430" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 4"/>
+
+  <!-- ============ LEFT COLUMN ============ -->
+  <text x="125" y="32" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">原数组 a (2x3)</text>
+
+  <!-- 2x3 matrix -->
+  <g>
+    <rect x="55" y="50" width="42" height="34" fill="#eff6ff" stroke="#2563eb"/>
+    <rect x="97" y="50" width="42" height="34" fill="#eff6ff" stroke="#2563eb"/>
+    <rect x="139" y="50" width="42" height="34" fill="#eff6ff" stroke="#2563eb"/>
+    <rect x="55" y="84" width="42" height="34" fill="#eff6ff" stroke="#2563eb"/>
+    <rect x="97" y="84" width="42" height="34" fill="#eff6ff" stroke="#2563eb"/>
+    <rect x="139" y="84" width="42" height="34" fill="#eff6ff" stroke="#2563eb"/>
+    <text x="76" y="72" text-anchor="middle" font-size="13" fill="#1f2937">0</text>
+    <text x="118" y="72" text-anchor="middle" font-size="13" fill="#1f2937">1</text>
+    <text x="160" y="72" text-anchor="middle" font-size="13" fill="#1f2937">2</text>
+    <text x="76" y="106" text-anchor="middle" font-size="13" fill="#1f2937">3</text>
+    <text x="118" y="106" text-anchor="middle" font-size="13" fill="#1f2937">4</text>
+    <text x="160" y="106" text-anchor="middle" font-size="13" fill="#1f2937">5</text>
+  </g>
+
+  <!-- memory bar -->
+  <text x="125" y="148" text-anchor="middle" font-size="11" fill="#6b7280">物理内存（一维）</text>
+  <g font-size="13" fill="#1f2937">
+    <rect x="30" y="158" width="32" height="30" fill="#f0fdf4" stroke="#059669"/>
+    <rect x="62" y="158" width="32" height="30" fill="#f0fdf4" stroke="#059669"/>
+    <rect x="94" y="158" width="32" height="30" fill="#f0fdf4" stroke="#059669"/>
+    <rect x="126" y="158" width="32" height="30" fill="#f0fdf4" stroke="#059669"/>
+    <rect x="158" y="158" width="32" height="30" fill="#f0fdf4" stroke="#059669"/>
+    <rect x="190" y="158" width="32" height="30" fill="#f0fdf4" stroke="#059669"/>
+    <text x="46" y="178" text-anchor="middle">0</text>
+    <text x="78" y="178" text-anchor="middle">1</text>
+    <text x="110" y="178" text-anchor="middle">2</text>
+    <text x="142" y="178" text-anchor="middle">3</text>
+    <text x="174" y="178" text-anchor="middle">4</text>
+    <text x="206" y="178" text-anchor="middle">5</text>
+  </g>
+  <line x1="40" y1="206" x2="212" y2="206" stroke="#059669" stroke-width="2" marker-end="url(#arrGreen)"/>
+  <text x="125" y="226" text-anchor="middle" font-size="11" fill="#059669">行优先 C-contiguous</text>
+  <text x="125" y="240" text-anchor="middle" font-size="11" fill="#059669">逻辑顺序 = 物理顺序</text>
+
+  <!-- ============ MIDDLE COLUMN ============ -->
+  <text x="375" y="32" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">转置 t = a.T (3x2)</text>
+
+  <!-- 3x2 matrix -->
+  <g>
+    <rect x="333" y="50" width="42" height="30" fill="#fdf2f8" stroke="#db2777"/>
+    <rect x="375" y="50" width="42" height="30" fill="#fdf2f8" stroke="#db2777"/>
+    <rect x="333" y="80" width="42" height="30" fill="#fdf2f8" stroke="#db2777"/>
+    <rect x="375" y="80" width="42" height="30" fill="#fdf2f8" stroke="#db2777"/>
+    <rect x="333" y="110" width="42" height="30" fill="#fdf2f8" stroke="#db2777"/>
+    <rect x="375" y="110" width="42" height="30" fill="#fdf2f8" stroke="#db2777"/>
+    <text x="354" y="70" text-anchor="middle" font-size="13" fill="#1f2937">0</text>
+    <text x="396" y="70" text-anchor="middle" font-size="13" fill="#1f2937">3</text>
+    <text x="354" y="100" text-anchor="middle" font-size="13" fill="#1f2937">1</text>
+    <text x="396" y="100" text-anchor="middle" font-size="13" fill="#1f2937">4</text>
+    <text x="354" y="130" text-anchor="middle" font-size="13" fill="#1f2937">2</text>
+    <text x="396" y="130" text-anchor="middle" font-size="13" fill="#1f2937">5</text>
+  </g>
+  <text x="375" y="156" text-anchor="middle" font-size="11" fill="#6b7280">逻辑读取顺序 0,3,1,4,2,5</text>
+
+  <!-- same memory bar -->
+  <g font-size="13" fill="#1f2937">
+    <rect x="280" y="170" width="32" height="30" fill="#f8fafc" stroke="#94a3b8"/>
+    <rect x="312" y="170" width="32" height="30" fill="#f8fafc" stroke="#94a3b8"/>
+    <rect x="344" y="170" width="32" height="30" fill="#f8fafc" stroke="#94a3b8"/>
+    <rect x="376" y="170" width="32" height="30" fill="#f8fafc" stroke="#94a3b8"/>
+    <rect x="408" y="170" width="32" height="30" fill="#f8fafc" stroke="#94a3b8"/>
+    <rect x="440" y="170" width="32" height="30" fill="#f8fafc" stroke="#94a3b8"/>
+    <text x="296" y="190" text-anchor="middle">0</text>
+    <text x="328" y="190" text-anchor="middle">1</text>
+    <text x="360" y="190" text-anchor="middle">2</text>
+    <text x="392" y="190" text-anchor="middle">3</text>
+    <text x="424" y="190" text-anchor="middle">4</text>
+    <text x="456" y="190" text-anchor="middle">5</text>
+  </g>
+  <text x="375" y="218" text-anchor="middle" font-size="11" fill="#6b7280">物理内存仍是 0 1 2 3 4 5（没变）</text>
+
+  <!-- jump-read dashed arrows: 0->3->1->4->2->5 (cell centers x: 0=296,1=328,2=360,3=392,4=424,5=456) -->
+  <g stroke="#db2777" stroke-width="1.6" stroke-dasharray="4 3" fill="none">
+    <path d="M296,234 C330,260 358,260 392,234" marker-end="url(#arrRed)"/>
+    <path d="M392,250 C360,272 330,272 328,250" marker-end="url(#arrRed)"/>
+    <path d="M328,238 C360,262 392,262 424,238" marker-end="url(#arrRed)"/>
+    <path d="M424,254 C392,274 362,274 360,254" marker-end="url(#arrRed)"/>
+    <path d="M360,242 C392,266 424,266 456,242" marker-end="url(#arrRed)"/>
+  </g>
+  <text x="375" y="296" text-anchor="middle" font-size="11" fill="#db2777" font-weight="600">读取要“跳着走”</text>
+  <text x="375" y="312" text-anchor="middle" font-size="11" fill="#db2777">stride 改变，内存未动 → 不连续</text>
+
+  <!-- ============ RIGHT COLUMN ============ -->
+  <text x="630" y="32" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">两条出路</text>
+
+  <!-- .view(6) X -->
+  <rect x="520" y="48" width="220" height="56" rx="6" fill="#fef2f2" stroke="#db2777"/>
+  <text x="540" y="74" font-size="13" fill="#1f2937" font-weight="600">.view(6)</text>
+  <text x="700" y="77" font-size="20" fill="#db2777" font-weight="700" text-anchor="middle">✗</text>
+  <text x="540" y="93" font-size="11" fill="#db2777">要求 逻辑顺序 == 物理顺序</text>
+
+  <!-- option A -->
+  <rect x="520" y="120" width="220" height="92" rx="6" fill="#f0fdf4" stroke="#059669"/>
+  <text x="540" y="142" font-size="12.5" fill="#1f2937" font-weight="600">.contiguous().view(6)</text>
+  <text x="528" y="142" font-size="15" fill="#059669" font-weight="700">✓</text>
+  <g font-size="11" fill="#1f2937">
+    <rect x="540" y="152" width="26" height="24" fill="#fff" stroke="#059669"/>
+    <rect x="566" y="152" width="26" height="24" fill="#fff" stroke="#059669"/>
+    <rect x="592" y="152" width="26" height="24" fill="#fff" stroke="#059669"/>
+    <rect x="618" y="152" width="26" height="24" fill="#fff" stroke="#059669"/>
+    <rect x="644" y="152" width="26" height="24" fill="#fff" stroke="#059669"/>
+    <rect x="670" y="152" width="26" height="24" fill="#fff" stroke="#059669"/>
+    <text x="553" y="169" text-anchor="middle">0</text>
+    <text x="579" y="169" text-anchor="middle">3</text>
+    <text x="605" y="169" text-anchor="middle">1</text>
+    <text x="631" y="169" text-anchor="middle">4</text>
+    <text x="657" y="169" text-anchor="middle">2</text>
+    <text x="683" y="169" text-anchor="middle">5</text>
+  </g>
+  <text x="540" y="198" font-size="11" fill="#059669">拷贝重排：新内存条按逻辑顺序排好</text>
+
+  <!-- option B -->
+  <rect x="520" y="228" width="220" height="56" rx="6" fill="#f0fdf4" stroke="#059669"/>
+  <text x="540" y="252" font-size="12.5" fill="#1f2937" font-weight="600">.reshape(6)</text>
+  <text x="528" y="252" font-size="15" fill="#059669" font-weight="700">✓</text>
+  <text x="540" y="271" font-size="11" fill="#059669">需要时自动拷贝（连续则等于 view）</text>
+
+  <!-- ============ BOTTOM CONCLUSION ============ -->
+  <rect x="30" y="450" width="700" height="44" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+  <text x="380" y="477" text-anchor="middle" font-size="15" font-weight="700" fill="#2563eb">结论：不确定就用 .reshape</text>
+</svg><figcaption>transpose 只改逻辑视图，不动物理内存：原数组行优先存为 0..5；转置后逻辑上是 (3,2)，但内存顺序没变，所以 .view 无法直接套用新形状。</figcaption></figure>
+
+<pre><code>import numpy as np
+
+a = np.arange(6).reshape(2, 3)        # 行优先
+print("a=\n", a)
+print("物理内存顺序:", a.ravel())       # [0 1 2 3 4 5]
+print("C连续?", a.flags['C_CONTIGUOUS'])   # True
+
+t = a.T                               # transpose：逻辑变，内存没动
+print("t=\n", t)                       # [[0 3] [1 4] [2 5]]
+print("t C连续?", t.flags['C_CONTIGUOUS'])     # False
+print("t 物理内存仍是:", t.ravel(order='K'))    # [0 1 2 3 4 5]
+
+# reshape 在不连续时自动拷贝，给出"按逻辑顺序"的结果
+print("t.reshape(6):", t.reshape(6))  # [0 3 1 4 2 5]</code></pre>
+
+<p>关键观察：<code>t</code> 逻辑上转置成 <code>[[0 3] [1 4] [2 5]]</code>，但底层内存还是 <code>0 1 2 3 4 5</code>（<code>ravel(order='K')</code> 按物理布局读，所以仍是原序）。NumPy 的 <code>reshape</code> 发现这块内存不连续，自动拷贝出按逻辑顺序排列的 <code>[0 3 1 4 2 5]</code>。<strong>PyTorch 的 <code>.view</code> 不会替你拷贝——它直接抛 RuntimeError，逼你显式选择 <code>.contiguous()</code> 或 <code>.reshape</code>。</strong></p>
+
+<p><strong>真实 API（指针）。</strong>这是最常见的"view 报错"现场和两种修复：</p>
+
+<pre class="ref" data-lang="PyTorch"><code>import torch
+
+a = torch.arange(6).reshape(2, 3)
+t = a.transpose(0, 1)          # 形状 (3, 2)，不连续
+print(t.is_contiguous())       # False
+
+# t.view(6)
+# RuntimeError: view size is not compatible with input tensor's size and
+# stride ... use .reshape(...) instead.
+
+# 修复一：先连续化，再 view
+print(t.contiguous().view(6))  # tensor([0, 3, 1, 4, 2, 5])
+
+# 修复二：直接用 reshape（需要时自动拷贝，否则等价 view）
+print(t.reshape(6))            # tensor([0, 3, 1, 4, 2, 5])</code></pre>
+
+<ul>
+<li>记忆口诀：<strong>不确定连不连续，就用 <code>.reshape</code></strong>；只有在你明确知道张量连续、且想保证零拷贝时才用 <code>.view</code>。</li>
+<li>C 连续（行优先）vs F 连续（列优先，Fortran order）：深度学习里默认且几乎只用 C 连续，知道这个词即可，不必深究。</li>
+</ul>
+
+<h2>设备搬运：张量和模型必须同处一地</h2>
+
+<p><strong>机制直觉。</strong>CPU 内存和 GPU 显存是两块物理上分开的内存，CPU 上的数字和 GPU 上的数字没法直接相加。深度学习里最高频的运行时错误之一就是：模型参数在 GPU、输入数据还在 CPU，两者一相乘就报 <em>device mismatch</em>。规矩很简单——<strong>参与同一次运算的张量必须在同一个 device 上</strong>。</p>
+
+<figure class="fig"><svg viewBox="0 0 720 480" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <marker id="arrOrange" orient="auto-start-reverse" markerWidth="9" markerHeight="9" refX="7" refY="4.5" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L9,4.5 L0,9 z" fill="#d97706"/>
+    </marker>
+    <marker id="arrGreen" orient="auto-start-reverse" markerWidth="9" markerHeight="9" refX="7" refY="4.5" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L9,4.5 L0,9 z" fill="#059669"/>
+    </marker>
+  </defs>
+
+  <!-- caption -->
+  <text x="360" y="26" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2937">参与同一次运算的张量必须在同一设备</text>
+  <text x="360" y="44" text-anchor="middle" font-size="11.5" fill="#475569">左：数据在 CPU、模型在 GPU 直接相乘报错；右：x.to(device) 对齐后正常</text>
+
+  <!-- divider -->
+  <line x1="360" y1="60" x2="360" y2="448" stroke="#94a3b8" stroke-width="1" stroke-dasharray="5 4"/>
+
+  <!-- ===================== LEFT COLUMN ===================== -->
+  <text x="180" y="80" text-anchor="middle" font-size="14" font-weight="700" fill="#db2777">✗ 设备不匹配</text>
+
+  <!-- CPU box -->
+  <rect x="60" y="98" width="240" height="74" rx="8" fill="#f1f5f9" stroke="#64748b" stroke-width="1.5"/>
+  <text x="74" y="116" font-size="12" font-weight="700" fill="#475569">CPU</text>
+  <rect x="115" y="124" width="130" height="38" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="180" y="148" text-anchor="middle" font-size="12.5" font-weight="600" fill="#1e3a8a">x  cpu</text>
+
+  <!-- mult sign broken -->
+  <text x="180" y="216" text-anchor="middle" font-size="26" fill="#1f2937">⊗</text>
+  <!-- red lightning / cross breaking it -->
+  <path d="M192 188 L168 212 L182 214 L160 240" fill="none" stroke="#db2777" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="200" y1="194" x2="232" y2="232" stroke="#db2777" stroke-width="3" stroke-linecap="round"/>
+  <line x1="232" y1="194" x2="200" y2="232" stroke="#db2777" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- GPU box -->
+  <rect x="60" y="252" width="240" height="74" rx="8" fill="#fff7ed" stroke="#d97706" stroke-width="1.5"/>
+  <text x="74" y="270" font-size="12" font-weight="700" fill="#b45309">GPU</text>
+  <rect x="115" y="278" width="130" height="38" rx="6" fill="#fed7aa" stroke="#d97706" stroke-width="1.5"/>
+  <text x="180" y="302" text-anchor="middle" font-size="12.5" font-weight="600" fill="#9a3412">W  cuda:0</text>
+
+  <!-- error message -->
+  <rect x="56" y="346" width="248" height="46" rx="6" fill="#fce7f3" stroke="#db2777" stroke-width="1.2"/>
+  <text x="180" y="365" text-anchor="middle" font-size="11.5" font-weight="700" fill="#be185d">RuntimeError:</text>
+  <text x="180" y="382" text-anchor="middle" font-size="11" fill="#be185d">tensors on cuda:0 and cpu</text>
+
+  <!-- ===================== RIGHT COLUMN ===================== -->
+  <text x="540" y="80" text-anchor="middle" font-size="14" font-weight="700" fill="#059669">✓ 搬到同一设备</text>
+
+  <!-- CPU box (right) -->
+  <rect x="420" y="98" width="100" height="74" rx="8" fill="#f1f5f9" stroke="#64748b" stroke-width="1.5"/>
+  <text x="434" y="116" font-size="12" font-weight="700" fill="#475569">CPU</text>
+  <rect x="438" y="124" width="64" height="38" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="470" y="148" text-anchor="middle" font-size="11.5" font-weight="600" fill="#1e3a8a">x  cpu</text>
+
+  <!-- curved arrow .to(device) -->
+  <path d="M524 134 C 590 134, 600 190, 600 222" fill="none" stroke="#d97706" stroke-width="2" marker-end="url(#arrOrange)"/>
+  <text x="606" y="170" font-size="11.5" font-weight="600" fill="#b45309">.to(device)</text>
+
+  <!-- GPU box (right) -->
+  <rect x="420" y="232" width="240" height="98" rx="8" fill="#fff7ed" stroke="#d97706" stroke-width="1.5"/>
+  <text x="434" y="250" font-size="12" font-weight="700" fill="#b45309">GPU</text>
+  <!-- x now on cuda -->
+  <rect x="438" y="262" width="96" height="38" rx="6" fill="#fed7aa" stroke="#d97706" stroke-width="1.5"/>
+  <text x="486" y="286" text-anchor="middle" font-size="12" font-weight="600" fill="#9a3412">x  cuda:0</text>
+  <!-- mult ok -->
+  <text x="548" y="288" text-anchor="middle" font-size="22" fill="#059669">⊗</text>
+  <!-- W on cuda -->
+  <rect x="562" y="262" width="86" height="38" rx="6" fill="#fed7aa" stroke="#d97706" stroke-width="1.5"/>
+  <text x="605" y="286" text-anchor="middle" font-size="12" font-weight="600" fill="#9a3412">W  cuda:0</text>
+
+  <!-- arrow to output -->
+  <line x1="540" y1="332" x2="540" y2="358" stroke="#059669" stroke-width="2" marker-end="url(#arrGreen)"/>
+
+  <!-- output y -->
+  <rect x="478" y="366" width="124" height="38" rx="6" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+  <text x="540" y="390" text-anchor="middle" font-size="12.5" font-weight="700" fill="#047857">y  cuda:0</text>
+
+  <!-- bottom hint -->
+  <text x="360" y="442" text-anchor="middle" font-size="11" fill="#475569">数据每个 batch 搬一次；模型训练开始时搬一次（model.to(device)）</text>
+</svg><figcaption>参与同一次运算的张量必须在同一设备。左：数据在 CPU、模型在 GPU 直接相乘报错；右：x.to(device) 对齐后正常。</figcaption></figure>
+
+<p><strong>真实 API（指针）。</strong>用 <code>.to(device)</code> 搬运，并且约定一个 <code>device</code> 变量贯穿全程：</p>
+
+<pre class="ref" data-lang="PyTorch"><code>import torch
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
+x = torch.randn(8, 16)              # 默认在 cpu
+model_w = torch.randn(16, 4, device=device)
+
+# x @ model_w   # 若 device=cuda 会报：
+# RuntimeError: Expected all tensors to be on the same device,
+# but found at least two devices, cuda:0 and cpu!
+
+x = x.to(device)                    # 把数据搬到同一设备
+y = x @ model_w                     # 现在 OK
+print(y.device)
+
+# 模型也一样要搬（下一课的 nn.Module）：model = model.to(device)
+# .cuda() 是 .to("cuda") 的简写；.cpu() 同理</code></pre>
+
+<ul>
+<li><code>.to(...)</code> 既能换设备也能换 dtype：<code>x.to(device, torch.float32)</code>。换到不同设备/类型时会产生<em>新张量</em>（拷贝），原张量不变。</li>
+<li>把数据搬上 GPU 通常发生在每个 batch；模型只在训练开始时搬一次。</li>
+</ul>
+
+<h2>dtype：选对精度，预判不匹配</h2>
+
+<p><strong>机制直觉。</strong>dtype 决定每个数字占几个字节、能表示多大范围、多少精度。常见三类：</p>
+
+<table>
+<thead><tr><th>dtype</th><th>字节</th><th>用途</th></tr></thead>
+<tbody>
+<tr><td><code>float32</code></td><td>4</td><td>默认浮点。训练/推理的通用选择，精度足够。</td></tr>
+<tr><td><code>bfloat16</code> (bf16)</td><td>2</td><td>混合精度训练。指数位与 float32 相同，所以可表示的数量级范围几乎一样，但尾数大幅缩短、精度低；省一半显存、算得快。</td></tr>
+<tr><td><code>int64</code> (long)</td><td>8</td><td>整数。索引、类别标签（如交叉熵的 target）默认就是它。</td></tr>
+</tbody>
+</table>
+
+<p>用 NumPy 把"dtype 不匹配会发生什么"这件事看清楚。注意：截断 / 溢出回绕的规则 NumPy 和 PyTorch 一致，但<em>混合 int 与 float 的具体提升目标</em>两者不同——下面先看 NumPy 的行为，PyTorch 的差异在参考块里说明。</p>
+
+<pre><code>import numpy as np
+
+# 1) 混合 dtype 运算：NumPy 自动提升到能容纳两者的类型
+xi = np.array([1, 2, 3], dtype=np.int64)
+yf = np.array([0.5, 0.5, 0.5], dtype=np.float32)
+z = xi + yf
+print("提升结果 dtype:", z.dtype, z)      # float64（不是 float32！）
+# 为什么是 float64 而不是 float32？因为 int64 的精度需求超过 float32 能安全容纳的范围，
+# NumPy 于是提升到更宽的 float64。这正是"混合 int 与低位浮点要小心"的典型坑。
+
+# 2) 向下转换会截断/溢出回绕
+big = np.array([100, 200, 300], dtype=np.int64).astype(np.int8)
+print("int64 -> int8:", big)             # [100 -56  44]  超出 [-128,127] 回绕
+# 提示：新版 numpy 对这种溢出可能给出 DeprecationWarning/RuntimeWarning，
+# 看到黄色/红色警告不代表程序出错，只是提醒你正在丢信息。
+
+# 3) float32 精度丢失
+f64 = np.array([0.1], dtype=np.float64)
+print("float64:", float(f64[0]))
+print("float32:", float(f64.astype(np.float32)[0]))  # 0.10000000149...</code></pre>
+
+<p><strong>真实 API（指针）。</strong>PyTorch 的 dtype 规则和 NumPy 有两处差别要记住：① 混合 int/float 时 PyTorch 倾向<em>保留 float32</em>，不会像 NumPy 那样升到 float64；② 很多操作根本<em>不会自动提升</em>，而是直接拒绝、抛 RuntimeError。</p>
+
+<pre class="ref" data-lang="PyTorch"><code>import torch
+
+a = torch.tensor([1, 2, 3])              # int64
+b = torch.tensor([1.0, 2.0, 3.0])        # float32
+
+# 差别①：混合 int64 + float32，PyTorch 结果是 float32（不是 NumPy 的 float64）
+print((a + b).dtype)                      # torch.float32
+
+# 差别②：很多 op 不自动提升，dtype 不匹配直接报错。例如交叉熵
+# （F = torch.nn.functional；交叉熵细节第6课讲，这里只看一点：标签 dtype 必须是 int64/long）：
+# import torch.nn.functional as F
+# loss = F.cross_entropy(logits, labels.float())  # 报错：labels 必须是 long，不能是 float
+
+x = torch.randn(4).to(torch.bfloat16)    # 转 bf16
+print(x.dtype)                           # torch.bfloat16
+
+y = a.float()                            # int64 -> float32 的简写
+z = a.to(torch.float32)                  # 等价</code></pre>
+
+<h2>调一调，观察现象</h2>
+
+<p><strong>微任务 1：把切片换成 copy，观察共享是否断开。</strong></p>
+<ul><li><strong>改一个数</strong>：把 <code>b = a[1:3]</code> 改成 <code>b = a[1:3].copy()</code>。</li>
+<li><strong>预期现象</strong>：改 <code>b[0]</code> 后 <code>a</code> <em>不再</em>变化，<code>shares_memory</code> 变 <code>False</code>。</li>
+<li><strong>为什么</strong>：切片是视图、共享内存；<code>.copy()</code> 分配了一块新内存。这正对应 torch 里 <code>from_numpy</code>（共享）与 <code>torch.tensor(a)</code>（拷贝）的区别。</li></ul>
+<pre><code>import numpy as np
+a = np.array([1, 2, 3, 4], dtype=np.float32)
+b = a[1:3].copy()        # 改这里：去掉 .copy() 再跑一次对比
+b[0] = 99
+print("a =", a)
+print("共享内存?", np.shares_memory(a, b))</code></pre>
+
+<p><strong>微任务 2：reshape 一个连续 vs 不连续的数组，看结果顺序。</strong></p>
+<ul><li><strong>改一个数</strong>：把 <code>m = a</code> 与 <code>m = a.T</code> 互换。</li>
+<li><strong>预期现象</strong>：连续时 reshape 得 <code>[0 1 2 3 4 5]</code>；转置后得 <code>[0 3 1 4 2 5]</code>。</li>
+<li><strong>为什么</strong>：reshape 按<em>逻辑顺序</em>读元素；转置改了逻辑顺序但没动物理内存，于是结果重排。<strong>关键对照：NumPy 的 reshape 在不连续时会自动拷贝并照常返回；而 torch 里此时 <code>.view(6)</code> 会直接抛 RuntimeError，必须显式 <code>.contiguous()</code> 或改用 <code>.reshape</code>。</strong>这是本课最高频的 view 报错来源。</li></ul>
+<pre><code>import numpy as np
+a = np.arange(6).reshape(2, 3)
+m = a.T                  # 改这里：换成 m = a 再跑一次
+print("连续?", m.flags['C_CONTIGUOUS'])
+print("reshape(6):", m.reshape(6))</code></pre>
+
+<p><strong>微任务 3：向下转 dtype，触发溢出回绕。</strong></p>
+<ul><li><strong>改一个数</strong>：把 <code>np.int8</code> 换成 <code>np.int16</code>。</li>
+<li><strong>预期现象</strong>：int8 下 <code>300</code> 回绕成 <code>44</code>；int16 范围够大，原样保留。</li>
+<li><strong>为什么</strong>：dtype 决定可表示范围，超出就回绕。深度学习里把 float32 标签误转 float16、或把大索引塞进小整型，都会悄悄出错。（新版 numpy 可能对溢出给出警告，属正常提醒，不是程序崩溃。）</li></ul>
+<pre><code>import numpy as np
+v = np.array([100, 200, 300], dtype=np.int64)
+print(v.astype(np.int8))    # 改这里：换成 np.int16</code></pre>
+
+<h2>动手练习</h2>
+
+<ol>
+<li><strong>共享内存侦探。</strong>写一个 NumPy 例子：构造数组 <code>a</code>，做三种操作——切片、<code>reshape</code>（连续时）、<code>.T</code>——分别用 <code>np.shares_memory(a, ...)</code> 判断它们是否与 <code>a</code> 共享内存。预测后再跑。然后用一句话写出对应的 torch 结论：<code>from_numpy</code> 共享、<code>clone</code> 不共享。</li>
+<li><strong>修复 view 报错。</strong>给定一段（写在纸上或注释里的）torch 伪代码：<code>x = torch.arange(24).reshape(2, 3, 4); y = x.permute(1, 0, 2); z = y.view(2, 12)</code>。指出哪一行会报错、为什么，并写出两种修复（用 <code>.contiguous()</code> 和用 <code>.reshape</code>），说明它们在内存上的区别。</li>
+<li><strong>设备/精度清单。</strong>为一个"把 CPU 上的 float64 numpy 数组喂给 GPU 上 float32 模型"的场景，按顺序写出需要做的转换调用（device 与 dtype 各一次），并解释如果漏掉任一步会触发哪类报错。</li>
+</ol>
+
+<h2>掌握自检</h2>
+<ul>
+<li>我能说出张量比 ndarray 多的三个属性，并在打印里认出它们。</li>
+<li>给定一个操作，我能预测它是否共享内存、改一个会不会动另一个。</li>
+<li>我能解释 transpose 后 <code>.view</code> 报错的原因，并写出 <code>.contiguous().view(...)</code> 和 <code>.reshape(...)</code> 两种修复。</li>
+<li>我能用一个 <code>device</code> 变量把数据和模型搬到一起，并认出 "device mismatch" 报错的成因。</li>
+<li>我知道 float32 / bf16 / int64 各自的典型用途，能预判向下转 dtype 时的截断/溢出，也知道 PyTorch 混合 int/float 的提升目标与 NumPy 不同。</li>
+</ul>
+
+<div class="skip">
+<h4>可以先放过的点</h4>
+<ul>
+<li><strong>in-place 操作的细节</strong>（<code>add_</code>、<code>mul_</code> 这类带下划线的方法会原地改内存）。现在只需记住：它们存在、能省显存、但和 autograd 会冲突。<em>等到下一课讲 autograd、看到 "a leaf Variable that requires grad is being used in an in-place operation" 报错时再回来。</em></li>
+<li><strong>F 连续 / 内存步长（stride）的精确计算</strong>。知道"转置不动内存、所以不连续"就够写代码了。<em>等到你要手写高性能 CUDA kernel 或调试奇怪的 stride bug 时再深入。</em></li>
+<li><strong>bf16 vs fp16 的取舍、混合精度的 GradScaler</strong>。这属于训练优化。<em>等到模型大到显存吃紧、或训练慢需要提速时再回来。</em></li>
+<li><strong><code>pin_memory</code> / 异步 <code>.to(non_blocking=True)</code> 等数据搬运优化</strong>。<em>等到 DataLoader 成为瓶颈时再学。</em></li>
+</ul>
+<p>顺带交代路线：本课的 PyTorch 块只是"参考指针"，真正的手写实现在后两课——<strong>第4课会带你手写一个可跑的 micrograd（自己实现 autograd），第5课手写迷你 Module</strong>。先把机制吃透，封装的库随后自然顺手。</p>
+</div>
+</article>
+<div class="navbtns"><a class="prev" href="lesson-02-numpy-vectorization-broadcasting.html"><div class="nlabel">← 上一课</div><div class="ntitle">第2课 · NumPy 数组、向量化与广播</div></a><a class="next" href="lesson-04-autograd.html"><div class="nlabel">下一课 →</div><div class="ntitle">第4课 · Autograd 自动微分</div></a></div>
+<nav class="toc"><h3>本模块课程表</h3><ol>
+<li><a href="lesson-01-env-scientific-stack.html"><span class="ln">第1课</span>Python 科学计算栈与环境工程</a></li>
+<li><a href="lesson-02-numpy-vectorization-broadcasting.html"><span class="ln">第2课</span>NumPy 数组、向量化与广播</a></li>
+<li class="cur"><span class="ln">第3课</span>PyTorch 张量、设备与 dtype</li>
+<li><a href="lesson-04-autograd.html"><span class="ln">第4课</span>Autograd 自动微分</a></li>
+<li><a href="lesson-05-nn-module.html"><span class="ln">第5课</span>nn.Module 与模型构建</a></li>
+<li class="soon"><span class="ln">第6课</span>从零写训练循环（核心）　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第7课</span>数据加载 Dataset 与 DataLoader　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第8课</span>GPU/CUDA 与混合精度　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第9课</span>实验管理、可复现与调试方法论　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第10课</span>Hugging Face 生态入门　<span class="badge">即将上线</span></li>
+</ol></nav>
+</div>
+<style>
+.pr-cell{border:1px solid #334155;border-radius:10px;margin:1.2em 0;overflow:hidden;background:#0f172a;}
+.pr-head{display:flex;align-items:center;gap:8px;background:#1e293b;color:#cbd5e1;padding:6px 10px;font-size:13px;font-family:system-ui,-apple-system,sans-serif;}
+.pr-title{flex:1;font-weight:600;}
+.pr-status{font-size:12px;color:#94a3b8;white-space:nowrap;max-width:50%;overflow:hidden;text-overflow:ellipsis;}
+.pr-btn{cursor:pointer;border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:6px;padding:3px 11px;font-size:13px;line-height:1.4;}
+.pr-btn:hover{background:#0b1220;}
+.pr-run{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:600;}
+.pr-run:hover{background:#1d4ed8;}
+.pr-cell.collapsed .pr-body{display:none;}
+.pr-editor{position:relative;background:#0f172a;}
+.pr-code,.pr-edit{display:block;width:100%;min-height:68px;border:none;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.55;padding:12px 14px;box-sizing:border-box;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:4;}
+.pr-code{position:absolute;inset:0;margin:0;overflow:hidden;background:#0f172a;color:#dbeafe;pointer-events:none;}
+.pr-edit{position:relative;background:transparent;color:transparent;caret-color:#e2e8f0;resize:vertical;outline:none;-webkit-text-fill-color:transparent;}
+.pr-edit::selection{background:rgba(96,165,250,.34);}
+.tok-kw{color:#c084fc;font-weight:700;}
+.tok-fn{color:#67e8f9;}
+.tok-num{color:#fbbf24;}
+.tok-str{color:#86efac;}
+.tok-comment{color:#94a3b8;font-style:italic;}
+.pr-out{margin:0;padding:10px 14px;border-top:1px solid #334155;background:#0b1220;color:#cbd5e1;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.5;white-space:pre-wrap;max-height:340px;overflow:auto;}
+.pr-out:empty{display:none;}
+.pr-out.err{color:#fca5a5;}
+.pr-cell.ref-cell{border-color:#475569;}
+.pr-cell.ref-cell .pr-head{background:#172033;color:#cbd5e1;}
+.pr-cell.ref-cell .pr-status{color:#fbbf24;font-style:italic;}
+.pr-code.pr-static{position:static;pointer-events:auto;overflow:auto;min-height:auto;background:#0f172a;color:#dbeafe;}
+#pr-fab{position:fixed;right:18px;bottom:18px;z-index:9998;background:#2563eb;color:#fff;border:none;border-radius:999px;padding:10px 17px;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.22);font-family:system-ui,sans-serif;}
+#pr-fab:hover{background:#1d4ed8;}
+#pr-lab{position:fixed;right:18px;bottom:66px;z-index:9999;width:400px;max-width:92vw;background:#0f172a;border:1px solid #334155;border-radius:12px;display:none;flex-direction:column;box-shadow:0 14px 38px rgba(0,0,0,.4);overflow:hidden;}
+#pr-lab.open{display:flex;}
+#pr-lab .pr-edit,#pr-lab .pr-code{min-height:150px;}
+</style>
+<script>
+(function(){
+  var PYBASE="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+  var pyReady=null;
+  function loadPy(status){
+    if(pyReady)return pyReady;
+    pyReady=(async function(){
+      status("正在加载 Python 运行时（首次约 10 秒，需联网）…");
+      await new Promise(function(res,rej){
+        var s=document.createElement("script");s.src=PYBASE+"pyodide.js";
+        s.onload=res;s.onerror=function(){rej(new Error("无法加载 Pyodide（首次运行需要联网）"));};
+        document.head.appendChild(s);
+      });
+      var py=await loadPyodide({indexURL:PYBASE});
+      status("正在加载 NumPy …");
+      await py.loadPackage("numpy");
+      status("Python 就绪 ✓");
+      return py;
+    })();
+    return pyReady;
+  }
+  async function run(code,outEl,statusEl){
+    var setS=function(m){if(statusEl)statusEl.textContent=m;};
+    outEl.classList.remove("err");outEl.textContent="";
+    var py;
+    try{py=await loadPy(setS);}
+    catch(e){outEl.classList.add("err");outEl.textContent="加载失败："+e.message;return;}
+    var buf="";
+    py.setStdout({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    py.setStderr({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    try{
+      var result=await py.runPythonAsync(code);
+      if(result!==undefined&&result!==null){
+        var r;try{r=result.toString();}catch(_){r=String(result);}
+        if(r!=="None")buf+=(buf&&!buf.endsWith("\n")?"\n":"")+r;
+        if(result&&result.destroy)result.destroy();
+      }
+      outEl.textContent=buf||"（运行成功，无输出。用 print(...) 查看结果）";
+    }catch(e){
+      outEl.classList.add("err");
+      outEl.textContent=buf+(buf?"\n":"")+String((e&&e.message)||e);
+    }
+  }
+  var KW={False:1,None:1,True:1,and:1,as:1,assert:1,async:1,await:1,break:1,class:1,continue:1,def:1,del:1,elif:1,else:1,except:1,finally:1,for:1,from:1,global:1,if:1,import:1,in:1,is:1,lambda:1,nonlocal:1,not:1,or:1,pass:1,raise:1,return:1,try:1,while:1,with:1,yield:1};
+  var FN={abs:1,all:1,any:1,array:1,bool:1,dict:1,enumerate:1,float:1,int:1,len:1,list:1,max:1,min:1,np:1,numpy:1,print:1,range:1,round:1,set:1,str:1,sum:1,tuple:1,zip:1,torch:1,nn:1,tensor:1,F:1,super:1,isinstance:1,getattr:1,setattr:1,hasattr:1,sorted:1,type:1,object:1,property:1};
+  function esc(s){return s.replace(/[&<>]/g,function(c){return c==="&"?"&amp;":c==="<"?"&lt;":"&gt;";});}
+  function colorLine(line){
+    var out="",i=0;
+    while(i<line.length){
+      var ch=line[i];
+      if(ch==="#"){out+='<span class="tok-comment">'+esc(line.slice(i))+"</span>";break;}
+      if(ch==="'"||ch==='"'){
+        var q=ch,triple=line.slice(i,i+3)===q+q+q,end=i+(triple?3:1),done=false;
+        while(end<line.length){
+          if(!triple&&line[end]==="\\"){end+=2;continue;}
+          if(triple&&line.slice(end,end+3)===q+q+q){end+=3;done=true;break;}
+          if(!triple&&line[end]===q){end+=1;done=true;break;}
+          end+=1;
+        }
+        out+='<span class="tok-str">'+esc(line.slice(i,done?end:line.length))+"</span>";
+        i=done?end:line.length;
+        continue;
+      }
+      if(/[0-9]/.test(ch)||(ch==="."&&/[0-9]/.test(line[i+1]||""))){
+        var m=line.slice(i).match(/^(?:0[xX][0-9a-fA-F]+|\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?/);
+        out+='<span class="tok-num">'+esc(m[0])+"</span>";i+=m[0].length;continue;
+      }
+      if(/[A-Za-z_]/.test(ch)){
+        var id=line.slice(i).match(/^[A-Za-z_][A-Za-z0-9_]*/)[0];
+        if(KW[id])out+='<span class="tok-kw">'+id+"</span>";
+        else if(FN[id])out+='<span class="tok-fn">'+id+"</span>";
+        else out+=id;
+        i+=id.length;continue;
+      }
+      out+=esc(ch);i+=1;
+    }
+    return out;
+  }
+  function paint(ta){
+    var pre=ta.closest(".pr-editor").querySelector(".pr-code");
+    pre.innerHTML=ta.value.split("\n").map(colorLine).join("\n")+(ta.value.endsWith("\n")?"\n":"");
+    pre.style.height=ta.style.height;
+    pre.scrollTop=ta.scrollTop;pre.scrollLeft=ta.scrollLeft;
+  }
+  function autosize(ta){ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight+2,460)+"px";}
+  function tune(ta){autosize(ta);paint(ta);}
+  function tabKey(e){
+    if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();var b=this.closest(".pr-cell,#pr-lab").querySelector(".pr-run");if(b)b.click();return;}
+    if(e.key==="Tab"){
+      e.preventDefault();
+      var s=this.selectionStart,en=this.selectionEnd,v=this.value,lineStart=v.lastIndexOf("\n",s-1)+1,lineEnd=v.indexOf("\n",en);
+      if(lineEnd<0)lineEnd=v.length;
+      if(s!==en||e.shiftKey){
+        var block=v.slice(lineStart,lineEnd),lines=block.split("\n"),delta=0;
+        if(e.shiftKey){
+          lines=lines.map(function(line){
+            if(line.startsWith("    ")){delta-=4;return line.slice(4);}
+            if(line.startsWith("\t")){delta-=1;return line.slice(1);}
+            return line;
+          });
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=Math.max(lineStart,s+(s===lineStart?0:Math.max(delta/Math.max(lines.length,1),-4)));
+          this.selectionEnd=Math.max(this.selectionStart,en+delta);
+        }else{
+          lines=lines.map(function(line){delta+=4;return "    "+line;});
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=s+4;
+          this.selectionEnd=en+delta;
+        }
+      }else{
+        this.value=v.slice(0,s)+"    "+v.slice(en);this.selectionStart=this.selectionEnd=s+4;
+      }
+      tune(this);
+      return;
+    }
+    if(e.key==="Enter"){
+      e.preventDefault();
+      var a=this.selectionStart,b=this.selectionEnd,text=this.value,start=text.lastIndexOf("\n",a-1)+1;
+      var prefix=text.slice(start,a),indent=(prefix.match(/^\s*/)||[""])[0],code=prefix.replace(/#.*$/,"").trimEnd();
+      var add="\n"+indent+(/:\s*$/.test(code)?"    ":"");
+      this.value=text.slice(0,a)+add+text.slice(b);
+      this.selectionStart=this.selectionEnd=a+add.length;
+      tune(this);
+      return;
+    }
+  }
+  function makeCell(code){
+    var cell=document.createElement("div");cell.className="pr-cell";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">可运行 · Python (NumPy)</span><span class="pr-status"></span><button class="pr-btn pr-toggle">收起</button><button class="pr-btn pr-run">▶ 运行</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    var ta=cell.querySelector(".pr-edit");ta.value=code;
+    var out=cell.querySelector(".pr-out"),st=cell.querySelector(".pr-status");
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    cell.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    var tog=cell.querySelector(".pr-toggle");
+    tog.onclick=function(){cell.classList.toggle("collapsed");tog.textContent=cell.classList.contains("collapsed")?"展开":"收起";};
+    setTimeout(function(){tune(ta);},0);
+    return cell;
+  }
+  function makeRef(code,lang){
+    var cell=document.createElement("div");cell.className="pr-cell ref-cell";
+    var L=lang||"参考";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">参考代码 · '+esc(L)+'</span><span class="pr-status">不在浏览器运行</span></div><pre class="pr-code pr-static"></pre>';
+    cell.querySelector(".pr-static").innerHTML=code.split("\n").map(colorLine).join("\n");
+    return cell;
+  }
+  function enhance(){
+    document.querySelectorAll("article pre").forEach(function(pre){
+      if(pre.closest(".pr-cell"))return;
+      var codeEl=pre.querySelector("code")||pre;
+      var code=codeEl.textContent.replace(/\s+$/,"");
+      if(!code)return;
+      if(pre.classList.contains("ref")){
+        pre.replaceWith(makeRef(code,pre.getAttribute("data-lang")));
+      }else{
+        pre.replaceWith(makeCell(code));
+      }
+    });
+  }
+  function lab(){
+    var fab=document.createElement("button");fab.id="pr-fab";fab.textContent="▶ Python 实验台";
+    var panel=document.createElement("div");panel.id="pr-lab";
+    panel.innerHTML='<div class="pr-head"><span class="pr-title">Python 实验台 · NumPy</span><span class="pr-status"></span><button class="pr-btn pr-run">▶ 运行</button><button class="pr-btn pr-min">收起</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    document.body.appendChild(fab);document.body.appendChild(panel);
+    var ta=panel.querySelector(".pr-edit");
+    ta.value="import numpy as np\na = np.array([3, 2])\nb = np.array([1, 4])\nprint(\"a + b =\", a + b)\nprint(\"a . b =\", a @ b)\nprint(\"|a|  =\", np.linalg.norm(a))\ncos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))\nprint(\"cos =\", round(float(cos), 4))";
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    var out=panel.querySelector(".pr-out"),st=panel.querySelector(".pr-status");
+    panel.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    fab.onclick=function(){panel.classList.toggle("open");};
+    panel.querySelector(".pr-min").onclick=function(){panel.classList.remove("open");};
+    setTimeout(function(){tune(ta);},0);
+  }
+  function init(){enhance();lab();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+<script src="../assets/annotator.js"></script>
+</body>
+</html>
