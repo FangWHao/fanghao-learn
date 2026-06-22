@@ -1,0 +1,70 @@
+<svg viewBox="0 0 640 430" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif">
+<title>基率谬误的人群方框分流图：稀有病阳性者多数没病</title>
+<desc>10000人按0.5%患病率分为50患病与9950健康，患病几乎全被检出（真阳性约50），健康人群5%误报产生约498假阳性，所有约547个阳性里真患病仅约9%。</desc>
+<defs>
+<pattern id="fpHatch" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(45)">
+<rect width="7" height="7" fill="#d97706" fill-opacity="0.22"/>
+<line x1="0" y1="0" x2="0" y2="7" stroke="#d97706" stroke-width="2"/>
+</pattern>
+<marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+<path d="M0,0 L9,4.5 L0,9 z" fill="#1f2937"/>
+</marker>
+<marker id="arrowFunnel" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+<path d="M0,0 L8,4 L0,8 z" fill="#94a3b8"/>
+</marker>
+</defs>
+<rect x="248" y="14" width="144" height="38" rx="5" fill="#2563eb" fill-opacity="0.12" stroke="#2563eb" stroke-width="1.5"/>
+<text x="320" y="32" text-anchor="middle" font-size="14" fill="#1f2937" font-weight="600">10000 人</text>
+<text x="320" y="46" text-anchor="middle" font-size="11" fill="#1f2937">受检人群</text>
+<line x1="320" y1="52" x2="320" y2="64" stroke="#94a3b8" stroke-width="1"/>
+<line x1="118" y1="64" x2="520" y2="64" stroke="#94a3b8" stroke-width="1"/>
+<line x1="118" y1="64" x2="118" y2="76" stroke="#94a3b8" stroke-width="1"/>
+<line x1="520" y1="64" x2="520" y2="76" stroke="#94a3b8" stroke-width="1"/>
+<rect x="62" y="76" width="112" height="30" rx="5" fill="#d97706" fill-opacity="0.14" stroke="#d97706" stroke-width="1.5"/>
+<text x="118" y="89" text-anchor="middle" font-size="13" fill="#1f2937" font-weight="600">患病 50 人</text>
+<text x="118" y="101" text-anchor="middle" font-size="11" fill="#1f2937">基率 0.5%</text>
+<rect x="404" y="76" width="232" height="78" rx="5" fill="#2563eb" fill-opacity="0.12" stroke="#2563eb" stroke-width="1.5"/>
+<text x="520" y="110" text-anchor="middle" font-size="13" fill="#1f2937" font-weight="600">健康 9950 人</text>
+<text x="520" y="126" text-anchor="middle" font-size="11" fill="#1f2937">占人群 99.5%（面积远大于患病）</text>
+<line x1="118" y1="106" x2="118" y2="116" stroke="#94a3b8" stroke-width="1"/>
+<line x1="74" y1="116" x2="162" y2="116" stroke="#94a3b8" stroke-width="1"/>
+<line x1="74" y1="116" x2="74" y2="126" stroke="#94a3b8" stroke-width="1"/>
+<line x1="162" y1="116" x2="162" y2="126" stroke="#94a3b8" stroke-width="1"/>
+<rect x="42" y="126" width="80" height="34" rx="4" fill="#059669" fill-opacity="0.9" stroke="#059669" stroke-width="1.5"/>
+<text x="82" y="140" text-anchor="middle" font-size="12" fill="#ffffff" font-weight="600">真阳性 TP</text>
+<text x="82" y="153" text-anchor="middle" font-size="11" fill="#ffffff">≈ 50（敏感度99%）</text>
+<rect x="128" y="126" width="46" height="34" rx="4" fill="#94a3b8" fill-opacity="0.18" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/>
+<text x="151" y="141" text-anchor="middle" font-size="11" fill="#1f2937">假阴</text>
+<text x="151" y="153" text-anchor="middle" font-size="11" fill="#1f2937">≈ 0</text>
+<line x1="520" y1="154" x2="520" y2="164" stroke="#94a3b8" stroke-width="1"/>
+<line x1="470" y1="164" x2="570" y2="164" stroke="#94a3b8" stroke-width="1"/>
+<line x1="470" y1="164" x2="470" y2="174" stroke="#94a3b8" stroke-width="1"/>
+<line x1="570" y1="164" x2="570" y2="174" stroke="#94a3b8" stroke-width="1"/>
+<rect x="404" y="174" width="100" height="40" rx="4" fill="url(#fpHatch)" stroke="#d97706" stroke-width="1.5"/>
+<text x="454" y="190" text-anchor="middle" font-size="12" fill="#1f2937" font-weight="600">假阳性 FP</text>
+<text x="454" y="204" text-anchor="middle" font-size="11" fill="#1f2937">≈ 498（误报5%）</text>
+<rect x="510" y="174" width="126" height="40" rx="4" fill="#94a3b8" fill-opacity="0.14" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/>
+<text x="573" y="190" text-anchor="middle" font-size="12" fill="#1f2937">真阴性 TN</text>
+<text x="573" y="204" text-anchor="middle" font-size="11" fill="#1f2937">≈ 9452</text>
+<path d="M82,160 C82,232 250,232 270,298" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arrowFunnel)"/>
+<path d="M454,214 C454,260 360,262 350,298" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arrowFunnel)"/>
+<text x="320" y="258" text-anchor="middle" font-size="13" fill="#1f2937" font-weight="600">所有阳性 ≈ 547 人</text>
+<text x="320" y="274" text-anchor="middle" font-size="11" fill="#1f2937">把上面两个阳性块并排，按面积比例</text>
+<g>
+<rect x="80" y="302" width="44" height="44" fill="#059669" fill-opacity="0.9" stroke="#059669" stroke-width="1.5"/>
+<rect x="124" y="302" width="436" height="44" fill="url(#fpHatch)" stroke="#d97706" stroke-width="1.5"/>
+<text x="102" y="328" text-anchor="middle" font-size="11" fill="#ffffff" font-weight="600">TP</text>
+<text x="102" y="340" text-anchor="middle" font-size="11" fill="#ffffff">50</text>
+<text x="342" y="322" text-anchor="middle" font-size="12" fill="#1f2937" font-weight="600">假阳性 FP ≈ 498</text>
+<text x="342" y="338" text-anchor="middle" font-size="11" fill="#1f2937">健康人群的误报淹没了真患者</text>
+</g>
+<line x1="102" y1="372" x2="102" y2="349" stroke="#1f2937" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="120" y="385" text-anchor="start" font-size="12" fill="#059669" font-weight="600">P(病 | +) = 50 / 547 ≈ 9%</text>
+<text x="320" y="412" text-anchor="middle" font-size="12" fill="#d97706" font-weight="600">稀有病：庞大健康人群的假阳性淹没了真阳性</text>
+<rect x="62" y="220" width="12" height="12" fill="#059669" fill-opacity="0.9"/>
+<text x="79" y="230" font-size="11" fill="#1f2937">真阳/真患者</text>
+<rect x="170" y="220" width="12" height="12" fill="url(#fpHatch)" stroke="#d97706" stroke-width="1"/>
+<text x="187" y="230" font-size="11" fill="#1f2937">阳性/假阳</text>
+<rect x="268" y="220" width="12" height="12" fill="#2563eb" fill-opacity="0.12" stroke="#2563eb" stroke-width="1"/>
+<text x="285" y="230" font-size="11" fill="#1f2937">健康/真阴</text>
+</svg>

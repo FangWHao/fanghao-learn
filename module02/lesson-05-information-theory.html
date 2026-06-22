@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块2 · 第5课 · 信息论——熵、交叉熵、KL</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/annotator.css">
+
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue-bg:#eff6ff;
+--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--pink:#db2777;
+--red:#dc2626;--red-bg:#fef2f2;--bg:#ffffff;--soft:#f8fafc;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);
+font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.85;font-size:17px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:840px;margin:0 auto;padding:0 22px 100px;}
+header.top{background:#fff;border-bottom:1px solid var(--line);padding:26px 22px 22px;margin-bottom:14px;}
+header.top .inner{max-width:840px;margin:0 auto;}
+.crumb{color:var(--muted);font-size:14px;letter-spacing:.3px;margin-bottom:6px;}
+h1{font-size:30px;line-height:1.3;margin:.1em 0 .2em;}
+.sub{color:var(--muted);font-size:15px;}
+article{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:30px 34px;margin-top:18px;}
+h2{font-size:23px;margin:1.7em 0 .6em;padding-bottom:.25em;border-bottom:2px solid var(--line);}
+h2:first-child{margin-top:.2em;}
+h3{font-size:19px;margin:1.3em 0 .4em;color:#0f172a;}
+h4{margin:.2em 0 .5em;font-size:16px;}
+p{margin:.7em 0;}
+ul,ol{padding-left:1.3em;margin:.6em 0;}
+li{margin:.32em 0;}
+code{background:#f1f5f9;padding:.12em .4em;border-radius:5px;font-size:.9em;
+font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a;}
+pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 18px;overflow:auto;font-size:14px;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0;}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:15.5px;}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+thead th{background:var(--soft);}
+figure.fig{margin:1.4em 0;text-align:center;}
+figure.fig svg{max-width:100%;height:auto;}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
+.note,.ml,.key,.pitfall,.example{border-radius:10px;padding:14px 18px;margin:1.2em 0;border:1px solid var(--line);}
+.note{background:var(--soft);border-left:4px solid #94a3b8;}
+.example{background:#fff;border-left:4px solid var(--blue);}
+.ml{background:var(--green-bg);border-left:4px solid var(--green);}
+.key{background:var(--amber-bg);border-left:4px solid var(--amber);}
+.pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.goals{background:var(--blue-bg);border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:10px;padding:14px 20px;margin:.2em 0 1.5em;}
+.goals h4{margin:.1em 0 .5em;color:#1e3a8a;}
+.goals ul{margin:.3em 0;}
+.skip{background:var(--soft);border:1px solid var(--line);border-left:4px solid #94a3b8;border-radius:10px;padding:14px 20px;margin:1.8em 0 0;color:#475569;}
+.skip h4{margin:.1em 0 .5em;color:#475569;}
+.tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
+.toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
+.toc h3{margin:.1em 0 .7em;}
+.toc ol{list-style:none;padding:0;}
+.toc li{padding:7px 10px;border-radius:8px;color:#334155;border:1px solid transparent;}
+.toc li a{color:inherit;text-decoration:none;display:block;}
+.toc li .ln{display:inline-block;min-width:54px;color:var(--muted);font-size:13px;}
+.toc li.cur{background:var(--blue-bg);border-color:#bfdbfe;font-weight:600;color:#1e3a8a;}
+.toc li:not(.cur):hover{background:var(--soft);}
+.navbtns{display:flex;justify-content:space-between;margin-top:22px;gap:12px;}
+.navbtns a{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--ink);}
+.navbtns a:hover{border-color:var(--blue);}
+.navbtns .nlabel{color:var(--muted);font-size:13px;}
+.navbtns .ntitle{font-weight:600;margin-top:3px;}
+.navbtns .next{text-align:right;}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.here{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:6px 0 4px;font-size:15px;color:#1e3a8a;line-height:1.7;}
+.here b{font-weight:700;}
+.cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
+.card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
+.card:hover{border-color:var(--blue);}
+.card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
+.card .ct{font-size:18px;font-weight:600;}
+.card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+.card .cap{margin-left:40px;margin-top:7px;font-size:13px;color:#1e3a8a;}
+.card .cap .lbl{display:inline-block;background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;margin-right:7px;}
+
+.card.soon{opacity:.6;cursor:default;}
+.card.soon:hover{border-color:var(--line);}
+.badge{display:inline-block;background:#e2e8f0;color:#475569;font-size:11px;font-weight:600;padding:1px 8px;border-radius:20px;margin-left:8px;vertical-align:middle;}
+.toc li.soon{color:#94a3b8;}
+.toc li.soon .badge{margin-left:4px;}
+</style>
+</head>
+<body>
+<header class="top"><div class="inner">
+<div class="crumb"><a href="index.html" style="color:inherit">模块 2 · 概率统计、信息论与最优化</a>　/　第 5 课（共 10 课）</div>
+<h1>信息论——熵、交叉熵、KL</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　阶段0：数学与工具基础　·　<strong>能力点：</strong>信息论——交叉熵/KL：深度学习最常用损失的来源（VAE/RLHF 的埋点）</div>
+</div></header>
+<div class="wrap">
+<article>
+<p>上一课我们用最大似然（MLE）把"概率假设"翻译成了"损失函数"：分类得到交叉熵、高斯回归得到 MSE。但你可能还有个疑问——<em>为什么那个 −∑ p log q 长这样？它到底在度量什么？为什么我们优化它，却说自己在"逼近真实分布"？</em>这一课用信息论把这层窗户纸彻底捅破：交叉熵、KL 散度、最大似然其实是同一件事的三种说法，它们在一个恒等式上"三线汇合"。</p>
+
+<div class="goals">
+  <h4>读完这一课，你将能够</h4>
+  <ul>
+    <li>用"惊讶程度"解释自信息 \(-\log p\)，并说清 bit 与 nat 的区别；</li>
+    <li>手算一个离散分布的熵 \(H(p)\)、交叉熵 \(H(p,q)\) 与 KL 散度 \(D_{\mathrm{KL}}(p\|q)\)，并验证恒等式 \(H(p,q)=H(p)+D_{\mathrm{KL}}(p\|q)\)；</li>
+    <li>说明为什么"最小化交叉熵 ⟺ 最小化 KL ⟺ 最大化似然"，以及为何我们优化交叉熵而非直接优化 KL；</li>
+    <li>区分前向 KL（覆盖众峰）与反向 KL（锁单峰）的行为差异，并指出 KL 为什么不是距离；</li>
+    <li>用 numpy 实现 entropy/cross_entropy/kl，并理解 log-sum-exp 的数值稳定技巧。</li>
+  </ul>
+</div>
+
+<h2>一、自信息：一件事有多"令人惊讶"</h2>
+
+<p>先抛开公式，想一个现实问题：<strong>一条消息携带的"信息量"该怎么量化？</strong></p>
+
+<p>直觉上有三条要求。第一，<em>越罕见的事，发生时信息量越大</em>。"今天太阳照常升起"几乎是废话（信息量≈0），"楼下中了一注头奖"则信息量爆表。第二，<em>必然发生的事（概率为 1）信息量应为 0</em>。第三，<em>两个独立事件一起发生，信息量应该相加</em>：你告诉我"硬币正面"再告诉我"骰子是 6"，总信息量等于分别告知之和。</p>
+
+<p>什么函数同时满足"概率越小值越大""\(p=1\) 时为 0""乘法变加法"？答案是负对数：</p>
+
+\[
+I(x) = -\log p(x).
+\]
+
+<p>把它叫作<strong>自信息（self-information）</strong>或<strong>惊讶度（surprisal）</strong>。验证三条性质：\(p\to 0\) 时 \(-\log p\to+\infty\)（越罕见越惊讶）；\(p=1\) 时 \(-\log 1=0\)（毫不惊讶）；独立事件 \(p(x,y)=p(x)p(y)\)，于是 \(-\log p(x,y)=-\log p(x)-\log p(y)\)（信息相加）。乘法变加法，正是对数的看家本领。</p>
+
+<figure class="fig"><svg viewBox="0 0 520 380" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>自信息 I(x)=−log p(x) 关于概率 p 的曲线</title><defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#d97706"/></marker><marker id="axA" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs><text x="260" y="26" text-anchor="middle" font-size="14" fill="#1f2937" font-weight="600">自信息 I(x) = −log p(x)</text><line x1="70" y1="40" x2="70" y2="312" stroke="#e2e8f0" stroke-width="0.75"/><line x1="180" y1="40" x2="180" y2="312" stroke="#e2e8f0" stroke-width="0.75"/><line x1="290" y1="40" x2="290" y2="312" stroke="#e2e8f0" stroke-width="0.75"/><line x1="400" y1="40" x2="400" y2="312" stroke="#e2e8f0" stroke-width="0.75"/><line x1="70" y1="220" x2="465" y2="220" stroke="#e2e8f0" stroke-width="0.75"/><line x1="70" y1="128" x2="465" y2="128" stroke="#e2e8f0" stroke-width="0.75"/><line x1="60" y1="312" x2="475" y2="312" stroke="#94a3b8" stroke-width="1" marker-end="url(#axA)"/><line x1="70" y1="320" x2="70" y2="36" stroke="#94a3b8" stroke-width="1" marker-end="url(#axA)"/><text x="478" y="316" font-size="13" fill="#1f2937">p</text><text x="56" y="40" text-anchor="end" font-size="13" fill="#1f2937">I</text><text x="66" y="328" text-anchor="middle" font-size="11" fill="#94a3b8">0</text><text x="180" y="328" text-anchor="middle" font-size="11" fill="#94a3b8">0.25</text><text x="290" y="328" text-anchor="middle" font-size="11" fill="#94a3b8">0.5</text><text x="400" y="328" text-anchor="middle" font-size="11" fill="#94a3b8">0.75</text><text x="464" y="328" text-anchor="middle" font-size="11" fill="#94a3b8">1.0</text><text x="62" y="312" text-anchor="end" font-size="11" fill="#94a3b8">0</text><text x="62" y="224" text-anchor="end" font-size="11" fill="#94a3b8">1</text><text x="62" y="132" text-anchor="end" font-size="11" fill="#94a3b8">2</text><text x="62" y="64" text-anchor="end" font-size="11" fill="#94a3b8">3 nat</text><path d="M74.4,55.7 L96,128.5 L114,163.0 L136,196.3 L158,219.7 L180,237.4 L202,251.7 L224,263.7 L246,274.1 L268,283.3 L290,291.5 L312,299.0 L334,305.7 L356,311.9 L378,317.5 L400,322.6 L422,327.3 L440,330.8 L464,335.0" stroke="#2563eb" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="290" y1="220" x2="290" y2="248" stroke="#d97706" stroke-width="1" stroke-dasharray="4 3"/><line x1="70" y1="248" x2="290" y2="248" stroke="#d97706" stroke-width="1" stroke-dasharray="4 3"/><circle cx="290" cy="248" r="4" fill="#d97706"/><text x="298" y="240" font-size="12" fill="#d97706">p=1/2：−log₂(0.5)=1 bit</text><circle cx="464" cy="312" r="4" fill="#059669"/><text x="458" y="300" text-anchor="end" font-size="12" fill="#059669">I=0 必然事件</text><line x1="92" y1="120" x2="80" y2="62" stroke="#d97706" stroke-width="2" fill="none" marker-end="url(#ah)"/><text x="120" y="92" font-size="12" fill="#d97706" font-weight="600">越罕见越惊讶 →∞</text><text x="118" y="108" font-size="11" fill="#94a3b8">(p→0)</text><text x="305" y="360" text-anchor="middle" font-size="11" fill="#94a3b8">纵轴：I(x)=−ln p（nat）；右侧虚线对照 bit 刻度</text></svg><figcaption>自信息 I(x)=−log p(x) 关于概率 p 的曲线：p→0 时信息量→∞（罕见事件极令人惊讶），p=1 时信息量=0（必然事件毫无信息）。叠加标出 p=1/2 处自信息恰为 1 bit。</figcaption></figure>
+
+<div class="note">
+  <p><strong>bit 还是 nat？只是换了把尺子。</strong>用 \(\log_2\) 时单位是 <strong>bit（比特）</strong>：一次公平抛硬币的结果 \(p=1/2\)，自信息 \(-\log_2(1/2)=1\) bit——恰好是"一个二进制位"能携带的信息。用自然对数 \(\ln\) 时单位是 <strong>nat（奈特）</strong>。两者只差一个常数因子：从 nat 换到 bit 要除以 \(\ln 2\)，即 \(1\text{ nat}=1/\ln 2\approx 1.4427\text{ bit}\)，反过来 \(1\text{ bit}=\ln 2\approx 0.6931\text{ nat}\)。深度学习里一律用 \(\ln\)（求导干净），所以本课公式默认 \(\ln\)，只在讲"编码长度"直觉时用 \(\log_2\)。</p>
+</div>
+
+<h2>二、熵：平均惊讶 = 平均不确定性 = 最优编码长度</h2>
+
+<p>自信息说的是"某一个事件"。但一个随机变量 \(X\) 会按分布 \(p\) 吐出各种取值，我们关心的是<strong>平均下来有多惊讶</strong>——这就是<strong>熵（entropy）</strong>，即自信息关于 \(p\) 的期望：</p>
+
+\[
+H(p) \;=\; \mathbb{E}_{x\sim p}\big[-\log p(x)\big] \;=\; -\sum_x p(x)\log p(x).
+\]
+
+<p>它有三个等价的解读，建议你全都收下：</p>
+
+<ul>
+  <li><strong>平均不确定性</strong>：分布越"摊平"，你越猜不准下一个取值，熵越大。</li>
+  <li><strong>最优编码的平均长度</strong>（用 \(\log_2\)，单位 bit）：信息论的核心结果（Shannon）是，如果你要为来自 \(p\) 的符号设计一套二进制编码，把<em>常见符号编短、罕见符号编长</em>，那么平均每个符号至少需要 \(H(p)\) 个 bit，且能逼近这个下界。熵就是"这堆数据本质上有多少信息、压缩极限是多少"。</li>
+  <li><strong>平均惊讶</strong>：每次开盲盒的惊讶程度的长期平均。</li>
+</ul>
+
+<p>两个极端把直觉钉牢：</p>
+
+<div class="key">
+  <ul>
+    <li><strong>完全确定 ⇒ 熵 = 0</strong>。若某个取值概率为 1，其余为 0，则 \(H=-1\cdot\log 1=0\)。没有任何不确定性，无需任何编码。</li>
+    <li><strong>均匀分布 ⇒ 熵最大</strong>。\(n\) 个等可能取值时 \(H=\log n\)（这是 \(n\) 个取值能达到的上限）。最摸不准，最难压缩。</li>
+  </ul>
+</div>
+
+<p>用偏置硬币把这条曲线画出来最清楚。一枚正面概率为 \(p\) 的硬币，其熵（伯努利熵）是</p>
+
+\[
+H(p) = -p\log p-(1-p)\log(1-p).
+\]
+
+<p>\(p=0\) 或 \(p=1\) 时硬币结果已注定，\(H=0\)；\(p=0.5\) 时最公平、最难猜，熵取最大值（\(\ln 2\approx0.693\) nat，即 1 bit——回到第一节那把尺子，\(1\text{ bit}=\ln 2\text{ nat}\)，两边对得上）。曲线是一个对称的拱形。</p>
+
+<figure class="fig"><svg viewBox="0 0 520 360" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>伯努利熵 H(p) 关于偏置 p 的对称拱形曲线</title><defs><marker id="ah" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker></defs><line x1="70" y1="60" x2="70" y2="290" stroke="#94a3b8" stroke-width="1" marker-end="url(#ah)"/><line x1="70" y1="290" x2="470" y2="290" stroke="#94a3b8" stroke-width="1" marker-end="url(#ah)"/><line x1="270" y1="100" x2="270" y2="290" stroke="#e2e8f0" stroke-width="0.75" stroke-dasharray="4 3"/><line x1="70" y1="100" x2="270" y2="100" stroke="#e2e8f0" stroke-width="0.75" stroke-dasharray="4 3"/><path d="M70,290 C110,150 150,108 270,100 C390,108 430,150 470,290" fill="#2563eb" fill-opacity="0.08" stroke="none"/><path d="M70,290 C110,150 150,108 270,100 C390,108 430,150 470,290" fill="none" stroke="#2563eb" stroke-width="2"/><circle cx="270" cy="100" r="3.5" fill="#d97706"/><circle cx="70" cy="290" r="3.5" fill="#059669"/><circle cx="470" cy="290" r="3.5" fill="#059669"/><text x="270" y="80" text-anchor="middle" font-size="12" fill="#d97706">最大不确定性</text><text x="270" y="94" text-anchor="middle" font-size="12" fill="#d97706">ln2≈0.693 nat = 1 bit</text><text x="70" y="315" text-anchor="middle" font-size="12" fill="#059669">完全确定</text><text x="70" y="329" text-anchor="middle" font-size="12" fill="#059669">H=0</text><text x="470" y="315" text-anchor="middle" font-size="12" fill="#059669">完全确定</text><text x="470" y="329" text-anchor="middle" font-size="12" fill="#059669">H=0</text><text x="70" y="306" text-anchor="middle" font-size="11" fill="#1f2937">0</text><text x="270" y="306" text-anchor="middle" font-size="11" fill="#1f2937">0.5</text><text x="470" y="306" text-anchor="middle" font-size="11" fill="#1f2937">1</text><text x="60" y="104" text-anchor="end" font-size="11" fill="#1f2937">0.693</text><text x="60" y="294" text-anchor="end" font-size="11" fill="#1f2937">0</text><text x="270" y="350" text-anchor="middle" font-size="14" fill="#1f2937">偏置 p</text><text x="24" y="175" text-anchor="middle" font-size="14" fill="#1f2937" transform="rotate(-90 24 175)">熵 H(p)（nat）</text></svg><figcaption>伯努利熵 H(p)=−p log p−(1−p) log(1−p) 关于偏置 p 的曲线：在 p=0.5 处取最大（最难猜），在 p=0 与 p=1 两端为 0（结果已注定）。呈对称拱形。</figcaption></figure>
+
+<div class="example">
+  <h4>例题：三点分布的熵</h4>
+  <p>设 \(p=(0.5,\,0.25,\,0.25)\)。逐项算自信息再加权平均（用 \(\ln\)）：</p>
+  \[
+  H(p) = -\big(0.5\ln 0.5 + 0.25\ln 0.25 + 0.25\ln 0.25\big).
+  \]
+  <p>由 \(-\ln 0.5=0.6931,\ -\ln 0.25=1.3863\)：</p>
+  \[
+  H(p)=0.5(0.6931)+0.25(1.3863)+0.25(1.3863)=1.0397\ \text{nat}.
+  \]
+  <p>换成 bit：\(1.0397/\ln 2 = 1.5\) bit。这个 \(1.5\) 很美——它说"用最优编码，平均每个符号要 1.5 个二进制位"。事实上把 0.5 那个符号编成 <code>0</code>（1 位）、另两个编成 <code>10</code>、<code>11</code>（各 2 位），平均长度 \(0.5\cdot1+0.25\cdot2+0.25\cdot2=1.5\) bit，正好达到熵的下界。</p>
+</div>
+
+<h2>三、交叉熵：用"错的码本"去编码会多花多少</h2>
+
+<p>现实里我们几乎从不知道真分布 \(p\)。模型给出的是一个<em>估计</em> \(q\)。假设真实数据来自 \(p\)，但我们手里只有为 \(q\) 设计的那套编码（把 \(q\) 认为常见的符号编短），<strong>用这套"可能不对的码本"去编码真实数据，平均要花多长？</strong>这就是<strong>交叉熵（cross-entropy）</strong>：</p>
+
+\[
+H(p,q) \;=\; \mathbb{E}_{x\sim p}\big[-\log q(x)\big] \;=\; -\sum_x p(x)\log q(x).
+\]
+
+<p>注意区别：抽样的频率用<em>真分布 \(p\)</em>（数据真的从这儿来），但每个符号的编码长度 \(-\log q(x)\) 用<em>错的 \(q\)</em>（我们以为它来自这儿）。如果 \(q=p\)，码本完美匹配数据，交叉熵就退化成熵 \(H(p)\)。如果 \(q\neq p\)，必然有浪费。这条"浪费不会是负的"由 <strong>Gibbs 不等式</strong>保证：</p>
+
+\[
+\boxed{\,H(p,q)\ \ge\ H(p)\,}\qquad\text{等号当且仅当 } q=p.
+\]
+
+<div class="ml">
+  <h4><span class="tag">ML</span> 和 ML 的联系：分类交叉熵就是这个交叉熵</h4>
+  <p>上一课那个分类损失，正是交叉熵 \(H(p,q)\) 的特例。把真标签写成 <strong>one-hot 分布</strong> \(p\)（正确类那一项为 1，其余为 0），把模型 softmax 输出写成预测分布 \(q=\hat y\)。代入定义：</p>
+  \[
+  H(p,\hat y) = -\sum_c p_c\log \hat y_c = -1\cdot\log \hat y_{\text{正确类}} = -\log \hat y_{\text{正确类}}.
+  \]
+  <p>求和里只有正确类那一项幸存（其余 \(p_c=0\)），剩下的恰好是上一课的 <strong>负对数似然（NLL）</strong>。"分类交叉熵 = NLL"在这里彻底对上了：one-hot 是一种特别"尖"的真分布。</p>
+</div>
+
+<h2>四、KL 散度：交叉熵比熵多出来的那块"浪费"</h2>
+
+<p>Gibbs 不等式说 \(H(p,q)\ge H(p)\)，那这个"多出来的差"本身就是个有用的量——它度量 \(q\) 偏离 \(p\) 有多远。给它起名 <strong>KL 散度（Kullback–Leibler divergence）</strong>：</p>
+
+\[
+D_{\mathrm{KL}}(p\|q) \;=\; H(p,q)-H(p) \;=\; \sum_x p(x)\log\frac{p(x)}{q(x)}.
+\]
+
+<p>两种写法是同一回事（把 \(H(p,q)-H(p)\) 展开，\(-\sum p\log q+\sum p\log p=\sum p\log(p/q)\)）。它的含义非常具体：<em>因为用了错的码本 \(q\)，每个符号平均多花的 bit 数</em>。</p>
+
+<div class="key">
+  <p>KL 的三条性质，每条都要记住：</p>
+  <ul>
+    <li><strong>非负</strong>：\(D_{\mathrm{KL}}(p\|q)\ge 0\)，当且仅当 \(p=q\) 时为 0（这正是 Gibbs 不等式的另一种说法）。</li>
+    <li><strong>不对称</strong>：一般 \(D_{\mathrm{KL}}(p\|q)\neq D_{\mathrm{KL}}(q\|p)\)。"p 偏离 q"和"q 偏离 p"是两个不同的数。</li>
+    <li><strong>不满足三角不等式</strong>，所以<em>它不是一个距离（metric）</em>。</li>
+  </ul>
+</div>
+
+<div class="pitfall">
+  <p><strong>易错：别把 KL 当"距离"。</strong>很多人脑子里把 \(D_{\mathrm{KL}}(p\|q)\) 想成 "\(p\) 和 \(q\) 之间的距离"，这会害你。距离必须对称（\(d(a,b)=d(b,a)\)）且满足三角不等式，KL 两条都不满足。正确的叫法是<strong>散度（divergence）</strong>——一个"从 \(p\) 看 \(q\) 有多别扭"的有向、不对称的度量。后面前向/反向 KL 行为迥异，根子就在这个不对称上。</p>
+</div>
+
+<h2>五、★核心：三线汇合 —— 交叉熵、KL、最大似然是同一件事</h2>
+
+<p>把上面那个定义移项，得到本课的中心恒等式：</p>
+
+\[
+\boxed{\,H(p,q) \;=\; H(p) \;+\; D_{\mathrm{KL}}(p\|q)\,}
+\]
+
+<p>用一根柱子看最直观：<strong>底部是 \(H(p)\)（数据本身的不可压缩信息），上面叠一段 \(D_{\mathrm{KL}}(p\|q)\)（因模型不完美造成的浪费），加起来才是交叉熵 \(H(p,q)\)</strong>。\(q\) 越接近 \(p\)，上面那段越短；\(q=p\) 时浪费归零，柱子缩到只剩 \(H(p)\)。</p>
+
+<figure class="fig"><svg viewBox="0 0 540 440" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>交叉熵分解为熵 H(p) 加 KL 散度，训练只能压缩 KL 段</title><defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#d97706"/></marker><marker id="arb" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#1f2937"/></marker><pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="7" height="7" fill="#d97706" fill-opacity="0.1"/><line x1="0" y1="0" x2="0" y2="7" stroke="#d97706" stroke-width="2"/></pattern></defs><text x="270" y="26" font-size="14" fill="#1f2937" text-anchor="middle" font-weight="600">交叉熵的分解：H(p,q) = H(p) + D_KL(p‖q)</text><line x1="120" y1="60" x2="120" y2="360" stroke="#94a3b8" stroke-width="1"/><line x1="120" y1="360" x2="430" y2="360" stroke="#94a3b8" stroke-width="1"/><rect x="155" y="240" width="70" height="120" fill="#2563eb" fill-opacity="0.85"/><rect x="155" y="80" width="70" height="160" fill="url(#hatch)" stroke="#d97706" stroke-width="2"/><line x1="120" y1="240" x2="225" y2="240" stroke="#1f2937" stroke-width="1" stroke-dasharray="4 3"/><line x1="135" y1="80" x2="135" y2="240" stroke="#1f2937" stroke-width="1.5"/><polyline points="139 84 135 80 131 84" fill="none" stroke="#1f2937" stroke-width="1.5"/><polyline points="139 236 135 240 131 236" fill="none" stroke="#1f2937" stroke-width="1.5"/><text x="190" y="305" font-size="12" fill="#ffffff" text-anchor="middle" font-weight="600">H(p)</text><text x="190" y="166" font-size="12" fill="#b45309" text-anchor="middle" font-weight="600">D_KL(p‖q)</text><text x="116" y="160" font-size="11" fill="#1f2937" text-anchor="end">H(p,q)</text><text x="116" y="174" font-size="11" fill="#1f2937" text-anchor="end">交叉熵</text><text x="248" y="316" font-size="11" fill="#1f2937">H(p) 数据固有信息</text><text x="248" y="330" font-size="11" fill="#64748b">（常数，与 θ 无关）</text><text x="248" y="158" font-size="11" fill="#b45309">D_KL(p‖q) 模型偏差的浪费</text><line x1="445" y1="80" x2="445" y2="160" stroke="#d97706" stroke-width="2" marker-end="url(#ar)"/><text x="438" y="110" font-size="11" fill="#d97706" text-anchor="end">压缩</text><text x="270" y="392" font-size="12" fill="#d97706" text-anchor="middle" font-weight="600">训练 = 压缩这一段 ⟺ 最小化 KL ⟺ 最大似然</text><text x="270" y="410" font-size="11" fill="#64748b" text-anchor="middle">（H(p) 是地板，训练动不了）</text><rect x="340" y="240" width="55" height="120" fill="#2563eb" fill-opacity="0.18" stroke="#2563eb" stroke-width="1" stroke-dasharray="4 3"/><line x1="340" y1="240" x2="395" y2="240" stroke="#059669" stroke-width="1.5" stroke-dasharray="4 3"/><text x="367" y="305" font-size="11" fill="#2563eb" text-anchor="middle">H(p)</text><text x="367" y="234" font-size="11" fill="#059669" text-anchor="middle">浪费归零</text><text x="367" y="376" font-size="11" fill="#059669" text-anchor="middle">q=p 时</text></svg><figcaption>三线汇合的柱状分解：交叉熵 H(p,q) = 底部的熵 H(p)（数据固有、与参数无关的常数）+ 上方叠加的 KL 散度 D_KL(p‖q)（模型不完美造成的额外浪费）。训练只能压缩上面那段。</figcaption></figure>
+
+<p>现在看关键一步。训练时，真分布 \(p\)（数据分布）是<strong>给定的、与模型参数 \(\theta\) 无关</strong>的——数据就摆在那，它的熵 \(H(p)\) 是个<em>常数</em>。我们只能调 \(q=q_\theta\)。于是对 \(\theta\) 求最小：</p>
+
+\[
+\min_\theta\, H(p,q_\theta) \;=\; \min_\theta\Big[\underbrace{H(p)}_{\text{常数}} + D_{\mathrm{KL}}(p\|q_\theta)\Big] \;\Longleftrightarrow\; \min_\theta\, D_{\mathrm{KL}}(p\|q_\theta).
+\]
+
+<p>常数项不影响极小值的位置。所以<strong>最小化交叉熵，等价于最小化 KL 散度</strong>。而上一课已证最小化交叉熵就是最大化似然。三者汇合：</p>
+
+<div class="key">
+  <p>\[
+  \min_\theta H(p,q_\theta)\;\Longleftrightarrow\;\min_\theta D_{\mathrm{KL}}(p\|q_\theta)\;\Longleftrightarrow\;\max_\theta\ \text{似然}.
+  \]</p>
+  <p><strong>这就是"我们优化交叉熵而不直接优化 KL"的全部原因：</strong>两者只差常数 \(H(p)\)，梯度完全相同，而交叉熵更好算（不需要知道 \(H(p)\)，one-hot 标签直接给出 \(-\log\hat y_{\text{正确}}\)）。我们嘴上说"让模型逼近真分布"（最小化 KL），手上写的却是交叉熵——它们是同一个优化问题。</p>
+</div>
+
+<div class="example">
+  <h4>例题：验证三线汇合</h4>
+  <p>真分布 \(p=(0.5,0.25,0.25)\)，已算出 \(H(p)=1.0397\) nat。两个预测：</p>
+  <ul>
+    <li>\(q_1=(0.4,0.4,0.2)\)：\(H(p,q_1)=-[0.5\ln0.4+0.25\ln0.4+0.25\ln0.2]=1.0896\)。则 \(D_{\mathrm{KL}}(p\|q_1)=1.0896-1.0397=0.0499\)。</li>
+    <li>\(q_2=(0.1,0.45,0.45)\)：\(H(p,q_2)=1.5505\)，\(D_{\mathrm{KL}}(p\|q_2)=1.5505-1.0397=0.5108\)。</li>
+  </ul>
+  <p>验证恒等式：\(H(p)+D_{\mathrm{KL}}(p\|q_1)=1.0397+0.0499=1.0896=H(p,q_1)\) ✓。两个都对得上。并且 \(q_1\) 比 \(q_2\) 离 \(p\) 近（KL 更小），所以 \(q_1\) 是更好的预测——交叉熵也确实更小，方向一致。</p>
+</div>
+
+<div class="example">
+  <h4>例题：one-hot 时交叉熵 = −log ŷ_正确</h4>
+  <p>真标签是第 2 类，\(p=(0,1,0)\)；模型预测 \(\hat y=(0.2,0.7,0.1)\)。交叉熵 \(H(p,\hat y)=-[0\cdot\ln0.2+1\cdot\ln0.7+0\cdot\ln0.1]=-\ln0.7=0.3567\)。直接算 \(-\ln\hat y_{\text{正确}}=-\ln0.7=0.3567\) ✓。注意此时 \(H(p)=0\)（one-hot 完全确定），所以 \(D_{\mathrm{KL}}(p\|\hat y)=H(p,\hat y)-0=0.3567\)：交叉熵和 KL 数值相等。这解释了分类任务里"交叉熵就是 KL"——因为真标签的熵是 0。</p>
+</div>
+
+<h2>六、前向 KL vs 反向 KL：覆盖众峰还是锁住一峰</h2>
+
+<p>KL 不对称，意味着"拿哪个分布当参照"会得到完全不同的拟合行为。这在生成模型里是生死攸关的设计选择。设真分布 \(p\) 是一个<strong>双峰</strong>分布，而我们的模型 \(q\) 只能是<strong>单峰</strong>（比如一个高斯）。</p>
+
+<ul>
+  <li><strong>前向 KL（forward）\(D_{\mathrm{KL}}(p\|q)=\sum p\log(p/q)\)</strong>：求和按 \(p\) 加权。哪里 \(p\) 大，哪里就被重点惩罚——而一旦某处 \(p>0\) 却 \(q\approx0\)，\(\log(p/q)\to+\infty\)，惩罚爆炸。所以 \(q\) <strong>不敢在任何 \(p\) 有质量的地方留空</strong>，结果是 \(q\) 摊开、跨坐在两个峰之间去<em>覆盖众峰（mean-seeking / mode-covering）</em>，也叫<strong>矩匹配</strong>。代价是峰谷之间的低概率区被 \(q\) 错误地赋了不小的概率。</li>
+  <li><strong>反向 KL（reverse）\(D_{\mathrm{KL}}(q\|p)=\sum q\log(q/p)\)</strong>：求和按 \(q\) 加权。哪里 \(q\) 大才计入惩罚；只要 \(q\) 在 \(p\) 很小的地方<em>也很小</em>，就几乎不受罚。于是 \(q\) <strong>倾向于躲进 \(p\) 的某一个峰里、把另一个峰直接忽略</strong>——<em>寻峰 / 锁单峰（mode-seeking）</em>。代价是漏掉了 \(p\) 的其他峰（mode collapse）。</li>
+</ul>
+
+<figure class="fig"><svg viewBox="0 0 540 320" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>前向 KL 覆盖众峰 vs 反向 KL 锁单峰</title><defs><marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker></defs><text x="270" y="20" text-anchor="middle" font-size="14" fill="#1f2937" font-weight="bold">前向 KL vs 反向 KL：用单峰 q 拟合双峰 p</text><g transform="translate(20,40)"><text x="120" y="8" text-anchor="middle" font-size="13" fill="#1f2937" font-weight="bold">前向 KL D_KL(p‖q)：覆盖众峰</text><line x1="20" y1="220" x2="232" y2="220" stroke="#94a3b8" stroke-width="1" marker-end="url(#ah)"/><line x1="20" y1="220" x2="20" y2="30" stroke="#94a3b8" stroke-width="1" marker-end="url(#ah)"/><text x="232" y="237" text-anchor="end" font-size="12" fill="#1f2937">x</text><text x="14" y="34" text-anchor="end" font-size="12" fill="#1f2937">密度</text><path d="M20,220 C50,220 58,90 80,90 C102,90 110,220 124,220 C138,220 146,90 168,90 C190,90 198,220 228,220" fill="#94a3b8" fill-opacity="0.18" stroke="#94a3b8" stroke-width="2"/><path d="M20,220 C70,220 80,135 124,135 C168,135 178,220 228,220" fill="#2563eb" fill-opacity="0.1" stroke="#2563eb" stroke-width="2"/><text x="124" y="128" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="bold">q</text><text x="124" y="167" text-anchor="middle" font-size="11" fill="#d97706">又宽又矮，跨坐山谷上方</text><text x="124" y="192" text-anchor="middle" font-size="11" fill="#d97706">不敢在 p&gt;0 处留空 → 摊平</text></g><g transform="translate(290,40)"><text x="120" y="8" text-anchor="middle" font-size="13" fill="#1f2937" font-weight="bold">反向 KL D_KL(q‖p)：锁单峰</text><line x1="20" y1="220" x2="232" y2="220" stroke="#94a3b8" stroke-width="1" marker-end="url(#ah)"/><line x1="20" y1="220" x2="20" y2="30" stroke="#94a3b8" stroke-width="1" marker-end="url(#ah)"/><text x="232" y="237" text-anchor="end" font-size="12" fill="#1f2937">x</text><text x="14" y="34" text-anchor="end" font-size="12" fill="#1f2937">密度</text><path d="M20,220 C50,220 58,90 80,90 C102,90 110,220 124,220 C138,220 146,90 168,90 C190,90 198,220 228,220" fill="#94a3b8" fill-opacity="0.18" stroke="#94a3b8" stroke-width="2"/><path d="M48,220 C66,220 70,45 80,45 C90,45 94,220 112,220" fill="#db2777" fill-opacity="0.1" stroke="#db2777" stroke-width="2"/><text x="80" y="40" text-anchor="middle" font-size="12" fill="#db2777" font-weight="bold">q</text><line x1="168" y1="90" x2="168" y2="220" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/><text x="188" y="120" text-anchor="middle" font-size="11" fill="#94a3b8">被忽略</text><text x="124" y="248" text-anchor="middle" font-size="11" fill="#d97706">又窄又高，精准锁住一个峰</text><text x="124" y="263" text-anchor="middle" font-size="11" fill="#d97706">躲进一个峰，忽略另一个</text></g><g transform="translate(40,300)"><line x1="0" y1="0" x2="22" y2="0" stroke="#94a3b8" stroke-width="2"/><text x="28" y="4" font-size="11" fill="#1f2937">真分布 p（双峰）</text><line x1="170" y1="0" x2="192" y2="0" stroke="#2563eb" stroke-width="2"/><text x="198" y="4" font-size="11" fill="#1f2937">前向 q</text><line x1="290" y1="0" x2="312" y2="0" stroke="#db2777" stroke-width="2"/><text x="318" y="4" font-size="11" fill="#1f2937">反向 q</text></g></svg><figcaption>用单峰 q 拟合双峰真分布 p：前向 KL D_KL(p‖q) 让 q 摊开横跨两峰（覆盖众峰/矩匹配），反向 KL D_KL(q‖p) 让 q 锁进其中一个峰（寻峰/锁单峰）。</figcaption></figure>
+
+<div class="note">
+  <p><strong>一句话记忆：</strong>前向 KL "宁可摊平也不留空"（覆盖），反向 KL "宁可漏掉也不摊错"（锁峰）。最大似然/交叉熵训练用的是<em>前向</em> \(D_{\mathrm{KL}}(p\|q)\)（参照真分布 \(p\)），所以最大似然天然倾向"覆盖"。变分推断（VAE 的某些视角）和很多 RL 目标则用反向 KL，倾向"锁峰"。</p>
+</div>
+
+<h2>七、互信息：两个变量共享了多少信息</h2>
+
+<p>熵度量单个变量的不确定性。如果观测了 \(Y\)，对 \(X\) 的不确定性能减少多少？减少的那部分就是 \(X\) 与 \(Y\) 共享的信息——<strong>互信息（mutual information）</strong>：</p>
+
+\[
+I(X;Y) \;=\; H(X) - H(X\mid Y),
+\]
+
+<p>其中 \(H(X\mid Y)\) 是<em>条件熵</em>（知道 \(Y\) 之后 \(X\) 还剩多少不确定性）。\(I(X;Y)\ge 0\)，且 \(X,Y\) 独立时为 0（知道 \(Y\) 对猜 \(X\) 毫无帮助）。它还能写成一个 KL：\(I(X;Y)=D_{\mathrm{KL}}\big(p(x,y)\,\|\,p(x)p(y)\big)\)——即"联合分布"离"假装独立"有多远。</p>
+
+<div class="ml">
+  <h4><span class="tag">ML</span> 和 ML 的联系：互信息是表示学习的理论底座</h4>
+  <p><strong>对比学习</strong>（contrastive learning，如 SimCLR/CLIP）的核心思想是：让同一张图的两个增强视图（或图文配对）的表示互信息尽量大。著名的 InfoNCE 损失与互信息密切相关——更准确地说，它是互信息的一个<em>有偏</em>下界，且这个界被 \(\log N\)（一个 batch 里的负样本数）封顶，所以"InfoNCE = 最大化互信息"只是一个近似口径，严格的对应留到 M8 表示学习那一课再展开。直觉层面记住"学到好表示" ≈ "保留尽量多与目标相关的互信息、丢掉无关的"就够用了。这一课的熵/KL 给了你读懂那些目标函数的语言。</p>
+</div>
+
+<h2>八、数值稳定：log-sum-exp 与 softmax 减最大值</h2>
+
+<p>交叉熵的实现绕不开 \(\log\) 和 \(\exp\)，而这两个函数在边界处会爆炸或下溢。两个必须掌握的工程技巧：</p>
+
+<p><strong>(1) softmax 减最大值。</strong>softmax \(\hat y_i=\dfrac{e^{z_i}}{\sum_j e^{z_j}}\) 里，若某个 logit \(z_i\) 很大，\(e^{z_i}\) 会溢出成 <code>inf</code>。利用一个事实：给所有 logit 同时减去常数 \(c\)，softmax 值不变（分子分母同乘 \(e^{-c}\) 抵消）。取 \(c=\max_j z_j\)，则最大的指数变成 \(e^0=1\)，绝不溢出：</p>
+
+\[
+\hat y_i=\frac{e^{z_i-c}}{\sum_j e^{z_j-c}},\qquad c=\max_j z_j.
+\]
+
+<p><strong>(2) log-sum-exp（LSE）。</strong>计算 \(\log\sum_j e^{z_j}\) 时同样先提最大值：</p>
+
+\[
+\log\sum_j e^{z_j} \;=\; c + \log\sum_j e^{z_j-c},\qquad c=\max_j z_j.
+\]
+
+<p>这样括号内最大项是 \(e^0=1\)，既不溢出也不会全部下溢成 0。实践中千万别先 softmax 再取 log（两步各自损失精度），而是用一体化的 <code>log_softmax = z - log_sum_exp(z)</code>。框架里的 <code>CrossEntropyLoss</code> 内部正是这么做的。</p>
+
+<div class="pitfall">
+  <p><strong>易错：手写交叉熵时 <code>log(0)</code>。</strong>如果预测概率某项恰为 0 而真标签在该项非 0，\(\log 0=-\infty\)，loss 变 <code>nan</code>。务必从 logits 出发用 log-softmax，或给概率加一个极小的 <code>eps</code> 裁剪。下面代码里我们用 <code>np.where(p&gt;0, ...)</code> 来安全地跳过 \(p=0\) 的项（约定 \(0\log 0=0\)）。</p>
+</div>
+
+<h2>调一调，观察现象</h2>
+
+<p>下面三个小实验都只用 numpy + print，几秒跑完。动手改一改，亲眼看现象比记结论牢十倍。</p>
+
+<div class="example">
+  <p><strong>任务 1：把分布从"尖"调到"平"，看熵怎么变。</strong>改 <code>p</code> 从接近 one-hot 到均匀。<strong>预期现象</strong>：越均匀熵越大，均匀分布 \((1/3,1/3,1/3)\) 达到最大 \(\ln 3\approx1.0986\)；接近 one-hot 时熵趋近 0。<strong>为什么</strong>：熵是平均不确定性，摊得越平越难猜。</p>
+  <pre><code>import numpy as np
+def entropy(p):
+    p = np.asarray(p, float)
+    return -np.sum(np.where(p>0, p*np.log(p), 0.0))
+for p in [[0.98,0.01,0.01],[0.6,0.3,0.1],[1/3,1/3,1/3]]:
+    print(p, '-> H =', round(entropy(p),4), 'nat')
+print('ln 3 =', round(np.log(3),4))
+</code></pre>
+</div>
+
+<div class="example">
+  <p><strong>任务 2：让 q 越来越接近 p，看交叉熵塌向熵、KL 塌向 0。</strong><strong>预期现象</strong>：随着 <code>q</code> 趋近 <code>p</code>，\(H(p,q)\) 单调下降逼近 \(H(p)\)，\(D_{\mathrm{KL}}\) 逼近 0；当 <code>q=p</code> 时 KL 恰为 0。<strong>为什么</strong>：交叉熵的"浪费部分"就是 KL，码本对了浪费归零。</p>
+  <pre><code>import numpy as np
+def entropy(p):
+    p=np.asarray(p,float); return -np.sum(np.where(p>0,p*np.log(p),0.0))
+def cross(p,q):
+    p=np.asarray(p,float); q=np.asarray(q,float)
+    return -np.sum(np.where(p>0,p*np.log(q),0.0))
+p=np.array([0.5,0.25,0.25])
+for t in [0.0,0.5,0.9,1.0]:          # t=插值系数，t=1 时 q=p
+    q=(1-t)*np.array([1/3,1/3,1/3])+t*p
+    print('t=',t,'H(p,q)=',round(cross(p,q),4),'KL=',round(cross(p,q)-entropy(p),4))
+print('H(p)=',round(entropy(p),4))
+</code></pre>
+</div>
+
+<div class="example">
+  <p><strong>任务 3：亲手验证 KL 不对称。</strong>交换 <code>p</code> 和 <code>q</code> 的位置算两次 KL。<strong>预期现象</strong>：\(D_{\mathrm{KL}}(p\|q_1)=0.0499\) 而 \(D_{\mathrm{KL}}(q_1\|p)=0.0541\)，两数不等。<strong>为什么</strong>：KL 是有向散度，求和加权用的分布不同（一次按 \(p\)、一次按 \(q_1\)），所以不对称——这也是它"不是距离"的铁证。</p>
+  <pre><code>import numpy as np
+def kl(p,q):
+    p=np.asarray(p,float); q=np.asarray(q,float)
+    return np.sum(np.where(p>0, p*np.log(p/q), 0.0))
+p =np.array([0.5,0.25,0.25])
+q1=np.array([0.4,0.4,0.2])
+print('KL(p||q1) =', round(kl(p,q1),4))
+print('KL(q1||p) =', round(kl(q1,p),4))
+print('相等吗?', np.isclose(kl(p,q1), kl(q1,p)))
+</code></pre>
+</div>
+
+<h2>动手练习</h2>
+
+<ol>
+  <li><strong>三函数与恒等式。</strong>实现 <code>entropy(p)</code>、<code>cross_entropy(p,q)</code>、<code>kl(p,q)</code> 三个函数（用 <code>np.where(p&gt;0, ...)</code> 处理 \(0\log0\)），对 \(p=(0.5,0.25,0.25)\)、\(q=(0.4,0.4,0.2)\) 数值验证 \(H(p,q)=H(p)+D_{\mathrm{KL}}(p\|q)\)（断言 <code>np.isclose</code>）。骨架：
+  <pre><code>import numpy as np
+def entropy(p):
+    p=np.asarray(p,float); return -np.sum(np.where(p>0,p*np.log(p),0.0))
+def cross_entropy(p,q):
+    p=np.asarray(p,float); q=np.asarray(q,float)
+    return -np.sum(np.where(p>0,p*np.log(q),0.0))
+def kl(p,q):
+    p=np.asarray(p,float); q=np.asarray(q,float)
+    return np.sum(np.where(p>0, p*np.log(p/q), 0.0))
+p=np.array([0.5,0.25,0.25]); q=np.array([0.4,0.4,0.2])
+print('H(p,q)        =', cross_entropy(p,q))
+print('H(p)+KL(p||q) =', entropy(p)+kl(p,q))
+print('恒等式成立?', np.isclose(cross_entropy(p,q), entropy(p)+kl(p,q)))
+print('KL 不对称: ', kl(p,q), 'vs', kl(q,p))
+</code></pre></li>
+  <li><strong>one-hot 验证。</strong>取真标签 <code>p=[0,1,0]</code> 与预测 <code>yhat=[0.2,0.7,0.1]</code>，用上面的 <code>cross_entropy</code> 算交叉熵，并与 <code>-np.log(yhat[1])</code> 比较，确认相等；再算 \(H(p)\) 确认它是 0，从而 \(D_{\mathrm{KL}}=H(p,\hat y)\)。</li>
+  <li><strong>稳定的 log-softmax。</strong>写一个 <code>log_softmax(z)=z - (c + np.log(np.sum(np.exp(z-c))))</code>（\(c=\)max），对 <code>z=[1000., 1001., 1002.]</code> 这种大 logit 测试不出现 <code>inf/nan</code>；再用它实现 <code>nll = -log_softmax(z)[label]</code> 作为单样本交叉熵。</li>
+  <li><strong>伯努利熵曲线（打印版）。</strong>对 <code>p in np.linspace(0,1,11)</code> 打印 \(H(p)=-p\ln p-(1-p)\ln(1-p)\)，确认最大值在 \(p=0.5\) 处约 0.6931 nat、两端为 0。<strong>注意</strong>：写 <code>np.where(p>0, p*np.log(p), 0)</code> 时，<code>np.log(p)</code> 仍会在 \(p=0\) 处被求值并打印 <code>RuntimeWarning</code>（虽然 <code>np.where</code> 最终选了 0、结果数值正确）。别被警告吓到——它不代表算错。要么用 <code>with np.errstate(divide='ignore', invalid='ignore'):</code> 包住计算抑制警告，要么先掩码取出 <code>p>0</code> 的项再 <code>log</code>。骨架：
+  <pre><code>import numpy as np
+def bern_H(p):
+    with np.errstate(divide='ignore', invalid='ignore'):
+        terms = np.where((p>0)&(p<1), -p*np.log(p)-(1-p)*np.log(1-p), 0.0)
+    return terms
+ps = np.linspace(0,1,11)
+for p in ps:
+    print('p=', round(float(p),1), 'H=', round(float(bern_H(p)),4))
+</code></pre></li>
+  <li><strong>（选做）前向 vs 反向 KL 的偏好。</strong>真分布是离散双峰 <code>p=[0.45,0.10,0.45]</code>（注意它已归一，三项和为 1——先 <code>assert np.isclose(p.sum(),1)</code>，不归一会让 KL 算出负值，违反 KL≥0）。在候选单峰 <code>qA=[0.9,0.05,0.05]</code>（锁左峰、几乎不给右峰质量）和 <code>qB=[0.4,0.2,0.4]</code>（覆盖双峰）中，分别算前向 \(D_{\mathrm{KL}}(p\|q)\) 与反向 \(D_{\mathrm{KL}}(q\|p)\)。<strong>预期现象</strong>：前向 KL \(D_{\mathrm{KL}}(p\|q_A)=0.7461\) 远大于 \(D_{\mathrm{KL}}(p\|q_B)=0.0367\)——前向<em>明显偏爱覆盖型</em> <code>qB</code>，因为锁左峰的 <code>qA</code> 在右峰处 \(q\approx0\) 而 \(p\) 有质量，被狠狠惩罚。反向 KL \(D_{\mathrm{KL}}(q_A\|p)=0.4793\)、\(D_{\mathrm{KL}}(q_B\|p)=0.0444\)：反向对锁峰型 <code>qA</code> 的惩罚（0.4793）远小于前向对它的惩罚（0.7461）——这就是"<em>反向相对宽容锁峰</em>"的数值证据。
+  <pre><code>import numpy as np
+def kl(p,q):
+    p=np.asarray(p,float); q=np.asarray(q,float)
+    return np.sum(np.where(p>0, p*np.log(p/q), 0.0))
+p =np.array([0.45,0.10,0.45]); assert np.isclose(p.sum(),1)
+qA=np.array([0.9,0.05,0.05]);  assert np.isclose(qA.sum(),1)   # 锁左峰
+qB=np.array([0.4,0.2,0.4]);    assert np.isclose(qB.sum(),1)   # 覆盖双峰
+print('前向 KL(p||qA) =', round(kl(p,qA),4), ' 前向 KL(p||qB) =', round(kl(p,qB),4))
+print('反向 KL(qA||p) =', round(kl(qA,p),4), ' 反向 KL(qB||p) =', round(kl(qB,p),4))
+</code></pre></li>
+</ol>
+
+<h2>掌握自检</h2>
+
+<ul>
+  <li>我能不查公式写出 \(I(x)=-\log p(x)\)，并说清 \(p\to0\)、\(p=1\) 两端的行为，以及 bit 与 nat 的换算。</li>
+  <li>给定一个三点分布，我能手算它的熵，并解释为什么均匀时最大、确定时为 0。</li>
+  <li>我能解释交叉熵 \(H(p,q)\) 的"错码本编码长度"含义，并立刻说出 Gibbs 不等式 \(H(p,q)\ge H(p)\)。</li>
+  <li>我能默写并推导 \(H(p,q)=H(p)+D_{\mathrm{KL}}(p\|q)\)，并用"\(H(p)\) 是常数"解释为什么最小化交叉熵 ⟺ 最小化 KL ⟺ 最大化似然。</li>
+  <li>有人说"KL 是 p 和 q 的距离"，我能立刻指出两条反例（不对称、不满足三角不等式）。</li>
+  <li>我能说清前向 KL 覆盖众峰、反向 KL 锁单峰，以及最大似然用的是哪一个。</li>
+  <li>我知道为什么手写交叉熵要从 logits 走 log-softmax，以及减最大值的作用。</li>
+</ul>
+
+<div class="skip">
+  <h4>可以跳过/暂缓的内容</h4>
+  <ul>
+    <li><strong>互信息的严格不等式与 InfoNCE 的推导</strong>（第七节）：本课只需建立"互信息 = 共享信息 = 联合分布离假装独立有多远"的直觉。InfoNCE 是有偏、被 \(\log N\) 封顶的下界，它和互信息的精确关系留到 <strong>M8 表示学习</strong>那一课再展开，现在不必深究。</li>
+    <li><strong>前向/反向 KL 在具体算法里的完整后果</strong>：本课只要求你能说出"覆盖 vs 锁峰"的方向。反向 KL 如何导致 VAE/变分推断的 mode collapse、它和 ELBO 的精确关系，到 <strong>VAE</strong> 那一课会专门处理。</li>
+    <li><strong>Gibbs 不等式 / KL≥0 的严格证明</strong>（用 Jensen 不等式对 \(\log\) 的凹性）：本课把它当作"浪费不会为负"的事实直接用即可，正式证明可等学完凸性/Jensen 后再回头补。</li>
+  </ul>
+</div>
+
+<div class="note">
+  <p><strong>埋点（下面这两处你会再见到 KL）：</strong>① <strong>VAE 的 ELBO</strong> = 重构项 \(-\)（KL 正则项）：那个 KL 把编码器输出的隐分布拉向先验 \(\mathcal{N}(0,I)\)，防止它乱长。② <strong>RLHF</strong> 的目标 = 奖励 \(-\ \beta\cdot D_{\mathrm{KL}}(\pi\|\pi_{\text{ref}})\)：那个 KL 像一根橡皮筋，把微调后的策略 \(\pi\) 拴在参考模型 \(\pi_{\text{ref}}\) 附近，防止它为了刷奖励而跑偏、说胡话。今天你建立的"KL = 偏离参照分布的代价"这个直觉，到那两课会直接复用。</p>
+</div>
+
+<p><strong>下一课预告：</strong>我们已经会"度量两个分布有多远"，但还有个更基础的能力没解决——<em>怎么从一个分布里真的抽出样本来？</em>下一课讲采样：逆变换采样、重参数化技巧（reparameterization）与蒙特卡洛估计。它们是 VAE、扩散模型、强化学习共同依赖的底层操作，也会让今天的 KL 正则项真正"动起来"。</p>
+</article>
+<div class="navbtns"><a class="prev" href="lesson-04-mle-map.html"><div class="nlabel">← 上一课</div><div class="ntitle">第4课 · 从数据到损失——MLE 与 MAP</div></a><a class="next" href="index.html"><div class="nlabel">→</div><div class="ntitle">已是当前最后一课 · 回目录</div></a></div>
+<nav class="toc"><h3>本模块课程表</h3><ol>
+<li><a href="lesson-01-random-variables.html"><span class="ln">第1课</span>概率的语言——随机变量、分布、期望与方差</a></li>
+<li><a href="lesson-02-distributions-covariance.html"><span class="ln">第2课</span>分布动物园与协方差</a></li>
+<li><a href="lesson-03-conditional-bayes.html"><span class="ln">第3课</span>条件概率与贝叶斯</a></li>
+<li><a href="lesson-04-mle-map.html"><span class="ln">第4课</span>从数据到损失——MLE 与 MAP</a></li>
+<li class="cur"><span class="ln">第5课</span>信息论——熵、交叉熵、KL</li>
+<li class="soon"><span class="ln">第6课</span>采样——逆变换、重参数化与蒙特卡洛　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第7课</span>凸性与梯度下降——优化的几何　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第8课</span>现代优化器——SGD、动量、Adam 与调度　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第9课</span>强化学习速成 I——MDP、价值与贝尔曼　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第10课</span>强化学习速成 II——策略梯度到 PPO　<span class="badge">即将上线</span></li>
+</ol></nav>
+</div>
+<!-- pyrunner-injected -->
+<style>
+.pr-cell{border:1px solid #334155;border-radius:10px;margin:1.2em 0;overflow:hidden;background:#0f172a;}
+.pr-head{display:flex;align-items:center;gap:8px;background:#1e293b;color:#cbd5e1;padding:6px 10px;font-size:13px;font-family:system-ui,-apple-system,sans-serif;}
+.pr-title{flex:1;font-weight:600;}
+.pr-status{font-size:12px;color:#94a3b8;white-space:nowrap;max-width:50%;overflow:hidden;text-overflow:ellipsis;}
+.pr-btn{cursor:pointer;border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:6px;padding:3px 11px;font-size:13px;line-height:1.4;}
+.pr-btn:hover{background:#0b1220;}
+.pr-run{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:600;}
+.pr-run:hover{background:#1d4ed8;}
+.pr-cell.collapsed .pr-body{display:none;}
+.pr-edit{display:block;width:100%;border:none;background:#0f172a;color:#e2e8f0;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.55;padding:12px 14px;resize:vertical;box-sizing:border-box;outline:none;}
+.pr-out{margin:0;padding:10px 14px;border-top:1px solid #334155;background:#0b1220;color:#cbd5e1;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.5;white-space:pre-wrap;max-height:340px;overflow:auto;}
+.pr-out:empty{display:none;}
+.pr-out.err{color:#fca5a5;}
+#pr-fab{position:fixed;right:18px;bottom:18px;z-index:9998;background:#2563eb;color:#fff;border:none;border-radius:999px;padding:10px 17px;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.22);font-family:system-ui,sans-serif;}
+#pr-fab:hover{background:#1d4ed8;}
+#pr-lab{position:fixed;right:18px;bottom:66px;z-index:9999;width:400px;max-width:92vw;background:#0f172a;border:1px solid #334155;border-radius:12px;display:none;flex-direction:column;box-shadow:0 14px 38px rgba(0,0,0,.4);overflow:hidden;}
+#pr-lab.open{display:flex;}
+#pr-lab .pr-edit{min-height:150px;}
+</style>
+<script>
+(function(){
+  var PYBASE="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+  var pyReady=null;
+  function loadPy(status){
+    if(pyReady)return pyReady;
+    pyReady=(async function(){
+      status("正在加载 Python 运行时（首次约 10 秒，需联网）…");
+      await new Promise(function(res,rej){
+        var s=document.createElement("script");s.src=PYBASE+"pyodide.js";
+        s.onload=res;s.onerror=function(){rej(new Error("无法加载 Pyodide（首次运行需要联网）"));};
+        document.head.appendChild(s);
+      });
+      var py=await loadPyodide({indexURL:PYBASE});
+      status("正在加载 NumPy …");
+      await py.loadPackage("numpy");
+      status("Python 就绪 ✓");
+      return py;
+    })();
+    return pyReady;
+  }
+  async function run(code,outEl,statusEl){
+    var setS=function(m){if(statusEl)statusEl.textContent=m;};
+    outEl.classList.remove("err");outEl.textContent="";
+    var py;
+    try{py=await loadPy(setS);}
+    catch(e){outEl.classList.add("err");outEl.textContent="加载失败："+e.message;return;}
+    var buf="";
+    py.setStdout({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    py.setStderr({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    try{
+      var result=await py.runPythonAsync(code);
+      if(result!==undefined&&result!==null){
+        var r;try{r=result.toString();}catch(_){r=String(result);}
+        if(r!=="None")buf+=(buf&&!buf.endsWith("\n")?"\n":"")+r;
+        if(result&&result.destroy)result.destroy();
+      }
+      outEl.textContent=buf||"（运行成功，无输出。用 print(...) 查看结果）";
+    }catch(e){
+      outEl.classList.add("err");
+      outEl.textContent=buf+(buf?"\n":"")+String((e&&e.message)||e);
+    }
+  }
+  function autosize(ta){ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight+2,460)+"px";}
+  function tabKey(e){
+    if(e.key==="Tab"){e.preventDefault();var s=this.selectionStart,en=this.selectionEnd;
+      this.value=this.value.slice(0,s)+"    "+this.value.slice(en);this.selectionStart=this.selectionEnd=s+4;}
+    if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();var b=this.closest(".pr-cell,#pr-lab").querySelector(".pr-run");if(b)b.click();}
+  }
+  function makeCell(code){
+    var cell=document.createElement("div");cell.className="pr-cell";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">可运行 · Python (NumPy)</span><span class="pr-status"></span><button class="pr-btn pr-toggle">收起</button><button class="pr-btn pr-run">▶ 运行</button></div><div class="pr-body"><textarea class="pr-edit" spellcheck="false"></textarea><pre class="pr-out"></pre></div>';
+    var ta=cell.querySelector(".pr-edit");ta.value=code;
+    var out=cell.querySelector(".pr-out"),st=cell.querySelector(".pr-status");
+    ta.addEventListener("input",function(){autosize(ta);});
+    ta.addEventListener("keydown",tabKey);
+    cell.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    var tog=cell.querySelector(".pr-toggle");
+    tog.onclick=function(){cell.classList.toggle("collapsed");tog.textContent=cell.classList.contains("collapsed")?"展开":"收起";};
+    setTimeout(function(){autosize(ta);},0);
+    return cell;
+  }
+  function enhance(){
+    document.querySelectorAll("article pre").forEach(function(pre){
+      if(pre.closest(".pr-cell"))return;
+      var codeEl=pre.querySelector("code")||pre;
+      var code=codeEl.textContent.replace(/\s+$/,"");
+      if(!code)return;
+      pre.replaceWith(makeCell(code));
+    });
+  }
+  function lab(){
+    var fab=document.createElement("button");fab.id="pr-fab";fab.textContent="▶ Python 实验台";
+    var panel=document.createElement("div");panel.id="pr-lab";
+    panel.innerHTML='<div class="pr-head"><span class="pr-title">Python 实验台 · NumPy</span><span class="pr-status"></span><button class="pr-btn pr-run">▶ 运行</button><button class="pr-btn pr-min">收起</button></div><div class="pr-body"><textarea class="pr-edit" spellcheck="false"></textarea><pre class="pr-out"></pre></div>';
+    document.body.appendChild(fab);document.body.appendChild(panel);
+    var ta=panel.querySelector(".pr-edit");
+    ta.value="import numpy as np\na = np.array([3, 2])\nb = np.array([1, 4])\nprint(\"a + b =\", a + b)\nprint(\"a . b =\", a @ b)\nprint(\"|a|  =\", np.linalg.norm(a))\ncos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))\nprint(\"cos =\", round(float(cos), 4))";
+    ta.addEventListener("keydown",tabKey);
+    var out=panel.querySelector(".pr-out"),st=panel.querySelector(".pr-status");
+    panel.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    fab.onclick=function(){panel.classList.toggle("open");};
+    panel.querySelector(".pr-min").onclick=function(){panel.classList.remove("open");};
+  }
+  function init(){enhance();lab();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+
+<script src="../assets/annotator.js"></script>
+</body>
+</html>

@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块2 · 第1课 · 概率的语言——随机变量、分布、期望与方差</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/annotator.css">
+
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue-bg:#eff6ff;
+--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--pink:#db2777;
+--red:#dc2626;--red-bg:#fef2f2;--bg:#ffffff;--soft:#f8fafc;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);
+font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.85;font-size:17px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:840px;margin:0 auto;padding:0 22px 100px;}
+header.top{background:#fff;border-bottom:1px solid var(--line);padding:26px 22px 22px;margin-bottom:14px;}
+header.top .inner{max-width:840px;margin:0 auto;}
+.crumb{color:var(--muted);font-size:14px;letter-spacing:.3px;margin-bottom:6px;}
+h1{font-size:30px;line-height:1.3;margin:.1em 0 .2em;}
+.sub{color:var(--muted);font-size:15px;}
+article{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:30px 34px;margin-top:18px;}
+h2{font-size:23px;margin:1.7em 0 .6em;padding-bottom:.25em;border-bottom:2px solid var(--line);}
+h2:first-child{margin-top:.2em;}
+h3{font-size:19px;margin:1.3em 0 .4em;color:#0f172a;}
+h4{margin:.2em 0 .5em;font-size:16px;}
+p{margin:.7em 0;}
+ul,ol{padding-left:1.3em;margin:.6em 0;}
+li{margin:.32em 0;}
+code{background:#f1f5f9;padding:.12em .4em;border-radius:5px;font-size:.9em;
+font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a;}
+pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 18px;overflow:auto;font-size:14px;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0;}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:15.5px;}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+thead th{background:var(--soft);}
+figure.fig{margin:1.4em 0;text-align:center;}
+figure.fig svg{max-width:100%;height:auto;}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
+.note,.ml,.key,.pitfall,.example{border-radius:10px;padding:14px 18px;margin:1.2em 0;border:1px solid var(--line);}
+.note{background:var(--soft);border-left:4px solid #94a3b8;}
+.example{background:#fff;border-left:4px solid var(--blue);}
+.ml{background:var(--green-bg);border-left:4px solid var(--green);}
+.key{background:var(--amber-bg);border-left:4px solid var(--amber);}
+.pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.goals{background:var(--blue-bg);border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:10px;padding:14px 20px;margin:.2em 0 1.5em;}
+.goals h4{margin:.1em 0 .5em;color:#1e3a8a;}
+.goals ul{margin:.3em 0;}
+.skip{background:var(--soft);border:1px solid var(--line);border-left:4px solid #94a3b8;border-radius:10px;padding:14px 20px;margin:1.8em 0 0;color:#475569;}
+.skip h4{margin:.1em 0 .5em;color:#475569;}
+.tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
+.toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
+.toc h3{margin:.1em 0 .7em;}
+.toc ol{list-style:none;padding:0;}
+.toc li{padding:7px 10px;border-radius:8px;color:#334155;border:1px solid transparent;}
+.toc li a{color:inherit;text-decoration:none;display:block;}
+.toc li .ln{display:inline-block;min-width:54px;color:var(--muted);font-size:13px;}
+.toc li.cur{background:var(--blue-bg);border-color:#bfdbfe;font-weight:600;color:#1e3a8a;}
+.toc li:not(.cur):hover{background:var(--soft);}
+.navbtns{display:flex;justify-content:space-between;margin-top:22px;gap:12px;}
+.navbtns a{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--ink);}
+.navbtns a:hover{border-color:var(--blue);}
+.navbtns .nlabel{color:var(--muted);font-size:13px;}
+.navbtns .ntitle{font-weight:600;margin-top:3px;}
+.navbtns .next{text-align:right;}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.here{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:6px 0 4px;font-size:15px;color:#1e3a8a;line-height:1.7;}
+.here b{font-weight:700;}
+.cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
+.card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
+.card:hover{border-color:var(--blue);}
+.card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
+.card .ct{font-size:18px;font-weight:600;}
+.card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+.card .cap{margin-left:40px;margin-top:7px;font-size:13px;color:#1e3a8a;}
+.card .cap .lbl{display:inline-block;background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;margin-right:7px;}
+
+.card.soon{opacity:.6;cursor:default;}
+.card.soon:hover{border-color:var(--line);}
+.badge{display:inline-block;background:#e2e8f0;color:#475569;font-size:11px;font-weight:600;padding:1px 8px;border-radius:20px;margin-left:8px;vertical-align:middle;}
+.toc li.soon{color:#94a3b8;}
+.toc li.soon .badge{margin-left:4px;}
+</style>
+</head>
+<body>
+<header class="top"><div class="inner">
+<div class="crumb"><a href="index.html" style="color:inherit">模块 2 · 概率统计、信息论与最优化</a>　/　第 1 课（共 10 课）</div>
+<h1>概率的语言——随机变量、分布、期望与方差</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　阶段0：数学与工具基础　·　<strong>能力点：</strong>概率语言——把&quot;不确定性&quot;写成数学（输出层/损失/噪声都用分布说话）</div>
+</div></header>
+<div class="wrap">
+<article>
+<div class="goals"><h4>读完这一课，你将能够</h4><ul><li>说清随机变量 \(X\)、PMF \(p(x)\)、PDF \(f(x)\)、CDF \(F(x)\) 各自描述什么，并指出"PDF 的值不是概率、可以大于 1、单点概率为 0"。</li><li>用 \(\mathbb{E}[X]=\sum_x x\,p(x)\) 或 \(\int x f(x)\,dx\) 手算期望，并把它解释成"长期平均 / 分布的质心"。</li><li>运用期望的线性性 \(\mathbb{E}[aX+bY]=a\mathbb{E}[X]+b\mathbb{E}[Y]\)（即便 \(X,Y\) 相关），并辨认 \(\mathbb{E}[g(X)]\neq g(\mathbb{E}[X])\) 的陷阱。</li><li>用 \(\mathrm{Var}(X)=\mathbb{E}[X^2]-\mu^2\) 算方差、复核标准差，并说出方差刻画"分布的胖瘦"。</li><li>写出离散分布的 CDF 阶梯，说明 \(F(x)=P(X\le x)\) 单调地从 0 爬到 1，并知道连续情形下 \(F'(x)=f(x)\)。</li><li>写出蒙特卡洛估计：用样本平均近似期望，并说清它为什么是无偏的、为什么 \(n\) 越大越准——以及它和 SGD 梯度估计是同一个思想。</li></ul></div>
+
+<p>模块 1 里，我们用线性代数把世界写成"确定的"向量与变换：给定输入，输出唯一。但真实数据从来不是这样——传感器有噪声、样本是随机抽到的、模型对世界总有"不知道"的部分。从这一课起，我们给世界<strong>加入不确定性</strong>，而描述不确定性的语言就是<strong>概率 probability</strong>。这一课先把最基础的四个词——随机变量、分布、期望、方差——讲透，它们是后面最大似然、信息论、以及训练用的 SGD 全部建立其上的地基。这些更高层的名词现在不必懂，只需知道它们都是从这四个词长出来的。</p>
+
+<h2>为什么机器学习离不开概率</h2>
+
+<p>先别急着背定义，问一个更前置的问题：ML 为什么非用概率不可？答案是，ML 要处理的每一处"不确定"都得有语言来量化它。</p>
+<ul>
+<li><strong>数据有噪声。</strong>同一张猫的照片，光照、压缩、标注员的手抖都会让像素值抖动。我们不说"这个像素是 137"，而说"它在 137 附近以某种概率分布"。</li>
+<li><strong>数据是采样来的。</strong>训练集只是从真实世界这口大锅里舀出的一小勺。模型在这一勺上学到的东西，能不能推广到整锅？这是"采样 sampling"带来的随机性，要用概率回答。</li>
+<li><strong>模型对世界"不知道"。</strong>一个好的分类器输出的不是"这是猫"，而是"90% 是猫、8% 是狗、2% 是其它"。这个 90% 是模型给出的一个<strong>概率化猜测</strong>——它把不确定性显式写了出来，而不是硬给一个非黑即白的答案。</li>
+</ul>
+<div class="note"><p><strong>一句话直觉：</strong>线性代数回答"给定输入，输出是什么"；概率回答"给定输入，输出<em>大概</em>是什么、有多大把握"。ML 的全部训练目标，几乎都可以写成"让模型给出的概率分布尽量贴近数据的真实分布"——这就是为什么这门语言绕不开。</p></div>
+
+<h2>样本空间、事件、随机变量：把"随机结果"映成数</h2>
+
+<p>掷一颗骰子，可能的结果有 6 种：\(\{1,2,3,4,5,6\}\)。这个"所有可能结果的集合"叫<strong>样本空间 sample space</strong>，记作 \(\Omega\)。其中某一类结果（比如"掷出偶数" \(\{2,4,6\}\)）叫一个<strong>事件 event</strong>，事件发生的可能性大小就是它的<strong>概率 \(P(\cdot)\)</strong>。</p>
+
+<p>但样本空间里的结果不一定是数字——抛硬币得到的是"正/反"，抽卡得到的是"金/紫/蓝"。为了能算、能比较、能放进公式，我们需要一座桥：把每个随机结果<strong>映射成一个数</strong>。这座桥就是<strong>随机变量 random variable</strong>，习惯用大写 \(X\) 表示，它取到的具体数值用小写 \(x\)。</p>
+
+<div class="note"><p><strong>纠正一个常见误解：</strong>随机变量既不"随机"也不是"变量"，它其实是一个<em>函数</em>——输入是样本空间里的某个结果 \(\omega\)，输出是一个实数 \(X(\omega)\)。比如抛两枚硬币，令 \(X=\) 正面个数，那么 \(X(\text{正正})=2,\ X(\text{正反})=1,\ X(\text{反反})=0\)。一旦把结果翻译成数，我们就能问"\(X\) 平均是多少""\(X\) 波动多大"这类定量问题。</p></div>
+
+<h3>离散 vs 连续</h3>
+<p>随机变量按取值方式分两类，这个区分会一路贯穿全课：</p>
+<ul>
+<li><strong>离散 discrete：</strong>取值是可以一个个数清的（骰子点数 \(\{1,\dots,6\}\)、邮件里"垃圾/正常"、一句话里的词）。</li>
+<li><strong>连续 continuous：</strong>取值充满一整段实数区间（身高、温度、神经网络某个权重）。在任意小区间里都塞着无穷多个可能值。</li>
+</ul>
+<p>"能不能数清"决定了我们用<strong>求和 \(\sum\)</strong> 还是<strong>积分 \(\int\)</strong> 来描述它，也决定了下面 PMF 和 PDF 的分野。</p>
+
+<h2>PMF 与 PDF：分布是什么</h2>
+
+<p>知道了 \(X\) 能取哪些值还不够，我们还想知道<strong>每个值有多大可能</strong>——这套"哪个值多大可能"的完整说明书，就叫 \(X\) 的<strong>分布 distribution</strong>。离散和连续各有一种说明书格式。</p>
+
+<h3>离散：概率质量函数 PMF</h3>
+<p>对离散变量，直接给每个可能取值分配一份概率，这个函数叫<strong>概率质量函数 probability mass function（PMF）</strong>，记 \(p(x)=P(X=x)\)。它必须满足两条铁律：</p>
+\[ p(x)\in[0,1]\quad\text{（每份概率在 0 和 1 之间）},\qquad \sum_x p(x)=1\quad\text{（所有份加起来正好是 1）}.\]
+<p>"质量 mass"这个词很形象：想象你有 1 单位的"概率泥巴"，把它捏成几块、按重要性分配到各个取值上。公平骰子就是把这团泥巴均分成 6 块，每块 \(\tfrac16\)。</p>
+
+<h3>连续：概率密度函数 PDF</h3>
+<p>连续变量麻烦在哪？取值有无穷多个。如果给每个具体值都分一份正概率，那"无穷多个正数加起来"就会爆掉，超过 1。所以连续情形下，问"\(X\) 恰好等于 3.0000…"是没意义的——答案是 <strong>0</strong>。我们改问区间："\(X\) 落在 \([3,3.1]\) 之间的概率多大"，这才有意义。</p>
+
+<p>描述连续分布的说明书叫<strong>概率密度函数 probability density function（PDF）</strong>，记 \(f(x)\)。它不直接给概率，而给"概率的<em>密度</em>"——某点附近概率有多<em>密集</em>。真正的概率要靠<strong>积分（求面积）</strong>得到：</p>
+\[ P(a\le X\le b)=\int_a^b f(x)\,dx,\qquad f(x)\ge 0,\qquad \int_{-\infty}^{\infty} f(x)\,dx=1.\]
+
+<div class="pitfall"><h4>易错：PDF 的值不是概率！</h4><p>这是初学者最大的坑。请把下面三条钉死：</p><ul><li><strong>PDF 的值 \(f(x)\) 本身不是概率</strong>，它是"密度"，单位是"概率 / 单位长度"。只有把它在一段区间上积分（求面积）才得到概率。</li><li><strong>\(f(x)\) 可以大于 1。</strong>例如在 \([0,0.5]\) 上均匀分布，密度处处为 \(1/0.5=2>1\)，完全合法——因为底乘高 \(=0.5\times2=1\)，面积才是概率。密度高不等于概率大于 1。</li><li><strong>连续变量单点概率为 0：</strong>\(P(X=c)=\int_c^c f=0\)。线宽为零的竖线下面积是 0。所以对连续变量 \(P(X\le 3)\) 和 \(P(X<3)\) 一模一样。</li></ul><p>上面用的是最平的均匀分布（密度是条水平线，"面积"退化成"底×高"），但你脑子里得有一条<em>会起伏</em>的曲线：比如<strong>钟形的高斯密度</strong>，中间高、两边低。某一段的概率仍然是<strong>那段曲线下的面积</strong>；峰值处密度最大，但"峰值那一点的概率"照样是 0（单点概率永远为 0）。高斯的公式留到下一课，这里只要让"面积=概率"在一条起伏的曲线上被想象一次，免得把"密度=常数"当成默认锚点。</p></div>
+
+<figure class="fig"><svg viewBox="0 0 720 340" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>PMF 读高度 vs PDF 读面积</title><defs><marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8"/></marker><clipPath id="ab-clip"><rect x="442" y="40" width="218" height="210"/></clipPath></defs><line x1="360" y1="40" x2="360" y2="300" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 3"/><text x="180" y="28" text-anchor="middle" font-size="14" font-weight="bold" fill="#1f2937">离散：PMF p(x)</text><text x="42" y="60" font-size="11" fill="#94a3b8">概率</text><line x1="48" y1="250" x2="48" y2="65" stroke="#94a3b8" stroke-width="1" marker-end="url(#arr)"/><line x1="48" y1="250" x2="320" y2="250" stroke="#94a3b8" stroke-width="1" marker-end="url(#arr)"/><text x="322" y="266" font-size="11" fill="#94a3b8">x</text><line x1="48" y1="92" x2="60" y2="92" stroke="#e2e8f0" stroke-width="0.75"/><text x="44" y="96" text-anchor="end" font-size="11" fill="#94a3b8">0.4</text><line x1="48" y1="171" x2="60" y2="171" stroke="#e2e8f0" stroke-width="0.75"/><text x="44" y="175" text-anchor="end" font-size="11" fill="#94a3b8">0.2</text><rect x="68" y="210" width="32" height="40" fill="#2563eb" opacity="0.85"/><text x="84" y="202" text-anchor="middle" font-size="11" fill="#1f2937">0.1</text><text x="84" y="266" text-anchor="middle" font-size="12" fill="#1f2937">0</text><rect x="118" y="171" width="32" height="79" fill="#2563eb" opacity="0.85"/><text x="134" y="163" text-anchor="middle" font-size="11" fill="#1f2937">0.2</text><text x="134" y="266" text-anchor="middle" font-size="12" fill="#1f2937">1</text><rect x="168" y="92" width="32" height="158" fill="#2563eb" opacity="0.85"/><text x="184" y="84" text-anchor="middle" font-size="11" fill="#1f2937">0.4</text><text x="184" y="266" text-anchor="middle" font-size="12" fill="#1f2937">2</text><rect x="218" y="171" width="32" height="79" fill="#2563eb" opacity="0.85"/><text x="234" y="163" text-anchor="middle" font-size="11" fill="#1f2937">0.2</text><text x="234" y="266" text-anchor="middle" font-size="12" fill="#1f2937">3</text><rect x="268" y="210" width="32" height="40" fill="#2563eb" opacity="0.85"/><text x="284" y="202" text-anchor="middle" font-size="11" fill="#1f2937">0.1</text><text x="284" y="266" text-anchor="middle" font-size="12" fill="#1f2937">4</text><text x="184" y="294" text-anchor="middle" font-size="12" fill="#2563eb">柱子高度 = 概率，Σp(x)=1</text><text x="540" y="28" text-anchor="middle" font-size="14" font-weight="bold" fill="#1f2937">连续：PDF f(x)</text><text x="396" y="60" font-size="11" fill="#94a3b8">密度</text><line x1="400" y1="250" x2="400" y2="65" stroke="#94a3b8" stroke-width="1" marker-end="url(#arr)"/><line x1="400" y1="250" x2="700" y2="250" stroke="#94a3b8" stroke-width="1" marker-end="url(#arr)"/><text x="702" y="266" font-size="11" fill="#94a3b8">x</text><line x1="400" y1="100" x2="408" y2="100" stroke="#94a3b8" stroke-width="0.75"/><text x="396" y="104" text-anchor="end" font-size="11" fill="#94a3b8">1</text><path d="M414,250 C450,247 470,165 495,118 C512,86 535,86 552,128 C575,185 600,243 686,250 L686,250 L414,250 Z" fill="#2563eb" opacity="0.08"/><path d="M414,250 C450,247 470,165 495,118 C512,86 535,86 552,128 C575,185 600,243 686,250 L686,250 L414,250 Z" fill="#2563eb" opacity="0.22" clip-path="url(#ab-clip)"/><path d="M414,250 C450,247 470,165 495,118 C512,86 535,86 552,128 C575,185 600,243 686,250" fill="none" stroke="#2563eb" stroke-width="2"/><line x1="442" y1="250" x2="442" y2="236" stroke="#2563eb" stroke-width="1" stroke-dasharray="4 3"/><text x="442" y="266" text-anchor="middle" font-size="12" fill="#1f2937">a</text><text x="660" y="266" text-anchor="middle" font-size="12" fill="#1f2937">b</text><text x="548" y="205" text-anchor="middle" font-size="12" fill="#2563eb">这块面积 = P(a≤X≤b)</text><line x1="400" y1="100" x2="690" y2="100" stroke="#d97706" stroke-width="1" stroke-dasharray="4 3"/><text x="690" y="96" text-anchor="end" font-size="12" fill="#d97706">f(x) 可以 >1（密度≠概率）</text><line x1="610" y1="220" x2="610" y2="232" stroke="#db2777" stroke-width="1"/><circle cx="610" cy="220" r="2.5" fill="#db2777"/><text x="610" y="248" text-anchor="middle" font-size="12" fill="#db2777">c</text><text x="618" y="304" text-anchor="middle" font-size="12" fill="#db2777">单点 P(X=c)=0（线宽为零→面积为零）</text><text x="540" y="324" text-anchor="middle" font-size="12" fill="#1f2937" font-weight="bold">PMF 读高度，PDF 读面积</text></svg><figcaption>左：离散分布的 PMF 用一排竖柱表示，每根柱子的高度直接就是该取值的概率 p(x)，所有柱高之和为 1。右：连续分布的 PDF 是一条光滑曲线 f(x)，曲线下方某区间 [a,b] 的阴影面积才是概率 P(a≤X≤b)；关键标注三点——（1）阴影面积=概率，（2）某一点处画一条竖线，宽度为零故单点概率=0，（3）曲线峰值标出 f(x)&gt;1 仍合法（例如窄而高的密度）。整张图的核心对比：PMF 读高度，PDF 读面积。</figcaption></figure>
+
+<div class="key"><p><strong>一句话记住区别：</strong>PMF 的<em>高度</em>就是概率（柱子高度直接读数）；PDF 的<em>面积</em>才是概率（曲线下方一块面积才是概率，高度只是密度）。</p></div>
+
+<h3>累积分布函数 CDF：一个统一的视角</h3>
+<p>无论离散还是连续，有一个函数都能用，叫<strong>累积分布函数 cumulative distribution function（CDF）</strong>：</p>
+\[ F(x)=P(X\le x).\]
+<p>它回答"\(X\) 不超过 \(x\) 的概率是多少"，是把概率<strong>从左往右一路累加 / 累积</strong>。它从 0 单调爬升到 1，永不下降。CDF 的好处是统一：离散时它是一条阶梯（每遇到一个取值就往上跳一格，跳的高度正是该点的 \(p(x)\)）；连续时它是一条光滑上升的曲线，而且<strong>它的斜率就是密度</strong>：\(F'(x)=f(x)\)。反过来，区间概率就是 CDF 的差：\(P(a<X\le b)=F(b)-F(a)\)。</p>
+<div class="note"><p>记不清 PDF 和 CDF 谁是谁时，记住这句：<strong>CDF 是 PDF 的"面积累加版"，PDF 是 CDF 的"斜率版"</strong>——它们是积分与求导的一对，正好接上模块 1 的微积分。</p></div>
+
+<h2>期望 \(\mathbb{E}[X]\)：分布的质心</h2>
+
+<p>有了分布，第一个想问的总结量是："这个随机变量<strong>平均</strong>是多少？"这就是<strong>期望 expectation</strong>，记 \(\mathbb{E}[X]\)，也常写成 \(\mu\)。定义是"取值按概率加权求和 / 积分"：</p>
+\[ \mathbb{E}[X]=\sum_x x\,p(x)\quad\text{(离散)},\qquad \mathbb{E}[X]=\int_{-\infty}^{\infty} x\,f(x)\,dx\quad\text{(连续)}.\]
+
+<div class="note"><p><strong>连续情形为什么也是这个式子？</strong>别把它当成"把 \(\sum\) 换成 \(\int\)、把 \(p(x)\) 换成 \(f(x)\,dx\)"的死记。关键在 \(f(x)\,dx\)：回想 PDF 要乘上一小段宽度才成概率，\(f(x)\,dx\) 恰好就是 \(X\) 落在 \([x,x+dx]\) 这一小片里的<strong>概率质量</strong>。于是 \(\int x\cdot f(x)\,dx\) 和离散的 \(\sum x\cdot p(x)\) 干的是同一件事——把每个取值乘上"它那一份概率"再累加，只不过取值连成一片，求和升级成了积分。</p></div>
+
+<p>它有三个等价直觉，挑你最顺的记：</p>
+<ul>
+<li><strong>长期平均：</strong>把这个随机实验独立重复无数次，所有结果的算术平均会稳定到 \(\mathbb{E}[X]\)。骰子掷无数次，平均点数趋于 3.5。</li>
+<li><strong>质心 / 平衡点：</strong>把分布想象成一根标尺，每个取值处压着重量 \(p(x)\) 的小球。\(\mathbb{E}[X]\) 就是这根标尺的<strong>重心</strong>——你在那里放一个支点，标尺恰好平衡。这也解释了为什么期望可以是一个"不可能取到的值"（骰子永远掷不出 3.5，但 3.5 是它的平衡点）。</li>
+<li><strong>加权平均：</strong>越可能出现的取值，对平均拉力越大。</li>
+</ul>
+
+<figure class="fig"><svg viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>期望是分布的质心：E[X]=3.5 是公平骰子 PMF 的平衡支点</title><defs><marker id="arrowL" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M6,0 L0,3 L6,6 Z" fill="#d97706"/></marker><marker id="arrowR" markerWidth="8" markerHeight="8" refX="2" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#d97706"/></marker></defs><text x="280" y="24" text-anchor="middle" font-size="14" fill="#1f2937" font-weight="600">期望 = 分布的质心 / 平衡点</text><g font-size="11" fill="#2563eb" text-anchor="middle"><rect x="70" y="70" width="44" height="110" fill="#2563eb" opacity="0.85"/><rect x="138" y="70" width="44" height="110" fill="#2563eb" opacity="0.85"/><rect x="206" y="70" width="44" height="110" fill="#2563eb" opacity="0.85"/><rect x="274" y="70" width="44" height="110" fill="#2563eb" opacity="0.85"/><rect x="342" y="70" width="44" height="110" fill="#2563eb" opacity="0.85"/><rect x="410" y="70" width="44" height="110" fill="#2563eb" opacity="0.85"/><text x="92" y="64">1/6</text><text x="160" y="64">1/6</text><text x="228" y="64">1/6</text><text x="296" y="64">1/6</text><text x="364" y="64">1/6</text><text x="432" y="64">1/6</text></g><text x="60" y="120" text-anchor="end" font-size="12" fill="#1f2937">P(X=k)</text><line x1="60" y1="180" x2="470" y2="180" stroke="#94a3b8" stroke-width="1"/><g font-size="12" fill="#1f2937" text-anchor="middle"><text x="92" y="197">1</text><text x="160" y="197">2</text><text x="228" y="197">3</text><text x="296" y="197">4</text><text x="364" y="197">5</text><text x="432" y="197">6</text></g><text x="470" y="197" font-size="12" fill="#94a3b8">k</text><line x1="262" y1="180" x2="262" y2="216" stroke="#d97706" stroke-width="1" stroke-dasharray="4 3"/><polygon points="262,214 248,242 276,242" fill="#d97706"/><line x1="244" y1="244" x2="280" y2="244" stroke="#d97706" stroke-width="2"/><text x="262" y="174" text-anchor="middle" font-size="12" fill="#d97706" font-weight="600">3.5</text><g stroke="#d97706" stroke-width="2"><line x1="170" y1="232" x2="120" y2="232" marker-end="url(#arrowL)"/><line x1="354" y1="232" x2="404" y2="232" marker-end="url(#arrowR)"/></g><text x="145" y="227" text-anchor="middle" font-size="11" fill="#d97706">左力矩</text><text x="379" y="227" text-anchor="middle" font-size="11" fill="#d97706">右力矩</text><text x="280" y="268" text-anchor="middle" font-size="12" fill="#1f2937">支点在 E[X]=3.5：分布在此恰好平衡（质心），左右力矩相等</text><text x="280" y="286" text-anchor="middle" font-size="12" fill="#d97706">3.5 不是骰子的可能取值，但它是平衡点</text></svg><figcaption>期望 = 分布的质心 / 平衡点。把骰子的 PMF 画成 6 根等高柱（每根 1/6），在数轴下方画一个三角形支点恰好放在 x=3.5 处，标注『E[X]=3.5 是让分布平衡的支点，尽管骰子掷不出 3.5』。直观传达：期望是按概率加权的重心，不必是可能取值。</figcaption></figure>
+
+<div class="example"><h4>例题：公平骰子的期望</h4><p>取值 \(x\in\{1,2,3,4,5,6\}\)，每个 \(p(x)=\tfrac16\)。</p>
+\[\mathbb{E}[X]=\sum_{x=1}^{6} x\cdot\tfrac16=\tfrac{1+2+3+4+5+6}{6}=\tfrac{21}{6}=3.5.\]
+<p>注意 3.5 本身不是骰子能掷出的点数——期望是"平衡点"，不必是可能取值。</p></div>
+
+<h3>期望的两条核心性质</h3>
+<p><strong>(1) 线性性 linearity（最常用、最强大）：</strong></p>
+\[ \mathbb{E}[aX+bY]=a\,\mathbb{E}[X]+b\,\mathbb{E}[Y].\]
+<p>这条性质强在哪？它<strong>不要求 \(X,Y\) 独立，甚至不要求它们不相关</strong>——只要期望存在，永远成立。直觉上，求和与求平均都是"线性"操作，可以先各自平均再相加，顺序无所谓。后面你会无数次用它把一个复杂的求和拆成一项项的平均（比如把一个 batch 的损失拆成每个样本损失的平均）。</p>
+
+<div class="pitfall"><h4>易错：\(\mathbb{E}[g(X)]\neq g(\mathbb{E}[X])\)</h4><p>线性性只对"线性"的 \(g\)（即 \(aX+b\) 这种）成立。对<strong>非线性</strong>的 \(g\)，"先变换再平均"和"先平均再变换"通常给出不同结果。用骰子验证 \(g(x)=x^2\)：</p>
+\[ \mathbb{E}[X^2]=\tfrac{1^2+2^2+\dots+6^2}{6}=\tfrac{91}{6}\approx15.17,\qquad (\mathbb{E}[X])^2=3.5^2=12.25.\]
+<p>两者差了 2.92，绝不相等。一般地，对凸函数 \(g\) 总有 \(\mathbb{E}[g(X)]\ge g(\mathbb{E}[X])\)——这就是<strong>Jensen 不等式</strong>，下一模块讲信息论和 ELBO 时会正式登场。</p><p><strong>这个坑在 ML 里随处可见。</strong>举个例子：集成（ensemble）多个分类器时，正确做法是先各自 softmax 出概率、再把概率平均；如果图省事先把各模型的 logits 平均、再 softmax，结果是不一样的——因为 softmax 是非线性的，"先平均再变换"不等于"先变换再平均"。<strong>记住：非线性变换不能随便把期望往里塞。</strong></p></div>
+
+<h2>方差 \(\mathrm{Var}(X)\)：分布的胖瘦</h2>
+
+<p>期望告诉你分布的中心在哪，但两个分布可以中心一样、<strong>胖瘦完全不同</strong>：一个紧紧挤在均值附近，一个铺得很开。刻画"铺多开 / 波动多大"的量就是<strong>方差 variance</strong>。</p>
+
+<p>怎么量化波动？很自然地想看"每个取值离均值有多远"，即偏差 \(X-\mu\)。但直接平均偏差会得到 0（正负相消，因为均值就是平衡点）。所以我们<strong>先平方再平均</strong>——平方消掉符号、且放大大偏差：</p>
+\[ \mathrm{Var}(X)=\mathbb{E}\big[(X-\mu)^2\big],\qquad \mu=\mathbb{E}[X].\]
+
+<p>实战中更好用的是它的<strong>等价展开式</strong>（"平方的期望减去期望的平方"）：</p>
+\[ \mathrm{Var}(X)=\mathbb{E}[X^2]-\mu^2.\]
+<p>推导一行：\(\mathbb{E}[(X-\mu)^2]=\mathbb{E}[X^2-2\mu X+\mu^2]=\mathbb{E}[X^2]-2\mu\mathbb{E}[X]+\mu^2=\mathbb{E}[X^2]-\mu^2\)（用了线性性，且 \(\mu\) 是常数）。这个式子只要算 \(\mathbb{E}[X^2]\) 和 \(\mathbb{E}[X]\) 两个量就行，特别省事。</p>
+
+<p>方差的单位是"原单位的平方"（比如米²），不好直观比较，所以常开方还原回原单位，得到<strong>标准差 standard deviation</strong> \(\sigma=\sqrt{\mathrm{Var}(X)}\)。标准差就是"典型偏离均值多远"的尺度。</p>
+
+<figure class="fig"><svg viewBox="0 0 600 340" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif">
+<title>方差刻画分布胖瘦：相同均值不同方差的两条高斯曲线</title>
+<defs>
+<marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/>
+</marker>
+</defs>
+<line x1="60" y1="250" x2="552" y2="250" stroke="#94a3b8" stroke-width="1" marker-end="url(#ah)"/>
+<line x1="60" y1="260" x2="60" y2="32" stroke="#94a3b8" stroke-width="1" marker-end="url(#ah)"/>
+<text x="556" y="254" font-size="12" fill="#1f2937">x</text>
+<text x="50" y="36" font-size="12" fill="#1f2937" text-anchor="end">概率密度</text>
+<line x1="300" y1="250" x2="300" y2="40" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/>
+<text x="300" y="28" font-size="12" fill="#1f2937" text-anchor="middle">μ = 0</text>
+<path d="M 60.0,249.4 L 94.3,247.7 L 128.6,242.8 L 159.4,233.2 L 190.3,216.9 L 217.7,197.4 L 245.1,176.7 L 272.6,160.7 L 293.1,154.9 L 300.0,154.5 L 306.9,154.9 L 327.4,160.7 L 354.9,176.7 L 382.3,197.4 L 409.7,216.9 L 440.6,233.2 L 471.4,242.8 L 505.7,247.7 L 540.0,249.4" fill="#db2777" fill-opacity="0.08" stroke="none"/>
+<path d="M 60.0,249.4 L 63.4,249.3 L 70.3,249.1 L 77.1,248.8 L 84.0,248.4 L 90.9,248.0 L 97.7,247.4 L 104.6,246.7 L 111.4,245.8 L 118.3,244.8 L 125.1,243.5 L 132.0,242.0 L 138.9,240.3 L 145.7,238.2 L 152.6,235.9 L 159.4,233.2 L 166.3,230.2 L 173.1,226.8 L 180.0,223.1 L 186.9,219.0 L 193.7,214.6 L 200.6,210.0 L 207.4,205.0 L 214.3,200.0 L 221.1,194.7 L 228.0,189.5 L 234.9,184.3 L 241.7,179.2 L 248.6,174.3 L 255.4,169.8 L 262.3,165.8 L 269.1,162.2 L 276.0,159.3 L 282.9,157.0 L 289.7,155.4 L 296.6,154.6 L 303.4,154.6 L 310.3,155.4 L 317.1,157.0 L 324.0,159.3 L 330.9,162.2 L 337.7,165.8 L 344.6,169.8 L 351.4,174.3 L 358.3,179.2 L 365.1,184.3 L 372.0,189.5 L 378.9,194.7 L 385.7,200.0 L 392.6,205.0 L 399.4,210.0 L 406.3,214.6 L 413.1,219.0 L 420.0,223.1 L 426.9,226.8 L 433.7,230.2 L 440.6,233.2 L 447.4,235.9 L 454.3,238.2 L 461.1,240.3 L 468.0,242.0 L 474.9,243.5 L 481.7,244.8 L 488.6,245.8 L 495.4,246.7 L 502.3,247.4 L 509.1,248.0 L 516.0,248.4 L 522.9,248.8 L 529.7,249.1 L 536.6,249.3 L 540.0,249.4" fill="none" stroke="#db2777" stroke-width="2"/>
+<path d="M 162.9,249.9 L 197.1,247.7 L 224.6,231.3 L 245.1,191.6 L 269.1,109.9 L 289.7,49.2 L 300.0,40.0 L 310.3,49.2 L 330.9,109.9 L 354.9,191.6 L 375.4,231.3 L 402.9,247.7 L 437.1,249.9 z" fill="#2563eb" fill-opacity="0.08" stroke="none"/>
+<path d="M 159.4,250.0 L 166.3,249.9 L 173.1,249.8 L 180.0,249.5 L 186.9,249.1 L 193.7,248.3 L 200.6,246.9 L 207.4,244.5 L 214.3,240.8 L 221.1,235.1 L 228.0,226.8 L 234.9,215.5 L 241.7,200.5 L 248.6,181.8 L 255.4,159.8 L 262.3,135.3 L 269.1,109.9 L 276.0,85.6 L 282.9,64.7 L 289.7,49.2 L 296.6,41.0 L 300.0,40.0 L 303.4,41.0 L 306.9,44.2 L 313.7,56.1 L 320.6,74.6 L 327.4,97.5 L 334.3,122.6 L 341.1,147.8 L 348.0,171.2 L 354.9,191.6 L 361.7,208.4 L 368.6,221.6 L 375.4,231.3 L 382.3,238.2 L 389.1,242.9 L 396.0,245.8 L 402.9,247.7 L 409.7,248.7 L 416.6,249.4 L 423.4,249.7 L 430.3,249.8 L 437.1,249.9 L 444.0,250.0" fill="none" stroke="#2563eb" stroke-width="2"/>
+<g>
+<line x1="265.7" y1="262" x2="334.3" y2="262" stroke="#2563eb" stroke-width="2"/>
+<line x1="265.7" y1="257" x2="265.7" y2="267" stroke="#2563eb" stroke-width="2"/>
+<line x1="334.3" y1="257" x2="334.3" y2="267" stroke="#2563eb" stroke-width="2"/>
+<text x="300" y="278" font-size="11" fill="#2563eb" text-anchor="middle">A 的 [−σ, +σ]，σ=1（窄）</text>
+</g>
+<g>
+<line x1="224.6" y1="296" x2="375.4" y2="296" stroke="#db2777" stroke-width="2"/>
+<line x1="224.6" y1="291" x2="224.6" y2="301" stroke="#db2777" stroke-width="2"/>
+<line x1="375.4" y1="291" x2="375.4" y2="301" stroke="#db2777" stroke-width="2"/>
+<text x="300" y="312" font-size="11" fill="#db2777" text-anchor="middle">B 的 [−σ, +σ]，σ=2.2（宽，跨度更大）</text>
+</g>
+<text x="318" y="52" font-size="13" fill="#2563eb">小方差：瘦高</text>
+<text x="318" y="68" font-size="13" fill="#2563eb">挤在均值附近</text>
+<text x="446" y="200" font-size="13" fill="#db2777">大方差：矮胖</text>
+<text x="446" y="216" font-size="13" fill="#db2777">铺得开</text>
+<line x1="476" y1="222" x2="500" y2="241" stroke="#db2777" stroke-width="1" stroke-dasharray="4 3"/>
+<text x="300" y="333" font-size="12" fill="#1f2937" text-anchor="middle">两条曲线下面积都 = 1</text>
+</svg><figcaption>方差刻画分布的胖瘦。叠画两条均值相同（都为 μ=0）但方差不同的高斯曲线：一条窄而高（小方差 σ²小，挤在均值附近），一条宽而矮（大方差 σ²大，铺得开）。两条曲线下面积都等于 1。标注小方差曲线『σ 小：数据紧贴均值』、大方差曲线『σ 大：数据分散』，并在横轴上用 ±σ 区间标出两者标准差跨度的差异。</figcaption></figure>
+
+<div class="example"><h4>例题：骰子的方差（用 \(\mathbb{E}[X^2]-\mu^2\) 复核）</h4>
+<p>已知 \(\mu=\mathbb{E}[X]=3.5\)。先算 \(\mathbb{E}[X^2]\)：</p>
+\[\mathbb{E}[X^2]=\tfrac{1+4+9+16+25+36}{6}=\tfrac{91}{6}\approx15.1667.\]
+\[\mathrm{Var}(X)=\mathbb{E}[X^2]-\mu^2=\tfrac{91}{6}-\tfrac{49}{4}=\tfrac{182-147}{12}=\tfrac{35}{12}\approx2.9167.\]
+<p>标准差 \(\sigma=\sqrt{35/12}\approx1.708\)。<strong>用定义式复核</strong>：偏差平方按概率加权，\(\tfrac16\big[(1{-}3.5)^2+\dots+(6{-}3.5)^2\big]=\tfrac16(6.25+2.25+0.25+0.25+2.25+6.25)=\tfrac{17.5}{6}=2.9167\) ✓，两条路殊途同归。</p></div>
+
+<div class="example"><h4>例题：一个非均匀离散分布的 E 与 Var</h4>
+<p>设 \(X\in\{0,1,2,3\}\)，\(p=(0.1,\,0.2,\,0.4,\,0.3)\)（先验证 \(\sum p=1\) ✓）。</p>
+\[\mu=\mathbb{E}[X]=0(0.1)+1(0.2)+2(0.4)+3(0.3)=0.2+0.8+0.9=1.9.\]
+\[\mathbb{E}[X^2]=0+1(0.2)+4(0.4)+9(0.3)=0.2+1.6+2.7=4.5.\]
+\[\mathrm{Var}(X)=4.5-1.9^2=4.5-3.61=0.89,\qquad \sigma\approx0.943.\]
+<p>定义式复核：\(\sum (x-1.9)^2 p(x)=0.361+0.162+0.004+0.363=0.89\) ✓。</p></div>
+
+<h2>蒙特卡洛估计：用样本平均近似期望</h2>
+
+<p>到目前为止我们都在"知道分布、算期望"。但真实 ML 里恰恰反过来：我们<strong>不知道</strong>真实分布的解析式，只能<strong>采样</strong>——拿到一堆样本 \(x_1,\dots,x_n\)。这时怎么估计期望？最朴素、也最强大的办法是直接<strong>用样本的算术平均去近似</strong>：</p>
+\[ \mathbb{E}[X]\;\approx\;\bar{X}_n=\frac1n\sum_{i=1}^n x_i.\]
+<p>这就是<strong>蒙特卡洛估计 Monte Carlo estimation</strong>。它凭什么管用？两条腿撑着：</p>
+<ul>
+<li><strong>它是无偏的（unbiased）。</strong>由期望的线性性，\(\mathbb{E}[\bar X_n]=\frac1n\sum_i\mathbb{E}[x_i]=\mathbb{E}[X]\)。这里悄悄用了一个前提：每个样本<strong>同分布</strong>，所以每个 \(\mathbb{E}[x_i]\) 都等于 \(\mathbb{E}[X]\)；至于把求和拆开、把 \(\tfrac1n\) 提出来，则纯靠线性性，<em>与独立性无关</em>。结论是：样本均值这个估计量<strong>平均而言不偏不倚</strong>，正好瞄准真期望，没有系统性高估或低估。</li>
+<li><strong>大数定律（Law of Large Numbers, LLN）保证它收敛。</strong>当 \(n\to\infty\)，\(\bar X_n\) 几乎必然趋于 \(\mathbb{E}[X]\)。更定量地，样本均值的标准差是 \(\sigma/\sqrt{n}\)——<strong>样本量翻 4 倍，估计的波动才减半</strong>（因为是 \(\sqrt n\) 而不是 \(n\)）。注意 \(\sigma/\sqrt n\) 这个式子比"无偏"多用了一个前提：样本<strong>相互独立</strong>（或至少不相关）。"独立 + 同分布"合起来就是机器学习里反复出现的高频缩写 <strong>i.i.d.（independent and identically distributed，独立同分布）</strong>——训练集采样、mini-batch 抽样默认都按这个假设来。这也是"越采样越准，但回报递减"的来历。</li>
+</ul>
+
+<figure class="fig"><svg viewBox="0 0 680 360" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>蒙特卡洛：样本均值随 n 增大收敛到真期望 E[X]=3.5</title><defs><marker id="mcArrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker></defs><text x="340" y="24" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2937">蒙特卡洛：样本均值随 n 增大收敛到真期望</text><g stroke="#e2e8f0" stroke-width="0.75"><line x1="90" y1="60" x2="90" y2="288"/><line x1="206" y1="60" x2="206" y2="288"/><line x1="322" y1="60" x2="322" y2="288"/><line x1="438" y1="60" x2="438" y2="288"/><line x1="554" y1="60" x2="554" y2="288"/><line x1="90" y1="88" x2="620" y2="88"/><line x1="90" y1="146" x2="620" y2="146"/><line x1="90" y1="232" x2="620" y2="232"/><line x1="90" y1="260" x2="620" y2="260"/></g><path d="M90,60 C 210,72 380,150 620,168 L620,124 C 380,108 210,30 90,60 Z" fill="#2563eb" fill-opacity="0.1" stroke="none"/><line x1="90" y1="146" x2="620" y2="146" stroke="#059669" stroke-width="2" stroke-dasharray="4 3"/><text x="616" y="140" text-anchor="end" font-size="12" fill="#059669" font-weight="600">真期望 E[X]=3.5</text><polyline fill="none" stroke="#2563eb" stroke-width="2" points="90,80 119,206 148,108 177,180 206,124 235,168 264,134 293,158 322,140 351,152 380,144 409,150 438,146 467,149 496,145 525,147 554,146 583,147 620,146"/><polyline fill="none" stroke="#3b82f6" stroke-width="2" points="90,222 119,96 148,176 177,116 206,164 235,128 264,156 293,138 322,154 351,142 380,150 409,145 438,148 467,144 496,147 525,146 554,147 583,146 620,146"/><polyline fill="none" stroke="#60a5fa" stroke-width="2" points="90,118 119,200 148,86 177,160 206,108 235,158 264,124 293,150 322,134 351,148 380,140 409,149 438,143 467,148 496,144 525,147 554,145 583,147 620,146"/><polyline fill="none" stroke="#1e40af" stroke-width="2" points="90,168 119,72 148,196 177,104 206,170 235,120 264,160 293,130 322,152 351,138 380,151 409,143 438,150 467,145 496,148 525,144 554,147 583,146 620,146"/><line x1="90" y1="288" x2="624" y2="288" stroke="#94a3b8" stroke-width="1" marker-end="url(#mcArrow)"/><line x1="90" y1="288" x2="90" y2="52" stroke="#94a3b8" stroke-width="1" marker-end="url(#mcArrow)"/><g font-size="12" fill="#1f2937" text-anchor="middle"><text x="90" y="304">10</text><text x="206" y="304">100</text><text x="322" y="304">1k</text><text x="438" y="304">10k</text><text x="554" y="304">100k</text></g><text x="624" y="304" text-anchor="end" font-size="12" fill="#1f2937">样本量 n（对数刻度）</text><g font-size="11" fill="#1f2937" text-anchor="end"><text x="84" y="91">4.5</text><text x="84" y="149">3.5</text><text x="84" y="235">2.5</text></g><text x="34" y="170" font-size="12" fill="#1f2937" text-anchor="middle" transform="rotate(-90 34 170)">累计样本均值</text><rect x="356" y="62" width="14" height="11" fill="#2563eb" fill-opacity="0.18" stroke="#2563eb" stroke-width="0.75"/><text x="376" y="72" font-size="12" fill="#1f2937">误差带 ∝ 1/√n：n 翻 4 倍，宽度减半</text><text x="148" y="48" font-size="11" fill="#3b82f6" text-anchor="middle">小 n：剧烈抖动</text><text x="520" y="118" font-size="11" fill="#1e40af" text-anchor="middle">大 n：收拢贴近真值</text><text x="340" y="334" text-anchor="middle" font-size="12" fill="#1f2937" font-weight="600">大数定律 LLN：n→∞ 时样本均值 → 真期望</text></svg><figcaption>蒙特卡洛：样本均值随样本量 n 增大而波动收窄、收敛到真期望。横轴为样本量 n（对数刻度，从小到大），纵轴为累计样本均值。画几条随机游走的折线（不同随机种子），它们在 n 小时上下剧烈抖动、随 n 增大逐渐收拢，最终都贴近一条水平的真期望线 E[X]=3.5。再叠一个随 n 收窄的 ±σ/√n 漏斗状误差带，直观体现『翻 4 倍样本、波动减半』。</figcaption></figure>
+
+<div class="ml"><h4><span class="tag">ML</span> 和 ML 的联系：SGD 的梯度是真梯度的无偏估计</h4><p>训练神经网络时，真正想最小化的是<strong>整个训练集上的平均损失</strong>（经验风险），它的梯度是 \(\nabla L=\frac1N\sum_{x}\nabla \ell(x)\)，也可以写成在训练集上取期望 \(\mathbb{E}_{x\sim\text{训练集}}[\nabla \ell(x)]\)——一个<strong>期望</strong>。但数据动辄上亿条，每步都算全量梯度太贵。<strong>随机梯度下降（SGD）</strong>的做法是：每步随机抽一个小批量（mini-batch），用这批样本的平均梯度 \(\frac1B\sum_i\nabla\ell(x_i)\) 代替真梯度。</p><p>看出来了吗？这<strong>正是蒙特卡洛估计</strong>，只不过被估计的随机变量是"梯度"。<strong>只要每个 mini-batch 是从训练集均匀随机抽取的</strong>，由期望的线性性，小批量梯度就是"整个训练集上真梯度"的<strong>无偏估计</strong>：平均而言方向是对的，只是带噪声。注意"无偏"是相对<strong>训练集这个经验平均</strong>而言的，不是相对世界的真实分布——后者牵扯到泛化，是另一个话题。batch 越大，由 \(\sigma/\sqrt{B}\) 知噪声越小、但每步越贵——这正是炼丹时 batch size 取舍的数学本质。本课埋的这个点，到模块的最优化部分会完整展开。</p></div>
+
+<div class="example"><h4>代码：用 numpy 采样估计骰子的 E 与 Var，并看 n 增大变准</h4>
+<pre><code>import numpy as np
+rng = np.random.default_rng(0)
+
+# 理论值
+E_true, Var_true = 3.5, 35/12
+print("理论: E[X]=%.4f  Var=%.4f" % (E_true, Var_true))
+
+# 不同样本量下的蒙特卡洛估计
+for n in [100, 1_000, 100_000, 10_000_000]:
+    s = rng.integers(1, 7, size=n)          # 公平骰子的 n 次采样
+    E_hat   = s.mean()                       # 样本均值 ≈ E[X]
+    Var_hat = s.var()                        # 样本方差 ≈ Var(X)
+    print("n=%-9d E_hat=%.4f (误差%.4f)  Var_hat=%.4f (误差%.4f)"
+          % (n, E_hat, abs(E_hat-E_true), Var_hat, abs(Var_hat-Var_true)))
+</code></pre>
+<p>运行会看到：误差随 \(n\) 增大而<strong>整体缩小</strong>（但不是单调，因为是随机的），到千万级时 \(E\) 已稳在 3.50 附近、\(Var\) 稳在 2.917 附近。这就是大数定律在你眼前发生。</p></div>
+
+<h2>调一调，观察现象</h2>
+<p>把上面的思路改一个数、跑一遍，用眼睛确认理论。每个实验都先想"预期看到什么"，再运行验证。</p>
+
+<div class="example"><h4>实验 1：样本量翻 4 倍，估计波动减半（√n 律）</h4>
+<p><strong>改什么：</strong>固定骰子分布，对每个 \(n\in\{100,400,1600\}\)，<strong>重复 2000 次实验</strong>各算一个样本均值，再看这 2000 个均值自己的标准差。<br>
+<strong>预期看到：</strong>波动随 \(n\) 增大而收窄，且大致是 \(\sigma/\sqrt n\)：约 0.17、0.085、0.043——每次 \(n\) 翻 4 倍，波动减半。<br>
+<strong>为什么：</strong>样本均值的标准差是 \(\sigma/\sqrt n\)（\(\sigma=\sqrt{35/12}\approx1.708\)），分母里是 \(\sqrt n\) 而非 \(n\)，所以要让精度翻倍得付出 4 倍样本——蒙特卡洛"回报递减"的根源。</p>
+<pre><code>import numpy as np
+rng = np.random.default_rng(1)
+sigma = np.sqrt(35/12)
+for n in [100, 400, 1600]:
+    means = [rng.integers(1,7,size=n).mean() for _ in range(2000)]
+    print("n=%-5d 样本均值的标准差=%.4f   理论 sigma/sqrt(n)=%.4f"
+          % (n, np.std(means), sigma/np.sqrt(n)))
+</code></pre></div>
+
+<div class="example"><h4>实验 2：线性性即便变量相关也成立</h4>
+<p><strong>改什么：</strong>造一对<strong>完全相关</strong>的变量：掷骰子得 \(X\)，令 \(Y=2-X\)（\(Y\) 被 \(X\) 完全决定）。分别估计 \(\mathbb{E}[X]+\mathbb{E}[Y]\) 和 \(\mathbb{E}[X+Y]\)。<br>
+<strong>预期看到：</strong>两者都约等于 2.0（理论上 \(\mathbb{E}[X+Y]=\mathbb{E}[2]=2\) 精确成立），尽管 \(X,Y\) 强相关。<br>
+<strong>为什么：</strong>线性性 \(\mathbb{E}[aX+bY]=a\mathbb{E}[X]+b\mathbb{E}[Y]\) <strong>不依赖独立性</strong>。这里 \(X+Y\equiv2\) 是常数，期望当然是 2。</p>
+<pre><code>import numpy as np
+rng = np.random.default_rng(2)
+X = rng.integers(1,7,size=500_000).astype(float)
+Y = 2.0 - X                       # Y 与 X 完全相关
+print("E[X]=%.3f  E[Y]=%.3f  之和=%.3f" % (X.mean(), Y.mean(), X.mean()+Y.mean()))
+print("E[X+Y]=%.3f  (理论恒为 2)" % (X+Y).mean())
+</code></pre></div>
+
+<div class="example"><h4>实验 3：\(\mathbb{E}[g(X)]\neq g(\mathbb{E}[X])\)（Jensen 埋点）</h4>
+<p><strong>改什么：</strong>取 \(g(x)=x^2\)，分别估计"先平方再平均" \(\mathbb{E}[X^2]\) 与"先平均再平方" \((\mathbb{E}[X])^2\)。<br>
+<strong>预期看到：</strong>\(\mathbb{E}[X^2]\approx15.17\)，而 \((\mathbb{E}[X])^2\approx12.25\)，前者明显更大，差约 2.92（恰好等于 \(\mathrm{Var}(X)\)！）。<br>
+<strong>为什么：</strong>\(g\) 是凸函数，由 Jensen 不等式 \(\mathbb{E}[g(X)]\ge g(\mathbb{E}[X])\)；而二者之差正是 \(\mathbb{E}[X^2]-(\mathbb{E}[X])^2=\mathrm{Var}(X)\)。非线性变换不能把期望随便挪进去。</p>
+<pre><code>import numpy as np
+rng = np.random.default_rng(3)
+X = rng.integers(1,7,size=2_000_000).astype(float)
+print("E[X^2]      = %.4f" % (X**2).mean())
+print("(E[X])^2    = %.4f" % (X.mean()**2))
+print("差值        = %.4f   (= Var(X) ≈ 2.9167)" % ((X**2).mean() - X.mean()**2))
+</code></pre></div>
+
+<h2>动手练习</h2>
+<ol>
+<li><strong>手算 + 代码复核。</strong>一枚不公平硬币正面概率 0.7，令 \(X=1\)（正）/ \(0\)（反）。手算 \(\mathbb{E}[X]\) 与 \(\mathrm{Var}(X)\)，再用 numpy 采样验证。
+<pre><code>import numpy as np
+rng = np.random.default_rng(0)
+p = 0.7
+# TODO: 手算 E[X]=? Var(X)=?  （提示：E[X]=p, Var=p(1-p)）
+X = (rng.random(1_000_000) &lt; p).astype(float)   # 1 表示正面
+print("E_hat=%.4f  Var_hat=%.4f" % (X.mean(), X.var()))
+</code></pre></li>
+<li><strong>PDF 可大于 1。</strong>在 \([0,0.5]\) 上的均匀分布密度处处为 2。用采样估计 \(P(X\le0.25)\)，确认它约为 0.5；并解释为什么"密度 2"不违反概率规则。
+<pre><code>import numpy as np
+rng = np.random.default_rng(1)
+X = rng.uniform(0, 0.5, size=1_000_000)
+# TODO: 估计 P(X<=0.25)，并想想 底0.5 × 高2 = 面积1
+print("P(X<=0.25) ≈ %.4f" % (X &lt;= 0.25).mean())
+</code></pre></li>
+<li><strong>CDF 是 PMF 的累加。</strong>对例题里的离散分布 \(p=(0.1,0.2,0.4,0.3)\)，手写 CDF 的四级阶梯 \(F(0),F(1),F(2),F(3)\)，并用 <code>np.cumsum</code> 验证它们是 \(0.1,0.3,0.7,1.0\)。</li>
+<li><strong>用样本估计期望，看无偏。</strong>对例题二的分布，用 <code>rng.choice([0,1,2,3], p=...)</code> 采样 \(n=10^6\) 次，确认样本均值 ≈ 1.9、样本方差 ≈ 0.89。把 \(n\) 调小到 30，多跑几次，体会小样本时估计的抖动。</li>
+<li><strong>(挑战) 蒙特卡洛求 π。</strong>在单位正方形里均匀撒点，落入 \(1/4\) 圆内的比例 ≈ \(\pi/4\)。这是把"求面积（一个积分 / 期望）"换成"数样本比例"的经典蒙特卡洛。用 \(n=10^6\) 估计 π，并观察误差随 \(n\) 的 \(1/\sqrt n\) 缩小。</li>
+</ol>
+
+<h2>掌握自检</h2>
+<ul>
+<li>有人说"这条 PDF 在某点取值 2.3，所以那里概率是 2.3"，我能立刻指出错在哪，并说明 PDF 值可大于 1、单点概率为 0。</li>
+<li>给我任一离散分布，我能在一分钟内手算 \(\mathbb{E}[X]\)、\(\mathbb{E}[X^2]\)、\(\mathrm{Var}(X)=\mathbb{E}[X^2]-\mu^2\) 和 \(\sigma\)，并用定义式复核一致。</li>
+<li>我能写出离散分布的 CDF 阶梯（每级跳高就是该点 \(p(x)\)），说清 \(F(x)=P(X\le x)\) 单调从 0 爬到 1，并指出连续情形 \(F'(x)=f(x)\)、PDF 是 CDF 的斜率版。</li>
+<li>我能说出 \(\mathbb{E}[aX+bY]=a\mathbb{E}[X]+b\mathbb{E}[Y]\) <strong>不需要</strong>独立性，并举一个 \(\mathbb{E}[g(X)]\neq g(\mathbb{E}[X])\) 的例子。</li>
+<li>我能解释为什么样本均值是期望的无偏估计（用到同分布）、为什么 \(\sigma/\sqrt n\) 这条还额外要独立（即 i.i.d.）、为什么 \(n\) 翻 4 倍精度才翻倍，并把这套话搬到"SGD 小批量梯度是训练集真梯度的无偏估计"上。</li>
+</ul>
+
+<p>下一课，我们把这套语言"装满弹药"：认识 ML 最常用的几种具体分布（伯努利、二项、高斯、类别分布等），看它们各自适合刻画什么数据；并把<strong>协方差 \(\mathrm{Cov}(X,Y)\)</strong> 推广到多维，接回模块 1 第 4 课——你会看到<strong>协方差矩阵对称半正定、可以特征分解</strong>，它的特征向量正是数据散布的主轴（PCA 的种子）。</p>
+
+<div class="skip"><h4>可以先放过的点</h4><ul>
+<li><strong>测度论层面的严格定义</strong>（样本空间上的 σ-代数、可测函数、随机变量作为"可测映射"）。本课的函数视角足够用，等你将来读概率论教材或需要处理"奇异分布"时再回来补，现在不必吃透。</li>
+<li><strong>模型输出的概率是否"可信"</strong>（校准 calibration、认知不确定性 vs 数据固有噪声）。本课只说"分类器的 90% 是一个概率化猜测"，至于这个数是否真等于模型的"确信程度"是更深的话题，后面再说。</li>
+<li><strong>期望不存在的病态分布</strong>（如柯西分布，积分发散导致期望无定义）。ML 里几乎都用良态分布，遇到再说。</li>
+<li><strong>Jensen 不等式的一般证明</strong>。这里只要记住"凸函数下 \(\mathbb{E}[g(X)]\ge g(\mathbb{E}[X])\)"这个结论方向即可，正式推导和它在 VAE 的 ELBO、信息论中的用法，留到模块的信息论部分再展开。</li>
+<li><strong>有放回 / 无放回采样，以及"训练集经验风险 vs 世界真实风险"的区别</strong>。本课把 SGD 的"无偏"说成相对训练集而言，已足够直觉；严格区分留到最优化与泛化部分。</li>
+<li><strong>样本方差除以 \(n\) 还是 \(n-1\)（无偏修正，贝塞尔校正）</strong>。本课用 numpy 默认的除以 \(n\) 不影响任何直觉；大样本下二者几乎无差，讲到估计理论时再细究。</li>
+</ul></div>
+</article>
+<div class="navbtns"><a class="prev" href="index.html"><div class="nlabel">←</div><div class="ntitle">模块目录</div></a><a class="next" href="lesson-02-distributions-covariance.html"><div class="nlabel">下一课 →</div><div class="ntitle">第2课 · 分布动物园与协方差</div></a></div>
+<nav class="toc"><h3>本模块课程表</h3><ol>
+<li class="cur"><span class="ln">第1课</span>概率的语言——随机变量、分布、期望与方差</li>
+<li><a href="lesson-02-distributions-covariance.html"><span class="ln">第2课</span>分布动物园与协方差</a></li>
+<li><a href="lesson-03-conditional-bayes.html"><span class="ln">第3课</span>条件概率与贝叶斯</a></li>
+<li><a href="lesson-04-mle-map.html"><span class="ln">第4课</span>从数据到损失——MLE 与 MAP</a></li>
+<li><a href="lesson-05-information-theory.html"><span class="ln">第5课</span>信息论——熵、交叉熵、KL</a></li>
+<li class="soon"><span class="ln">第6课</span>采样——逆变换、重参数化与蒙特卡洛　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第7课</span>凸性与梯度下降——优化的几何　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第8课</span>现代优化器——SGD、动量、Adam 与调度　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第9课</span>强化学习速成 I——MDP、价值与贝尔曼　<span class="badge">即将上线</span></li>
+<li class="soon"><span class="ln">第10课</span>强化学习速成 II——策略梯度到 PPO　<span class="badge">即将上线</span></li>
+</ol></nav>
+</div>
+<!-- pyrunner-injected -->
+<style>
+.pr-cell{border:1px solid #334155;border-radius:10px;margin:1.2em 0;overflow:hidden;background:#0f172a;}
+.pr-head{display:flex;align-items:center;gap:8px;background:#1e293b;color:#cbd5e1;padding:6px 10px;font-size:13px;font-family:system-ui,-apple-system,sans-serif;}
+.pr-title{flex:1;font-weight:600;}
+.pr-status{font-size:12px;color:#94a3b8;white-space:nowrap;max-width:50%;overflow:hidden;text-overflow:ellipsis;}
+.pr-btn{cursor:pointer;border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:6px;padding:3px 11px;font-size:13px;line-height:1.4;}
+.pr-btn:hover{background:#0b1220;}
+.pr-run{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:600;}
+.pr-run:hover{background:#1d4ed8;}
+.pr-cell.collapsed .pr-body{display:none;}
+.pr-edit{display:block;width:100%;border:none;background:#0f172a;color:#e2e8f0;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.55;padding:12px 14px;resize:vertical;box-sizing:border-box;outline:none;}
+.pr-out{margin:0;padding:10px 14px;border-top:1px solid #334155;background:#0b1220;color:#cbd5e1;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.5;white-space:pre-wrap;max-height:340px;overflow:auto;}
+.pr-out:empty{display:none;}
+.pr-out.err{color:#fca5a5;}
+#pr-fab{position:fixed;right:18px;bottom:18px;z-index:9998;background:#2563eb;color:#fff;border:none;border-radius:999px;padding:10px 17px;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.22);font-family:system-ui,sans-serif;}
+#pr-fab:hover{background:#1d4ed8;}
+#pr-lab{position:fixed;right:18px;bottom:66px;z-index:9999;width:400px;max-width:92vw;background:#0f172a;border:1px solid #334155;border-radius:12px;display:none;flex-direction:column;box-shadow:0 14px 38px rgba(0,0,0,.4);overflow:hidden;}
+#pr-lab.open{display:flex;}
+#pr-lab .pr-edit{min-height:150px;}
+</style>
+<script>
+(function(){
+  var PYBASE="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+  var pyReady=null;
+  function loadPy(status){
+    if(pyReady)return pyReady;
+    pyReady=(async function(){
+      status("正在加载 Python 运行时（首次约 10 秒，需联网）…");
+      await new Promise(function(res,rej){
+        var s=document.createElement("script");s.src=PYBASE+"pyodide.js";
+        s.onload=res;s.onerror=function(){rej(new Error("无法加载 Pyodide（首次运行需要联网）"));};
+        document.head.appendChild(s);
+      });
+      var py=await loadPyodide({indexURL:PYBASE});
+      status("正在加载 NumPy …");
+      await py.loadPackage("numpy");
+      status("Python 就绪 ✓");
+      return py;
+    })();
+    return pyReady;
+  }
+  async function run(code,outEl,statusEl){
+    var setS=function(m){if(statusEl)statusEl.textContent=m;};
+    outEl.classList.remove("err");outEl.textContent="";
+    var py;
+    try{py=await loadPy(setS);}
+    catch(e){outEl.classList.add("err");outEl.textContent="加载失败："+e.message;return;}
+    var buf="";
+    py.setStdout({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    py.setStderr({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    try{
+      var result=await py.runPythonAsync(code);
+      if(result!==undefined&&result!==null){
+        var r;try{r=result.toString();}catch(_){r=String(result);}
+        if(r!=="None")buf+=(buf&&!buf.endsWith("\n")?"\n":"")+r;
+        if(result&&result.destroy)result.destroy();
+      }
+      outEl.textContent=buf||"（运行成功，无输出。用 print(...) 查看结果）";
+    }catch(e){
+      outEl.classList.add("err");
+      outEl.textContent=buf+(buf?"\n":"")+String((e&&e.message)||e);
+    }
+  }
+  function autosize(ta){ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight+2,460)+"px";}
+  function tabKey(e){
+    if(e.key==="Tab"){e.preventDefault();var s=this.selectionStart,en=this.selectionEnd;
+      this.value=this.value.slice(0,s)+"    "+this.value.slice(en);this.selectionStart=this.selectionEnd=s+4;}
+    if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();var b=this.closest(".pr-cell,#pr-lab").querySelector(".pr-run");if(b)b.click();}
+  }
+  function makeCell(code){
+    var cell=document.createElement("div");cell.className="pr-cell";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">可运行 · Python (NumPy)</span><span class="pr-status"></span><button class="pr-btn pr-toggle">收起</button><button class="pr-btn pr-run">▶ 运行</button></div><div class="pr-body"><textarea class="pr-edit" spellcheck="false"></textarea><pre class="pr-out"></pre></div>';
+    var ta=cell.querySelector(".pr-edit");ta.value=code;
+    var out=cell.querySelector(".pr-out"),st=cell.querySelector(".pr-status");
+    ta.addEventListener("input",function(){autosize(ta);});
+    ta.addEventListener("keydown",tabKey);
+    cell.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    var tog=cell.querySelector(".pr-toggle");
+    tog.onclick=function(){cell.classList.toggle("collapsed");tog.textContent=cell.classList.contains("collapsed")?"展开":"收起";};
+    setTimeout(function(){autosize(ta);},0);
+    return cell;
+  }
+  function enhance(){
+    document.querySelectorAll("article pre").forEach(function(pre){
+      if(pre.closest(".pr-cell"))return;
+      var codeEl=pre.querySelector("code")||pre;
+      var code=codeEl.textContent.replace(/\s+$/,"");
+      if(!code)return;
+      pre.replaceWith(makeCell(code));
+    });
+  }
+  function lab(){
+    var fab=document.createElement("button");fab.id="pr-fab";fab.textContent="▶ Python 实验台";
+    var panel=document.createElement("div");panel.id="pr-lab";
+    panel.innerHTML='<div class="pr-head"><span class="pr-title">Python 实验台 · NumPy</span><span class="pr-status"></span><button class="pr-btn pr-run">▶ 运行</button><button class="pr-btn pr-min">收起</button></div><div class="pr-body"><textarea class="pr-edit" spellcheck="false"></textarea><pre class="pr-out"></pre></div>';
+    document.body.appendChild(fab);document.body.appendChild(panel);
+    var ta=panel.querySelector(".pr-edit");
+    ta.value="import numpy as np\na = np.array([3, 2])\nb = np.array([1, 4])\nprint(\"a + b =\", a + b)\nprint(\"a . b =\", a @ b)\nprint(\"|a|  =\", np.linalg.norm(a))\ncos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))\nprint(\"cos =\", round(float(cos), 4))";
+    ta.addEventListener("keydown",tabKey);
+    var out=panel.querySelector(".pr-out"),st=panel.querySelector(".pr-status");
+    panel.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    fab.onclick=function(){panel.classList.toggle("open");};
+    panel.querySelector(".pr-min").onclick=function(){panel.classList.remove("open");};
+  }
+  function init(){enhance();lab();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+
+<script src="../assets/annotator.js"></script>
+</body>
+</html>
