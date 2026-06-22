@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块2 · 第10课 · 强化学习速成 II——策略梯度到 PPO</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<script src="../assets/theme.js"></script>
+<link rel="stylesheet" href="../assets/annotator.css">
+<link rel="stylesheet" href="../assets/theme.css">
+
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue-bg:#eff6ff;
+--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--pink:#db2777;
+--red:#dc2626;--red-bg:#fef2f2;--bg:#ffffff;--soft:#f8fafc;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);
+font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.85;font-size:17px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:840px;margin:0 auto;padding:0 22px 100px;}
+header.top{background:#fff;border-bottom:1px solid var(--line);padding:26px 22px 22px;margin-bottom:14px;}
+header.top .inner{max-width:840px;margin:0 auto;}
+.crumb{color:var(--muted);font-size:14px;letter-spacing:.3px;margin-bottom:6px;}
+h1{font-size:30px;line-height:1.3;margin:.1em 0 .2em;}
+.sub{color:var(--muted);font-size:15px;}
+article{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:30px 34px;margin-top:18px;}
+h2{font-size:23px;margin:1.7em 0 .6em;padding-bottom:.25em;border-bottom:2px solid var(--line);}
+h2:first-child{margin-top:.2em;}
+h3{font-size:19px;margin:1.3em 0 .4em;color:#0f172a;}
+h4{margin:.2em 0 .5em;font-size:16px;}
+p{margin:.7em 0;}
+ul,ol{padding-left:1.3em;margin:.6em 0;}
+li{margin:.32em 0;}
+code{background:#f1f5f9;padding:.12em .4em;border-radius:5px;font-size:.9em;
+font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a;}
+pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 18px;overflow:auto;font-size:14px;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0;}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:15.5px;}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+thead th{background:var(--soft);}
+figure.fig{margin:1.4em 0;text-align:center;}
+figure.fig svg{max-width:100%;height:auto;}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
+.note,.ml,.key,.pitfall,.example{border-radius:10px;padding:14px 18px;margin:1.2em 0;border:1px solid var(--line);}
+.note{background:var(--soft);border-left:4px solid #94a3b8;}
+.example{background:#fff;border-left:4px solid var(--blue);}
+.ml{background:var(--green-bg);border-left:4px solid var(--green);}
+.key{background:var(--amber-bg);border-left:4px solid var(--amber);}
+.pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.goals{background:var(--blue-bg);border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:10px;padding:14px 20px;margin:.2em 0 1.5em;}
+.goals h4{margin:.1em 0 .5em;color:#1e3a8a;}
+.goals ul{margin:.3em 0;}
+.skip{background:var(--soft);border:1px solid var(--line);border-left:4px solid #94a3b8;border-radius:10px;padding:14px 20px;margin:1.8em 0 0;color:#475569;}
+.skip h4{margin:.1em 0 .5em;color:#475569;}
+.tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
+.toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
+.toc h3{margin:.1em 0 .7em;}
+.toc ol{list-style:none;padding:0;}
+.toc li{padding:7px 10px;border-radius:8px;color:#334155;border:1px solid transparent;}
+.toc li a{color:inherit;text-decoration:none;display:block;}
+.toc li .ln{display:inline-block;min-width:54px;color:var(--muted);font-size:13px;}
+.toc li.cur{background:var(--blue-bg);border-color:#bfdbfe;font-weight:600;color:#1e3a8a;}
+.toc li:not(.cur):hover{background:var(--soft);}
+.navbtns{display:flex;justify-content:space-between;margin-top:22px;gap:12px;}
+.navbtns a{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--ink);}
+.navbtns a:hover{border-color:var(--blue);}
+.navbtns .nlabel{color:var(--muted);font-size:13px;}
+.navbtns .ntitle{font-weight:600;margin-top:3px;}
+.navbtns .next{text-align:right;}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.here{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:6px 0 4px;font-size:15px;color:#1e3a8a;line-height:1.7;}
+.here b{font-weight:700;}
+.cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
+.card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
+.card:hover{border-color:var(--blue);}
+.card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
+.card .ct{font-size:18px;font-weight:600;}
+.card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+.card .cap{margin-left:40px;margin-top:7px;font-size:13px;color:#1e3a8a;}
+.card .cap .lbl{display:inline-block;background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;margin-right:7px;}
+
+.card.soon{opacity:.6;cursor:default;}
+.card.soon:hover{border-color:var(--line);}
+.badge{display:inline-block;background:#e2e8f0;color:#475569;font-size:11px;font-weight:600;padding:1px 8px;border-radius:20px;margin-left:8px;vertical-align:middle;}
+.toc li.soon{color:#94a3b8;}
+.toc li.soon .badge{margin-left:4px;}
+</style>
+</head>
+<body>
+<header class="top"><div class="inner">
+<div class="crumb"><a href="../index.html" style="color:inherit">首页</a>　/　<a href="index.html" style="color:inherit">模块 2 · 概率统计、信息论与最优化</a>　/　第 10 课（共 10 课）</div>
+<h1>强化学习速成 II——策略梯度到 PPO</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　阶段0：数学与工具基础　·　<strong>能力点：</strong>强化学习 II——策略梯度→PPO（直通 RLHF/GRPO）</div>
+</div></header>
+<div class="wrap">
+<article>
+<p>上一课我们用价值函数与贝尔曼方程刻画了"一个状态/动作有多好"，并通过"估价值 → 贪心选动作"间接得到策略。这一课换一条主线：<strong>不绕道价值，直接把策略本身参数化、对参数求梯度往上爬</strong>。这条路通向今天大模型对齐的核心——RLHF 里的 PPO。</p>
+
+<div class="goals">
+<h4>读完这一课，你将能够</h4>
+<ul>
+<li>用一句话说清<strong>策略梯度定理</strong>的直觉，并写出 \(\nabla_\theta J=\mathbb{E}[\nabla_\theta\log\pi_\theta(a\mid s)\,G]\)；</li>
+<li>证明<strong>加基线 \(b(s)\) 不改变梯度期望</strong>，并说清承重的是哪两步、它为何能降方差；</li>
+<li>区分<strong>优势函数 \(A=Q-V\)</strong>、actor–critic 与 GAE，说清各自解决什么问题；</li>
+<li>解释 <strong>PPO 裁剪代理目标</strong>为什么要把重要性比 \(r\) 限制在 \([1-\epsilon,1+\epsilon]\)，逐字说清 \(A>0\) 与 \(A<0\) 两种情形各裁掉了什么，以及它与 KL 惩罚的等价直觉；</li>
+<li>画出 <strong>RLHF</strong> 的优化目标 \(\text{reward}-\beta\,D_{\mathrm{KL}}(\pi_\theta\|\pi_{\text{ref}})\)，并说清 DPO / GRPO 各省掉了哪一步。</li>
+</ul>
+</div>
+
+<h2>1. 为什么要"直接优化策略"？</h2>
+
+<p>价值方法（上一课的 Q-learning 思路）有个隐含假设：先精确估出每个动作的价值，再取 \(\arg\max\)。可一旦动作是<strong>连续的</strong>（机械臂的力矩）或<strong>巨大离散</strong>（语言模型下一个 token 有几万种选择），"对所有动作取 max"就变得不现实。</p>
+
+<p>换个思路：把策略写成一个带参数的概率分布 \(\pi_\theta(a\mid s)\)（比如 softmax 或高斯），定义目标为<strong>期望回报</strong>
+\[
+J(\theta)=\mathbb{E}_{\tau\sim\pi_\theta}\!\left[\,G(\tau)\,\right],\qquad G(\tau)=\sum_{t=0}^{T}\gamma^{t} r_t,
+\]
+其中 \(\tau=(s_0,a_0,r_0,s_1,\dots)\) 是一条采样轨迹。我们想做的事极其朴素：<strong>对 \(\theta\) 做梯度上升</strong> \(\theta\leftarrow\theta+\eta\,\nabla_\theta J\)。问题只剩一个：\(J\) 是对"按 \(\pi_\theta\) 采样的轨迹"求期望，而采样分布本身依赖 \(\theta\)，这个梯度怎么算？</p>
+
+<div class="note">
+<strong>直觉先行。</strong> 想象你在调一个"出招概率表"。你试了一整局，结果赢了——你不知道具体哪一步是关键，但一个安全的赌注是：<strong>把这一局里用过的所有招式，概率都调高一点</strong>；输了就调低一点。赢得越多调得越狠。策略梯度就是这句话的数学化。</div>
+
+<h2>2. 策略梯度定理：好结果就抬高导致它的动作的对数概率</h2>
+
+<p>核心是一个叫 <strong>log-derivative trick（对数求导技巧）</strong>的小恒等式。对任意依赖 \(\theta\) 的概率 \(p_\theta\)：
+\[
+\nabla_\theta p_\theta = p_\theta\,\frac{\nabla_\theta p_\theta}{p_\theta}=p_\theta\,\nabla_\theta\log p_\theta .
+\]
+这一步把"对概率求梯度"换成了"概率 × 对数概率的梯度"，而后者正好能写回期望里。把它用在整条轨迹上：一条轨迹的概率是初始分布乘上每一步"策略 × 转移"的连乘，取 \(\log\) 把连乘变连加，
+\[
+\log p_\theta(\tau)=\log\rho(s_0)+\sum_t\Big[\log\pi_\theta(a_t\mid s_t)+\log P(s_{t+1}\mid s_t,a_t)\Big].
+\]
+对 \(\theta\) 求梯度时，初始分布 \(\rho(s_0)\) 与环境转移 \(P(s_{t+1}\mid s_t,a_t)\) 都<strong>不含 \(\theta\)</strong>，梯度为 0，只剩下 \(\sum_t\nabla_\theta\log\pi_\theta(a_t\mid s_t)\)。这就是"为何转移会消失"的完整机制。代回去就得到<strong>策略梯度定理</strong>：</p>
+
+\[
+\boxed{\;\nabla_\theta J(\theta)=\mathbb{E}_{\tau\sim\pi_\theta}\!\left[\Big(\sum_{t}\nabla_\theta\log\pi_\theta(a_t\mid s_t)\Big)\;G(\tau)\right]\;}
+\]
+
+<p>读这条式子：\(\nabla_\theta\log\pi_\theta(a_t\mid s_t)\) 是"<strong>朝着让动作 \(a_t\) 更可能的方向</strong>"，整条轨迹的回报 \(G(\tau)\) 当作这一批动作共同的权重。\(G\) 大且为正，就大步抬高这些动作的概率；\(G\) 为负，就压低。这就是第 1 节那句"赢了全调高"的严格版。下一节的 pitfall 会把这个"整条回报"收紧成更省方差的形式。</p>
+
+<figure class="fig"><svg viewBox="0 0 540 400" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>策略梯度直觉：高回报轨迹提高动作概率，低回报轨迹降低概率</title><defs><marker id="arrSeq" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker><marker id="arrUp" viewBox="0 0 10 10" refX="5" refY="9" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,10 L5,0 L10,10 z" fill="#059669"/></marker><marker id="arrDown" viewBox="0 0 10 10" refX="5" refY="9" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,10 L5,0 L10,10 z" fill="#db2777"/></marker><marker id="arrJ" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#d97706"/></marker></defs><text x="270" y="24" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2937">策略梯度直觉：按回报调整动作概率</text><g><text x="40" y="60" text-anchor="middle" font-size="12" font-weight="600" fill="#059669">高回报轨迹</text><g><line x1="40" y1="118" x2="100" y2="118" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrSeq)"/><line x1="140" y1="118" x2="200" y2="118" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrSeq)"/><line x1="240" y1="118" x2="300" y2="118" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrSeq)"/><line x1="340" y1="118" x2="400" y2="118" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrSeq)"/></g><text x="70" y="110" text-anchor="middle" font-size="12" fill="#059669">a₀</text><text x="170" y="110" text-anchor="middle" font-size="12" fill="#059669">a₁</text><text x="270" y="110" text-anchor="middle" font-size="12" fill="#059669">a₂</text><circle cx="30" cy="118" r="11" fill="#2563eb" fill-opacity="0.15" stroke="#2563eb" stroke-width="2"/><text x="30" y="122" text-anchor="middle" font-size="11" fill="#1f2937">s₀</text><circle cx="120" cy="118" r="11" fill="#2563eb" fill-opacity="0.15" stroke="#2563eb" stroke-width="2"/><text x="120" y="122" text-anchor="middle" font-size="11" fill="#1f2937">s₁</text><circle cx="220" cy="118" r="11" fill="#2563eb" fill-opacity="0.15" stroke="#2563eb" stroke-width="2"/><text x="220" y="122" text-anchor="middle" font-size="11" fill="#1f2937">s₂</text><circle cx="412" cy="118" r="11" fill="#059669" fill-opacity="0.18" stroke="#059669" stroke-width="2"/><text x="412" y="122" text-anchor="middle" font-size="10" fill="#1f2937">终</text><line x1="70" y1="100" x2="70" y2="80" stroke="#059669" stroke-width="2" marker-end="url(#arrUp)"/><line x1="170" y1="100" x2="170" y2="80" stroke="#059669" stroke-width="2" marker-end="url(#arrUp)"/><line x1="270" y1="100" x2="270" y2="80" stroke="#059669" stroke-width="2" marker-end="url(#arrUp)"/><text x="455" y="98" text-anchor="middle" font-size="12" font-weight="600" fill="#059669">G(τ)=+8</text><text x="455" y="114" text-anchor="middle" font-size="11" fill="#059669">提高</text><text x="455" y="128" text-anchor="middle" font-size="11" fill="#059669">π(aₜ|sₜ)</text></g><g><text x="40" y="178" text-anchor="middle" font-size="12" font-weight="600" fill="#db2777">低回报轨迹</text><g><line x1="40" y1="236" x2="100" y2="236" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrSeq)"/><line x1="140" y1="236" x2="200" y2="236" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrSeq)"/><line x1="240" y1="236" x2="300" y2="236" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrSeq)"/><line x1="340" y1="236" x2="400" y2="236" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrSeq)"/></g><text x="70" y="228" text-anchor="middle" font-size="12" fill="#db2777">a₀</text><text x="170" y="228" text-anchor="middle" font-size="12" fill="#db2777">a₁</text><text x="270" y="228" text-anchor="middle" font-size="12" fill="#db2777">a₂</text><circle cx="30" cy="236" r="11" fill="#2563eb" fill-opacity="0.15" stroke="#2563eb" stroke-width="2"/><text x="30" y="240" text-anchor="middle" font-size="11" fill="#1f2937">s₀</text><circle cx="120" cy="236" r="11" fill="#2563eb" fill-opacity="0.15" stroke="#2563eb" stroke-width="2"/><text x="120" y="240" text-anchor="middle" font-size="11" fill="#1f2937">s₁</text><circle cx="220" cy="236" r="11" fill="#2563eb" fill-opacity="0.15" stroke="#2563eb" stroke-width="2"/><text x="220" y="240" text-anchor="middle" font-size="11" fill="#1f2937">s₂</text><circle cx="412" cy="236" r="11" fill="#db2777" fill-opacity="0.18" stroke="#db2777" stroke-width="2"/><text x="412" y="240" text-anchor="middle" font-size="10" fill="#1f2937">终</text><line x1="70" y1="254" x2="70" y2="274" stroke="#db2777" stroke-width="2" marker-end="url(#arrDown)"/><line x1="170" y1="254" x2="170" y2="274" stroke="#db2777" stroke-width="2" marker-end="url(#arrDown)"/><line x1="270" y1="254" x2="270" y2="274" stroke="#db2777" stroke-width="2" marker-end="url(#arrDown)"/><text x="455" y="216" text-anchor="middle" font-size="12" font-weight="600" fill="#db2777">G(τ)=−3</text><text x="455" y="232" text-anchor="middle" font-size="11" fill="#db2777">降低</text><text x="455" y="246" text-anchor="middle" font-size="11" fill="#db2777">概率</text></g><line x1="20" y1="300" x2="520" y2="300" stroke="#e2e8f0" stroke-width="0.75"/><text x="270" y="332" text-anchor="middle" font-size="14" fill="#1f2937">∇<tspan baseline-shift="sub" font-size="10">θ</tspan> J = E[ <tspan fill="#2563eb" font-weight="600">∇<tspan baseline-shift="sub" font-size="10">θ</tspan> log π(a|s)</tspan> · <tspan fill="#d97706" font-weight="600">G</tspan> ]</text><path d="M148,344 q0,8 -8,8 h-? " /><path d="M150,344 C150,350 145,350 140,350 C145,350 150,350 150,356" fill="none" stroke="#2563eb" stroke-width="1.2"/><text x="195" y="354" text-anchor="middle" font-size="11" fill="#2563eb">∇log π = 方向</text><path d="M330,344 C330,350 335,350 340,350 C335,350 330,350 330,356" fill="none" stroke="#d97706" stroke-width="1.2"/><text x="385" y="354" text-anchor="middle" font-size="11" fill="#d97706">G = 权重</text><text x="270" y="384" text-anchor="middle" font-size="11" fill="#1f2937">力度 ∝ 回报，方向沿 ∇log π</text></svg><figcaption>策略梯度直觉：采样一条轨迹，若回报高，就把这条轨迹用到的所有动作的概率往上推（绿色↑箭头）；回报低则往下压（红色↓箭头）。推/压的力度正比于回报，方向沿 ∇log π。</figcaption></figure>
+
+<div class="ml">
+<h4><span class="tag">ML</span> 和 ML 的联系</h4>
+<p>这个形式你其实见过。监督学习里最小化交叉熵，梯度是 \(\nabla_\theta\big(-\log\pi_\theta(y\mid x)\big)\)——"<strong>抬高正确标签的对数概率</strong>"。策略梯度几乎一模一样，只是把"正确标签"换成"实际采到的动作"，并用回报当作这条样本的<strong>权重（软标签）</strong>。所以可以把 REINFORCE 理解成"<strong>加权的最大似然</strong>"：表现好的轨迹权重大，被更用力地模仿。</p>
+</div>
+
+<h3>REINFORCE 算法（最朴素的策略梯度）</h3>
+<ol>
+<li>用当前 \(\pi_\theta\) 跑一整条（或一批）轨迹，记录 \((s_t,a_t,r_t)\)；</li>
+<li>算每步的<strong>未来回报</strong>（reward-to-go）\(G_t=\sum_{k\ge t}\gamma^{k-t}r_k\)；</li>
+<li>用 \(\hat g=\frac1N\sum_t \nabla_\theta\log\pi_\theta(a_t\mid s_t)\,G_t\) 估计梯度；</li>
+<li>更新 \(\theta\leftarrow\theta+\eta\,\hat g\)，回到第 1 步。</li>
+</ol>
+
+<div class="pitfall">
+<strong>易错：用未来回报 \(G_t\) 还是整条 \(G(\tau)\)？</strong> 上面方框定理为忠于第 1 节的 \(J\)，给每步都乘了<strong>整条</strong>轨迹回报 \(G(\tau)\)。但严格来说第 \(t\) 步只应被"<strong>它之后</strong>的回报"\(G_t\) 加权——因为当前动作影响不了过去的奖励（这叫 <em>causality / reward-to-go</em>）。可以证明把权重从 \(G(\tau)\) 换成 \(G_t\) <strong>期望不变（过去那段奖励与当前 \(\nabla\log\pi\) 不相关，期望贡献为 0），但方差更小</strong>。所以 REINFORCE 实现里用的是 \(G_t\)（步骤 2），这不是定理写错了，而是同一个无偏梯度的低方差写法。初学若误用整条回报，能跑但更抖。</div>
+
+<h2>3. 高方差是头号敌人，基线是第一剂解药</h2>
+
+<p>REINFORCE 能用，但<strong>方差极大</strong>：回报 \(G_t\) 受整条轨迹的随机性影响，同一个策略两次采样可能差很远，梯度估计像在噪声里找方向。更糟的是一个"尺度问题"：如果所有回报都是正的（比如奖励恒非负），那么<strong>每个动作的概率都被往上抬</strong>，只是被抬的多少不同——这显然浪费，我们真正想要的是"<strong>比平均好的抬、比平均差的压</strong>"。</p>
+
+<p>解药叫<strong>基线（baseline）</strong>：从回报里减去一个<strong>只依赖状态、不依赖动作</strong>的量 \(b(s)\)：
+\[
+\nabla_\theta J=\mathbb{E}\!\left[\nabla_\theta\log\pi_\theta(a\mid s)\,\big(G_t-b(s_t)\big)\right].
+\]
+最常用的基线就是状态价值 \(b(s)=V^\pi(s)\)（"这个状态平均能拿多少分"）。减掉它之后，括号里变成"<strong>这次比平均好还是差</strong>"，有正有负，更新方向立刻变得有意义。</p>
+
+<figure class="fig"><svg viewBox="0 0 540 430" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif">
+<title>基线降方差：减去 V 后优势跨越 0 两侧，分布更集中</title>
+<defs>
+<marker id="arrR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0 0 L10 5 L0 10 z" fill="#94a3b8"/>
+</marker>
+</defs>
+
+<!-- ===================== 左：裸回报 G ===================== -->
+<text x="135" y="30" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2937">裸回报 G</text>
+<text x="135" y="48" text-anchor="middle" font-size="12" fill="#db2777">全都被抬高 → 信号弱</text>
+
+<!-- 宽钟形曲线（高方差）：以 x≈135(对应值约4.8) 为峰，宽 -->
+<path d="M30 175 C 70 173, 95 120, 135 120 C 175 120, 200 173, 240 175"
+fill="#2563eb" fill-opacity="0.08" stroke="none"/>
+<path d="M30 175 C 70 173, 95 120, 135 120 C 175 120, 200 173, 240 175"
+fill="none" stroke="#2563eb" stroke-width="2"/>
+<text x="135" y="112" text-anchor="middle" font-size="11" fill="#2563eb">高方差（宽）</text>
+
+<!-- 数轴 -->
+<line x1="30" y1="240" x2="246" y2="240" stroke="#94a3b8" stroke-width="1" marker-end="url(#arrR)"/>
+<!-- 刻度 0..8 ；x = 30 + value*22.5 -->
+<g font-size="11" fill="#1f2937" text-anchor="middle">
+<line x1="30" y1="236" x2="30" y2="244" stroke="#94a3b8" stroke-width="1"/>
+<text x="30" y="258">0</text>
+<line x1="75" y1="236" x2="75" y2="244" stroke="#94a3b8" stroke-width="1"/>
+<text x="75" y="258">2</text>
+<line x1="120" y1="236" x2="120" y2="244" stroke="#94a3b8" stroke-width="1"/>
+<text x="120" y="258">4</text>
+<line x1="165" y1="236" x2="165" y2="244" stroke="#94a3b8" stroke-width="1"/>
+<text x="165" y="258">6</text>
+<line x1="210" y1="236" x2="210" y2="244" stroke="#94a3b8" stroke-width="1"/>
+<text x="210" y="258">8</text>
+</g>
+
+<!-- 数据点 2,3,5,6,8  全为正 -->
+<g fill="#2563eb">
+<circle cx="75" cy="240" r="5"/>
+<circle cx="97.5" cy="240" r="5"/>
+<circle cx="142.5" cy="240" r="5"/>
+<circle cx="165" cy="240" r="5"/>
+<circle cx="210" cy="240" r="5"/>
+</g>
+<!-- 抬高箭头：全部向上同向 -->
+<g stroke="#db2777" stroke-width="2" marker-end="url(#arrR)">
+<line x1="75" y1="232" x2="75" y2="210"/>
+<line x1="97.5" y1="232" x2="97.5" y2="210"/>
+<line x1="142.5" y1="232" x2="142.5" y2="210"/>
+<line x1="165" y1="232" x2="165" y2="210"/>
+<line x1="210" y1="232" x2="210" y2="210"/>
+</g>
+<text x="135" y="292" text-anchor="middle" font-size="12" fill="#1f2937">所有更新都「抬高」，共同正偏移淹没信号</text>
+
+<!-- ===================== 右：优势 A = G − V ===================== -->
+<text x="405" y="30" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2937">优势 A = G − V</text>
+<text x="405" y="48" text-anchor="middle" font-size="12" fill="#6b7280">（V ≈ 4.8，把整簇平移到 0 附近）</text>
+
+<!-- 窄钟形曲线（低方差）：以 x=360(值0) 为峰，窄；同高度对比 -->
+<path d="M325 175 C 345 174, 350 120, 360 120 C 370 120, 375 174, 395 175"
+fill="#059669" fill-opacity="0.10" stroke="none"/>
+<path d="M325 175 C 345 174, 350 120, 360 120 C 370 120, 375 174, 395 175"
+fill="none" stroke="#059669" stroke-width="2"/>
+<text x="360" y="112" text-anchor="middle" font-size="11" fill="#059669">低方差（窄）</text>
+
+<!-- 数轴 -->
+<line x1="300" y1="240" x2="510" y2="240" stroke="#94a3b8" stroke-width="1" marker-end="url(#arrR)"/>
+<!-- 0 处虚线，0 在 x=360 ；x = 360 + value*15 -->
+<line x1="360" y1="118" x2="360" y2="300" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/>
+<text x="360" y="314" text-anchor="middle" font-size="11" fill="#94a3b8">0（平均水平）</text>
+
+<g font-size="11" fill="#1f2937" text-anchor="middle">
+<line x1="315" y1="236" x2="315" y2="244" stroke="#94a3b8" stroke-width="1"/>
+<text x="315" y="258">−3</text>
+<line x1="360" y1="236" x2="360" y2="244" stroke="#94a3b8" stroke-width="1"/>
+<text x="360" y="258" fill="#94a3b8">0</text>
+<line x1="405" y1="236" x2="405" y2="244" stroke="#94a3b8" stroke-width="1"/>
+<text x="405" y="258">3</text>
+</g>
+
+<!-- 负侧点 -2.8,-1.8 红色；正侧 0.2,1.2,3.2 绿色 -->
+<g fill="#d97706">
+<circle cx="318" cy="240" r="5"/>
+<circle cx="333" cy="240" r="5"/>
+</g>
+<g fill="#059669">
+<circle cx="363" cy="240" r="5"/>
+<circle cx="378" cy="240" r="5"/>
+<circle cx="408" cy="240" r="5"/>
+</g>
+
+<!-- 负侧：压低（向下）红色 -->
+<g stroke="#d97706" stroke-width="2" marker-end="url(#arrR)">
+<line x1="318" y1="248" x2="318" y2="272"/>
+<line x1="333" y1="248" x2="333" y2="272"/>
+</g>
+<!-- 正侧：抬高（向上）绿色 -->
+<g stroke="#059669" stroke-width="2" marker-end="url(#arrR)">
+<line x1="363" y1="232" x2="363" y2="210"/>
+<line x1="378" y1="232" x2="378" y2="210"/>
+<line x1="408" y1="232" x2="408" y2="210"/>
+</g>
+
+<text x="318" y="290" text-anchor="middle" font-size="11" fill="#d97706">比平均差 → 压低</text>
+<text x="430" y="206" text-anchor="middle" font-size="11" fill="#059669">比平均好 → 抬高</text>
+
+<!-- ===================== 底部：方差对比强调 ===================== -->
+<line x1="246" y1="200" x2="288" y2="200" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrR)"/>
+<text x="267" y="192" text-anchor="middle" font-size="11" fill="#94a3b8">减 V</text>
+
+<rect x="150" y="350" width="240" height="44" rx="8" fill="#d97706" fill-opacity="0.08" stroke="#d97706" stroke-width="1"/>
+<text x="270" y="370" text-anchor="middle" font-size="14" font-weight="600" fill="#d97706">方差 ↓ 约 58%</text>
+<text x="270" y="387" text-anchor="middle" font-size="11" fill="#1f2937">分布更集中 · 跨越 0 两侧 · 更新更稳</text>
+</svg><figcaption>基线降方差：原始回报全为正（左，所有更新都&#x27;抬高&#x27;，信号被共同正偏移淹没）；减去 V 后优势有正有负（右，比平均好的抬、差的压），分布更集中、更新更稳。</figcaption></figure>
+
+<div class="example">
+<h4>例题：证明加基线不改变梯度期望</h4>
+<p>要证 \(\mathbb{E}_{a\sim\pi_\theta}\big[\nabla_\theta\log\pi_\theta(a\mid s)\,b(s)\big]=0\)。</p>
+\[
+\sum_{a}\pi_\theta(a\mid s)\,\nabla_\theta\log\pi_\theta(a\mid s)\,b(s)
+= b(s)\sum_a \pi_\theta(a\mid s)\,\frac{\nabla_\theta\pi_\theta(a\mid s)}{\pi_\theta(a\mid s)}
+\]
+\[
+= b(s)\sum_a \nabla_\theta\pi_\theta(a\mid s)
+= b(s)\,\nabla_\theta\underbrace{\sum_a \pi_\theta(a\mid s)}_{=\,1}
+= b(s)\,\nabla_\theta 1 = 0 .
+\]
+<p>关键是<strong>两步</strong>：(1) \(b(s)\) 与 \(a\) 无关，作为常数提到求和外（这一步靠的是"常数提取"，不是别的）；(2) <strong>真正承重的一步</strong>——梯度与求和可交换，把 \(\sum_a\nabla_\theta\pi=\nabla_\theta\sum_a\pi\)，而 \(\sum_a\pi\equiv 1\)，其梯度恒为 0。所以减基线<strong>不引入偏差</strong>，却能把方差里那一大坨"共同的正偏移"消掉。</p>
+</div>
+
+<div class="key">
+<strong>关键结论。</strong> 基线是 RL 里"免费的午餐"：不改期望、只降方差。这正是上一课贝尔曼估计出的 \(V(s)\) 的高光用途——它天生就是"该状态的平均回报"，拿来当基线再合适不过。</div>
+
+<h2>4. 优势函数与 Actor–Critic</h2>
+
+<p>把"回报减基线"取它的期望版本，就得到<strong>优势函数（advantage）</strong>：
+\[
+A^\pi(s,a)=Q^\pi(s,a)-V^\pi(s).
+\]
+它回答一个极其具体的问题："<strong>在状态 \(s\) 下选 \(a\)，比这个状态的平均水平好多少？</strong>" \(A>0\) 就该抬概率，\(A<0\) 就该压。理想的策略梯度其实是
+\[
+\nabla_\theta J=\mathbb{E}\big[\nabla_\theta\log\pi_\theta(a\mid s)\,A^\pi(s,a)\big].
+\]</p>
+
+<p>但 \(Q,V\) 我们并不知道，得估。于是有了 <strong>actor–critic（演员—评论家）</strong>双网络结构：</p>
+<ul>
+<li><strong>Actor（演员）</strong>= 策略 \(\pi_\theta\)，负责出动作；</li>
+<li><strong>Critic（评论家）</strong>= 价值估计 \(V_\phi\)（或 \(Q\)），负责打分；</li>
+<li>用 critic 算出优势 \(\hat A\)，回传给 actor 做策略梯度更新；critic 自己则用上一课的 TD / 贝尔曼回归来训练。</li>
+</ul>
+
+<p>最简单的优势估计就是单步 TD 误差 \(\delta_t=r_t+\gamma V(s_{t+1})-V(s_t)\)。<strong>当 \(V=V^\pi\)（真值函数）时，\(\delta_t\) 是 \(A^\pi\) 的无偏估计</strong>（因为 \(\mathbb{E}[\delta_t\mid s_t,a_t]=Q^\pi-V^\pi=A^\pi\)）；实践中我们只有近似的 critic \(V_\phi\)，用它替代时 \(\delta_t\) 就<strong>带偏差</strong>（偏差正比于 \(V_\phi-V^\pi\)），但换来的是很低的方差。这个"低方差、有偏"正是下面 GAE 在 \(\lambda=0\) 一端的特征。</p>
+
+<figure class="fig"><svg viewBox="0 0 520 420" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>Actor–Critic 闭环：评价→改进的循环</title><defs><marker id="ah-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/></marker><marker id="ah-pink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#db2777"/></marker><marker id="ah-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#d97706"/></marker><marker id="ah-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#059669"/></marker></defs><text x="260" y="26" text-anchor="middle" font-size="14" fill="#1f2937" font-weight="600">Actor–Critic 闭环：评价 → 改进</text><circle cx="260" cy="230" r="118" fill="none" stroke="#e2e8f0" stroke-width="0.75" stroke-dasharray="4 3"/><text x="260" y="234" text-anchor="middle" font-size="11" fill="#94a3b8">循环</text><rect x="190" y="58" width="140" height="58" rx="8" fill="#e2e8f0" fill-opacity="0.4" stroke="#1f2937" stroke-width="1.5"/><text x="260" y="84" text-anchor="middle" font-size="14" fill="#1f2937" font-weight="600">环境 Env</text><text x="260" y="102" text-anchor="middle" font-size="11" fill="#94a3b8">状态/回报来源</text><rect x="36" y="220" width="150" height="62" rx="8" fill="#2563eb" fill-opacity="0.1" stroke="#2563eb" stroke-width="1.5"/><text x="111" y="246" text-anchor="middle" font-size="14" fill="#2563eb" font-weight="600">Actor π_θ</text><text x="111" y="264" text-anchor="middle" font-size="11" fill="#1f2937">出动作</text><rect x="334" y="220" width="150" height="62" rx="8" fill="#db2777" fill-opacity="0.1" stroke="#db2777" stroke-width="1.5"/><text x="409" y="246" text-anchor="middle" font-size="14" fill="#db2777" font-weight="600">Critic V_φ</text><text x="409" y="264" text-anchor="middle" font-size="11" fill="#1f2937">打分 / 估 V</text><path d="M196,108 C150,140 120,170 111,214" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#ah-blue)"/><text x="118" y="156" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">s</text><text x="118" y="170" text-anchor="middle" font-size="11" fill="#94a3b8">状态</text><path d="M148,218 C175,168 205,138 226,114" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#ah-blue)"/><text x="200" y="178" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">a</text><text x="200" y="192" text-anchor="middle" font-size="11" fill="#94a3b8">动作</text><path d="M324,114 C355,140 385,170 400,214" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#ah-green)"/><text x="392" y="150" text-anchor="middle" font-size="12" fill="#059669" font-weight="600">r , s'</text><text x="392" y="164" text-anchor="middle" font-size="11" fill="#94a3b8">回报与新状态</text><path d="M334,260 L188,260" fill="none" stroke="#d97706" stroke-width="2" marker-end="url(#ah-amber)"/><text x="260" y="252" text-anchor="middle" font-size="12" fill="#d97706" font-weight="600">优势 A = Q − V</text><text x="260" y="282" text-anchor="middle" font-size="11" fill="#d97706">策略梯度更新 ∇logπ · A</text><path d="M409,284 C409,330 409,352 409,352 L409,360" fill="none" stroke="#db2777" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#ah-pink)"/><rect x="246" y="356" width="326" height="44" rx="8" fill="#db2777" fill-opacity="0.06" stroke="#db2777" stroke-width="1" stroke-dasharray="4 3"/><text x="409" y="375" text-anchor="middle" font-size="12" fill="#db2777" font-weight="600">TD 误差 δ = r + γV(s') − V(s)</text><text x="409" y="391" text-anchor="middle" font-size="11" fill="#1f2937">Critic 回归更新（自评）</text><g><rect x="14" y="356" width="210" height="44" rx="6" fill="none" stroke="#94a3b8" stroke-width="1"/><line x1="26" y1="370" x2="46" y2="370" stroke="#2563eb" stroke-width="2" marker-end="url(#ah-blue)"/><text x="52" y="374" font-size="11" fill="#1f2937">状态/动作流</text><line x1="146" y1="370" x2="166" y2="370" stroke="#059669" stroke-width="2" marker-end="url(#ah-green)"/><text x="172" y="374" font-size="11" fill="#1f2937">奖励流</text><line x1="26" y1="388" x2="46" y2="388" stroke="#d97706" stroke-width="2" marker-end="url(#ah-amber)"/><text x="52" y="392" font-size="11" fill="#1f2937">优势→改进 Actor</text></g></svg><figcaption>Actor–Critic 闭环：环境给状态 s，actor(策略π)出动作 a 作用于环境得到 r 和 s&#x27;；critic(价值 V) 评估并算出优势 A=Q−V，优势回传给 actor 做策略梯度更新，critic 自己用 TD 误差更新。</figcaption></figure>
+
+<h3>GAE：在偏差和方差之间拨一个旋钮</h3>
+<p>"用几步回报来估优势"有个两难：步数少（如单步 TD）<strong>方差小但偏差大</strong>（严重依赖不准的 \(V_\phi\)）；步数多（如蒙特卡洛全回报）<strong>偏差小但方差大</strong>。<strong>GAE（广义优势估计，Generalized Advantage Estimation）</strong>用一个衰减因子 \(\lambda\in[0,1]\) 把各步 TD 误差指数加权平均：
+\[
+\hat A_t^{\text{GAE}}=\sum_{l\ge 0}(\gamma\lambda)^l\,\delta_{t+l}.
+\]
+\(\lambda=0\) 退化成单步 TD（低方差高偏差），\(\lambda=1\) 退化成蒙特卡洛（高方差低偏差）。\(\lambda\) 就是那个<strong>偏差—方差旋钮</strong>，实践里常取 0.95 左右。现在点到为止，PPO 里会用到它。</p>
+
+<h2>5. On-policy vs Off-policy：能不能重用旧数据？</h2>
+
+<p>策略梯度有个昂贵的前提：梯度是对"<strong>当前</strong>策略 \(\pi_\theta\) 采的样"求期望。一旦更新了 \(\theta\)，旧数据就"过期"了，严格来说得重新采样——这叫 <strong>on-policy（同策略）</strong>，REINFORCE、A2C、PPO 都属此类，数据利用率低但稳定。</p>
+
+<p>与之相对，<strong>off-policy（异策略）</strong>（如 Q-learning、DQN）允许用<strong>另一个策略</strong>（甚至历史回放池）采的数据来学习，数据利用率高，但训练更易不稳定。</p>
+
+<p>PPO 想要"<strong>鱼和熊掌兼得</strong>"：用一批旧策略 \(\pi_{\text{old}}\) 的数据做<strong>好几步</strong>更新（提高数据利用率），但通过<strong>重要性采样</strong>修正分布差异，并<strong>限制每步别走太远</strong>以保持稳定。这就引出了重要性比与裁剪。</p>
+
+<h2>6. PPO：别一步把策略毁掉</h2>
+
+<p>朴素策略梯度有个致命脆弱点：学习率稍大，一步更新就可能把策略推到一个糟糕区域，而坏策略采的数据又更糟，<strong>负反馈崩盘、再也回不来</strong>。<strong>信任域（trust region）</strong>思想说：每步更新要<strong>限制在"离旧策略不太远"的范围里</strong>，小步快走才稳。这个名字借自优化——<strong>就像优化里只在当前点的一个"可信半径"内相信你的近似模型，超出半径模型就不可靠了</strong>；在这里，"模型"是用旧数据估出来的优势，"半径"就是新旧策略的偏移量。</p>
+
+<p>怎么衡量"用旧数据评估新策略"？用<strong>重要性比（importance ratio）</strong>
+\[
+r_t(\theta)=\frac{\pi_\theta(a_t\mid s_t)}{\pi_{\theta_{\text{old}}}(a_t\mid s_t)} .
+\]
+\(r>1\) 表示新策略比旧策略更想选这个动作。代理目标 \(\mathbb{E}[\,r_t(\theta)\,\hat A_t\,]\) 就是"用旧数据估的、新策略的期望优势"。但如果不加约束，模型会为了拉高一个高优势动作把 \(r\) 推到天上去——一步走太远。</p>
+
+<p>PPO 的招数干净利落：<strong>裁剪代理目标（clipped surrogate objective）</strong>
+\[
+L^{\text{CLIP}}(\theta)=\mathbb{E}_t\Big[\min\big(r_t\hat A_t,\;\operatorname{clip}(r_t,1-\epsilon,1+\epsilon)\,\hat A_t\big)\Big].
+\]
+逐字读这个 \(\min\)（下面以 \(|\hat A|=1\) 为例）：</p>
+<ul>
+<li>当 <strong>\(\hat A>0\)</strong>（好动作）：目标随 \(r\) 增大而增大，但 \(r\) 一旦超过 \(1+\epsilon\)，被裁平——<strong>再怎么想抬这个动作，超过 \(1+\epsilon\) 就没有额外奖励了</strong>，于是没动机往大走太远。被裁平发生在 \(r\) 偏<strong>大</strong>的一侧。</li>
+<li>当 <strong>\(\hat A<0\)</strong>（坏动作）：注意这里的图景<strong>不对称</strong>。在 \(r>1-\epsilon\) 区间，目标随 \(r\) 减小而增大（越不选这个坏动作越好）；可一旦 \(r\) 低于 \(1-\epsilon\) 就被<strong>裁平（封底在 \(-(1-\epsilon)\cdot|\hat A|\)）</strong>，再压低也不给额外收益——被裁平发生在 \(r\) 偏<strong>小</strong>的一侧。而 \(r\) 偏<strong>大</strong>的那一侧<strong>不裁</strong>，惩罚照常随 \(r\) 增大（更负）。换句话说，\(A<0\) 时大 \(r\) <strong>不会</strong>被裁，它本就该被狠狠惩罚。</li>
+<li>那个外层 \(\min\) 保证裁剪只会让目标<strong>更保守</strong>，不会因裁剪反而鼓励更大步。</li>
+</ul>
+
+<p>这恰好和下面调一调③ 的数值对上：\(A=-1\) 时 \(r=0.8\) 与 \(r=0.5\) 都给 \(-0.80\)（封底），而 \(r=1.5\) 给 \(-1.50\)（未裁、更负）。</p>
+
+<figure class="fig"><svg viewBox="0 0 520 400" role="img" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, system-ui, sans-serif">
+  <title>PPO 裁剪目标随重要性比 r 的变化</title>
+  <defs>
+    <marker id="ppoah" orient="auto-start-reverse" markerWidth="8" markerHeight="8" refX="6" refY="3" markerUnits="userSpaceOnUse" viewBox="0 0 8 6">
+      <path d="M0,0 L7,3 L0,6 Z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <!-- shaded clipped regions (behind lines) -->
+  <!-- green clipped: r>1.2, between un-clipped slope L=r and flat cap L=1.2 -->
+  <path d="M310,168 L470,168 L470,32 Z" fill="#059669" opacity="0.12"/>
+  <!-- red clipped: r<0.8, between flat cap L=-0.8 and un-clipped slope L=-r -->
+  <path d="M70,338 L230,338 L70,270 Z" fill="#db2777" opacity="0.12"/>
+
+  <!-- trust region band [0.8,1.2] -->
+  <rect x="230" y="270" width="80" height="92" fill="#d97706" opacity="0.07"/>
+
+  <!-- grid: horizontal at L=0 -->
+  <line x1="70" y1="270" x2="470" y2="270" stroke="#e2e8f0" stroke-width="0.75"/>
+
+  <!-- axes -->
+  <line x1="70" y1="32" x2="70" y2="372" stroke="#94a3b8" stroke-width="1" marker-end="url(#ppoah)"/>
+  <line x1="70" y1="270" x2="488" y2="270" stroke="#94a3b8" stroke-width="1" marker-end="url(#ppoah)"/>
+
+  <!-- vertical dashed: 1-e (0.8), r=1, 1+e (1.2) -->
+  <line x1="230" y1="56" x2="230" y2="372" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/>
+  <line x1="270" y1="56" x2="270" y2="372" stroke="#1f2937" stroke-width="1" stroke-dasharray="4 3" opacity="0.55"/>
+  <line x1="310" y1="56" x2="310" y2="372" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/>
+
+  <!-- green line A=+1 : L = min(r, 1.2) -->
+  <polyline points="70,270 310,168 470,168" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- red line A=-1 : flat at -0.8 for r<0.8, then -r (capped at bottom) -->
+  <polyline points="70,338 230,338 306,372" fill="none" stroke="#db2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- r axis ticks -->
+  <line x1="70" y1="270" x2="70" y2="275" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="230" y1="270" x2="230" y2="275" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="270" y1="270" x2="270" y2="275" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="310" y1="270" x2="310" y2="275" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="470" y1="270" x2="470" y2="275" stroke="#94a3b8" stroke-width="1"/>
+
+  <!-- r axis tick labels -->
+  <text x="70" y="288" font-size="11" fill="#1f2937" text-anchor="middle">0</text>
+  <text x="230" y="288" font-size="11" fill="#1f2937" text-anchor="middle">0.8</text>
+  <text x="270" y="288" font-size="11" fill="#1f2937" text-anchor="middle">1.0</text>
+  <text x="310" y="288" font-size="11" fill="#1f2937" text-anchor="middle">1.2</text>
+  <text x="470" y="288" font-size="11" fill="#1f2937" text-anchor="middle">2.0</text>
+
+  <!-- dashed-line labels at top -->
+  <text x="230" y="50" font-size="11" fill="#1f2937" text-anchor="middle">1−ε</text>
+  <text x="270" y="50" font-size="11" fill="#1f2937" text-anchor="middle">旧策略</text>
+  <text x="310" y="50" font-size="11" fill="#1f2937" text-anchor="middle">1+ε</text>
+
+  <!-- axis titles -->
+  <text x="486" y="262" font-size="12" fill="#1f2937" text-anchor="end">r = π / π_old</text>
+  <text x="62" y="44" font-size="12" fill="#1f2937" text-anchor="end" transform="rotate(-90 62 44)">目标 L^CLIP</text>
+
+  <!-- green flat / clip annotations -->
+  <text x="468" y="160" font-size="12" fill="#059669" text-anchor="end" font-weight="600">A &gt; 0：裁平（封顶 1+ε）</text>
+  <text x="398" y="100" font-size="11" fill="#059669" text-anchor="middle">裁掉的额外收益</text>
+  <text x="398" y="116" font-size="11" fill="#059669" text-anchor="middle">→ 无动机走太远</text>
+
+  <!-- red flat / clip annotations -->
+  <text x="78" y="332" font-size="12" fill="#db2777" text-anchor="start" font-weight="600">A &lt; 0：裁平（封底 −0.8）</text>
+  <text x="150" y="364" font-size="11" fill="#db2777" text-anchor="middle">裁掉的</text>
+  <text x="150" y="380" font-size="11" fill="#db2777" text-anchor="middle">额外收益</text>
+
+  <!-- trust region label -->
+  <text x="270" y="392" font-size="12" fill="#d97706" text-anchor="middle" font-weight="600">信任域</text>
+</svg><figcaption>PPO 裁剪目标随重要性比 r 的变化。A&gt;0(绿)：r 超过 1+ε 后目标被裁平、不再奖励更大的偏移；A&lt;0(红)：r 低于 1−ε 后被裁平。阴影区是被裁掉的部分。</figcaption></figure>
+
+<div class="note">
+<strong>等价的 KL 视角。</strong> 裁剪只是实现信任域的一种"硬"手段。另一种"软"手段是直接在目标里加 KL 惩罚：\(\mathbb{E}[r_t\hat A_t]-\beta\,D_{\mathrm{KL}}(\pi_\theta\|\pi_{\theta_{\text{old}}})\)。两者精神一致——<strong>都在说"新策略别离旧策略太远"</strong>。裁剪用一个 \(\epsilon\) 的"护栏"，KL 惩罚用一个 \(\beta\) 的"弹簧"。这里 KL 写成<strong>新策略在前</strong> \(D_{\mathrm{KL}}(\pi_\theta\|\cdot)\)，因为它是用新策略采样来估计的；下一节 RLHF 会沿用同一约定直接复用这根弹簧。</div>
+
+<div class="pitfall">
+<strong>易错：\(\epsilon\) 不是学习率。</strong> \(\epsilon\)（常取 0.1–0.2）控制的是"<strong>单步策略能偏离旧策略多远</strong>"，学习率 \(\eta\) 控制"每个梯度步走多大"。两者都管"步长"但层级不同：即使 \(\eta\) 很小，多跑几个 epoch 也可能让 \(r\) 累积出界，所以裁剪这道护栏始终必要。</div>
+
+<h2>7. ★ 直通 RLHF：奖励模型 + PPO + KL 锚</h2>
+
+<p>现在把这套机器接到大模型上。<strong>RLHF（基于人类反馈的强化学习）</strong>分两步：</p>
+<ol>
+<li><strong>训练奖励模型（reward model）</strong>\(R_\psi\)：用人类对"哪个回答更好"的偏好数据，学一个给回答打分的函数；</li>
+<li><strong>用 PPO 优化语言模型策略</strong>\(\pi_\theta\)，去最大化奖励——但<strong>带一个 KL 锚</strong>：
+\[
+\max_\theta\;\mathbb{E}_{x,\,y\sim\pi_\theta}\Big[\,R_\psi(x,y)\;-\;\beta\,D_{\mathrm{KL}}\big(\pi_\theta(\cdot\mid x)\,\big\|\,\pi_{\text{ref}}(\cdot\mid x)\big)\Big].
+\]</li>
+</ol>
+
+<p>这里把语言生成看成 RL：状态 = 已生成的前缀，动作 = 下一个 token，奖励 = 整段回答的得分 \(R_\psi\)。<strong>注意奖励只在序列末尾给一个标量，怎么把它摊到中间每个 token（靠 \(\gamma\) 折扣、价值函数 bootstrap 或 GAE 把末端信号往前回传）是 RLHF 里最关键、也最容易把初学者绕晕的工程问题——见下方 skip。</strong></p>
+
+<p>那个 <strong>\(-\beta\,D_{\mathrm{KL}}(\pi_\theta\|\pi_{\text{ref}})\)</strong> 是灵魂所在——\(\pi_{\text{ref}}\) 是微调前的参考模型，KL 惩罚<strong>把策略拴在参考模型附近</strong>，防止它为了骗高奖励而<strong>说出语无伦次的胡话（reward hacking）</strong>或丢掉原有的语言能力。</p>
+
+<div class="ml">
+<h4><span class="tag">ML</span> 呼应第 5 课的 KL 埋点</h4>
+<p>还记得第 5 课讲信息论时埋下的 \(D_{\mathrm{KL}}(p\|q)\)——它度量"用 \(q\) 近似 \(p\) 多吃亏"，非负、不对称。在 RLHF 里它摇身一变成了<strong>"别跑偏"的正则项</strong>：\(\beta\) 大则策略保守、贴着参考模型；\(\beta\) 小则更敢追高奖励但更冒险。这与第 6 节 PPO 的 KL 视角是同一根弹簧——两处都把<strong>新策略 \(\pi_\theta\) 写在前</strong>（KL 不对称，方向取决于对谁采样，这里都是对新策略采样估计），只不过第 6 节锚的是<strong>上一步的旧策略</strong>，这里锚的是<strong>参考模型</strong>。</p>
+</div>
+
+<figure class="fig"><svg viewBox="0 0 540 360" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>RLHF 流水线：奖励模型打分减 KL 锚定，PPO 更新策略</title><desc>提示 x 进入策略 π_θ 生成 y，奖励模型 R_ψ 打分，减去 β·KL(π_θ‖π_ref) 组成目标，PPO 回环更新策略；底部预告 DPO 与 GRPO。</desc><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f2937"/></marker><marker id="ahLoop" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#d97706"/></marker><marker id="ahKL" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#db2777"/></marker></defs><text x="270" y="22" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2937">RLHF 流水线</text><rect x="18" y="120" width="78" height="44" rx="6" fill="#2563eb" fill-opacity="0.08" stroke="#2563eb" stroke-width="1.5"/><text x="57" y="146" text-anchor="middle" font-size="13" fill="#1f2937">提示 x</text><rect x="138" y="112" width="108" height="60" rx="6" fill="#2563eb" fill-opacity="0.12" stroke="#2563eb" stroke-width="1.5"/><text x="192" y="138" text-anchor="middle" font-size="13" fill="#1f2937">策略 π_θ</text><text x="192" y="156" text-anchor="middle" font-size="11" fill="#1f2937">(待训练 LLM)</text><rect x="290" y="112" width="108" height="60" rx="6" fill="#db2777" fill-opacity="0.10" stroke="#db2777" stroke-width="1.5"/><text x="344" y="138" text-anchor="middle" font-size="13" fill="#1f2937">奖励模型 R_ψ</text><text x="344" y="156" text-anchor="middle" font-size="11" fill="#1f2937">(打分器)</text><rect x="180" y="32" width="140" height="48" rx="6" fill="#94a3b8" fill-opacity="0.12" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 3"/><text x="250" y="52" text-anchor="middle" font-size="13" fill="#1f2937">参考模型 π_ref</text><text x="250" y="69" text-anchor="middle" font-size="11" fill="#1f2937">(冻结)</text><rect x="356" y="200" width="168" height="62" rx="6" fill="#d97706" fill-opacity="0.10" stroke="#d97706" stroke-width="1.5"/><text x="440" y="222" text-anchor="middle" font-size="12" font-weight="600" fill="#1f2937">组合目标 maximize</text><text x="440" y="245" text-anchor="middle" font-size="12" fill="#1f2937">R_ψ(x,y) − β·KL(π_θ‖π_ref)</text><line x1="96" y1="142" x2="132" y2="142" stroke="#1f2937" stroke-width="2" marker-end="url(#ah)"/><line x1="246" y1="142" x2="284" y2="142" stroke="#1f2937" stroke-width="2" marker-end="url(#ah)"/><text x="265" y="106" text-anchor="middle" font-size="11" fill="#1f2937">生成 y</text><path d="M398,150 C440,160 440,178 440,194" fill="none" stroke="#1f2937" stroke-width="2" marker-end="url(#ah)"/><text x="452" y="172" text-anchor="start" font-size="11" fill="#1f2937">打分 R(x,y)</text><path d="M320,62 C400,66 440,120 440,194" fill="none" stroke="#db2777" stroke-width="2" marker-end="url(#ahKL)"/><text x="446" y="96" text-anchor="start" font-size="11" fill="#db2777">−β·D_KL(π_θ‖π_ref)</text><text x="436" y="114" text-anchor="start" font-size="10" fill="#94a3b8">锚定参考模型</text><text x="436" y="127" text-anchor="start" font-size="10" fill="#94a3b8">→防胡话 / 防 reward hacking</text><path d="M356,238 C200,256 130,250 130,184 C130,180 145,178 158,176" fill="none" stroke="#d97706" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#ahLoop)"/><text x="232" y="276" text-anchor="middle" font-size="12" font-weight="600" fill="#d97706">PPO 更新</text><line x1="18" y1="312" x2="522" y2="312" stroke="#e2e8f0" stroke-width="0.75"/><text x="18" y="332" text-anchor="start" font-size="11" fill="#94a3b8">预告（后继者）：</text><text x="18" y="348" text-anchor="start" font-size="11" fill="#94a3b8">DPO — 去掉 R_ψ 与 PPO 循环，直接用偏好对优化策略</text><text x="290" y="348" text-anchor="start" font-size="11" fill="#94a3b8">GRPO — 去掉 critic，用组内相对优势</text></svg><figcaption>RLHF 流水线：策略 π_θ 生成回答 y，奖励模型 R_ψ 打分，减去 β·KL(π_θ‖π_ref) 作为最终目标，PPO 据此更新 π_θ；KL 锚把策略拴在参考模型附近，防止 reward hacking。</figcaption></figure>
+
+<h3>两个"省事"的后继者（点到，留作预告）</h3>
+<ul>
+<li><strong>DPO（直接偏好优化）</strong>：数学上可以证明，"奖励 \(-\,\beta\)KL"这个带约束的最优解有闭式形式，于是能把整套 RL 重写成一个<strong>直接在偏好数据上的监督式损失</strong>——<strong>不再需要奖励模型，也不再需要 PPO 采样循环</strong>。训练像普通分类一样稳。细节留到 <strong>M12</strong>。</li>
+<li><strong>GRPO（组相对策略优化）</strong>：PPO 要训一个 critic 来估 \(V\) 当基线，又贵又难调。GRPO 干脆<strong>去掉 critic</strong>：对同一道题采<strong>一组</strong>回答，用<strong>组内的相对好坏（减组内均值、除组内标准差）</strong>当优势。这在数学推理类任务上特别好用，是 DeepSeek 系列推理模型的关键，留到 <strong>M14</strong>。</li>
+</ul>
+
+<div class="example">
+<h4>例题：对二动作 softmax 策略手算 \(\nabla_\theta\log\pi\)</h4>
+<p>设两个动作的 logits 为 \(\theta=(\theta_0,\theta_1)\)，\(\pi(a)=\mathrm{softmax}(\theta)_a\)。对实际选到的动作 \(a\)：
+\[
+\log\pi(a)=\theta_a-\log\!\big(e^{\theta_0}+e^{\theta_1}\big).
+\]
+对 \(\theta_j\) 求偏导：
+\[
+\frac{\partial\log\pi(a)}{\partial\theta_j}=\mathbb{1}[j=a]-\pi(j).
+\]
+即梯度向量 \(\nabla_\theta\log\pi(a)=\mathbf{e}_a-\pi\)。取 \(\theta=(0.5,-0.5)\)，则 \(\pi=(0.731,0.269)\)，若选到 \(a=0\)：
+\[
+\nabla_\theta\log\pi(0)=(1-0.731,\;-0.269)=(0.269,\,-0.269).
+\]
+直觉：<strong>抬高被选动作的 logit、压低其余动作的 logit</strong>，压低多少正比于它们当前的概率。我用有限差分验证过，两者完全吻合（见下方代码）。</p>
+</div>
+
+<h2>调一调，观察现象</h2>
+<p>下面三个小实验都用 numpy 现场写的最小环境，几秒跑完。建议每个都先<strong>猜</strong>结果再运行。</p>
+
+<div class="example">
+<h4>调一调 ①：有无基线的方差对比</h4>
+<p><strong>改什么</strong>：在伯努利老虎机上，固定策略，分别用"裸回报"和"回报减基线 \(V\)"估策略梯度，比较方差。<br>
+<strong>预期看到</strong>：两者梯度<strong>均值几乎相同</strong>（基线不改期望），但<strong>带基线的方差明显更小</strong>（这里约降到 42%）。<br>
+<strong>为什么</strong>：基线把所有动作共有的"正偏移"消掉，只留下"比平均好/差"的部分。</p>
+<pre><code>import numpy as np
+rng = np.random.default_rng(0)
+p = np.array([0.25, 0.75])          # 动作1更好
+pi = np.array([0.5, 0.5])           # 固定均匀策略
+b = (pi*p).sum()                    # 基线 = V = 期望奖励
+def grad_logpi(a, pi):
+    g = -pi.copy(); g[a] += 1.0; return g
+g_nob, g_b = [], []
+for _ in range(2000):
+    a = rng.choice(2, p=pi)
+    r = float(rng.random() < p[a])
+    gl = grad_logpi(a, pi)
+    g_nob.append(gl*r)              # 无基线
+    g_b.append(gl*(r-b))            # 有基线
+g_nob, g_b = np.array(g_nob), np.array(g_b)
+print("mean no-baseline :", g_nob.mean(0))
+print("mean baseline    :", g_b.mean(0))
+print("var  no-baseline :", g_nob.var(0).sum())
+print("var  baseline    :", g_b.var(0).sum())
+print("variance ratio   :", g_b.var(0).sum()/g_nob.var(0).sum())
+# 预期: 两个 mean 几乎相等, ratio < 1 (约 0.42)</code></pre>
+</div>
+
+<div class="example">
+<h4>调一调 ②：跑一个最小 REINFORCE，看基线如何稳住训练</h4>
+<p><strong>改什么</strong>：放开策略让它更新，看 \(\pi(\text{好动作})\) 是否爬向 1。再把 <code>use_baseline</code> 切成 False。<strong>注意这里特意把奖励整体抬高了一个常数偏移 <code>OFFSET=5</code></strong>——让所有回报都远离 0，正是基线最该出手的场景。<br>
+<strong>预期看到</strong>：好动作概率从 0.5 稳步升到 ~0.9+；<strong>去掉基线后，收敛后的曲线明显更抖</strong>（这里跨 50 个种子，收敛段的步间抖动方差约差几百倍）。如果你只跑一条种子、且不加偏移，这个差别很可能<strong>肉眼看不出来</strong>——降方差的效果要么靠"奖励远离 0"放大，要么靠"多种子平均"才稳定显现。<br>
+<strong>为什么</strong>：基线把回报里那一大坨"共同正偏移"（这里是 5）减掉，梯度信号才不被它淹没；不减的话，每个动作都被那个大正数往上猛推，方向信号被噪声盖住。</p>
+<pre><code>import numpy as np
+def softmax(z): z=z-z.max(); e=np.exp(z); return e/e.sum()
+def run(seed, use_baseline, OFFSET=5.0, eta=0.1, steps=400):
+    rng = np.random.default_rng(seed)
+    p = np.array([0.1, 0.9]); theta = np.array([0.0, 0.0])
+    traj = []
+    for it in range(steps):
+        pi = softmax(theta)
+        a = rng.choice(2, p=pi)
+        r = float(rng.random() < p[a]) + OFFSET      # 奖励整体抬高
+        base = (pi*p).sum() + OFFSET if use_baseline else 0.0
+        adv = r - base
+        g = -pi.copy(); g[a] += 1.0                  # grad log pi(a)
+        theta += eta * g * adv
+        traj.append(softmax(theta)[1])
+    return np.array(traj)
+# 单条种子先看学没学会
+tr = run(seed=1, use_baseline=True)
+print("final pi(good) =", round(tr[-1], 3))
+# 跨 50 种子比较收敛段(后200步)的步间抖动方差
+import numpy as np
+def jitter(use_b):
+    return np.mean([np.diff(run(s, use_b)[200:]).var() for s in range(50)])
+print("jitter var  baseline :", jitter(True))
+print("jitter var  no-base  :", jitter(False))
+print("ratio (b/nob)        :", jitter(True)/jitter(False))
+# 预期: pi(good) 升向 0.9+; ratio 远小于 1 (带基线抖动小得多)</code></pre>
+</div>
+
+<div class="example">
+<h4>调一调 ③：PPO 裁剪到底裁掉了什么</h4>
+<p><strong>改什么</strong>：扫一遍重要性比 \(r\)，分别在 \(A=+1\) 与 \(A=-1\) 下打印裁剪目标，改 <code>eps</code> 看护栏宽窄。<br>
+<strong>预期看到</strong>：\(A=+1\) 时目标在 \(r>1+\epsilon\) 后<strong>封顶不再增</strong>（\(r\) 偏大一侧被裁）；\(A=-1\) 时在 \(r<1-\epsilon\) 后<strong>封底不再降</strong>（\(r\) 偏<strong>小</strong>一侧被裁），而 \(r\) 偏大一侧<strong>不裁、惩罚继续加深</strong>；\(\epsilon\) 越大护栏越宽。<br>
+<strong>为什么</strong>：裁剪只取消"把 \(r\) 推向<strong>对自己有利方向</strong>"的额外收益（好动作往大推、坏动作往小推），从而限制单步偏移；坏动作被推向大 \(r\) 本就该重罚，不裁。</p>
+<pre><code>import numpy as np
+def clip_obj(r, A, eps=0.2):
+    return min(r*A, np.clip(r, 1-eps, 1+eps)*A)
+for r in [0.5, 0.8, 1.0, 1.2, 1.5]:
+    print(f"r={r:>3}:  A=+1 -> {clip_obj(r, 1.0):+.2f}   "
+          f"A=-1 -> {clip_obj(r, -1.0):+.2f}")
+# 预期(eps=0.2):
+#   A=+1 时 r=1.2 与 r=1.5 都给 +1.20 (封顶), r 偏小一侧不裁
+#   A=-1 时 r=0.8 与 r=0.5 都给 -0.80 (封底), 而 r=1.5 给 -1.50 (未裁、更负)</code></pre>
+</div>
+
+<h2>动手练习</h2>
+<ol>
+<li><strong>基线最优值（推导）</strong>：已知减任意 \(b(s)\) 不改期望。证明使梯度估计方差最小的基线是 \(b^*(s)=\dfrac{\mathbb{E}[(\nabla_\theta\log\pi)^2 G]}{\mathbb{E}[(\nabla_\theta\log\pi)^2]}\)（对方差关于 \(b\) 求导置零）。说明为什么实践里仍常用 \(V(s)\) 近似它。</li>
+<li><strong>reward-to-go（代码）</strong>：把调一调②改成一个两状态、最长 5 步的小 MDP，分别用"整条回报 \(G(\tau)\)"和"未来回报 \(G_t\)"更新，打印两种梯度估计的方差。骨架：<pre><code>import numpy as np
+# 两状态 MDP: s0--a->s1, 终点给奖励; 自己设转移与奖励
+# 采样若干轨迹, 对每条算 G(tau) 与各步 G_t
+# 比较 sum_t gradlogpi*G(tau)  vs  sum_t gradlogpi*G_t 的方差
+# 预期: 用 G_t 的方差更小</code></pre></li>
+<li><strong>单步 TD 优势（代码）</strong>：在调一调②的老虎机上把基线从"真实 \(V\)"换成一个<strong>在线估计的 \(\hat V\)</strong>（用 \(\hat V\leftarrow\hat V+\alpha(r-\hat V)\) 滑动平均），观察它是否收敛到 \(\sum_a\pi(a)p_a\)（注意若加了偏移则再加上偏移）并依然降方差。</li>
+<li><strong>KL 惩罚 vs 裁剪（思考+代码）</strong>：把调一调③的裁剪目标换成 \(r\hat A-\beta\,(r-1-\log r)\)，扫 \(\beta\) 看它如何同样地"抑制 \(r\) 偏离 1"。这里的 <strong>\(r-1-\log r\) 是用单个样本的重要性比 \(r\) 去估计 \(D_{\mathrm{KL}}(\pi_\theta\|\pi_{\text{old}})\) 的常用估计量</strong>（在 \(r=1\) 处取最小值 0、两侧上翘，恒非负），所以它扮演的正是把 \(r\) 拉回 1 的那根"弹簧"，与正文里分布层面的 KL 锚是一回事。定性比较"弹簧"（KL）和"护栏"（裁剪）两种形状的差异。</li>
+<li><strong>RLHF 目标实验（代码）</strong>：构造一个 5-动作离散"句子"分布，给定一个玩具奖励向量与参考分布 \(\pi_{\text{ref}}\)，数值优化 \(\sum_a\pi(a)R(a)-\beta D_{\mathrm{KL}}(\pi\|\pi_{\text{ref}})\)。改 \(\beta\)：\(\beta\to0\) 时 \(\pi\) 退化成"全压在最高奖励动作"，\(\beta\) 大时 \(\pi\to\pi_{\text{ref}}\)。验证这个趋势。</li>
+</ol>
+
+<h2>掌握自检</h2>
+<ul>
+<li>我能不查资料写出策略梯度定理，并解释 \(\nabla\log\pi\) 与回报相乘的物理意义吗？还能说清为什么实现里用未来回报 \(G_t\) 而非整条 \(G(\tau)\) 吗？</li>
+<li>我能独立证明 \(\mathbb{E}[\nabla\log\pi\cdot b(s)]=0\) 吗？我能指出承重的<strong>两步</strong>（常数提取 + "梯度与求和交换、\(\sum\pi=1\) 梯度为 0"）分别是哪步吗？</li>
+<li>我能区分 \(Q\)、\(V\)、\(A\) 三者，并说清 actor 和 critic 各负责什么吗？我能说清单步 TD 误差何时无偏、何时有偏吗？</li>
+<li>我能解释 PPO 裁剪在 \(A>0\) 和 \(A<0\) 两种情形下分别在 \(r\) 的哪一侧裁平、哪一侧不裁吗？\(\epsilon\) 和学习率有何不同？</li>
+<li>我能写出 RLHF 的优化目标，并说清 \(-\beta\,D_{\mathrm{KL}}(\pi_\theta\|\pi_{\text{ref}})\) 防止了什么问题吗？DPO 和 GRPO 各省掉了哪一步？</li>
+</ul>
+
+<div class="skip">
+<h4>可以先放过的点</h4>
+<ul>
+<li><strong>GAE 的完整推导</strong>：现在只需记住"\(\lambda\) 是偏差—方差旋钮"。等你真正实现 PPO 时再回来推那个等比级数。</li>
+<li><strong>PPO 外层 \(\min\) 为何能保证保守</strong>：直觉够用了；想吃透可以画出 \(A>0\) 与 \(A<0\) 两条裁剪曲线逐段分析，等做调一调③有手感后再回看。</li>
+<li><strong>DPO 的闭式解推导</strong>：涉及带 KL 约束的最优策略形式，留到 M12 偏好优化专题。</li>
+<li><strong>语言生成里"逐 token 奖励分配"的工程细节</strong>：第 7 节那个"末端一个标量怎么摊到每个 token"的问题，正是这里要替你挡掉的——等到真正跑 RLHF（M12/M14）再深究即可。</li>
+</ul>
+</div>
+
+<p><em>模块 2 到此完成！你已经把概率、信息论、强化学习的地基打牢。下一站：进<strong>模块 3（Python/PyTorch 工程）</strong>把这些算法真正写成能跑的代码，或者直接进入<strong>深度学习</strong>。这两条路最终会在 RLHF 这里重逢。</em></p>
+</article>
+<div class="navbtns"><a class="prev" href="lesson-09-rl-crash-1.html"><div class="nlabel">← 上一课</div><div class="ntitle">第9课 · 强化学习速成 I——MDP、价值与贝尔曼</div></a><a class="next" href="index.html"><div class="nlabel">→</div><div class="ntitle">已是当前最后一课 · 回目录</div></a></div>
+<nav class="toc"><h3>本模块课程表</h3><ol>
+<li><a href="lesson-01-random-variables.html"><span class="ln">第1课</span>概率的语言——随机变量、分布、期望与方差</a></li>
+<li><a href="lesson-02-distributions-covariance.html"><span class="ln">第2课</span>分布动物园与协方差</a></li>
+<li><a href="lesson-03-conditional-bayes.html"><span class="ln">第3课</span>条件概率与贝叶斯</a></li>
+<li><a href="lesson-04-mle-map.html"><span class="ln">第4课</span>从数据到损失——MLE 与 MAP</a></li>
+<li><a href="lesson-05-information-theory.html"><span class="ln">第5课</span>信息论——熵、交叉熵、KL</a></li>
+<li><a href="lesson-06-sampling.html"><span class="ln">第6课</span>采样——逆变换、重参数化与蒙特卡洛</a></li>
+<li><a href="lesson-07-convexity-gradient-descent.html"><span class="ln">第7课</span>凸性与梯度下降——优化的几何</a></li>
+<li><a href="lesson-08-optimizers.html"><span class="ln">第8课</span>现代优化器——SGD、动量、Adam 与调度</a></li>
+<li><a href="lesson-09-rl-crash-1.html"><span class="ln">第9课</span>强化学习速成 I——MDP、价值与贝尔曼</a></li>
+<li class="cur"><span class="ln">第10课</span>强化学习速成 II——策略梯度到 PPO</li>
+</ol></nav>
+</div>
+<!-- pyrunner-injected -->
+<style>
+.pr-cell{border:1px solid #334155;border-radius:10px;margin:1.2em 0;overflow:hidden;background:#0f172a;}
+.pr-head{display:flex;align-items:center;gap:8px;background:#1e293b;color:#cbd5e1;padding:6px 10px;font-size:13px;font-family:system-ui,-apple-system,sans-serif;}
+.pr-title{flex:1;font-weight:600;}
+.pr-status{font-size:12px;color:#94a3b8;white-space:nowrap;max-width:50%;overflow:hidden;text-overflow:ellipsis;}
+.pr-btn{cursor:pointer;border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:6px;padding:3px 11px;font-size:13px;line-height:1.4;}
+.pr-btn:hover{background:#0b1220;}
+.pr-run{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:600;}
+.pr-run:hover{background:#1d4ed8;}
+.pr-cell.collapsed .pr-body{display:none;}
+.pr-editor{position:relative;background:#0f172a;}
+.pr-code,.pr-edit{display:block;width:100%;min-height:68px;border:none;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.55;padding:12px 14px;box-sizing:border-box;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:4;}
+.pr-code{position:absolute;inset:0;margin:0;overflow:hidden;background:#0f172a;color:#dbeafe;pointer-events:none;}
+.pr-edit{position:relative;background:transparent;color:transparent;caret-color:#e2e8f0;resize:vertical;outline:none;-webkit-text-fill-color:transparent;}
+.pr-edit::selection{background:rgba(96,165,250,.34);}
+.tok-kw{color:#c084fc;font-weight:700;}
+.tok-fn{color:#67e8f9;}
+.tok-num{color:#fbbf24;}
+.tok-str{color:#86efac;}
+.tok-comment{color:#94a3b8;font-style:italic;}
+.pr-out{margin:0;padding:10px 14px;border-top:1px solid #334155;background:#0b1220;color:#cbd5e1;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.5;white-space:pre-wrap;max-height:340px;overflow:auto;}
+.pr-out:empty{display:none;}
+.pr-out.err{color:#fca5a5;}
+#pr-fab{position:fixed;right:18px;bottom:18px;z-index:9998;background:#2563eb;color:#fff;border:none;border-radius:999px;padding:10px 17px;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.22);font-family:system-ui,sans-serif;}
+#pr-fab:hover{background:#1d4ed8;}
+#pr-lab{position:fixed;right:18px;bottom:66px;z-index:9999;width:400px;max-width:92vw;background:#0f172a;border:1px solid #334155;border-radius:12px;display:none;flex-direction:column;box-shadow:0 14px 38px rgba(0,0,0,.4);overflow:hidden;}
+#pr-lab.open{display:flex;}
+#pr-lab .pr-edit,#pr-lab .pr-code{min-height:150px;}
+</style>
+<script>
+(function(){
+  var PYBASE="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+  var pyReady=null;
+  function loadPy(status){
+    if(pyReady)return pyReady;
+    pyReady=(async function(){
+      status("正在加载 Python 运行时（首次约 10 秒，需联网）…");
+      await new Promise(function(res,rej){
+        var s=document.createElement("script");s.src=PYBASE+"pyodide.js";
+        s.onload=res;s.onerror=function(){rej(new Error("无法加载 Pyodide（首次运行需要联网）"));};
+        document.head.appendChild(s);
+      });
+      var py=await loadPyodide({indexURL:PYBASE});
+      status("正在加载 NumPy …");
+      await py.loadPackage("numpy");
+      status("Python 就绪 ✓");
+      return py;
+    })();
+    return pyReady;
+  }
+  async function run(code,outEl,statusEl){
+    var setS=function(m){if(statusEl)statusEl.textContent=m;};
+    outEl.classList.remove("err");outEl.textContent="";
+    var py;
+    try{py=await loadPy(setS);}
+    catch(e){outEl.classList.add("err");outEl.textContent="加载失败："+e.message;return;}
+    var buf="";
+    py.setStdout({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    py.setStderr({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    try{
+      var result=await py.runPythonAsync(code);
+      if(result!==undefined&&result!==null){
+        var r;try{r=result.toString();}catch(_){r=String(result);}
+        if(r!=="None")buf+=(buf&&!buf.endsWith("\n")?"\n":"")+r;
+        if(result&&result.destroy)result.destroy();
+      }
+      outEl.textContent=buf||"（运行成功，无输出。用 print(...) 查看结果）";
+    }catch(e){
+      outEl.classList.add("err");
+      outEl.textContent=buf+(buf?"\n":"")+String((e&&e.message)||e);
+    }
+  }
+  var KW={False:1,None:1,True:1,and:1,as:1,assert:1,async:1,await:1,break:1,class:1,continue:1,def:1,del:1,elif:1,else:1,except:1,finally:1,for:1,from:1,global:1,if:1,import:1,in:1,is:1,lambda:1,nonlocal:1,not:1,or:1,pass:1,raise:1,return:1,try:1,while:1,with:1,yield:1};
+  var FN={abs:1,all:1,any:1,array:1,bool:1,dict:1,enumerate:1,float:1,int:1,len:1,list:1,max:1,min:1,np:1,numpy:1,print:1,range:1,round:1,set:1,str:1,sum:1,tuple:1,zip:1};
+  function esc(s){return s.replace(/[&<>]/g,function(c){return c==="&"?"&amp;":c==="<"?"&lt;":"&gt;";});}
+  function colorLine(line){
+    var out="",i=0;
+    while(i<line.length){
+      var ch=line[i];
+      if(ch==="#"){out+='<span class="tok-comment">'+esc(line.slice(i))+"</span>";break;}
+      if(ch==="'"||ch==='"'){
+        var q=ch,triple=line.slice(i,i+3)===q+q+q,end=i+(triple?3:1),done=false;
+        while(end<line.length){
+          if(!triple&&line[end]==="\\"){end+=2;continue;}
+          if(triple&&line.slice(end,end+3)===q+q+q){end+=3;done=true;break;}
+          if(!triple&&line[end]===q){end+=1;done=true;break;}
+          end+=1;
+        }
+        out+='<span class="tok-str">'+esc(line.slice(i,done?end:line.length))+"</span>";
+        i=done?end:line.length;
+        continue;
+      }
+      if(/[0-9]/.test(ch)||(ch==="."&&/[0-9]/.test(line[i+1]||""))){
+        var m=line.slice(i).match(/^(?:0[xX][0-9a-fA-F]+|\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?/);
+        out+='<span class="tok-num">'+esc(m[0])+"</span>";i+=m[0].length;continue;
+      }
+      if(/[A-Za-z_]/.test(ch)){
+        var id=line.slice(i).match(/^[A-Za-z_][A-Za-z0-9_]*/)[0];
+        if(KW[id])out+='<span class="tok-kw">'+id+"</span>";
+        else if(FN[id])out+='<span class="tok-fn">'+id+"</span>";
+        else out+=id;
+        i+=id.length;continue;
+      }
+      out+=esc(ch);i+=1;
+    }
+    return out;
+  }
+  function paint(ta){
+    var pre=ta.closest(".pr-editor").querySelector(".pr-code");
+    pre.innerHTML=ta.value.split("\n").map(colorLine).join("\n")+(ta.value.endsWith("\n")?"\n":"");
+    pre.style.height=ta.style.height;
+    pre.scrollTop=ta.scrollTop;pre.scrollLeft=ta.scrollLeft;
+  }
+  function autosize(ta){ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight+2,460)+"px";}
+  function tune(ta){autosize(ta);paint(ta);}
+  function tabKey(e){
+    if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();var b=this.closest(".pr-cell,#pr-lab").querySelector(".pr-run");if(b)b.click();return;}
+    if(e.key==="Tab"){
+      e.preventDefault();
+      var s=this.selectionStart,en=this.selectionEnd,v=this.value,lineStart=v.lastIndexOf("\n",s-1)+1,lineEnd=v.indexOf("\n",en);
+      if(lineEnd<0)lineEnd=v.length;
+      if(s!==en||e.shiftKey){
+        var block=v.slice(lineStart,lineEnd),lines=block.split("\n"),delta=0;
+        if(e.shiftKey){
+          lines=lines.map(function(line){
+            if(line.startsWith("    ")){delta-=4;return line.slice(4);}
+            if(line.startsWith("\t")){delta-=1;return line.slice(1);}
+            return line;
+          });
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=Math.max(lineStart,s+(s===lineStart?0:Math.max(delta/Math.max(lines.length,1),-4)));
+          this.selectionEnd=Math.max(this.selectionStart,en+delta);
+        }else{
+          lines=lines.map(function(line){delta+=4;return "    "+line;});
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=s+4;
+          this.selectionEnd=en+delta;
+        }
+      }else{
+        this.value=v.slice(0,s)+"    "+v.slice(en);this.selectionStart=this.selectionEnd=s+4;
+      }
+      tune(this);
+      return;
+    }
+    if(e.key==="Enter"){
+      e.preventDefault();
+      var a=this.selectionStart,b=this.selectionEnd,text=this.value,start=text.lastIndexOf("\n",a-1)+1;
+      var prefix=text.slice(start,a),indent=(prefix.match(/^\s*/)||[""])[0],code=prefix.replace(/#.*$/,"").trimEnd();
+      var add="\n"+indent+(/:\s*$/.test(code)?"    ":"");
+      this.value=text.slice(0,a)+add+text.slice(b);
+      this.selectionStart=this.selectionEnd=a+add.length;
+      tune(this);
+      return;
+    }
+  }
+  function makeCell(code){
+    var cell=document.createElement("div");cell.className="pr-cell";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">可运行 · Python (NumPy)</span><span class="pr-status"></span><button class="pr-btn pr-toggle">收起</button><button class="pr-btn pr-run">▶ 运行</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    var ta=cell.querySelector(".pr-edit");ta.value=code;
+    var out=cell.querySelector(".pr-out"),st=cell.querySelector(".pr-status");
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    cell.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    var tog=cell.querySelector(".pr-toggle");
+    tog.onclick=function(){cell.classList.toggle("collapsed");tog.textContent=cell.classList.contains("collapsed")?"展开":"收起";};
+    setTimeout(function(){tune(ta);},0);
+    return cell;
+  }
+  function enhance(){
+    document.querySelectorAll("article pre").forEach(function(pre){
+      if(pre.closest(".pr-cell"))return;
+      var codeEl=pre.querySelector("code")||pre;
+      var code=codeEl.textContent.replace(/\s+$/,"");
+      if(!code)return;
+      pre.replaceWith(makeCell(code));
+    });
+  }
+  function lab(){
+    var fab=document.createElement("button");fab.id="pr-fab";fab.textContent="▶ Python 实验台";
+    var panel=document.createElement("div");panel.id="pr-lab";
+    panel.innerHTML='<div class="pr-head"><span class="pr-title">Python 实验台 · NumPy</span><span class="pr-status"></span><button class="pr-btn pr-run">▶ 运行</button><button class="pr-btn pr-min">收起</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    document.body.appendChild(fab);document.body.appendChild(panel);
+    var ta=panel.querySelector(".pr-edit");
+    ta.value="import numpy as np\na = np.array([3, 2])\nb = np.array([1, 4])\nprint(\"a + b =\", a + b)\nprint(\"a . b =\", a @ b)\nprint(\"|a|  =\", np.linalg.norm(a))\ncos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))\nprint(\"cos =\", round(float(cos), 4))";
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    var out=panel.querySelector(".pr-out"),st=panel.querySelector(".pr-status");
+    panel.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    fab.onclick=function(){panel.classList.toggle("open");};
+    panel.querySelector(".pr-min").onclick=function(){panel.classList.remove("open");};
+    setTimeout(function(){tune(ta);},0);
+  }
+  function init(){enhance();lab();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+
+<script src="../assets/annotator.js"></script>
+</body>
+</html>

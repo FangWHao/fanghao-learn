@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块2 · 第7课 · 凸性与梯度下降——优化的几何</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<script src="../assets/theme.js"></script>
+<link rel="stylesheet" href="../assets/annotator.css">
+<link rel="stylesheet" href="../assets/theme.css">
+
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue-bg:#eff6ff;
+--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--pink:#db2777;
+--red:#dc2626;--red-bg:#fef2f2;--bg:#ffffff;--soft:#f8fafc;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);
+font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.85;font-size:17px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:840px;margin:0 auto;padding:0 22px 100px;}
+header.top{background:#fff;border-bottom:1px solid var(--line);padding:26px 22px 22px;margin-bottom:14px;}
+header.top .inner{max-width:840px;margin:0 auto;}
+.crumb{color:var(--muted);font-size:14px;letter-spacing:.3px;margin-bottom:6px;}
+h1{font-size:30px;line-height:1.3;margin:.1em 0 .2em;}
+.sub{color:var(--muted);font-size:15px;}
+article{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:30px 34px;margin-top:18px;}
+h2{font-size:23px;margin:1.7em 0 .6em;padding-bottom:.25em;border-bottom:2px solid var(--line);}
+h2:first-child{margin-top:.2em;}
+h3{font-size:19px;margin:1.3em 0 .4em;color:#0f172a;}
+h4{margin:.2em 0 .5em;font-size:16px;}
+p{margin:.7em 0;}
+ul,ol{padding-left:1.3em;margin:.6em 0;}
+li{margin:.32em 0;}
+code{background:#f1f5f9;padding:.12em .4em;border-radius:5px;font-size:.9em;
+font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a;}
+pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 18px;overflow:auto;font-size:14px;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0;}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:15.5px;}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+thead th{background:var(--soft);}
+figure.fig{margin:1.4em 0;text-align:center;}
+figure.fig svg{max-width:100%;height:auto;}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
+.note,.ml,.key,.pitfall,.example{border-radius:10px;padding:14px 18px;margin:1.2em 0;border:1px solid var(--line);}
+.note{background:var(--soft);border-left:4px solid #94a3b8;}
+.example{background:#fff;border-left:4px solid var(--blue);}
+.ml{background:var(--green-bg);border-left:4px solid var(--green);}
+.key{background:var(--amber-bg);border-left:4px solid var(--amber);}
+.pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.goals{background:var(--blue-bg);border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:10px;padding:14px 20px;margin:.2em 0 1.5em;}
+.goals h4{margin:.1em 0 .5em;color:#1e3a8a;}
+.goals ul{margin:.3em 0;}
+.skip{background:var(--soft);border:1px solid var(--line);border-left:4px solid #94a3b8;border-radius:10px;padding:14px 20px;margin:1.8em 0 0;color:#475569;}
+.skip h4{margin:.1em 0 .5em;color:#475569;}
+.tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
+.toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
+.toc h3{margin:.1em 0 .7em;}
+.toc ol{list-style:none;padding:0;}
+.toc li{padding:7px 10px;border-radius:8px;color:#334155;border:1px solid transparent;}
+.toc li a{color:inherit;text-decoration:none;display:block;}
+.toc li .ln{display:inline-block;min-width:54px;color:var(--muted);font-size:13px;}
+.toc li.cur{background:var(--blue-bg);border-color:#bfdbfe;font-weight:600;color:#1e3a8a;}
+.toc li:not(.cur):hover{background:var(--soft);}
+.navbtns{display:flex;justify-content:space-between;margin-top:22px;gap:12px;}
+.navbtns a{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--ink);}
+.navbtns a:hover{border-color:var(--blue);}
+.navbtns .nlabel{color:var(--muted);font-size:13px;}
+.navbtns .ntitle{font-weight:600;margin-top:3px;}
+.navbtns .next{text-align:right;}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.here{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:6px 0 4px;font-size:15px;color:#1e3a8a;line-height:1.7;}
+.here b{font-weight:700;}
+.cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
+.card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
+.card:hover{border-color:var(--blue);}
+.card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
+.card .ct{font-size:18px;font-weight:600;}
+.card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+.card .cap{margin-left:40px;margin-top:7px;font-size:13px;color:#1e3a8a;}
+.card .cap .lbl{display:inline-block;background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;margin-right:7px;}
+
+.card.soon{opacity:.6;cursor:default;}
+.card.soon:hover{border-color:var(--line);}
+.badge{display:inline-block;background:#e2e8f0;color:#475569;font-size:11px;font-weight:600;padding:1px 8px;border-radius:20px;margin-left:8px;vertical-align:middle;}
+.toc li.soon{color:#94a3b8;}
+.toc li.soon .badge{margin-left:4px;}
+</style>
+</head>
+<body>
+<header class="top"><div class="inner">
+<div class="crumb"><a href="../index.html" style="color:inherit">首页</a>　/　<a href="index.html" style="color:inherit">模块 2 · 概率统计、信息论与最优化</a>　/　第 7 课（共 10 课）</div>
+<h1>凸性与梯度下降——优化的几何</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　阶段0：数学与工具基础　·　<strong>能力点：</strong>凸性与梯度下降——损失能否真正降下去</div>
+</div></header>
+<div class="wrap">
+<article>
+<p>前几课我们从概率与信息论里把损失函数"推"了出来：最大似然给了我们交叉熵，MAP 给了我们带正则的目标。可一旦写下 \(L(\theta)\)，真正的问题才开始——<strong>怎么把它最小化？</strong>这一课讲优化的几何：什么样的地形好走（凸性），为什么沿负梯度走最快，以及为什么有的"碗"明明是凸的却走得慢得让人抓狂（病态曲率）。</p>
+
+<div class="goals">
+<h4>读完这一课，你将能够</h4>
+<ul>
+<li>用"弦在曲线上方"和"Hessian 半正定"两套语言判断一个函数是否凸，并解释凸为什么意味着"局部最优即全局最优"。</li>
+<li>说清为什么负梯度是最速下降方向，并解释学习率 \(\eta\) 太大/太小各会怎样。</li>
+<li>用条件数（Hessian 最大/最小特征值之比）解释梯度下降为什么在狭长山谷里走"之"字形、收敛慢。</li>
+<li>用维度直觉解释为什么高维参数空间里临界点几乎都是鞍点、而非坏的局部极小。</li>
+<li>纠正"非凸=训不了"的误解，说出深度学习里真正的拦路虎是鞍点、病态曲率、坏初始化与学习率。</li>
+<li>在 \(f=\tfrac12(x^2+\gamma y^2)\) 上手算梯度下降，并用 numpy 改条件数观察收敛快慢。</li>
+</ul>
+</div>
+
+<h2>训练，就是优化</h2>
+
+<p>把前几课的成果收个口：无论是回归、分类还是生成模型，训练最终都落到一个统一的形式</p>
+
+\[ \min_{\theta}\; L(\theta), \]
+
+<p>其中 \(\theta\) 是模型的所有参数（可能是几个数，也可能是几十亿个数），\(L\) 是损失。<strong>"学习"这个浪漫的词，在数学上就是"在 \(\theta\) 的高维空间里找一个让 \(L\) 尽量小的点"。</strong>剩下的全是细节：地形长什么样，从哪儿出发，每步迈多大。</p>
+
+<div class="note">
+<p><strong>直觉。</strong>把 \(L(\theta)\) 想象成一片地形，\(\theta\) 是你站的位置，海拔就是损失。你被蒙住眼睛，只能用脚感受脚下的坡度（梯度），想走到最低的谷底。这一课就是研究：什么样的地形容易走到底，什么样的地形会把你困住。</p>
+</div>
+
+<h2>凸集与凸函数：什么是"好地形"</h2>
+
+<p>先别急着背定义。我们想要的"好地形"直觉上是：<strong>一个碗。</strong>不管从哪儿放一颗球，它都会滚到同一个最低点。数学家把这种性质拆成两层：底面的形状（凸集）和碗壁的形状（凸函数）。</p>
+
+<h3>凸集：连两点的线段不会"出界"</h3>
+
+<p>一个集合 \(C\) 是<strong>凸集（convex set）</strong>，如果对里面任意两点 \(x,y\)，连接它们的整条线段也都在 \(C\) 里：</p>
+
+\[ x,y\in C \;\Rightarrow\; \lambda x+(1-\lambda)y\in C,\quad \forall\,\lambda\in[0,1]. \]
+
+<p>约定好一个贯穿全课的读法：<strong>\(\lambda\) 是"\(x\) 的份额"</strong>——\(\lambda=1\) 时整点落在 \(x\)，\(\lambda=0\) 时落在 \(y\)，中间按比例滑动。圆盘、实心椭圆、整个 \(\mathbb{R}^n\) 都是凸的；一个月牙形、一个甜甜圈就不是——你能找到两点，它们的连线穿出了集合外面。</p>
+
+<h3>凸函数：弦永远在曲线上方</h3>
+
+<p>有了凸的"地基"，再看碗壁。一个函数 \(f\) 是<strong>凸函数（convex function）</strong>，如果它图像上任意两点之间的<strong>弦（割线）都在函数图像的上方或重合</strong>：</p>
+
+\[ f\big(\lambda x+(1-\lambda)y\big)\;\le\;\lambda f(x)+(1-\lambda)f(y),\quad \forall\,\lambda\in[0,1]. \]
+
+<p>左边是"先取平均位置，再看函数值"；右边是"先取两端函数值，再平均"。<strong>凸 = 实际曲线 ≤ 直线插值。</strong>注意左右两边的 \(\lambda\) 配的始终是同一个点——\(\lambda\) 越大，无论是位置还是函数值都更靠近 \(x\) 这一端，两边永远对齐，不会错位。抛物线 \(x^2\)、指数 \(e^x\)、绝对值 \(|x|\) 都满足；而 \(\sin x\) 或者有两个谷的函数就不满足——某些弦会钻到曲线下面去。</p>
+
+<figure class="fig"><svg viewBox="0 0 540 320" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif">
+  <title>凸函数与非凸函数对比：弦在曲线上方为凸（唯一谷底），弦可在曲线下方为非凸（多个局部极小）</title>
+  <defs>
+    <marker id="arrowAmber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#d97706"/>
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#059669"/>
+    </marker>
+  </defs>
+
+  <!-- ===== Titles ===== -->
+  <text x="135" y="24" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2937">凸函数 (convex)</text>
+  <text x="405" y="24" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2937">非凸函数 (non-convex)</text>
+
+  <!-- ============================================================ -->
+  <!-- LEFT PANEL : convex parabola                                  -->
+  <!-- ============================================================ -->
+  <line x1="30" y1="240" x2="248" y2="240" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="40" y1="44" x2="40" y2="240" stroke="#94a3b8" stroke-width="1"/>
+
+  <!-- convex curve: U shape -->
+  <path d="M 58,72 Q 140,290 222,72" fill="none" stroke="#2563eb" stroke-width="2"/>
+
+  <!-- two points on the curve where chord touches -->
+  <circle cx="90.8" cy="141.8" r="3.5" fill="#2563eb"/>
+  <circle cx="192.5" cy="136.4" r="3.5" fill="#2563eb"/>
+
+  <!-- dashed chord between the two points (sits above the curve) -->
+  <line x1="90.8" y1="141.8" x2="192.5" y2="136.4" stroke="#db2777" stroke-width="1" stroke-dasharray="4 3"/>
+  <text x="142" y="120" text-anchor="middle" font-size="12" fill="#db2777">弦</text>
+
+  <!-- single valley marker -->
+  <circle cx="140" cy="218" r="3.5" fill="#d97706"/>
+  <line x1="178" y1="252" x2="146" y2="221" stroke="#d97706" stroke-width="2" marker-end="url(#arrowAmber)"/>
+  <text x="181" y="258" text-anchor="start" font-size="11" fill="#d97706">唯一谷底</text>
+
+  <!-- ============================================================ -->
+  <!-- RIGHT PANEL : non-convex wavy curve                           -->
+  <!-- ============================================================ -->
+  <line x1="300" y1="240" x2="520" y2="240" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="310" y1="44" x2="310" y2="240" stroke="#94a3b8" stroke-width="1"/>
+
+  <!-- wavy curve: shallow local min - central bump - deep global min -->
+  <path d="M 325,70
+           C 340,120 350,150 360,150
+           C 372,150 400,118 415,95
+           C 432,118 458,205 470,205
+           C 480,205 492,160 505,80"
+        fill="none" stroke="#2563eb" stroke-width="2"/>
+
+  <!-- two points on the curve, one on each side, whose chord passes UNDER the bump -->
+  <circle cx="343" cy="127" r="3.5" fill="#2563eb"/>
+  <circle cx="497" cy="135" r="3.5" fill="#2563eb"/>
+
+  <!-- dashed chord: passes below the central bump -->
+  <line x1="343" y1="127" x2="497" y2="135" stroke="#db2777" stroke-width="1" stroke-dasharray="4 3"/>
+  <text x="408" y="150" text-anchor="middle" font-size="12" fill="#db2777">弦穿到曲线下方</text>
+
+  <!-- local min (shallow) -->
+  <circle cx="360" cy="150" r="3.5" fill="#d97706"/>
+  <line x1="345" y1="200" x2="357" y2="156" stroke="#d97706" stroke-width="2" marker-end="url(#arrowAmber)"/>
+  <text x="343" y="214" text-anchor="middle" font-size="11" fill="#d97706">局部极小</text>
+
+  <!-- global min (deep) -->
+  <circle cx="470" cy="205" r="3.5" fill="#059669"/>
+  <line x1="455" y1="232" x2="466" y2="210" stroke="#059669" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  <text x="470" y="246" text-anchor="middle" font-size="11" fill="#059669">全局极小</text>
+
+  <!-- trapped ball at the shallow local min -->
+  <circle cx="360" cy="143" r="4.5" fill="none" stroke="#1f2937" stroke-width="1.5"/>
+  <text x="360" y="128" text-anchor="middle" font-size="11" fill="#1f2937">困住的球</text>
+
+  <!-- ===== bottom captions ===== -->
+  <text x="135" y="288" text-anchor="middle" font-size="12" fill="#1f2937">弦在曲线上方 → 凸 → 唯一谷底</text>
+  <text x="405" y="288" text-anchor="middle" font-size="12" fill="#1f2937">弦可在曲线下方 → 非凸 → 多个谷/假谷底</text>
+</svg><figcaption>凸 vs 非凸：左图凸函数，任取两点连成的弦（虚线）整段落在曲线上方，且只有一个谷；右图非凸函数有多个谷和一个鞍状起伏，某些弦会钻到曲线下方，于是出现会困住球的局部极小。</figcaption></figure>
+
+<div class="note">
+<p><strong>直觉。</strong>"弦在上方"为什么重要？因为它排除了"中间凹下去一块"的可能。如果中间能凹下去，那块凹陷就可能形成第二个谷——一个会困住球的坑。凸函数从定义上就杜绝了这种坑，所以它最多只有一个谷。</p>
+</div>
+
+<h3>二阶判据：Hessian 半正定（呼应 M1 第7课）</h3>
+
+<p>"弦在上方"很直观，但拿到一个具体函数怎么快速判断？这就要请出我们在模块1学过的 <strong>Hessian 矩阵 \(H\)</strong>（二阶偏导构成的对称矩阵，记录了曲面在每个方向上的弯曲程度）。一维情形大家熟悉：\(f''(x)\ge 0\)（处处不向下弯）就凸。多维的推广是：</p>
+
+\[ f \text{ 凸} \quad\Longleftrightarrow\quad H(\theta)\succeq 0\ \text{处处成立（Hessian 半正定）}. \]
+
+<p>"半正定 \(\succeq 0\)"在模块1第4/5课讲过：等价于 <strong>\(H\) 的所有特征值都 \(\ge 0\)</strong>。几何上，特征值是各主方向的"弯曲强度"。全部 \(\ge 0\)，意味着无论朝哪个方向看，曲面都不向下弯——这正是"碗"的样子。如果某个特征值是负的，那个方向就是向下弯的，曲面在该方向像个鞍——不再是碗。</p>
+
+<div class="example">
+<h4>例题：用 Hessian 判断二次函数是否凸</h4>
+<p>判断 \(f(x,y)=2x^2+3y^2-2xy\) 是否凸。</p>
+<p><strong>解。</strong>先求一阶偏导：\(\partial_x f = 4x-2y\)，\(\partial_y f = 6y-2x\)。再求二阶：</p>
+\[ H=\begin{bmatrix} \partial_{xx} & \partial_{xy}\\ \partial_{yx} & \partial_{yy}\end{bmatrix} =\begin{bmatrix} 4 & -2\\ -2 & 6\end{bmatrix}. \]
+<p>判<strong>正定</strong>有个不必算特征值的捷径——<strong>顺序主子式法（顺序主子式全为正即正定）</strong>：左上角 \(4>0\)；整个行列式 \(\det H = 4\cdot 6-(-2)(-2)=24-4=20>0\)。两个顺序主子式都为正 ⇒ \(H\) 正定 ⇒ 特征值都 \(>0\)（实际为 \(2.76\) 与 \(7.24\)）⇒ \(f\) 严格凸。</p>
+<p>注意 Hessian 是常数矩阵（二次函数的二阶导不含变量），所以"处处正定"一次就验完——这正是二次函数好分析的原因。</p>
+<p><strong>两点小提醒（看完即可放过）。</strong>其一，顺序主子式全为正只能判<strong>正定</strong>；要判"半正定"（特征值 \(\ge 0\) 而非 \(>0\)）则需用<strong>所有</strong>主子式或直接看特征值，顺序主子式那套对半正定不成立。其二，我们这里只用到"正定 ⇒ 严格凸"这一个方向；反过来不一定成立——比如 \(x^4\) 是严格凸的，但它在原点的二阶导恰好为 \(0\)（并非处处正定）。</p>
+</div>
+
+<div class="key">
+<h4>关键结论：凸的最大好处——局部最优即全局最优</h4>
+<p>凸函数最值钱的性质是：<strong>任何局部最优都是全局最优。</strong>直觉证明：假设 \(\theta^\star\) 是个局部最低点，但别处有个更低的点 \(\theta'\)（\(L(\theta')<L(\theta^\star)\)）。由凸性，连接 \(\theta^\star\) 与 \(\theta'\) 的整条线段上，函数值都被弦压在弦的下方；而这条弦从 \(L(\theta^\star)\) 斜降到更低的 \(L(\theta')\)，所以<strong>线段上每一个中间点的函数值都严格低于 \(L(\theta^\star)\)</strong>。换句话说，\(\theta^\star\) 旁边就有比它更低的点——这跟"\(\theta^\star\) 是局部最低（周围都更高）"直接矛盾。所以更低的点不存在。<strong>一句话：凸地形里没有"假谷底"，你脚下感觉到的最低点就是真正的最低点。</strong>这就是为什么凸问题"好优化"——梯度下降只要走到坡度为零的地方，就一定到家了。</p>
+</div>
+
+<h2>负梯度 = 最速下降方向（呼应 M1 第6课）</h2>
+
+<p>知道了好地形长什么样，现在问：站在地形上某点，往哪个方向迈一步下降最快？答案是<strong>负梯度方向 \(-\nabla L\)</strong>。回忆模块1第6课的一阶展开，朝单位方向 \(u\) 走一小步 \(\epsilon\)：</p>
+
+\[ L(\theta+\epsilon u)\approx L(\theta)+\epsilon\,\nabla L(\theta)^\top u. \]
+
+<p>下降量由 \(\nabla L^\top u\)（梯度与方向的内积）决定。要让函数下降最多，就要让这个内积<strong>最负</strong>。内积 \(=\|\nabla L\|\,\|u\|\cos\angle\)，在 \(\|u\|=1\) 下，当 \(u\) 与 \(\nabla L\) 方向<strong>正好相反</strong>（\(\cos=-1\)）时最负。所以最速下降方向就是 \(u=-\nabla L/\|\nabla L\|\)。<strong>梯度指向上坡最陡的方向，取个负号就是下坡最陡的方向。</strong></p>
+
+<figure class="fig"><svg viewBox="0 0 520 420" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>负梯度方向即最速下降方向</title><defs><marker id="sd-arr-blue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#2563eb"/></marker><marker id="sd-arr-pink" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#db2777"/></marker><marker id="sd-arr-amber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#d97706"/></marker></defs><ellipse cx="240" cy="210" rx="200" ry="125" fill="#2563eb" fill-opacity="0.04" stroke="#cbd5e1" stroke-width="1.5"/><ellipse cx="240" cy="210" rx="155" ry="97" fill="#2563eb" fill-opacity="0.05" stroke="#cbd5e1" stroke-width="1.5"/><ellipse cx="240" cy="210" rx="110" ry="69" fill="#2563eb" fill-opacity="0.06" stroke="#cbd5e1" stroke-width="1.5"/><ellipse cx="240" cy="210" rx="65" ry="41" fill="#2563eb" fill-opacity="0.08" stroke="#cbd5e1" stroke-width="1.5"/><ellipse cx="240" cy="210" rx="24" ry="15" fill="#2563eb" fill-opacity="0.12" stroke="#94a3b8" stroke-width="1.5"/><circle cx="240" cy="210" r="3" fill="#1f2937"/><text x="240" y="234" font-size="12" fill="#1f2937" text-anchor="middle">谷底 min L</text><line x1="362.5" y1="135" x2="425" y2="96" stroke="#db2777" stroke-width="2" marker-end="url(#sd-arr-pink)"/><text x="430" y="86" font-size="14" fill="#db2777" text-anchor="start" font-weight="600">∇L</text><text x="430" y="102" font-size="12" fill="#db2777" text-anchor="start">上坡最陡</text><line x1="362.5" y1="135" x2="300" y2="174" stroke="#2563eb" stroke-width="2" marker-end="url(#sd-arr-blue)"/><text x="262" y="186" font-size="14" fill="#2563eb" text-anchor="end" font-weight="600">−∇L</text><text x="262" y="202" font-size="12" fill="#2563eb" text-anchor="end">下坡最陡=更新方向</text><circle cx="362.5" cy="135" r="3.5" fill="#1f2937"/><text x="376" y="131" font-size="14" fill="#1f2937" text-anchor="start" font-weight="600">θ</text><line x1="377" y1="145" x2="345" y2="165" stroke="#d97706" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#sd-arr-amber)"/><text x="334" y="158" font-size="12" fill="#d97706" text-anchor="end" font-style="italic">η 步长</text><line x1="345" y1="118" x2="380" y2="152" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/><text x="356" y="112" font-size="11" fill="#94a3b8" text-anchor="middle">等高线切向</text><text x="240" y="396" font-size="12" fill="#1f2937" text-anchor="middle">梯度⊥等高线：沿 −∇L 迈一步 η，朝谷底下降</text></svg><figcaption>负梯度=最速下降：椭圆等高线上某点处，梯度箭头垂直于等高线指向上坡（损失增大）方向，取负号 -∇L 指向下坡最陡方向；梯度下降每步沿 -∇L 迈一步 η。</figcaption></figure>
+
+<p>把这个想法变成迭代算法，就是<strong>梯度下降（gradient descent）</strong>：</p>
+
+\[ \boxed{\;\theta \leftarrow \theta-\eta\,\nabla L(\theta)\;} \]
+
+<p>每一步朝当前最陡的下坡方向迈一步，步长由<strong>学习率（learning rate）\(\eta\)</strong> 控制。注意"最速下降"只是<strong>局部</strong>最优方向——它只看脚下这一小步，不保证是通往谷底的全局捷径（下面的"之"字形就是这个局部性付出的代价）。</p>
+
+<h3>学习率 \(\eta\)：太大震荡/发散，太小太慢</h3>
+
+<p>\(\eta\) 是这一课最需要手感的旋钮。它控制每步迈多远，而"多远算合适"取决于地形的弯曲程度。</p>
+
+<ul>
+<li><strong>\(\eta\) 太小：太慢。</strong>每步挪一点点，要迈成千上万步才到谷底。安全但磨蹭。</li>
+<li><strong>\(\eta\) 太大：震荡甚至发散。</strong>步子迈过了头，从谷的一侧蹦到另一侧，甚至越蹦越高飞出去。这正是模块1第6课提过的"之"字形/反弹现象在一维上的极端版。</li>
+</ul>
+
+<p>对二次碗 \(f=\tfrac12 a\theta^2\)（曲率 \(a\)），一步更新是 \(\theta\leftarrow\theta-\eta a\theta=(1-\eta a)\theta\)。要收敛必须 \(|1-\eta a|<1\)，即 <strong>\(0<\eta<2/a\)</strong>。曲率越大（碗越陡），可用的学习率上限越低。<strong>记住这个 \(2/a\)——在多维里，\(a\) 就是某个方向上的曲率，也就是 Hessian 的一个特征值；最严格的红线由<em>最大</em>特征值决定，所以下面会写成 \(\eta<2/\lambda_{\max}\)。</strong>它马上要解释病态问题。</p>
+
+<div class="pitfall">
+<p><strong>易错。</strong>很多人把"loss 没降下来"一律归咎于"模型不行/数据不行"，其实头号嫌疑往往是 \(\eta\)。\(\eta\) 太大时 loss 会上下剧烈跳动甚至变成 NaN；太小时 loss 平滑但几乎不动。<strong>看 loss 曲线的形状，就能反推 \(\eta\) 调高还是调低</strong>——这是最便宜的诊断。</p>
+</div>
+
+<h2>病态与条件数：凸碗也能很难走（呼应 M1 第4/5课）</h2>
+
+<p>这里是全课最关键的洞察。我们刚说凸问题"好优化"，但"好"指的是"不会卡在假谷底"，<strong>不等于"走得快"</strong>。即使地形是个完美的凸碗，如果这碗又长又窄，梯度下降照样会走得很惨。</p>
+
+<h3>条件数：碗有多"歪"</h3>
+
+<p>衡量碗"歪不歪"的量叫<strong>条件数（condition number）</strong>，定义为 Hessian 的最大与最小特征值之比：</p>
+
+\[ \kappa=\frac{\lambda_{\max}(H)}{\lambda_{\min}(H)}. \]
+
+<p>回忆模块1：特征值是各主方向的曲率。\(\kappa=1\) 意味着各方向曲率一样——等高线是<strong>正圆</strong>，碗很"圆正"。\(\kappa\) 很大意味着某方向陡得多、某方向缓得多——等高线是<strong>狭长的椭圆</strong>，一条又深又窄的山谷。这种碗叫<strong>病态（ill-conditioned）</strong>。</p>
+
+<figure class="fig"><svg viewBox="0 0 540 290" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif">
+<title>条件数对梯度下降的影响：圆形山谷直奔谷底 vs 狭长山谷之字形收敛慢</title>
+<defs>
+<marker id="arrBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/>
+</marker>
+<marker id="arrPink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" fill="#db2777"/>
+</marker>
+</defs>
+
+<!-- ============ LEFT PANEL : kappa = 1 ============ -->
+<!-- concentric circles, center (115,150) -->
+<circle cx="115" cy="150" r="92" fill="none" stroke="#e2e8f0" stroke-width="0.75"/>
+<circle cx="115" cy="150" r="74" fill="none" stroke="#e2e8f0" stroke-width="0.75"/>
+<circle cx="115" cy="150" r="56" fill="none" stroke="#cbd5e1" stroke-width="0.75"/>
+<circle cx="115" cy="150" r="38" fill="none" stroke="#cbd5e1" stroke-width="0.75"/>
+<circle cx="115" cy="150" r="20" fill="#2563eb" fill-opacity="0.06" stroke="#cbd5e1" stroke-width="0.75"/>
+
+<!-- center / valley bottom -->
+<circle cx="115" cy="150" r="3" fill="#d97706"/>
+<text x="115" y="135" text-anchor="middle" font-size="11" fill="#d97706">谷底</text>
+
+<!-- GD trajectory : nearly straight to center, few steps -->
+<!-- start at upper-left point on outer ring -->
+<g stroke="#2563eb" stroke-width="2" fill="none">
+<line x1="50" y1="92" x2="85" y2="123" marker-end="url(#arrBlue)"/>
+<line x1="85" y1="123" x2="104" y2="140" marker-end="url(#arrBlue)"/>
+<line x1="104" y1="140" x2="113" y2="148" marker-end="url(#arrBlue)"/>
+</g>
+<circle cx="50" cy="92" r="3.5" fill="#2563eb"/>
+<text x="46" y="84" text-anchor="end" font-size="11" fill="#2563eb">起点</text>
+
+<!-- panel title -->
+<text x="115" y="262" text-anchor="middle" font-size="14" fill="#1f2937" font-weight="600">κ = 1  圆形</text>
+<text x="115" y="280" text-anchor="middle" font-size="12" fill="#059669">负梯度直指圆心 · 几步直奔谷底</text>
+
+<!-- ============ RIGHT PANEL : kappa >> 1 ============ -->
+<!-- elongated horizontal ellipses, center (395,150) -->
+<ellipse cx="395" cy="150" rx="118" ry="34" fill="none" stroke="#e2e8f0" stroke-width="0.75"/>
+<ellipse cx="395" cy="150" rx="95" ry="27" fill="none" stroke="#e2e8f0" stroke-width="0.75"/>
+<ellipse cx="395" cy="150" rx="72" ry="20.5" fill="none" stroke="#cbd5e1" stroke-width="0.75"/>
+<ellipse cx="395" cy="150" rx="48" ry="14" fill="none" stroke="#cbd5e1" stroke-width="0.75"/>
+<ellipse cx="395" cy="150" rx="24" ry="7" fill="#db2777" fill-opacity="0.06" stroke="#cbd5e1" stroke-width="0.75"/>
+
+<!-- valley long axis hint -->
+<line x1="277" y1="150" x2="513" y2="150" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/>
+<text x="497" y="143" text-anchor="end" font-size="11" fill="#94a3b8">山谷长轴</text>
+
+<!-- center / valley bottom -->
+<circle cx="395" cy="150" r="3" fill="#d97706"/>
+<text x="395" y="135" text-anchor="middle" font-size="11" fill="#d97706">谷底</text>
+
+<!-- GD zigzag trajectory : from left end, big lateral bounces, slow drift right -->
+<g stroke="#db2777" stroke-width="2" fill="none">
+<line x1="292" y1="120" x2="306" y2="178" marker-end="url(#arrPink)"/>
+<line x1="306" y1="178" x2="320" y2="124" marker-end="url(#arrPink)"/>
+<line x1="320" y1="124" x2="334" y2="174" marker-end="url(#arrPink)"/>
+<line x1="334" y1="174" x2="348" y2="129" marker-end="url(#arrPink)"/>
+<line x1="348" y1="129" x2="362" y2="169" marker-end="url(#arrPink)"/>
+<line x1="362" y1="169" x2="376" y2="134" marker-end="url(#arrPink)"/>
+<line x1="376" y1="134" x2="388" y2="162" marker-end="url(#arrPink)"/>
+<line x1="388" y1="162" x2="395" y2="150" marker-end="url(#arrPink)"/>
+</g>
+<circle cx="292" cy="120" r="3.5" fill="#db2777"/>
+<text x="288" y="112" text-anchor="end" font-size="11" fill="#db2777">起点</text>
+
+<!-- panel title -->
+<text x="395" y="262" text-anchor="middle" font-size="14" fill="#1f2937" font-weight="600">κ ≫ 1  狭长山谷</text>
+<text x="395" y="280" text-anchor="middle" font-size="12" fill="#db2777">之字形来回反弹 · 沿谷底收敛慢</text>
+</svg><figcaption>病态对比：左图条件数κ=1，等高线是正圆，负梯度直指圆心，梯度下降几步直奔谷底；右图κ大，等高线是狭长椭圆，负梯度几乎垂直于山谷长轴，轨迹在两壁间来回反弹走出之字形，沿谷底缓慢推进。</figcaption></figure>
+
+<h3>狭长山谷里的"之"字形</h3>
+
+<p>为什么病态会拖慢梯度下降？因为<strong>负梯度方向通常并不指向谷底</strong>。在狭长椭圆里，梯度主要垂直于山谷长轴（朝陡的方向），只有很小一点分量沿长轴（朝谷底）。结果是：你大步横跨山谷、在两侧壁来回反弹（之字形），却只极慢地沿着谷底往前蹭。</p>
+
+<p>更糟的是学习率被"卡死"：为了在陡方向不发散，\(\eta\) 必须 \(<2/\lambda_{\max}\)；可这么小的 \(\eta\) 在缓方向上每步只挪 \(\eta\lambda_{\min}\) 那么一丁点。收敛步数大致正比于 \(\kappa\)：<strong>条件数翻倍，要走的步数也大致翻倍。</strong></p>
+
+<div class="example">
+<h4>例题：在病态二次型上手算两步梯度下降</h4>
+<p>取 \(f(x,y)=\tfrac12(x^2+\gamma y^2)\)，\(\gamma=10\)（于是 \(H=\mathrm{diag}(1,10)\)，\(\kappa=10\)）。梯度 \(\nabla f=(x,\;\gamma y)\)。从 \((1,1)\) 出发，取 \(\eta=0.18\)，手算两步：</p>
+<p><strong>第 1 步.</strong> 当前 \((1,1)\)，梯度 \((1,\;10\cdot 1)=(1,10)\)。更新：</p>
+\[ (x,y)\leftarrow(1,1)-0.18\,(1,10)=(0.82,\,-0.80). \]
+<p>注意 \(y\) 从 \(+1\) 一下被甩到 \(-0.80\)——<strong>跨过了谷底（\(y=0\)）跳到对面</strong>。这就是之字形的一步。</p>
+<p><strong>第 2 步.</strong> 当前 \((0.82,-0.80)\)，梯度 \((0.82,\;10\cdot(-0.80))=(0.82,\,-8.0)\)。更新：</p>
+\[ (x,y)\leftarrow(0.82,-0.80)-0.18\,(0.82,-8.0)=(0.6724,\,0.64). \]
+<p>\(y\) 又从 \(-0.80\) 弹回 \(+0.64\)——在山谷两侧来回横跳。对比 \(x\) 方向：\(1\to0.82\to0.6724\)，老老实实单调下降，但慢吞吞。<strong>陡方向（\(y\)）剧烈震荡、缓方向（\(x\)）龟速前进，这就是病态的全部痛苦。</strong></p>
+<p>（若把 \(\eta\) 调到 \(0.2=2/\lambda_{\max}\)，\(y\) 方向会变成 \(1\to-1\to1\) 永远反弹不收敛；再大就发散。这印证了 \(\eta<2/\lambda_{\max}\) 的红线。）</p>
+</div>
+
+<div class="ml">
+<h4><span class="tag">ML</span> 和 ML 的联系</h4>
+<p>病态不是教科书里的人造怪物，它在真实训练里无处不在：不同参数的尺度天差地别、特征没归一化、深层网络里梯度在层间被反复缩放——都会让损失曲面变成狭长山谷。<strong>这正是下一课要讲的自适应优化器（动量、RMSProp、Adam）存在的根本理由：</strong>它们本质上都是在"偷偷估计曲率、给每个方向配不同的有效学习率"，从而抹平病态、把之字形掰直。所以"为什么需要 Adam"这个问题，答案就藏在条件数 \(\kappa\) 里。</p>
+</div>
+
+<h2>深度学习是非凸的——但敌人不是非凸本身</h2>
+
+<p>坏消息先说：神经网络的损失 \(L(\theta)\) 几乎从不凸。激活函数的非线性、层层复合，让损失曲面布满起伏。按"凸才好优化"的逻辑，深度学习似乎根本没法训。可它偏偏训得很好。为什么？</p>
+
+<p>关键在于<strong>高维空间的几何反直觉</strong>。我们的恐惧来自低维想象：非凸 = 一堆坑，球会卡在某个不够深的坑（坏的局部极小）里出不来。但在百万维参数空间里，这个图像是错的。</p>
+
+<figure class="fig"><svg viewBox="0 0 520 440" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif">
+  <title>鞍点示意：x²−y² 马鞍面，x 方向上弯成谷、y 方向下弯成脊</title>
+  <defs>
+    <marker id="ar-blue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/>
+    </marker>
+    <marker id="ar-pink" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#db2777"/>
+    </marker>
+    <marker id="ar-grey" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <!-- 轴测坐标轴：原点在曲面中心 (260,205) -->
+  <!-- x 轴方向：向右下 (谷的走向) -->
+  <line x1="260" y1="205" x2="430" y2="270" stroke="#94a3b8" stroke-width="1" marker-end="url(#ar-grey)"/>
+  <text x="436" y="278" font-size="12" fill="#94a3b8">x</text>
+  <!-- y 轴方向：向左下 (脊的走向) -->
+  <line x1="260" y1="205" x2="92" y2="270" stroke="#94a3b8" stroke-width="1" marker-end="url(#ar-grey)"/>
+  <text x="74" y="278" font-size="12" fill="#94a3b8">y</text>
+  <!-- z 轴：竖直向上 -->
+  <line x1="260" y1="205" x2="260" y2="60" stroke="#94a3b8" stroke-width="1" marker-end="url(#ar-grey)"/>
+  <text x="251" y="54" font-size="12" fill="#94a3b8">z = f</text>
+
+  <!-- 马鞍面：用若干网格曲线勾勒。整体为半透明蓝填充的曲面轮廓 -->
+  <!-- 曲面外缘轮廓（四角连成的鞍形边界），用浅蓝填充 -->
+  <path d="M 110,222
+           Q 185,150 260,123
+           Q 335,150 410,222
+           Q 335,250 260,287
+           Q 185,250 110,222 Z"
+        fill="#2563eb" fill-opacity="0.07" stroke="#cbd5e1" stroke-width="0.75"/>
+
+  <!-- 沿 x 方向的若干等参曲线（向上弯，谷的家族）—— 浅蓝细线 -->
+  <path d="M 132,165 Q 200,150 260,150 Q 320,150 388,165" fill="none" stroke="#bfdbfe" stroke-width="0.75"/>
+  <path d="M 121,193 Q 195,176 260,176 Q 325,176 399,193" fill="none" stroke="#bfdbfe" stroke-width="0.75"/>
+  <path d="M 121,251 Q 195,234 260,234 Q 325,234 399,251" fill="none" stroke="#bfdbfe" stroke-width="0.75"/>
+  <path d="M 132,279 Q 200,264 260,264 Q 320,264 388,279" fill="none" stroke="#bfdbfe" stroke-width="0.75"/>
+
+  <!-- 主曲线 1：沿 x 轴的剖面 —— 向上弯的谷（λ=+），蓝色实线 -->
+  <path d="M 122,222 Q 195,205 260,205 Q 325,205 398,222" fill="none" stroke="#2563eb" stroke-width="2"/>
+  <text x="346" y="183" font-size="13" fill="#2563eb" font-weight="600">向上弯 λ=+ 谷</text>
+  <line x1="392" y1="200" x2="382" y2="216" stroke="#2563eb" stroke-width="0.75"/>
+
+  <!-- 主曲线 2：沿 y 轴的剖面 —— 向下弯的脊（λ=−），粉色实线 -->
+  <path d="M 110,189 Q 185,205 260,205 Q 335,205 410,189" fill="none" stroke="#db2777" stroke-width="2"/>
+  <text x="40" y="183" font-size="13" fill="#db2777" font-weight="600">向下弯 λ=− 脊</text>
+  <line x1="118" y1="200" x2="128" y2="190" stroke="#db2777" stroke-width="0.75"/>
+
+  <!-- 临界点 + 小球 在中心 -->
+  <circle cx="260" cy="205" r="6" fill="#d97706" stroke="#ffffff" stroke-width="1.5"/>
+  <text x="272" y="226" font-size="12" fill="#d97706" font-weight="600">临界点</text>
+  <text x="272" y="240" font-size="11" fill="#1f2937">梯度 = 0</text>
+
+  <!-- 箭头：x 方向被拉回（指向中心，谷底回稳）—— 蓝，沿谷线两侧朝内 -->
+  <line x1="338" y1="205" x2="300" y2="205" stroke="#2563eb" stroke-width="2" marker-end="url(#ar-blue)"/>
+  <text x="318" y="197" font-size="11" fill="#2563eb" text-anchor="middle">被拉回</text>
+
+  <!-- 箭头：y 方向被推开（远离中心，沿脊滑落）—— 粉，沿脊线朝外 -->
+  <line x1="222" y1="205" x2="170" y2="194" stroke="#db2777" stroke-width="2" marker-end="url(#ar-pink)"/>
+  <text x="190" y="183" font-size="11" fill="#db2777" text-anchor="middle">被推开</text>
+
+  <!-- 图例 -->
+  <line x1="120" y1="318" x2="150" y2="318" stroke="#2563eb" stroke-width="2"/>
+  <text x="156" y="322" font-size="11" fill="#1f2937">x 方向：上弯，谷，把球拉回</text>
+  <line x1="120" y1="336" x2="150" y2="336" stroke="#db2777" stroke-width="2"/>
+  <text x="156" y="340" font-size="11" fill="#1f2937">y 方向：下弯，脊，把球推开</text>
+
+  <!-- 底部结论文字 -->
+  <line x1="40" y1="362" x2="480" y2="362" stroke="#e2e8f0" stroke-width="0.75"/>
+  <text x="260" y="385" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="600">高维：要全部方向都向上弯才是坏局部极小 → 极罕见</text>
+  <text x="260" y="406" font-size="12" fill="#d97706" text-anchor="middle" font-weight="600">有上有下的鞍点 → 压倒性常见</text>
+</svg><figcaption>鞍点示意：马鞍形曲面 f=x²−y²，沿x方向是向上弯的谷（特征值+），沿y方向是向下弯的脊（特征值−）。高维中临界点几乎都是这种有上有下的鞍点，而非各方向都向上弯的坏局部极小。</figcaption></figure>
+
+<p>一个临界点（梯度为零处）是"坏局部极小"，要求 Hessian 在<strong>所有</strong>方向都向上弯（全部特征值 \(>0\)）。而它是<strong>鞍点（saddle point）</strong>，只要存在一个向上弯、一个向下弯的方向（特征值有正有负）。在 \(d\) 维空间里，"每个方向都恰好向上弯"就像连抛 \(d\) 次硬币全是正面——维度越高越罕见（这只是个抓直觉的类比，背后"各方向曲率符号近似独立"的严格分布属于随机矩阵理论，留到 skip）。<strong>所以高维里临界点压倒性地是鞍点，而不是坏的局部极小。</strong>另外，在很多实际网络里还观察到：越深的（损失越高的）局部极小越稀少，大多数局部极小的损失都彼此接近、且接近全局最优——卡在一个"差很多的谷"里的概率其实很低（这是经验规律，成立与否依赖具体模型与假设，并非铁律，边界留到 skip）。</p>
+
+<div class="example">
+<h4>例题：一个最简单的鞍点</h4>
+<p>看 \(f(x,y)=x^2-y^2\)，临界点在原点。Hessian \(H=\mathrm{diag}(2,-2)\)，特征值 \(+2\)（\(x\) 方向向上弯，是个谷）和 \(-2\)（\(y\) 方向向下弯，是个脊）。有正有负 ⇒ 鞍点。沿 \(x\) 轴它是最小值，沿 \(y\) 轴它是最大值——像马鞍。</p>
+<p><strong>逃离有多快？</strong>在这个<strong>标准（非退化）</strong>鞍点上，下弯方向 \(y\) 的更新是 \(y\leftarrow(1+2\eta)y\)，乘的是一个大于 \(1\) 的因子，是<strong>指数放大</strong>——只要初始 \(y\) 不恰好为零，迟早会被迅速甩离原点（练习3 正是演示这一点）。所以纯二次鞍点其实逃得挺快。<strong>真正让训练"磨蹭很久"的，是另一类：Hessian 在多个方向特征值都 \(\approx 0\) 的<em>平坦/退化</em>鞍点与平台区</strong>——那里下弯方向的曲率极小，指数放大的因子非常接近 \(1\)，前期看上去几乎停滞，要积累很多步才动起来。换句话说，逃离速度取决于负曲率的强度和初始扰动的大小：曲率越平、扰动越小，看似卡得越久。</p>
+</div>
+
+<div class="key">
+<h4>关键结论：真正的难点是什么</h4>
+<p>请把"非凸 = 训不了"这个恐惧删掉。深度学习能成立的经验事实是：<strong>非凸本身不可怕，可怕的是</strong>——①<strong>鞍点</strong>（高维里远比坏局部极小常见；标准鞍点逃得快，但平坦/退化的鞍点与平台会让训练长期磨蹭）；②<strong>病态曲率</strong>（之字形，前面那套条件数的故事在非凸地形里照样成立）；③<strong>坏初始化</strong>（出发点决定你掉进哪片地形）；④<strong>学习率</strong>（永远的头号旋钮）。下一课的优化器、和后面要学的初始化/归一化技巧，全都是冲着这四个敌人去的——而<strong>没有一个</strong>是冲着"消灭非凸"去的。</p>
+</div>
+
+<h2>两个必须记住的凸例子</h2>
+
+<p>虽然深度模型非凸，但机器学习的两个基石问题是<strong>凸</strong>的，它们是理解一切的脚手架：</p>
+
+<ul>
+<li><strong>最小二乘（线性回归）</strong>：\(L(\theta)=\tfrac12\|X\theta-y\|^2\)。Hessian 是 \(H=X^\top X\)，它永远半正定（对任意 \(v\)，\(v^\top X^\top X v=\|Xv\|^2\ge 0\)）。所以最小二乘是凸的，甚至有闭式解 \(\theta=(X^\top X)^{-1}X^\top y\)。而它的条件数正是 \(X^\top X\) 的条件数——特征尺度不一致就病态，这就是为什么要做特征标准化。</li>
+<li><strong>逻辑回归</strong>：用交叉熵（上一课从最大似然推出来的那个）做损失时，\(L(\theta)\) 关于 \(\theta\) 是凸的。它没有闭式解，但<strong>凸性保证没有坏的局部极小，梯度下降不会被假谷底困住</strong>，会一路朝全局最优走。逻辑回归是"凸但需迭代"的典范，是从线性模型走向神经网络的最后一站平地。</li>
+</ul>
+
+<h2>调一调，观察现象</h2>
+
+<p>下面用 numpy 在 \(f=\tfrac12(x^2+\gamma y^2)\) 上跑梯度下降。改三个旋钮，亲眼看到上面讲的每个结论。每段都能几秒跑完，只 import numpy、只用 print。</p>
+
+<div class="example">
+<h4>任务 1：调条件数 \(\gamma\)，看收敛步数</h4>
+<p><strong>改什么 → </strong>把 \(\gamma\) 从 1 改到 10 再到 50（用各自安全的 \(\eta=1/\gamma\)）。<strong>预期看到 → </strong>到达 \(\|\theta\|<10^{-3}\) 所需步数随 \(\gamma\) 暴涨：\(\gamma=1\) 约 1 步、\(\gamma=10\) 约 66 步、\(\gamma=50\) 约 342 步。<strong>注意 → </strong>\(\gamma=1\) 那个"1 步"是个退化巧合：此时 \(\eta=1/\gamma=1\) 恰好等于 \(1/\lambda\)，更新变成 \(\theta\leftarrow(1-1)\theta=0\)，一步精确落到原点，并不代表"\(\kappa=1\) 所以快"。真正体现"步数 ≈ 正比于 \(\kappa\)"的是 \(\gamma=10\) 与 \(50\) 这两点（\(66\) 与 \(342\)，比值约 \(1:5\)，正好对上 \(\kappa\) 的 \(10:50\)）。<strong>为什么 → </strong>条件数 \(\kappa=\gamma\)，收敛步数大致正比于 \(\kappa\)，病态直接拖慢全局。</p>
+<pre><code>import numpy as np
+
+def run(gamma, eta, x0=(1.0, 1.0), tol=1e-3, max_steps=10000):
+    x = np.array(x0, dtype=float)
+    for k in range(1, max_steps + 1):
+        grad = np.array([x[0], gamma * x[1]])   # 梯度 (x, gamma*y)
+        x = x - eta * grad                       # theta <- theta - eta * grad
+        if np.linalg.norm(x) < tol:
+            return k
+    return max_steps
+
+for gamma in [1.0, 10.0, 50.0]:
+    eta = 1.0 / gamma            # 安全步长，约 1/lambda_max
+    print(f"gamma={gamma:5}  cond={gamma:.0f}  steps={run(gamma, eta)}")
+</code></pre>
+</div>
+
+<div class="example">
+<h4>任务 2：打印轨迹，亲眼看"之"字形</h4>
+<p><strong>改什么 → </strong>固定 \(\gamma=10,\ \eta=0.18\)，从 \((1,1)\) 出发，打印前几步的 \((x,y)\)。<strong>预期看到 → </strong>\(y\) 列正负来回横跳（\(1\to-0.80\to0.64\to\dots\)），\(x\) 列单调缓降（\(1\to0.82\to0.6724\to\dots\)）。<strong>为什么 → </strong>陡方向 \(y\) 跨过谷底来回反弹，缓方向 \(x\) 龟速前进——这就是病态的"之"字形，和例题手算完全一致。</p>
+<pre><code>import numpy as np
+
+gamma, eta = 10.0, 0.18
+x = np.array([1.0, 1.0])
+print("step  x        y")
+for k in range(6):
+    print(f"{k:3}  {x[0]: .4f}  {x[1]: .4f}")
+    grad = np.array([x[0], gamma * x[1]])
+    x = x - eta * grad
+</code></pre>
+</div>
+
+<div class="example">
+<h4>任务 3：把 \(\eta\) 推过红线，看震荡与发散</h4>
+<p><strong>改什么 → </strong>固定 \(\gamma=10\)（\(\lambda_{\max}=10\)，红线 \(\eta=2/10=0.2\)）。依次试 \(\eta=0.15\)（收敛）、\(\eta=0.2\)（恰好反弹不收敛）、\(\eta=0.21\)（发散）。<strong>预期看到 → </strong>看的是"降 / 不降 / 爆"这三种<em>定性</em>形态，不是绝对到零：\(\eta=0.15\) 时范数单调缩小、40 步降到约 \(1.5\times10^{-3}\) 量级（还没到极小，因为这点收敛本就要 60 多步）；\(\eta=0.2\) 时 \(y\) 在 \(\pm1\) 间永远反弹、范数卡在 \(1.0\) 不降；\(\eta=0.21\) 时范数爆炸到约 \(4.5\times10^{1}\)。<strong>为什么 → </strong>收敛要求 \(|1-\eta\lambda_{\max}|<1\)，即 \(\eta<2/\lambda_{\max}=0.2\)，跨过就停止收敛、再大就发散。</p>
+<pre><code>import numpy as np
+
+gamma = 10.0
+for eta in [0.15, 0.20, 0.21]:
+    x = np.array([1.0, 1.0])
+    for _ in range(40):
+        x = x - eta * np.array([x[0], gamma * x[1]])
+    print(f"eta={eta:.2f}  final ||theta||={np.linalg.norm(x):.3e}")
+</code></pre>
+</div>
+
+<h2>动手练习</h2>
+
+<ol>
+<li><strong>手验凸性。</strong>对 \(f(x,y)=x^2+4y^2+xy\)，手算 Hessian，用顺序主子式判断是否（严格）凸（提示：左上 \(2>0\)，\(\det=2\cdot8-1=15>0\)，故正定），再用 numpy 的 <code>np.linalg.eigvalsh</code> 验证特征值都为正。</li>
+<li><strong>测量条件数与步数的正比关系。</strong>基于任务 1 的 <code>run</code>，对 \(\gamma\in\{2,5,10,20,40\}\) 各用 \(\eta=1/\gamma\) 跑一遍，打印 <code>(gamma, steps)</code>，观察 steps 是否大致随 \(\gamma\) 线性增长。（提示：别把 \(\gamma=1\) 那个 1 步的退化点混进来比，它是 \(\eta\) 恰好等于精确解步长的特例；从 \(\gamma=2\) 起看线性趋势才靠谱。）</li>
+<li><strong>逃离鞍点。</strong>在 \(f(x,y)=x^2-y^2\)（梯度 \((2x,-2y)\)）上从 \((0.5,\,10^{-6})\) 出发跑梯度下降，打印 \(y\) 随步数的变化。\(y\) 会按 \((1+2\eta)\) 的因子被指数放大、最终逃离原点——体会"沿下弯方向被指数推开"的过程（初始 \(y\) 越小，前期看似停滞越久，一旦起来就很快）。把初始 \(y\) 设成精确的 \(0\) 会怎样？为什么？</li>
+<li><strong>归一化能治病态。</strong>构造 \(f=\tfrac12(x^2+100y^2)\)（\(\kappa=100\)）。先直接跑，记下步数；再做变量替换 \(y'=10y\)（即在 \(y\) 方向把尺度缩小 10 倍），让新问题变成 \(\tfrac12(x^2+y'^2)\)（\(\kappa=1\)），再跑，对比步数。这就是特征标准化的威力。</li>
+</ol>
+
+<h2>掌握自检</h2>
+
+<ul>
+<li>我能用"弦在曲线上方"和"Hessian 半正定（特征值 \(\ge 0\)）"两种方式说明同一件事：凸；并知道"顺序主子式全为正"判的是正定（⇒ 严格凸），而"严格凸"反过来不一定正定（如 \(x^4\)）。</li>
+<li>我能解释凸为什么保证"局部最优即全局最优"，以及这为什么让凸问题"好优化"。</li>
+<li>我能推出负梯度是最速下降方向，并说出 \(\eta\) 太大/太小的后果与收敛红线 \(\eta<2/\lambda_{\max}\)（一维里就是 \(2/a\)）。</li>
+<li>我能用条件数 \(\kappa=\lambda_{\max}/\lambda_{\min}\) 解释之字形和收敛慢，并说出这如何引出下一课的自适应优化器。</li>
+<li>我能用维度直觉解释为什么高维里临界点几乎都是鞍点、而非坏局部极小，并区分"标准鞍点逃得快"与"平坦/退化鞍点会磨蹭"。</li>
+<li>我能反驳"非凸=训不了"，并列出真正的四个敌人：鞍点、病态曲率、坏初始化、学习率。</li>
+<li>我能各举一个凸的机器学习例子（最小二乘 / 逻辑回归）并说明其凸性来源。</li>
+</ul>
+
+<p>下一课我们就把这一课的诊断变成药方：<strong>实战优化器——SGD、动量、Adam 与学习率调度</strong>。你会看到动量如何借惯性穿过之字形，Adam 如何给每个方向配自适应步长来对抗病态——这一课埋下的每个 \(\kappa\)、每个红线 \(2/\lambda_{\max}\)，都会在那里得到回应。</p>
+
+<div class="skip">
+<h4>可以先放过的点</h4>
+<ul>
+<li><strong>凸性的严格证明</strong>（比如"局部即全局"的 \(\epsilon\)-\(\delta\) 论证、各种凸函数运算的封闭性、半正定与严格凸的精确等价条件）。现在记住几何直觉就够，等你以后读凸优化教材（如 Boyd）再回来补严谨。</li>
+<li><strong>鞍点几何的随机矩阵理论</strong>（为什么高维里特征值符号近似独立、损失随临界点高度的分布，以及"局部极小质量分布"这条经验规律到底在什么假设下成立）。现在只需接受"高维里鞍点远多于坏局部极小"这个结论，等深入研究优化理论时再深挖。</li>
+<li><strong>逻辑回归在可分数据上的细节</strong>：当数据完全线性可分时，交叉熵的最优参数会跑到无穷大（loss\(\to0\) 但 \(\theta\) 无界），梯度下降不会停在有限点上——这也是为什么逻辑回归实践中常配 L2 正则（既埋下正则动机，又不破坏本课节奏）。</li>
+<li><strong>条件数对收敛速度的精确界</strong>（如梯度下降的 \(\frac{\kappa-1}{\kappa+1}\) 收缩率、动量法把它改善到 \(\sqrt{\kappa}\) 的推导）。现在记住"步数大致正比于 \(\kappa\)"，下一课讲动量时再看为什么能开根号。</li>
+</ul>
+</div>
+</article>
+<div class="navbtns"><a class="prev" href="lesson-06-sampling.html"><div class="nlabel">← 上一课</div><div class="ntitle">第6课 · 采样——逆变换、重参数化与蒙特卡洛</div></a><a class="next" href="lesson-08-optimizers.html"><div class="nlabel">下一课 →</div><div class="ntitle">第8课 · 现代优化器——SGD、动量、Adam 与调度</div></a></div>
+<nav class="toc"><h3>本模块课程表</h3><ol>
+<li><a href="lesson-01-random-variables.html"><span class="ln">第1课</span>概率的语言——随机变量、分布、期望与方差</a></li>
+<li><a href="lesson-02-distributions-covariance.html"><span class="ln">第2课</span>分布动物园与协方差</a></li>
+<li><a href="lesson-03-conditional-bayes.html"><span class="ln">第3课</span>条件概率与贝叶斯</a></li>
+<li><a href="lesson-04-mle-map.html"><span class="ln">第4课</span>从数据到损失——MLE 与 MAP</a></li>
+<li><a href="lesson-05-information-theory.html"><span class="ln">第5课</span>信息论——熵、交叉熵、KL</a></li>
+<li><a href="lesson-06-sampling.html"><span class="ln">第6课</span>采样——逆变换、重参数化与蒙特卡洛</a></li>
+<li class="cur"><span class="ln">第7课</span>凸性与梯度下降——优化的几何</li>
+<li><a href="lesson-08-optimizers.html"><span class="ln">第8课</span>现代优化器——SGD、动量、Adam 与调度</a></li>
+<li><a href="lesson-09-rl-crash-1.html"><span class="ln">第9课</span>强化学习速成 I——MDP、价值与贝尔曼</a></li>
+<li><a href="lesson-10-rl-crash-2.html"><span class="ln">第10课</span>强化学习速成 II——策略梯度到 PPO</a></li>
+</ol></nav>
+</div>
+<!-- pyrunner-injected -->
+<style>
+.pr-cell{border:1px solid #334155;border-radius:10px;margin:1.2em 0;overflow:hidden;background:#0f172a;}
+.pr-head{display:flex;align-items:center;gap:8px;background:#1e293b;color:#cbd5e1;padding:6px 10px;font-size:13px;font-family:system-ui,-apple-system,sans-serif;}
+.pr-title{flex:1;font-weight:600;}
+.pr-status{font-size:12px;color:#94a3b8;white-space:nowrap;max-width:50%;overflow:hidden;text-overflow:ellipsis;}
+.pr-btn{cursor:pointer;border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:6px;padding:3px 11px;font-size:13px;line-height:1.4;}
+.pr-btn:hover{background:#0b1220;}
+.pr-run{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:600;}
+.pr-run:hover{background:#1d4ed8;}
+.pr-cell.collapsed .pr-body{display:none;}
+.pr-editor{position:relative;background:#0f172a;}
+.pr-code,.pr-edit{display:block;width:100%;min-height:68px;border:none;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.55;padding:12px 14px;box-sizing:border-box;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:4;}
+.pr-code{position:absolute;inset:0;margin:0;overflow:hidden;background:#0f172a;color:#dbeafe;pointer-events:none;}
+.pr-edit{position:relative;background:transparent;color:transparent;caret-color:#e2e8f0;resize:vertical;outline:none;-webkit-text-fill-color:transparent;}
+.pr-edit::selection{background:rgba(96,165,250,.34);}
+.tok-kw{color:#c084fc;font-weight:700;}
+.tok-fn{color:#67e8f9;}
+.tok-num{color:#fbbf24;}
+.tok-str{color:#86efac;}
+.tok-comment{color:#94a3b8;font-style:italic;}
+.pr-out{margin:0;padding:10px 14px;border-top:1px solid #334155;background:#0b1220;color:#cbd5e1;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.5;white-space:pre-wrap;max-height:340px;overflow:auto;}
+.pr-out:empty{display:none;}
+.pr-out.err{color:#fca5a5;}
+#pr-fab{position:fixed;right:18px;bottom:18px;z-index:9998;background:#2563eb;color:#fff;border:none;border-radius:999px;padding:10px 17px;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.22);font-family:system-ui,sans-serif;}
+#pr-fab:hover{background:#1d4ed8;}
+#pr-lab{position:fixed;right:18px;bottom:66px;z-index:9999;width:400px;max-width:92vw;background:#0f172a;border:1px solid #334155;border-radius:12px;display:none;flex-direction:column;box-shadow:0 14px 38px rgba(0,0,0,.4);overflow:hidden;}
+#pr-lab.open{display:flex;}
+#pr-lab .pr-edit,#pr-lab .pr-code{min-height:150px;}
+</style>
+<script>
+(function(){
+  var PYBASE="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+  var pyReady=null;
+  function loadPy(status){
+    if(pyReady)return pyReady;
+    pyReady=(async function(){
+      status("正在加载 Python 运行时（首次约 10 秒，需联网）…");
+      await new Promise(function(res,rej){
+        var s=document.createElement("script");s.src=PYBASE+"pyodide.js";
+        s.onload=res;s.onerror=function(){rej(new Error("无法加载 Pyodide（首次运行需要联网）"));};
+        document.head.appendChild(s);
+      });
+      var py=await loadPyodide({indexURL:PYBASE});
+      status("正在加载 NumPy …");
+      await py.loadPackage("numpy");
+      status("Python 就绪 ✓");
+      return py;
+    })();
+    return pyReady;
+  }
+  async function run(code,outEl,statusEl){
+    var setS=function(m){if(statusEl)statusEl.textContent=m;};
+    outEl.classList.remove("err");outEl.textContent="";
+    var py;
+    try{py=await loadPy(setS);}
+    catch(e){outEl.classList.add("err");outEl.textContent="加载失败："+e.message;return;}
+    var buf="";
+    py.setStdout({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    py.setStderr({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    try{
+      var result=await py.runPythonAsync(code);
+      if(result!==undefined&&result!==null){
+        var r;try{r=result.toString();}catch(_){r=String(result);}
+        if(r!=="None")buf+=(buf&&!buf.endsWith("\n")?"\n":"")+r;
+        if(result&&result.destroy)result.destroy();
+      }
+      outEl.textContent=buf||"（运行成功，无输出。用 print(...) 查看结果）";
+    }catch(e){
+      outEl.classList.add("err");
+      outEl.textContent=buf+(buf?"\n":"")+String((e&&e.message)||e);
+    }
+  }
+  var KW={False:1,None:1,True:1,and:1,as:1,assert:1,async:1,await:1,break:1,class:1,continue:1,def:1,del:1,elif:1,else:1,except:1,finally:1,for:1,from:1,global:1,if:1,import:1,in:1,is:1,lambda:1,nonlocal:1,not:1,or:1,pass:1,raise:1,return:1,try:1,while:1,with:1,yield:1};
+  var FN={abs:1,all:1,any:1,array:1,bool:1,dict:1,enumerate:1,float:1,int:1,len:1,list:1,max:1,min:1,np:1,numpy:1,print:1,range:1,round:1,set:1,str:1,sum:1,tuple:1,zip:1};
+  function esc(s){return s.replace(/[&<>]/g,function(c){return c==="&"?"&amp;":c==="<"?"&lt;":"&gt;";});}
+  function colorLine(line){
+    var out="",i=0;
+    while(i<line.length){
+      var ch=line[i];
+      if(ch==="#"){out+='<span class="tok-comment">'+esc(line.slice(i))+"</span>";break;}
+      if(ch==="'"||ch==='"'){
+        var q=ch,triple=line.slice(i,i+3)===q+q+q,end=i+(triple?3:1),done=false;
+        while(end<line.length){
+          if(!triple&&line[end]==="\\"){end+=2;continue;}
+          if(triple&&line.slice(end,end+3)===q+q+q){end+=3;done=true;break;}
+          if(!triple&&line[end]===q){end+=1;done=true;break;}
+          end+=1;
+        }
+        out+='<span class="tok-str">'+esc(line.slice(i,done?end:line.length))+"</span>";
+        i=done?end:line.length;
+        continue;
+      }
+      if(/[0-9]/.test(ch)||(ch==="."&&/[0-9]/.test(line[i+1]||""))){
+        var m=line.slice(i).match(/^(?:0[xX][0-9a-fA-F]+|\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?/);
+        out+='<span class="tok-num">'+esc(m[0])+"</span>";i+=m[0].length;continue;
+      }
+      if(/[A-Za-z_]/.test(ch)){
+        var id=line.slice(i).match(/^[A-Za-z_][A-Za-z0-9_]*/)[0];
+        if(KW[id])out+='<span class="tok-kw">'+id+"</span>";
+        else if(FN[id])out+='<span class="tok-fn">'+id+"</span>";
+        else out+=id;
+        i+=id.length;continue;
+      }
+      out+=esc(ch);i+=1;
+    }
+    return out;
+  }
+  function paint(ta){
+    var pre=ta.closest(".pr-editor").querySelector(".pr-code");
+    pre.innerHTML=ta.value.split("\n").map(colorLine).join("\n")+(ta.value.endsWith("\n")?"\n":"");
+    pre.style.height=ta.style.height;
+    pre.scrollTop=ta.scrollTop;pre.scrollLeft=ta.scrollLeft;
+  }
+  function autosize(ta){ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight+2,460)+"px";}
+  function tune(ta){autosize(ta);paint(ta);}
+  function tabKey(e){
+    if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();var b=this.closest(".pr-cell,#pr-lab").querySelector(".pr-run");if(b)b.click();return;}
+    if(e.key==="Tab"){
+      e.preventDefault();
+      var s=this.selectionStart,en=this.selectionEnd,v=this.value,lineStart=v.lastIndexOf("\n",s-1)+1,lineEnd=v.indexOf("\n",en);
+      if(lineEnd<0)lineEnd=v.length;
+      if(s!==en||e.shiftKey){
+        var block=v.slice(lineStart,lineEnd),lines=block.split("\n"),delta=0;
+        if(e.shiftKey){
+          lines=lines.map(function(line){
+            if(line.startsWith("    ")){delta-=4;return line.slice(4);}
+            if(line.startsWith("\t")){delta-=1;return line.slice(1);}
+            return line;
+          });
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=Math.max(lineStart,s+(s===lineStart?0:Math.max(delta/Math.max(lines.length,1),-4)));
+          this.selectionEnd=Math.max(this.selectionStart,en+delta);
+        }else{
+          lines=lines.map(function(line){delta+=4;return "    "+line;});
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=s+4;
+          this.selectionEnd=en+delta;
+        }
+      }else{
+        this.value=v.slice(0,s)+"    "+v.slice(en);this.selectionStart=this.selectionEnd=s+4;
+      }
+      tune(this);
+      return;
+    }
+    if(e.key==="Enter"){
+      e.preventDefault();
+      var a=this.selectionStart,b=this.selectionEnd,text=this.value,start=text.lastIndexOf("\n",a-1)+1;
+      var prefix=text.slice(start,a),indent=(prefix.match(/^\s*/)||[""])[0],code=prefix.replace(/#.*$/,"").trimEnd();
+      var add="\n"+indent+(/:\s*$/.test(code)?"    ":"");
+      this.value=text.slice(0,a)+add+text.slice(b);
+      this.selectionStart=this.selectionEnd=a+add.length;
+      tune(this);
+      return;
+    }
+  }
+  function makeCell(code){
+    var cell=document.createElement("div");cell.className="pr-cell";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">可运行 · Python (NumPy)</span><span class="pr-status"></span><button class="pr-btn pr-toggle">收起</button><button class="pr-btn pr-run">▶ 运行</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    var ta=cell.querySelector(".pr-edit");ta.value=code;
+    var out=cell.querySelector(".pr-out"),st=cell.querySelector(".pr-status");
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    cell.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    var tog=cell.querySelector(".pr-toggle");
+    tog.onclick=function(){cell.classList.toggle("collapsed");tog.textContent=cell.classList.contains("collapsed")?"展开":"收起";};
+    setTimeout(function(){tune(ta);},0);
+    return cell;
+  }
+  function enhance(){
+    document.querySelectorAll("article pre").forEach(function(pre){
+      if(pre.closest(".pr-cell"))return;
+      var codeEl=pre.querySelector("code")||pre;
+      var code=codeEl.textContent.replace(/\s+$/,"");
+      if(!code)return;
+      pre.replaceWith(makeCell(code));
+    });
+  }
+  function lab(){
+    var fab=document.createElement("button");fab.id="pr-fab";fab.textContent="▶ Python 实验台";
+    var panel=document.createElement("div");panel.id="pr-lab";
+    panel.innerHTML='<div class="pr-head"><span class="pr-title">Python 实验台 · NumPy</span><span class="pr-status"></span><button class="pr-btn pr-run">▶ 运行</button><button class="pr-btn pr-min">收起</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    document.body.appendChild(fab);document.body.appendChild(panel);
+    var ta=panel.querySelector(".pr-edit");
+    ta.value="import numpy as np\na = np.array([3, 2])\nb = np.array([1, 4])\nprint(\"a + b =\", a + b)\nprint(\"a . b =\", a @ b)\nprint(\"|a|  =\", np.linalg.norm(a))\ncos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))\nprint(\"cos =\", round(float(cos), 4))";
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    var out=panel.querySelector(".pr-out"),st=panel.querySelector(".pr-status");
+    panel.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    fab.onclick=function(){panel.classList.toggle("open");};
+    panel.querySelector(".pr-min").onclick=function(){panel.classList.remove("open");};
+    setTimeout(function(){tune(ta);},0);
+  }
+  function init(){enhance();lab();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+
+<script src="../assets/annotator.js"></script>
+</body>
+</html>

@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块2 · 第9课 · 强化学习速成 I——MDP、价值与贝尔曼</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<script src="../assets/theme.js"></script>
+<link rel="stylesheet" href="../assets/annotator.css">
+<link rel="stylesheet" href="../assets/theme.css">
+
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue-bg:#eff6ff;
+--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--pink:#db2777;
+--red:#dc2626;--red-bg:#fef2f2;--bg:#ffffff;--soft:#f8fafc;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);
+font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.85;font-size:17px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:840px;margin:0 auto;padding:0 22px 100px;}
+header.top{background:#fff;border-bottom:1px solid var(--line);padding:26px 22px 22px;margin-bottom:14px;}
+header.top .inner{max-width:840px;margin:0 auto;}
+.crumb{color:var(--muted);font-size:14px;letter-spacing:.3px;margin-bottom:6px;}
+h1{font-size:30px;line-height:1.3;margin:.1em 0 .2em;}
+.sub{color:var(--muted);font-size:15px;}
+article{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:30px 34px;margin-top:18px;}
+h2{font-size:23px;margin:1.7em 0 .6em;padding-bottom:.25em;border-bottom:2px solid var(--line);}
+h2:first-child{margin-top:.2em;}
+h3{font-size:19px;margin:1.3em 0 .4em;color:#0f172a;}
+h4{margin:.2em 0 .5em;font-size:16px;}
+p{margin:.7em 0;}
+ul,ol{padding-left:1.3em;margin:.6em 0;}
+li{margin:.32em 0;}
+code{background:#f1f5f9;padding:.12em .4em;border-radius:5px;font-size:.9em;
+font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a;}
+pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 18px;overflow:auto;font-size:14px;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0;}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:15.5px;}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+thead th{background:var(--soft);}
+figure.fig{margin:1.4em 0;text-align:center;}
+figure.fig svg{max-width:100%;height:auto;}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
+.note,.ml,.key,.pitfall,.example{border-radius:10px;padding:14px 18px;margin:1.2em 0;border:1px solid var(--line);}
+.note{background:var(--soft);border-left:4px solid #94a3b8;}
+.example{background:#fff;border-left:4px solid var(--blue);}
+.ml{background:var(--green-bg);border-left:4px solid var(--green);}
+.key{background:var(--amber-bg);border-left:4px solid var(--amber);}
+.pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.goals{background:var(--blue-bg);border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:10px;padding:14px 20px;margin:.2em 0 1.5em;}
+.goals h4{margin:.1em 0 .5em;color:#1e3a8a;}
+.goals ul{margin:.3em 0;}
+.skip{background:var(--soft);border:1px solid var(--line);border-left:4px solid #94a3b8;border-radius:10px;padding:14px 20px;margin:1.8em 0 0;color:#475569;}
+.skip h4{margin:.1em 0 .5em;color:#475569;}
+.tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
+.toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
+.toc h3{margin:.1em 0 .7em;}
+.toc ol{list-style:none;padding:0;}
+.toc li{padding:7px 10px;border-radius:8px;color:#334155;border:1px solid transparent;}
+.toc li a{color:inherit;text-decoration:none;display:block;}
+.toc li .ln{display:inline-block;min-width:54px;color:var(--muted);font-size:13px;}
+.toc li.cur{background:var(--blue-bg);border-color:#bfdbfe;font-weight:600;color:#1e3a8a;}
+.toc li:not(.cur):hover{background:var(--soft);}
+.navbtns{display:flex;justify-content:space-between;margin-top:22px;gap:12px;}
+.navbtns a{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--ink);}
+.navbtns a:hover{border-color:var(--blue);}
+.navbtns .nlabel{color:var(--muted);font-size:13px;}
+.navbtns .ntitle{font-weight:600;margin-top:3px;}
+.navbtns .next{text-align:right;}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.here{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:6px 0 4px;font-size:15px;color:#1e3a8a;line-height:1.7;}
+.here b{font-weight:700;}
+.cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
+.card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
+.card:hover{border-color:var(--blue);}
+.card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
+.card .ct{font-size:18px;font-weight:600;}
+.card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+.card .cap{margin-left:40px;margin-top:7px;font-size:13px;color:#1e3a8a;}
+.card .cap .lbl{display:inline-block;background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;margin-right:7px;}
+
+.card.soon{opacity:.6;cursor:default;}
+.card.soon:hover{border-color:var(--line);}
+.badge{display:inline-block;background:#e2e8f0;color:#475569;font-size:11px;font-weight:600;padding:1px 8px;border-radius:20px;margin-left:8px;vertical-align:middle;}
+.toc li.soon{color:#94a3b8;}
+.toc li.soon .badge{margin-left:4px;}
+</style>
+</head>
+<body>
+<header class="top"><div class="inner">
+<div class="crumb"><a href="../index.html" style="color:inherit">首页</a>　/　<a href="index.html" style="color:inherit">模块 2 · 概率统计、信息论与最优化</a>　/　第 9 课（共 10 课）</div>
+<h1>强化学习速成 I——MDP、价值与贝尔曼</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　阶段0：数学与工具基础　·　<strong>能力点：</strong>强化学习 I——MDP/价值/贝尔曼（RLHF、推理 RL 的语言）</div>
+</div></header>
+<div class="wrap">
+<article>
+<p>前 5 课我们都在做同一件事：手里有一堆带标签的数据 \((x,y)\)，写一个损失 \(L(\theta)\)，再用梯度 \(\nabla_\theta L\) 把它压小。监督学习的世界里，"什么是对的"是给定的——标签就是真理。但很多任务根本没有标签。下棋时没人告诉你"这一步的正确走法是 e4"；陪人聊天时没有"标准回复"；让模型写代码，你能说的只有"这段跑通了、那段报错了"。你只有一个稀薄的信号：<strong>行为好不好</strong>。这一课我们换范式——<strong>从奖励中学习（reinforcement learning, RL）</strong>。</p>
+
+<div class="goals">
+  <h4>读完这一课，你将能够</h4>
+  <ul>
+    <li>用 <strong>MDP 五元组</strong> \((\mathcal{S},\mathcal{A},P,r,\gamma)\) 把一个"序贯决策"问题形式化，并说清马尔可夫性意味着什么；</li>
+    <li>解释折扣回报 \(G_t\) 里的 \(\gamma\) 为什么同时管"数学收敛"和"近期更重要"两件事；</li>
+    <li>写出并<strong>口算</strong>一个小 MDP 的贝尔曼方程，求出状态价值 \(V^\pi\)；</li>
+    <li>区分 \(V^\pi/Q^\pi\) 与最优 \(V^*/Q^*\)，并说出贝尔曼最优方程里那个 \(\max\) 的来历；</li>
+    <li>用 numpy 在小 MDP 上跑<strong>价值迭代</strong>，看着 \(V\) 一轮轮收敛；并把 LLM 生成文本看成一个序贯决策问题。</li>
+  </ul>
+</div>
+
+<h2>一、为什么需要 RL：从"标签"到"奖励"</h2>
+
+<p>先把两种范式并排放：</p>
+
+<table>
+  <tr><th></th><th>监督学习</th><th>强化学习</th></tr>
+  <tr><td>反馈</td><td>每个样本一个<strong>正确答案</strong> \(y\)</td><td>一个<strong>标量奖励</strong> \(r\)（好不好，不告诉你"应该怎么做"）</td></tr>
+  <tr><td>样本独立性</td><td>样本通常 i.i.d.</td><td>你的动作改变下一步看到的状态，<strong>样本互相牵连</strong></td></tr>
+  <tr><td>目标</td><td>最小化损失 \(L(\theta)\)</td><td><strong>最大化</strong>长期累积奖励</td></tr>
+  <tr><td>反馈时机</td><td>立即、密集</td><td>常常<strong>延迟、稀疏</strong>（下完整盘棋才知道输赢）</td></tr>
+</table>
+
+<div class="note">
+  <strong>直觉。</strong>监督学习像有一本带答案的习题册：每道题翻到背面就有标准解。RL 像学骑自行车：没人能把"正确的肌肉发力序列"写成标签给你，你只能摔几次（负奖励）、稳住几秒（正奖励），从这些粗糙的好坏信号里反推出一套行为。关键的难点是<strong>归因（credit assignment）</strong>：摔倒发生在第 10 秒，但真正的错误也许是第 3 秒身体就歪了——奖励是延迟的，到底哪个动作该背锅？
+</div>
+
+<div class="ml">
+  <h4><span class="tag">ML</span> 和 ML 的联系（埋点：为什么前沿模型都在用 RL）</h4>
+  <p>大语言模型的"对齐"和"推理"恰恰是没有标签的任务。"这个回答有没有帮助、安不安全"无法写成唯一正确字符串，只能由<strong>人类偏好</strong>或一个<strong>奖励模型</strong>打分——这就是 <strong>RLHF</strong>（基于人类反馈的强化学习）。推理模型则用"最终答案对不对"作奖励，去强化那些能导向正确结论的思维链。下一课我们会看到，这些都建立在本课的 MDP 语言之上。先把地基打牢。</p>
+</div>
+
+<h2>二、Agent 与环境：交互回路</h2>
+
+<p>RL 的世界里只有两个角色：<strong>智能体（agent）</strong>和<strong>环境（environment）</strong>。它们来回传球：每一步，agent 观察到当前<strong>状态 \(s\)</strong>，挑一个<strong>动作 \(a\)</strong>；环境收到动作后，吐回一个<strong>奖励 \(r\)</strong> 和<strong>下一个状态 \(s'\)</strong>。如此循环。</p>
+
+<figure class="fig"><svg viewBox="0 0 520 300" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>Agent–环境交互回路</title><desc>智能体根据状态 s 选动作 a，环境返回奖励 r 与下一状态 s′，如此循环。</desc><defs><marker id="loop-arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/></marker><marker id="loop-arrow-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#d97706"/></marker></defs><rect x="36" y="92" width="150" height="92" rx="14" fill="#2563eb" fill-opacity="0.08" stroke="#2563eb" stroke-width="2"/><text x="111" y="128" text-anchor="middle" font-size="16" font-weight="600" fill="#1f2937">Agent</text><text x="111" y="153" text-anchor="middle" font-size="13" fill="#2563eb">策略 π(a | s)</text><rect x="334" y="92" width="150" height="92" rx="14" fill="#059669" fill-opacity="0.08" stroke="#059669" stroke-width="2"/><text x="409" y="124" text-anchor="middle" font-size="16" font-weight="600" fill="#1f2937">Environment</text><text x="409" y="148" text-anchor="middle" font-size="13" fill="#059669">转移 P，奖励 r</text><path d="M188,118 C248,86 272,86 332,118" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#loop-arrow-blue)"/><text x="260" y="78" text-anchor="middle" font-size="14" fill="#2563eb">动作 a</text><path d="M332,158 C272,190 248,190 188,158" fill="none" stroke="#d97706" stroke-width="2" marker-end="url(#loop-arrow-amber)"/><text x="260" y="212" text-anchor="middle" font-size="14" fill="#d97706">状态 s′ 与奖励 r</text><text x="260" y="270" text-anchor="middle" font-size="12" fill="#1f2937">目标：最大化折扣回报  G_t = Σ γ^k r_(t+k)</text></svg><figcaption>Agent–环境交互回路：智能体根据状态 s 选动作 a，环境返回奖励 r 与下一状态 s′，如此循环。</figcaption></figure>
+
+<p>这个回路就是 RL 的全部物理。agent 要解决的问题是：<em>面对每个状态，该选什么动作，才能让未来累积的奖励最大？</em>这个"选动作的规则"就叫<strong>策略（policy）</strong>，记作 \(\pi(a\mid s)\)——给定状态 \(s\)，在各动作上的概率分布（确定性策略就是把全部概率压在一个动作上）。</p>
+
+<h2>三、把问题写成数学：马尔可夫决策过程 MDP</h2>
+
+<p>要让"状态-动作-奖励"的循环可计算，我们需要一个干净的数学外壳。它叫 <strong>马尔可夫决策过程（Markov Decision Process, MDP）</strong>，由五个东西组成：</p>
+
+<ul>
+  <li><strong>状态集 \(\mathcal{S}\)</strong>：环境可能处于的所有情况（棋盘局面、机器人位姿、已生成的文本前缀）。</li>
+  <li><strong>动作集 \(\mathcal{A}\)</strong>：每个状态下可选的动作（落子、关节力矩、下一个 token）。</li>
+  <li><strong>转移 \(P(s'\mid s,a)\)</strong>：在 \(s\) 做 \(a\) 后，跳到 \(s'\) 的概率。环境的"物理引擎"。</li>
+  <li><strong>奖励 \(r(s,a)\)</strong>（或 \(r(s,a,s')\)）：这一步拿到的即时标量反馈。</li>
+  <li><strong>折扣 \(\gamma\in[0,1)\)</strong>：未来奖励的打折系数（下面细讲）。</li>
+</ul>
+
+<p>名字里的 "Markov" 是核心约束。<strong>马尔可夫性（Markov property）</strong>说的是：</p>
+
+\[
+P(s_{t+1}\mid s_t,a_t,\,s_{t-1},a_{t-1},\dots,s_0)=P(s_{t+1}\mid s_t,a_t).
+\]
+
+<p>翻译成人话：<strong>未来只依赖"现在"，不依赖"怎么走到现在的"。</strong>只要状态 \(s_t\) 写得足够完整，过去的历史就被"压缩"进了当前状态，可以全部丢掉。</p>
+
+<div class="note">
+  <strong>直觉（为什么这条约束这么值钱）。</strong>有了马尔可夫性，整个未来的好坏只跟"现在站在哪"有关，于是我们可以给<strong>每个状态</strong>赋一个固定的"价值"——而不必为"经由哪条历史到达"分别记账。这把一个指数爆炸的历史空间，塌缩成一个状态空间上的递归问题。后面的贝尔曼方程能成立，全靠这一条。
+</div>
+
+<div class="pitfall">
+  <strong>易错。</strong>马尔可夫性不是"环境很简单"，而是"状态定义得够全"。象棋当前局面是马尔可夫的；但如果你的"状态"只有棋子位置、漏了"轮到谁走 / 能否王车易位"，它就<em>不</em>马尔可夫了。在 LLM 里，把"已生成的全部前缀"当状态，就自动满足马尔可夫性——因为下一个 token 的分布只看完整前缀。
+</div>
+
+<figure class="fig"><svg viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>两状态 MDP 在固定策略下的循环转移图</title><defs><marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/></marker><marker id="arrowPink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#db2777"/></marker></defs><text x="300" y="34" text-anchor="middle" font-size="14" fill="#1f2937" font-weight="600">折扣因子 γ = 0.9</text><circle cx="180" cy="170" r="46" fill="#2563eb" fill-opacity="0.12" stroke="#2563eb" stroke-width="2"/><text x="180" y="177" text-anchor="middle" font-size="26" fill="#1f2937" font-weight="700">A</text><circle cx="420" cy="170" r="46" fill="#059669" fill-opacity="0.12" stroke="#059669" stroke-width="2"/><text x="420" y="177" text-anchor="middle" font-size="26" fill="#1f2937" font-weight="700">B</text><path d="M214,139 Q300,84 386,139" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/><text x="300" y="98" text-anchor="middle" font-size="14" fill="#2563eb" font-weight="600">r = 0</text><path d="M386,201 Q300,256 214,201" fill="none" stroke="#db2777" stroke-width="2" marker-end="url(#arrowPink)"/><text x="300" y="248" text-anchor="middle" font-size="14" fill="#db2777" font-weight="600">r = +1</text><text x="180" y="252" text-anchor="middle" font-size="13" fill="#d97706" font-weight="600">V(A) ≈ 4.74</text><text x="420" y="252" text-anchor="middle" font-size="13" fill="#d97706" font-weight="600">V(B) ≈ 5.26</text></svg><figcaption>小 MDP 状态转移图：两状态 A、B 在固定策略下循环，边上标注奖励与折扣。</figcaption></figure>
+
+<h2>四、回报 \(G_t\) 与折扣 \(\gamma\)：把"长期"装进一个数</h2>
+
+<p>agent 要最大化的不是某一步的 \(r\)，而是从现在起<strong>未来全部奖励的总和</strong>。但"总和"有个麻烦：如果一直走下去，奖励无限多个相加可能发散（\(\infty\) 没法比较大小）。解决办法是给越远的奖励打越狠的折扣。定义<strong>折扣回报（discounted return）</strong>：</p>
+
+\[
+G_t \;=\; r_t + \gamma\, r_{t+1} + \gamma^2 r_{t+2} + \cdots \;=\; \sum_{k\ge 0}\gamma^k\, r_{t+k},
+\qquad \gamma\in[0,1).
+\]
+
+<p>这个 \(\gamma\) 同时干两件事：</p>
+<ol>
+  <li><strong>数学上保证收敛。</strong>只要奖励有界 \(|r|\le R_{\max}\)，几何级数 \(\sum_{k\ge0}\gamma^k R_{\max}=\tfrac{R_{\max}}{1-\gamma}\) 就是有限的——无穷的未来被压成一个有限的数，才能拿来比较和优化。这里用到的求和公式 \(\sum_{k\ge0}\gamma^k=\tfrac{1}{1-\gamma}\)（当 \(|\gamma|<1\)）一行就能自证：记 \(S=1+\gamma+\gamma^2+\cdots\)，两边乘 \(\gamma\) 得 \(\gamma S=\gamma+\gamma^2+\cdots\)，相减 \(S-\gamma S=1\)，故 \(S=\tfrac{1}{1-\gamma}\)。</li>
+  <li><strong>表达"近期奖励更重要"。</strong>\(\gamma\) 越小，agent 越"短视"，只在乎眼前；\(\gamma\to 1\)，agent 越"有远见"，愿意为长远回报牺牲眼前。一个常用直觉：把 \(\gamma\) 看成"每一步有 \(1-\gamma\) 的概率游戏突然结束"——所以未来的奖励要按存活概率打折。</li>
+</ol>
+
+<div class="key">
+  <strong>关键结论。</strong>\(\gamma\) 不是可有可无的工程参数，它是把"无限长的未来"折叠成"一个可优化标量"的数学胶水，同时编码了你对"耐心程度"的偏好。
+</div>
+
+<h2>五、价值函数：给状态/动作标个"值"</h2>
+
+<p>回报 \(G_t\) 依赖于具体走出来的那一条随机轨迹，每次都不一样。我们真正想知道的是<strong>期望意义</strong>下，在某个状态有多好。于是定义<strong>状态价值函数（state-value function）</strong>：</p>
+
+\[
+V^\pi(s)\;=\;\mathbb{E}_\pi\!\left[\,G_t \mid s_t=s\,\right]
+\;=\;\mathbb{E}_\pi\!\left[\sum_{k\ge0}\gamma^k r_{t+k}\,\Big|\,s_t=s\right].
+\]
+
+<p>读作：<em>从状态 \(s\) 出发、之后一直按策略 \(\pi\) 行动，期望能拿到多少折扣回报。</em>注意它带上标 \(\pi\)——价值是<strong>相对于某个策略</strong>而言的，换策略就换价值。</p>
+
+<p>有时我们想更细一点：不仅问"这个状态多好"，而是"在这个状态<strong>做某个特定动作</strong>有多好"。这就是<strong>动作价值函数（action-value function）</strong>，也叫 Q 函数：</p>
+
+\[
+Q^\pi(s,a)\;=\;\mathbb{E}_\pi\!\left[\,G_t \mid s_t=s,\,a_t=a\,\right].
+\]
+
+<p>它先<strong>强制</strong>在 \(s\) 做 \(a\)（哪怕 \(\pi\) 本来不爱选它），之后再按 \(\pi\) 走。两者关系直观：状态价值是动作价值按策略概率的加权平均，\(V^\pi(s)=\sum_a \pi(a\mid s)\,Q^\pi(s,a)\)。</p>
+
+<div class="note">
+  <strong>直觉（为什么要两个函数）。</strong>\(V\) 回答"我现在处境如何"；\(Q\) 回答"我下一步该怎么动"。要做决策，\(Q\) 更直接：在 \(s\) 比较各动作的 \(Q(s,a)\)，挑最大的那个就行，不需要再知道环境转移。这就是为什么 Q-learning、DQN 这一支算法直接去学 \(Q\)。模块2后面会用到的<strong>优势函数 \(A^\pi(s,a)=Q^\pi(s,a)-V^\pi(s)\)</strong>——"这个动作比该状态的平均水平好多少"——也由这两者作差得到，是策略梯度/PPO 的主角，下一课见。
+</div>
+
+<h2>六、贝尔曼方程：价值的递归骨架</h2>
+
+<p>价值函数定义里有个无穷求和，没法直接算。<strong>贝尔曼方程（Bellman equation）</strong>的魔法是把它<strong>拆成一步</strong>。把 \(G_t = r_t + \gamma G_{t+1}\) 这个恒等式代进期望，就得到：</p>
+
+\[
+V^\pi(s)\;=\;\mathbb{E}_{a\sim\pi,\,s'\sim P}\big[\,r(s,a)+\gamma\,V^\pi(s')\,\big].
+\]
+
+<p>一句话读懂它：<strong>当前价值 = 即时奖励 + 未来价值的折扣。</strong>站在 \(s\)，先拿这一步的 \(r\)，然后跳到 \(s'\)——而 \(s'\) 那边的"好坏"早已被 \(V^\pi(s')\) 总结好了，打个 \(\gamma\) 折扣加回来即可。无穷的未来被一个递归引用替代了。</p>
+
+<div class="note">
+  <strong>这一步用到了两件事。</strong>从 \(\mathbb{E}[\gamma G_{t+1}\mid s_t=s]\) 之所以能塌缩成 \(\gamma\,V^\pi(s')\)，靠的是：(1) <strong>嵌套期望</strong>（也叫全期望公式/塔性质）——先按转移落到某个 \(s'\)，再对未来取一次条件期望，而 \(\mathbb{E}[G_{t+1}\mid s_{t+1}=s']\) 按定义就是 \(V^\pi(s')\)；(2) <strong>马尔可夫性</strong>——保证这个 \(V^\pi(s')\) 只看 \(s'\)、与"怎么走到 \(s'\)"的历史无关。换句话说，"\(G_{t+1}\to V^\pi(s')\)"不是凭空替换，而是这两条共同允许的。完整推导可放过，但要知道它从哪来。
+</div>
+
+<figure class="fig"><svg viewBox="0 0 720 300" role="img" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, system-ui, sans-serif">
+  <title>贝尔曼递归：V(s) = 即时奖励 r + 折扣后的未来价值 γ·V(s′)</title>
+  <desc>左侧大节点 V(s)，等号右侧分为即时奖励 r 与 γ·V(s′) 两块，下游小节点 s′ 通过带箭头的边连接，边上标动作 a，虚线框圈出右侧整体。</desc>
+
+  <defs>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/>
+    </marker>
+  </defs>
+
+  <!-- ===== 左侧：当前状态价值大节点 V(s) ===== -->
+  <circle cx="92" cy="130" r="48" fill="#2563eb" fill-opacity="0.10" stroke="#2563eb" stroke-width="2"/>
+  <text x="92" y="126" text-anchor="middle" font-size="20" font-weight="600" fill="#1f2937">V(s)</text>
+  <text x="92" y="146" text-anchor="middle" font-size="11" fill="#475569">当前状态价值</text>
+
+  <!-- ===== 等号 ===== -->
+  <text x="178" y="138" text-anchor="middle" font-size="28" font-weight="600" fill="#1f2937">=</text>
+
+  <!-- ===== 虚线框：圈出右侧递归整体 ===== -->
+  <rect x="208" y="64" width="490" height="132" rx="12" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/>
+
+  <!-- ===== 第一块：即时奖励 r ===== -->
+  <rect x="226" y="100" width="120" height="58" rx="8" fill="#d97706" fill-opacity="0.12" stroke="#d97706" stroke-width="2"/>
+  <text x="286" y="125" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2937">即时奖励 r</text>
+  <text x="286" y="144" text-anchor="middle" font-size="11" fill="#92600a">这一步拿到的</text>
+
+  <!-- ===== 加号 ===== -->
+  <text x="372" y="138" text-anchor="middle" font-size="26" font-weight="600" fill="#1f2937">+</text>
+
+  <!-- ===== 第二块：γ · V(s′) ===== -->
+  <rect x="398" y="100" width="120" height="58" rx="8" fill="#2563eb" fill-opacity="0.10" stroke="#2563eb" stroke-width="2"/>
+  <text x="458" y="125" text-anchor="middle" font-size="15" font-weight="600" fill="#1f2937">γ · V(s′)</text>
+  <text x="458" y="144" text-anchor="middle" font-size="11" fill="#1e40af">折扣后的未来</text>
+
+  <!-- ===== 下游小节点 s′ ===== -->
+  <circle cx="636" cy="129" r="34" fill="#2563eb" fill-opacity="0.06" stroke="#2563eb" stroke-width="2"/>
+  <text x="636" y="134" text-anchor="middle" font-size="16" font-weight="600" fill="#1f2937">s′</text>
+
+  <!-- ===== 带箭头的边：γ·V(s′) 指向 s′，表示一步之后 ===== -->
+  <line x1="520" y1="129" x2="600" y2="129" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <text x="560" y="118" text-anchor="middle" font-size="12" fill="#db2777" font-style="italic">动作 a</text>
+  <text x="560" y="150" text-anchor="middle" font-size="11" fill="#64748b">一步之后</text>
+
+  <!-- ===== 虚线框下方小字 ===== -->
+  <text x="453" y="186" text-anchor="middle" font-size="12" fill="#475569">无穷未来被一次递归引用替代</text>
+
+  <!-- ===== 底部完整公式 ===== -->
+  <text x="360" y="248" text-anchor="middle" font-size="14" fill="#1f2937">V(s) = r + γ · V(s′)</text>
+  <text x="360" y="272" text-anchor="middle" font-size="11" fill="#64748b">贝尔曼递归：当前价值 = 即时奖励 + 折扣后的未来价值</text>
+</svg><figcaption>贝尔曼递归分解：当前状态价值 = 即时奖励 + 折扣后的未来价值。</figcaption></figure>
+
+<p>这是一组关于 \(\{V^\pi(s)\}\) 的<strong>线性方程</strong>（每个状态一条），原则上可以直接解。下面的例题就这么干。</p>
+
+<div class="example">
+  <h4>例题：两状态 MDP，手解贝尔曼方程</h4>
+  <p>两个状态 \(A,B\)，策略固定（每个状态只有一个动作，所以不用写 \(\pi\)）。规则：在 \(A\) 拿奖励 \(0\) 后必定去 \(B\)；在 \(B\) 拿奖励 \(1\) 后必定回 \(A\)。折扣 \(\gamma=0.9\)。求 \(V(A),V(B)\)。</p>
+  <p>写出两条贝尔曼方程（转移确定，期望退化为代入）：</p>
+  \[
+  V(A)=0+0.9\,V(B),\qquad V(B)=1+0.9\,V(A).
+  \]
+  <p>把第一式代入第二式：\(V(B)=1+0.9(0.9\,V(B))=1+0.81\,V(B)\)，于是 \((1-0.81)V(B)=1\)，</p>
+  \[
+  V(B)=\frac{1}{0.19}\approx 5.2632,\qquad V(A)=0.9\,V(B)\approx 4.7368.
+  \]
+  <p><strong>验算：</strong>\(V(A)=0.9\times5.2632=4.7368\)✓；\(V(B)=1+0.9\times4.7368=5.2632\)✓。两个状态价值都是正的有限数。事实上这里有个精确的结构：从 \(B\) 出发每隔两步拿一次 \(+1\)，所以 \(V(B)=1+\gamma^2+\gamma^4+\cdots=\tfrac{1}{1-\gamma^2}=\tfrac{1}{1-0.81}=\tfrac{1}{0.19}\)，和上面解出来的分毫不差——"每隔一步 \(+1\)、按 \(\gamma^2\) 几何求和"不是巧合，而是这个交替 MDP 的本来面目。</p>
+</div>
+
+<h3>最优价值与贝尔曼最优方程</h3>
+
+<p>上面是<strong>评估</strong>一个给定策略。但 RL 的终极目标是<strong>找最好的</strong>策略。定义<strong>最优状态价值</strong> \(V^*(s)=\max_\pi V^\pi(s)\)、<strong>最优动作价值</strong> \(Q^*(s,a)=\max_\pi Q^\pi(s,a)\)。它们满足<strong>贝尔曼最优方程（Bellman optimality equation）</strong>：</p>
+
+\[
+V^*(s)=\max_a \Big[\,r(s,a)+\gamma\,\mathbb{E}_{s'}\,V^*(s')\,\Big],
+\qquad
+Q^*(s,a)=r(s,a)+\gamma\,\mathbb{E}_{s'}\Big[\max_{a'}Q^*(s',a')\Big].
+\]
+
+<p>和普通贝尔曼方程<strong>唯一的差别</strong>是把"对策略求期望 \(\mathbb{E}_{a\sim\pi}\)"换成了"取最大 \(\max_a\)"。直觉：既然要最优，每一步当然挑当下看起来回报最高的动作，而不是按某个固定策略掷骰子。一旦有了 \(Q^*\)，最优策略就是"每个状态选 \(\arg\max_a Q^*(s,a)\)"——决策变成查表。</p>
+
+<div class="key">
+  <strong>关键结论。</strong>普通贝尔曼方程是<strong>线性</strong>的（可直接解线性系统），最优方程因为有 \(\max\) 变成<strong>非线性</strong>，一般不能一步解出——但可以<strong>迭代逼近</strong>，这就引出价值迭代。
+</div>
+
+<h2>七、怎么求解：价值迭代与 Q-learning（点到为止）</h2>
+
+<p><strong>价值迭代（value iteration）</strong>：把贝尔曼最优方程当成<strong>更新规则</strong>反复用。从随便一个 \(V_0\)（比如全 0）开始，每轮对所有状态做</p>
+
+\[
+V_{k+1}(s)\;\leftarrow\;\max_a\Big[\,r(s,a)+\gamma\,\mathbb{E}_{s'}\,V_k(s')\,\Big].
+\]
+
+<p>可以证明这个更新是<strong>压缩映射（contraction）</strong>——每轮把 \(V_k\) 与真值 \(V^*\) 的距离至少缩小到原来的 \(\gamma\) 倍，所以必然收敛到唯一不动点 \(V^*\)。下面的代码会让你亲眼看到这个收敛。</p>
+
+<p><strong>Q-learning</strong>：当你<strong>不知道</strong>环境的转移 \(P\) 和奖励 \(r\)（只能与环境交互、采样），就没法算上式里的期望 \(\mathbb{E}_{s'}\)。Q-learning 用一次真实采样的 \((s,a,r,s')\) 来近似它，朝目标 \(r+\gamma\max_{a'}Q(s',a')\) 挪一小步：</p>
+
+\[
+Q(s,a)\;\leftarrow\;Q(s,a)+\eta\Big[\underbrace{r+\gamma\max_{a'}Q(s',a')}_{\text{TD 目标}}-Q(s,a)\Big].
+\]
+
+<p>这里 \(\eta\) 就是熟悉的学习率，方括号叫 <strong>TD 误差</strong>——它就是"<strong>目标 \(-\) 当前估计</strong>"的残差。正因为括号里取的是"目标减预测"，前面才用 \(+\) 号：朝目标方向挪一小步。（监督学习里梯度下降也是用"目标减预测"这个残差来推动更新，方向一致，异曲同工。）细节后面专门讲，这里只要记住：<strong>价值迭代</strong>是"已知模型、用期望算"，<strong>Q-learning</strong>是"未知模型、用采样学"。</p>
+
+<h2>八、探索 vs 利用：ε-greedy</h2>
+
+<p>"未知模型、靠采样"带来一个新两难。假设你刚试了一家餐馆觉得不错（\(Q\) 较高）——你该<strong>每次都去</strong>它（<strong>利用 exploitation</strong>，吃稳的），还是偶尔去试没去过的（<strong>探索 exploration</strong>，万一更好）？只利用，你可能永远错过真正最好的；只探索，你浪费大量时间在烂选项上。这就是 <strong>探索–利用权衡（exploration–exploitation trade-off）</strong>。</p>
+
+<p>最简单的解法是 <strong>ε-greedy</strong>：以概率 \(1-\varepsilon\) 选当前估计最好的动作（利用），以小概率 \(\varepsilon\) 随机乱选一个（探索）。</p>
+
+<div class="note">
+  <strong>直觉。</strong>\(\varepsilon\) 是"好奇心预算"。大多数时候走熟路，但留一条小缝随机试探，保证每个动作都有机会被试到、其 \(Q\) 估计不会因为一次倒霉就被永久埋没。实践中常让 \(\varepsilon\) 随训练逐渐衰减：先多探索、后多利用。
+</div>
+
+<h2>九、把 LLM 文本生成看成 MDP（RLHF 埋点）</h2>
+
+<p>现在把这套语言套到大模型上，你会发现严丝合缝：</p>
+
+<table>
+  <tr><th>MDP 元素</th><th>在 LLM 文本生成里是什么</th></tr>
+  <tr><td>状态 \(s\)</td><td>已经生成的<strong>前缀</strong>（prompt + 目前为止的 tokens）</td></tr>
+  <tr><td>动作 \(a\)</td><td>下一个 <strong>token</strong>（动作空间 = 整个词表）</td></tr>
+  <tr><td>策略 \(\pi(a\mid s)\)</td><td>语言模型本身——给定前缀，下一个 token 的概率分布</td></tr>
+  <tr><td>转移 \(P(s'\mid s,a)\)</td><td>确定的：把选中的 token 拼到前缀后面，就是新状态</td></tr>
+  <tr><td>奖励 \(r\)</td><td>通常在序列<strong>结束</strong>时由<strong>奖励模型 / 人类偏好</strong>打一个分（中间步 \(r=0\)）</td></tr>
+  <tr><td>折扣 \(\gamma\)</td><td>常取接近 1，因为我们在乎整段输出的最终质量</td></tr>
+</table>
+
+<p>于是"训练 LLM 对齐人类偏好"就成了一个标准 RL 问题：<strong>调整策略 \(\pi_\theta\)（模型权重 \(\theta\)），让生成序列的期望奖励最大</strong>。奖励稀疏（只在末尾）、归因困难（哪个 token 该记功）正是 RLHF 的核心挑战——也正是下一课的策略梯度要解决的。</p>
+
+<div class="key">
+  <strong>关键结论。</strong>本课的 MDP / 价值 / 贝尔曼不是棋类玩具的专利。把"生成"看成"序贯决策"，前沿大模型的对齐与推理训练，本质上都站在这套地基上。
+</div>
+
+<h2>调一调，观察现象</h2>
+
+<p>下面三个小实验都用 numpy 现场搭一个最小 MDP，亲手验证上面的结论。每个都几秒内跑完。先读"改什么 → 预期看到什么 → 为什么"，再跑代码核对。</p>
+
+<div class="example">
+  <h4>实验 1：折扣 \(\gamma\) 怎么影响价值大小</h4>
+  <p><strong>改什么：</strong>在 1×4 走廊 GridWorld（状态 0,1,2,3；3 是终点，走进去得 \(+1\)）上做价值迭代，把 \(\gamma\) 从 \(0.9\) 改成 \(0.5\)。<br>
+  <strong>预期看到：</strong>\(\gamma=0.9\) 时收敛到 \([0.81,\,0.9,\,1.0,\,0]\)；\(\gamma=0.5\) 时变成 \([0.25,\,0.5,\,1.0,\,0]\)。离终点越远，价值被折扣得越狠，\(\gamma\) 小则"远处"几乎没价值。<br>
+  <strong>为什么：</strong>从状态 \(s\) 到终点要走 \(d\) 步，价值约为 \(\gamma^{d-1}\)（进终点那步才拿 \(+1\)）。\(\gamma\) 越小，\(\gamma^{d}\) 衰减越快，远处的状态价值越接近 0——这就是"短视"的数值体现。</p>
+  <pre><code>import numpy as np
+def value_iter(gamma, iters=12):
+    nS, nA = 4, 2          # 状态 0..3, 动作 0=左 1=右
+    def step(s, a):
+        if s == 3: return s, 0.0, True          # 3 是终点
+        ns = min(s+1,3) if a==1 else max(s-1,0)
+        return ns, (1.0 if ns==3 else 0.0), (ns==3)
+    V = np.zeros(nS)
+    for _ in range(iters):
+        Vn = V.copy()
+        for s in range(3):                       # 终点 V=0 不更新
+            qs = []
+            for a in range(nA):
+                ns, r, done = step(s, a)
+                qs.append(r + gamma*(0.0 if done else V[ns]))
+            Vn[s] = max(qs)
+        V = Vn
+    return np.round(V, 4)
+print("gamma=0.9:", value_iter(0.9))
+print("gamma=0.5:", value_iter(0.5))</code></pre>
+</div>
+
+<div class="example">
+  <h4>实验 2：看 \(V\) 一轮轮"长"出来（收敛过程）</h4>
+  <p><strong>改什么：</strong>把每一轮的 \(V\) 都打印出来（而不是只看最后结果）。<br>
+  <strong>预期看到（\(\gamma=0.9\)）：</strong>价值像水波从终点倒灌回起点——
+  iter1 <code>[0,0,1,0]</code> → iter2 <code>[0,0.9,1,0]</code> → iter3 <code>[0.81,0.9,1,0]</code>，第 3 轮起就不再变。<br>
+  <strong>为什么：</strong>每一轮，信息只能从"已知价值的状态"往外传一格（贝尔曼更新一次只看一步邻居）。终点的 \(+1\) 第 1 轮先点亮 state2，第 2 轮才传到 state1，第 3 轮到 state0。走廊长 \(d\) 就需要约 \(d\) 轮——这正是"价值迭代是逐步压缩"的可视化。</p>
+  <pre><code>import numpy as np
+nS, nA, gamma = 4, 2, 0.9
+def step(s, a):
+    if s == 3: return s, 0.0, True
+    ns = min(s+1,3) if a==1 else max(s-1,0)
+    return ns, (1.0 if ns==3 else 0.0), (ns==3)
+V = np.zeros(nS)
+for it in range(6):
+    Vn = V.copy()
+    for s in range(3):
+        Vn[s] = max(step(s,a)[1] + gamma*(0.0 if step(s,a)[2] else V[step(s,a)[0]])
+                    for a in range(nA))
+    V = Vn
+    print("iter %d:"%(it+1), np.round(V,4))</code></pre>
+</div>
+
+<div class="example">
+  <h4>实验 3：ε 调大/调小，探索的代价</h4>
+  <p><strong>改什么：</strong>在 3 臂伯努利老虎机（真实中奖率 0.2 / 0.5 / 0.8）上跑 ε-greedy，把 \(\varepsilon\) 从 \(0.1\) 改成 \(0.5\)。<br>
+  <strong>预期看到：</strong>两种 \(\varepsilon\) 估出的 \(Q\) 都接近真值 \([0.2,0.5,0.8]\)；但 \(\varepsilon=0.1\) 时绝大多数次数（约 1850/2000）拉在最优臂上，\(\varepsilon=0.5\) 时最优臂只占约三分之二（约 1330/2000），大量次数浪费在差臂。一般地，最优臂被拉的比例约为 \((1-\varepsilon)+\varepsilon/K\)（\(K\) = 臂数）：利用阶段几乎全压最优臂，探索阶段则在 \(K\) 个臂里均摊。代入 \(\varepsilon=0.5,K=3\) 得 \(0.5+0.5/3\approx0.667\)，正是约 \(2/3\)。<br>
+  <strong>为什么：</strong>\(\varepsilon\) 越大，差臂被采样的次数越多、它们的 \(Q\) 估得越稳，但用于"利用"最优臂的次数越少——总收益更低。这就是探索–利用的天平：探索买的是信息，付的是即时回报。</p>
+  <pre><code>import numpy as np
+def run(eps, T=2000, seed=0):
+    rng = np.random.default_rng(seed)
+    true_p = np.array([0.2, 0.5, 0.8])
+    Q = np.zeros(3); N = np.zeros(3)
+    for _ in range(T):
+        a = rng.integers(3) if rng.random() < eps else int(np.argmax(Q))
+        r = 1.0 if rng.random() < true_p[a] else 0.0
+        N[a] += 1; Q[a] += (r - Q[a]) / N[a]      # 增量平均
+    return np.round(Q,3), N.astype(int)
+for eps in (0.1, 0.5):
+    Q, N = run(eps)
+    print(f"eps={eps}  Q={Q}  pulls={N}")</code></pre>
+</div>
+
+<h2>动手练习</h2>
+
+<ol>
+  <li><strong>手解贝尔曼。</strong>把例题的奖励改成"在 \(A\) 得 \(+2\)、在 \(B\) 得 \(-1\)"，转移不变，\(\gamma=0.9\)。列出两条贝尔曼方程并解出 \(V(A),V(B)\)。（提示：\(V(A)=2+0.9V(B)\)，\(V(B)=-1+0.9V(A)\)；解线性方程组。）</li>
+  <li><strong>价值迭代加长。</strong>把走廊从 4 个状态改成 6 个状态（终点在 state5），跑实验 2 的逐轮打印，数一数 \(V\) 需要几轮才稳定，验证"轮数 ≈ 走廊长度"。</li>
+  <li><strong>从 \(V\) 读出策略。</strong>价值迭代收敛后，对每个状态 \(s\) 算 \(\arg\max_a[r+\gamma V(s')]\)，打印出最优动作。预期：所有状态都选"向右"。写出这段提取代码。</li>
+  <li><strong>随机转移版。</strong>把走廊改成"选右有 0.8 概率真往右、0.2 概率原地不动"。修改 <code>step</code> 让它在期望意义下更新（\(\sum_{s'}P(s'|s,a)[r+\gamma V(s')]\)），重跑价值迭代，观察价值整体变小（因为达成目标更慢）。</li>
+  <li><strong>ε 衰减。</strong>把实验 3 改成 \(\varepsilon\) 随步数衰减 \(\varepsilon_t=1/\sqrt{t+1}\)，比较固定 \(\varepsilon=0.1\) 与衰减版累计收益 \(\sum r\)。预期衰减版略胜（前期探索充分、后期充分利用）。</li>
+</ol>
+
+<figure class="fig"><svg viewBox="0 0 720 220" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>走廊 GridWorld 价值热力图（γ=0.9），价值越靠近终点越大，最优策略一路向右</title><defs><marker id="arrR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#059669"/></marker></defs><text x="360" y="28" text-anchor="middle" font-size="14" fill="#1f2937" font-weight="600">走廊 GridWorld 价值热力（γ=0.9）：越靠近终点 V 越大</text><g><rect x="60" y="55" width="130" height="90" rx="6" fill="#2563eb" fill-opacity="0.18" stroke="#2563eb" stroke-width="1.5"/><rect x="210" y="55" width="130" height="90" rx="6" fill="#2563eb" fill-opacity="0.45" stroke="#2563eb" stroke-width="1.5"/><rect x="360" y="55" width="130" height="90" rx="6" fill="#2563eb" fill-opacity="0.85" stroke="#2563eb" stroke-width="1.5"/><rect x="510" y="55" width="130" height="90" rx="6" fill="#d97706" fill-opacity="0.12" stroke="#d97706" stroke-width="1.5"/></g><g text-anchor="middle"><text x="125" y="108" font-size="30" fill="#1f2937" font-weight="700">0.81</text><text x="275" y="108" font-size="30" fill="#1f2937" font-weight="700">0.90</text><text x="425" y="108" font-size="30" fill="#ffffff" font-weight="700">1.00</text><text x="575" y="98" font-size="26" fill="#1f2937" font-weight="700">0</text></g><g text-anchor="middle"><path d="M591,118 l0,-20 18,0" fill="none" stroke="#d97706" stroke-width="1.5"/><polygon points="591,98 603,93 603,103" fill="#d97706"/><text x="575" y="135" font-size="12" fill="#d97706" font-weight="700">GOAL</text></g><g text-anchor="middle" font-size="12" fill="#1f2937"><text x="125" y="172">s=0</text><text x="275" y="172">s=1</text><text x="425" y="172">s=2</text><text x="575" y="172">s=3 (终点)</text></g><g><line x1="190" y1="100" x2="210" y2="100" stroke="#059669" stroke-width="2" marker-end="url(#arrR)"/><line x1="340" y1="100" x2="360" y2="100" stroke="#059669" stroke-width="2" marker-end="url(#arrR)"/><line x1="490" y1="100" x2="510" y2="100" stroke="#059669" stroke-width="2" marker-end="url(#arrR)"/></g><g><line x1="60" y1="198" x2="635" y2="198" stroke="#059669" stroke-width="2" marker-end="url(#arrR)"/><text x="60" y="190" font-size="12" fill="#059669" font-weight="600">最优策略：一路向右 →</text></g></svg><figcaption>走廊 GridWorld 的价值热力（γ=0.9）：越靠近终点价值越大，用数字+渐变深浅表示 V 大小。</figcaption></figure>
+
+<h2>掌握自检</h2>
+
+<ul>
+  <li>我能说清监督学习的"标签"和 RL 的"奖励"差在哪，并举一个只有奖励、没有标签的任务。</li>
+  <li>我能写出 MDP 五元组，并解释马尔可夫性"未来只依赖现在"在状态定义上的要求。</li>
+  <li>我能说出折扣 \(\gamma\) 同时承担的两个角色（收敛 + 近期优先）。</li>
+  <li>给一个两状态 MDP，我能列出贝尔曼方程并手解 \(V\)。</li>
+  <li>我能指出普通贝尔曼方程与贝尔曼最优方程的唯一差别（\(\mathbb{E}_{a\sim\pi}\) vs \(\max_a\)），以及为什么后者非线性。</li>
+  <li>我能解释价值迭代为什么会收敛（压缩映射 / 逐步把信息往外传），并能从 \(V\) 提取出贪心策略。</li>
+  <li>我能把 LLM 文本生成映射成 MDP 的五个元素，并说出为什么 RLHF 的奖励是稀疏的。</li>
+</ul>
+
+<div class="skip">
+  <h4>可以先放过的点</h4>
+  <ul>
+    <li><strong>压缩映射的证明（Banach 不动点定理）。</strong>现在只需相信"价值迭代必收敛、收敛到唯一 \(V^*\)"，等到专门讲收敛性分析时再回来啃 \(\gamma\)-压缩的 \(\varepsilon\)-\(\delta\)。</li>
+    <li><strong>Q-learning 的收敛条件与 TD 学习全貌。</strong>本课只给了更新式的直觉，离线/在线、on-policy/off-policy 的区别留到 RL 速成 II。</li>
+    <li><strong>连续状态/动作与函数近似。</strong>这里的 \(V,Q\) 都是查表（有限状态）。当状态是图像或文本时要用神经网络近似，那是深度 RL 的内容，先不展开。</li>
+    <li><strong>奖励塑形与折扣对偏好的细微影响。</strong>\(\gamma\) 选多少、奖励怎么设计才不"被钻空子"，是 RLHF 的实战难题，下一课起逐步触及。</li>
+  </ul>
+</div>
+
+<p><em>下一课预告：</em>有了 MDP 与价值的地基，我们就能问"如何<strong>直接</strong>优化策略 \(\pi_\theta\)"——这就是<strong>策略梯度</strong>。我们会推出策略梯度定理、引入本课提过的<strong>优势函数 \(A=Q-V\)</strong> 降方差，一路走到 <strong>PPO</strong>，并把它接到 <strong>RLHF</strong>：用人类偏好训练奖励模型，再用 RL 微调大模型。本课埋下的每个点，下一课都会兑现。</p>
+</article>
+<div class="navbtns"><a class="prev" href="lesson-08-optimizers.html"><div class="nlabel">← 上一课</div><div class="ntitle">第8课 · 现代优化器——SGD、动量、Adam 与调度</div></a><a class="next" href="lesson-10-rl-crash-2.html"><div class="nlabel">下一课 →</div><div class="ntitle">第10课 · 强化学习速成 II——策略梯度到 PPO</div></a></div>
+<nav class="toc"><h3>本模块课程表</h3><ol>
+<li><a href="lesson-01-random-variables.html"><span class="ln">第1课</span>概率的语言——随机变量、分布、期望与方差</a></li>
+<li><a href="lesson-02-distributions-covariance.html"><span class="ln">第2课</span>分布动物园与协方差</a></li>
+<li><a href="lesson-03-conditional-bayes.html"><span class="ln">第3课</span>条件概率与贝叶斯</a></li>
+<li><a href="lesson-04-mle-map.html"><span class="ln">第4课</span>从数据到损失——MLE 与 MAP</a></li>
+<li><a href="lesson-05-information-theory.html"><span class="ln">第5课</span>信息论——熵、交叉熵、KL</a></li>
+<li><a href="lesson-06-sampling.html"><span class="ln">第6课</span>采样——逆变换、重参数化与蒙特卡洛</a></li>
+<li><a href="lesson-07-convexity-gradient-descent.html"><span class="ln">第7课</span>凸性与梯度下降——优化的几何</a></li>
+<li><a href="lesson-08-optimizers.html"><span class="ln">第8课</span>现代优化器——SGD、动量、Adam 与调度</a></li>
+<li class="cur"><span class="ln">第9课</span>强化学习速成 I——MDP、价值与贝尔曼</li>
+<li><a href="lesson-10-rl-crash-2.html"><span class="ln">第10课</span>强化学习速成 II——策略梯度到 PPO</a></li>
+</ol></nav>
+</div>
+<!-- pyrunner-injected -->
+<style>
+.pr-cell{border:1px solid #334155;border-radius:10px;margin:1.2em 0;overflow:hidden;background:#0f172a;}
+.pr-head{display:flex;align-items:center;gap:8px;background:#1e293b;color:#cbd5e1;padding:6px 10px;font-size:13px;font-family:system-ui,-apple-system,sans-serif;}
+.pr-title{flex:1;font-weight:600;}
+.pr-status{font-size:12px;color:#94a3b8;white-space:nowrap;max-width:50%;overflow:hidden;text-overflow:ellipsis;}
+.pr-btn{cursor:pointer;border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:6px;padding:3px 11px;font-size:13px;line-height:1.4;}
+.pr-btn:hover{background:#0b1220;}
+.pr-run{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:600;}
+.pr-run:hover{background:#1d4ed8;}
+.pr-cell.collapsed .pr-body{display:none;}
+.pr-editor{position:relative;background:#0f172a;}
+.pr-code,.pr-edit{display:block;width:100%;min-height:68px;border:none;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.55;padding:12px 14px;box-sizing:border-box;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:4;}
+.pr-code{position:absolute;inset:0;margin:0;overflow:hidden;background:#0f172a;color:#dbeafe;pointer-events:none;}
+.pr-edit{position:relative;background:transparent;color:transparent;caret-color:#e2e8f0;resize:vertical;outline:none;-webkit-text-fill-color:transparent;}
+.pr-edit::selection{background:rgba(96,165,250,.34);}
+.tok-kw{color:#c084fc;font-weight:700;}
+.tok-fn{color:#67e8f9;}
+.tok-num{color:#fbbf24;}
+.tok-str{color:#86efac;}
+.tok-comment{color:#94a3b8;font-style:italic;}
+.pr-out{margin:0;padding:10px 14px;border-top:1px solid #334155;background:#0b1220;color:#cbd5e1;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.5;white-space:pre-wrap;max-height:340px;overflow:auto;}
+.pr-out:empty{display:none;}
+.pr-out.err{color:#fca5a5;}
+#pr-fab{position:fixed;right:18px;bottom:18px;z-index:9998;background:#2563eb;color:#fff;border:none;border-radius:999px;padding:10px 17px;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.22);font-family:system-ui,sans-serif;}
+#pr-fab:hover{background:#1d4ed8;}
+#pr-lab{position:fixed;right:18px;bottom:66px;z-index:9999;width:400px;max-width:92vw;background:#0f172a;border:1px solid #334155;border-radius:12px;display:none;flex-direction:column;box-shadow:0 14px 38px rgba(0,0,0,.4);overflow:hidden;}
+#pr-lab.open{display:flex;}
+#pr-lab .pr-edit,#pr-lab .pr-code{min-height:150px;}
+</style>
+<script>
+(function(){
+  var PYBASE="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+  var pyReady=null;
+  function loadPy(status){
+    if(pyReady)return pyReady;
+    pyReady=(async function(){
+      status("正在加载 Python 运行时（首次约 10 秒，需联网）…");
+      await new Promise(function(res,rej){
+        var s=document.createElement("script");s.src=PYBASE+"pyodide.js";
+        s.onload=res;s.onerror=function(){rej(new Error("无法加载 Pyodide（首次运行需要联网）"));};
+        document.head.appendChild(s);
+      });
+      var py=await loadPyodide({indexURL:PYBASE});
+      status("正在加载 NumPy …");
+      await py.loadPackage("numpy");
+      status("Python 就绪 ✓");
+      return py;
+    })();
+    return pyReady;
+  }
+  async function run(code,outEl,statusEl){
+    var setS=function(m){if(statusEl)statusEl.textContent=m;};
+    outEl.classList.remove("err");outEl.textContent="";
+    var py;
+    try{py=await loadPy(setS);}
+    catch(e){outEl.classList.add("err");outEl.textContent="加载失败："+e.message;return;}
+    var buf="";
+    py.setStdout({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    py.setStderr({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    try{
+      var result=await py.runPythonAsync(code);
+      if(result!==undefined&&result!==null){
+        var r;try{r=result.toString();}catch(_){r=String(result);}
+        if(r!=="None")buf+=(buf&&!buf.endsWith("\n")?"\n":"")+r;
+        if(result&&result.destroy)result.destroy();
+      }
+      outEl.textContent=buf||"（运行成功，无输出。用 print(...) 查看结果）";
+    }catch(e){
+      outEl.classList.add("err");
+      outEl.textContent=buf+(buf?"\n":"")+String((e&&e.message)||e);
+    }
+  }
+  var KW={False:1,None:1,True:1,and:1,as:1,assert:1,async:1,await:1,break:1,class:1,continue:1,def:1,del:1,elif:1,else:1,except:1,finally:1,for:1,from:1,global:1,if:1,import:1,in:1,is:1,lambda:1,nonlocal:1,not:1,or:1,pass:1,raise:1,return:1,try:1,while:1,with:1,yield:1};
+  var FN={abs:1,all:1,any:1,array:1,bool:1,dict:1,enumerate:1,float:1,int:1,len:1,list:1,max:1,min:1,np:1,numpy:1,print:1,range:1,round:1,set:1,str:1,sum:1,tuple:1,zip:1};
+  function esc(s){return s.replace(/[&<>]/g,function(c){return c==="&"?"&amp;":c==="<"?"&lt;":"&gt;";});}
+  function colorLine(line){
+    var out="",i=0;
+    while(i<line.length){
+      var ch=line[i];
+      if(ch==="#"){out+='<span class="tok-comment">'+esc(line.slice(i))+"</span>";break;}
+      if(ch==="'"||ch==='"'){
+        var q=ch,triple=line.slice(i,i+3)===q+q+q,end=i+(triple?3:1),done=false;
+        while(end<line.length){
+          if(!triple&&line[end]==="\\"){end+=2;continue;}
+          if(triple&&line.slice(end,end+3)===q+q+q){end+=3;done=true;break;}
+          if(!triple&&line[end]===q){end+=1;done=true;break;}
+          end+=1;
+        }
+        out+='<span class="tok-str">'+esc(line.slice(i,done?end:line.length))+"</span>";
+        i=done?end:line.length;
+        continue;
+      }
+      if(/[0-9]/.test(ch)||(ch==="."&&/[0-9]/.test(line[i+1]||""))){
+        var m=line.slice(i).match(/^(?:0[xX][0-9a-fA-F]+|\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?/);
+        out+='<span class="tok-num">'+esc(m[0])+"</span>";i+=m[0].length;continue;
+      }
+      if(/[A-Za-z_]/.test(ch)){
+        var id=line.slice(i).match(/^[A-Za-z_][A-Za-z0-9_]*/)[0];
+        if(KW[id])out+='<span class="tok-kw">'+id+"</span>";
+        else if(FN[id])out+='<span class="tok-fn">'+id+"</span>";
+        else out+=id;
+        i+=id.length;continue;
+      }
+      out+=esc(ch);i+=1;
+    }
+    return out;
+  }
+  function paint(ta){
+    var pre=ta.closest(".pr-editor").querySelector(".pr-code");
+    pre.innerHTML=ta.value.split("\n").map(colorLine).join("\n")+(ta.value.endsWith("\n")?"\n":"");
+    pre.style.height=ta.style.height;
+    pre.scrollTop=ta.scrollTop;pre.scrollLeft=ta.scrollLeft;
+  }
+  function autosize(ta){ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight+2,460)+"px";}
+  function tune(ta){autosize(ta);paint(ta);}
+  function tabKey(e){
+    if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();var b=this.closest(".pr-cell,#pr-lab").querySelector(".pr-run");if(b)b.click();return;}
+    if(e.key==="Tab"){
+      e.preventDefault();
+      var s=this.selectionStart,en=this.selectionEnd,v=this.value,lineStart=v.lastIndexOf("\n",s-1)+1,lineEnd=v.indexOf("\n",en);
+      if(lineEnd<0)lineEnd=v.length;
+      if(s!==en||e.shiftKey){
+        var block=v.slice(lineStart,lineEnd),lines=block.split("\n"),delta=0;
+        if(e.shiftKey){
+          lines=lines.map(function(line){
+            if(line.startsWith("    ")){delta-=4;return line.slice(4);}
+            if(line.startsWith("\t")){delta-=1;return line.slice(1);}
+            return line;
+          });
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=Math.max(lineStart,s+(s===lineStart?0:Math.max(delta/Math.max(lines.length,1),-4)));
+          this.selectionEnd=Math.max(this.selectionStart,en+delta);
+        }else{
+          lines=lines.map(function(line){delta+=4;return "    "+line;});
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=s+4;
+          this.selectionEnd=en+delta;
+        }
+      }else{
+        this.value=v.slice(0,s)+"    "+v.slice(en);this.selectionStart=this.selectionEnd=s+4;
+      }
+      tune(this);
+      return;
+    }
+    if(e.key==="Enter"){
+      e.preventDefault();
+      var a=this.selectionStart,b=this.selectionEnd,text=this.value,start=text.lastIndexOf("\n",a-1)+1;
+      var prefix=text.slice(start,a),indent=(prefix.match(/^\s*/)||[""])[0],code=prefix.replace(/#.*$/,"").trimEnd();
+      var add="\n"+indent+(/:\s*$/.test(code)?"    ":"");
+      this.value=text.slice(0,a)+add+text.slice(b);
+      this.selectionStart=this.selectionEnd=a+add.length;
+      tune(this);
+      return;
+    }
+  }
+  function makeCell(code){
+    var cell=document.createElement("div");cell.className="pr-cell";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">可运行 · Python (NumPy)</span><span class="pr-status"></span><button class="pr-btn pr-toggle">收起</button><button class="pr-btn pr-run">▶ 运行</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    var ta=cell.querySelector(".pr-edit");ta.value=code;
+    var out=cell.querySelector(".pr-out"),st=cell.querySelector(".pr-status");
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    cell.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    var tog=cell.querySelector(".pr-toggle");
+    tog.onclick=function(){cell.classList.toggle("collapsed");tog.textContent=cell.classList.contains("collapsed")?"展开":"收起";};
+    setTimeout(function(){tune(ta);},0);
+    return cell;
+  }
+  function enhance(){
+    document.querySelectorAll("article pre").forEach(function(pre){
+      if(pre.closest(".pr-cell"))return;
+      var codeEl=pre.querySelector("code")||pre;
+      var code=codeEl.textContent.replace(/\s+$/,"");
+      if(!code)return;
+      pre.replaceWith(makeCell(code));
+    });
+  }
+  function lab(){
+    var fab=document.createElement("button");fab.id="pr-fab";fab.textContent="▶ Python 实验台";
+    var panel=document.createElement("div");panel.id="pr-lab";
+    panel.innerHTML='<div class="pr-head"><span class="pr-title">Python 实验台 · NumPy</span><span class="pr-status"></span><button class="pr-btn pr-run">▶ 运行</button><button class="pr-btn pr-min">收起</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    document.body.appendChild(fab);document.body.appendChild(panel);
+    var ta=panel.querySelector(".pr-edit");
+    ta.value="import numpy as np\na = np.array([3, 2])\nb = np.array([1, 4])\nprint(\"a + b =\", a + b)\nprint(\"a . b =\", a @ b)\nprint(\"|a|  =\", np.linalg.norm(a))\ncos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))\nprint(\"cos =\", round(float(cos), 4))";
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    var out=panel.querySelector(".pr-out"),st=panel.querySelector(".pr-status");
+    panel.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    fab.onclick=function(){panel.classList.toggle("open");};
+    panel.querySelector(".pr-min").onclick=function(){panel.classList.remove("open");};
+    setTimeout(function(){tune(ta);},0);
+  }
+  function init(){enhance();lab();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+
+<script src="../assets/annotator.js"></script>
+</body>
+</html>

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块2 · 第8课 · 现代优化器——SGD、动量、Adam 与调度</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<script src="../assets/theme.js"></script>
+<link rel="stylesheet" href="../assets/annotator.css">
+<link rel="stylesheet" href="../assets/theme.css">
+
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue-bg:#eff6ff;
+--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--pink:#db2777;
+--red:#dc2626;--red-bg:#fef2f2;--bg:#ffffff;--soft:#f8fafc;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);
+font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.85;font-size:17px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:840px;margin:0 auto;padding:0 22px 100px;}
+header.top{background:#fff;border-bottom:1px solid var(--line);padding:26px 22px 22px;margin-bottom:14px;}
+header.top .inner{max-width:840px;margin:0 auto;}
+.crumb{color:var(--muted);font-size:14px;letter-spacing:.3px;margin-bottom:6px;}
+h1{font-size:30px;line-height:1.3;margin:.1em 0 .2em;}
+.sub{color:var(--muted);font-size:15px;}
+article{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:30px 34px;margin-top:18px;}
+h2{font-size:23px;margin:1.7em 0 .6em;padding-bottom:.25em;border-bottom:2px solid var(--line);}
+h2:first-child{margin-top:.2em;}
+h3{font-size:19px;margin:1.3em 0 .4em;color:#0f172a;}
+h4{margin:.2em 0 .5em;font-size:16px;}
+p{margin:.7em 0;}
+ul,ol{padding-left:1.3em;margin:.6em 0;}
+li{margin:.32em 0;}
+code{background:#f1f5f9;padding:.12em .4em;border-radius:5px;font-size:.9em;
+font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a;}
+pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 18px;overflow:auto;font-size:14px;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0;}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:15.5px;}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+thead th{background:var(--soft);}
+figure.fig{margin:1.4em 0;text-align:center;}
+figure.fig svg{max-width:100%;height:auto;}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
+.note,.ml,.key,.pitfall,.example{border-radius:10px;padding:14px 18px;margin:1.2em 0;border:1px solid var(--line);}
+.note{background:var(--soft);border-left:4px solid #94a3b8;}
+.example{background:#fff;border-left:4px solid var(--blue);}
+.ml{background:var(--green-bg);border-left:4px solid var(--green);}
+.key{background:var(--amber-bg);border-left:4px solid var(--amber);}
+.pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.goals{background:var(--blue-bg);border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:10px;padding:14px 20px;margin:.2em 0 1.5em;}
+.goals h4{margin:.1em 0 .5em;color:#1e3a8a;}
+.goals ul{margin:.3em 0;}
+.skip{background:var(--soft);border:1px solid var(--line);border-left:4px solid #94a3b8;border-radius:10px;padding:14px 20px;margin:1.8em 0 0;color:#475569;}
+.skip h4{margin:.1em 0 .5em;color:#475569;}
+.tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
+.toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
+.toc h3{margin:.1em 0 .7em;}
+.toc ol{list-style:none;padding:0;}
+.toc li{padding:7px 10px;border-radius:8px;color:#334155;border:1px solid transparent;}
+.toc li a{color:inherit;text-decoration:none;display:block;}
+.toc li .ln{display:inline-block;min-width:54px;color:var(--muted);font-size:13px;}
+.toc li.cur{background:var(--blue-bg);border-color:#bfdbfe;font-weight:600;color:#1e3a8a;}
+.toc li:not(.cur):hover{background:var(--soft);}
+.navbtns{display:flex;justify-content:space-between;margin-top:22px;gap:12px;}
+.navbtns a{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--ink);}
+.navbtns a:hover{border-color:var(--blue);}
+.navbtns .nlabel{color:var(--muted);font-size:13px;}
+.navbtns .ntitle{font-weight:600;margin-top:3px;}
+.navbtns .next{text-align:right;}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.here{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:6px 0 4px;font-size:15px;color:#1e3a8a;line-height:1.7;}
+.here b{font-weight:700;}
+.cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
+.card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
+.card:hover{border-color:var(--blue);}
+.card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
+.card .ct{font-size:18px;font-weight:600;}
+.card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+.card .cap{margin-left:40px;margin-top:7px;font-size:13px;color:#1e3a8a;}
+.card .cap .lbl{display:inline-block;background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;margin-right:7px;}
+
+.card.soon{opacity:.6;cursor:default;}
+.card.soon:hover{border-color:var(--line);}
+.badge{display:inline-block;background:#e2e8f0;color:#475569;font-size:11px;font-weight:600;padding:1px 8px;border-radius:20px;margin-left:8px;vertical-align:middle;}
+.toc li.soon{color:#94a3b8;}
+.toc li.soon .badge{margin-left:4px;}
+</style>
+</head>
+<body>
+<header class="top"><div class="inner">
+<div class="crumb"><a href="../index.html" style="color:inherit">首页</a>　/　<a href="index.html" style="color:inherit">模块 2 · 概率统计、信息论与最优化</a>　/　第 8 课（共 10 课）</div>
+<h1>现代优化器——SGD、动量、Adam 与调度</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　阶段0：数学与工具基础　·　<strong>能力点：</strong>现代优化器——把损失变成训练好的模型（AdamW+warmup 是大模型标配）</div>
+</div></header>
+<div class="wrap">
+<article>
+<p>上一课我们看清了梯度下降的几何：在病态（ill-conditioned）的损失面上——也就是 Hessian \(H\) 的最大、最小特征值相差悬殊、<strong>条件数（condition number）</strong>很大时——普通梯度下降会在狭长山谷里来回"之字形"震荡，走得又慢又痛苦。这一课我们就来补上工程上真正在用的那套工具：用<strong>随机性</strong>换便宜、用<strong>惯性</strong>压震荡、用<strong>自适应步长</strong>对付病态，再用<strong>调度</strong>稳住训练。学完这一课，你就能看懂任何一份现代深度学习训练脚本里的优化器配置。</p>
+
+<div class="goals"><h4>读完这一课，你将能够</h4><ul>
+<li>解释 full-batch / mini-batch / SGD 的区别，并说清为什么"一小批样本的梯度"是真梯度的<strong>无偏估计</strong>，噪声为什么有用。</li>
+<li>手算一步<strong>动量（momentum）</strong>更新和一步<strong>Adam</strong>更新（含偏差修正），并说明它们各自压住了什么问题。</li>
+<li>梳理 AdaGrad → RMSProp → Adam → AdamW 这条自适应学习率的演化线，并说清 AdamW 为何取代了"Adam + L2"。</li>
+<li>设计一条 <strong>warmup + cosine</strong> 学习率调度曲线，并解释梯度裁剪（gradient clipping）防爆炸的作用。</li>
+<li>用 numpy 在病态二次型上复现 GD / 动量 / Adam 的收敛差异，并观察动量如何减少之字形。</li>
+</ul></div>
+
+<h2>一、为什么不用全部数据算梯度：SGD 的便宜与噪声</h2>
+
+<p>先回到最朴素的设定。我们要最小化训练集上的平均损失：</p>
+\[ L(\theta)=\frac1N\sum_{i=1}^N \ell_i(\theta),\qquad \nabla L(\theta)=\frac1N\sum_{i=1}^N \nabla\ell_i(\theta). \]
+<p>这叫 <strong>全批梯度下降（full-batch GD）</strong>：每走一步，都要扫一遍全部 \(N\) 个样本求平均梯度。当 \(N\) 是百万、上亿时，光算一步就要把整个数据集过一遍——慢到无法接受。</p>
+
+<div class="note"><strong>直觉：</strong>你想知道"全国人的平均身高"，难道要量每一个人吗？随机抽 100 个人量一量，平均值就已经很接近真值了。<strong>随机梯度下降（Stochastic Gradient Descent, SGD）</strong>就是这个"抽样"思想用在梯度上：随机抽一个（或一小批）样本，用它们的梯度当作全体梯度的近似，省钱地往前走一步。</div>
+
+<p>关键在于这个近似是<strong>无偏的（unbiased）</strong>。呼应模块2第1课讲的蒙特卡洛与无偏估计：如果随机均匀抽一个样本下标 \(i\sim \mathrm{Uniform}\{1,\dots,N\}\)，那么单样本梯度 \(\nabla\ell_i(\theta)\) 是随机变量，它的期望恰好是真梯度</p>
+\[ \mathbb{E}_{i}\big[\nabla\ell_i(\theta)\big]=\frac1N\sum_{i=1}^N\nabla\ell_i(\theta)=\nabla L(\theta). \]
+<p>也就是说，SGD 走的方向<strong>平均而言是对的</strong>，只是每一步带了随机噪声。抽一小批 \(\mathcal B\)（大小 \(|\mathcal B|=B\)）取平均，估计仍无偏，但方差按 \(\propto 1/B\) 缩小——批量越大越平稳，但每步越贵。这是个权衡（trade-off）。</p>
+
+<figure class="fig"><svg viewBox="0 0 520 340" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, system-ui, sans-serif" role="img"><title>full-batch 平滑下降 vs SGD 带噪但更快取得进展的 loss 曲线对比</title><text x="260" y="26" text-anchor="middle" font-size="14" font-weight="bold" fill="#1f2937">full-batch（平滑） vs SGD（带噪但快）</text><g stroke="#e2e8f0" stroke-width="0.75"><line x1="60" y1="240" x2="480" y2="240"/><line x1="60" y1="180" x2="480" y2="180"/><line x1="60" y1="120" x2="480" y2="120"/><line x1="60" y1="60" x2="480" y2="60"/></g><line x1="60" y1="60" x2="60" y2="290" stroke="#94a3b8" stroke-width="1"/><line x1="60" y1="290" x2="480" y2="290" stroke="#94a3b8" stroke-width="1"/><text x="270" y="322" text-anchor="middle" font-size="12" fill="#1f2937">迭代步数 (iteration)</text><text x="22" y="175" text-anchor="middle" font-size="12" fill="#1f2937" transform="rotate(-90 22 175)">loss</text><polyline fill="none" stroke="#2563eb" stroke-width="2" points="60,72 84,108 108,135 132,158 156,177 180,193 204,206 228,217 252,225 276,232 300,237 324,241 348,244 372,246 396,247.5 420,248.5 444,249 468,249.5"/><polyline fill="none" stroke="#d97706" stroke-width="2" points="60,72 84,96 108,127 132,108 156,148 180,127 204,166 228,144 252,174 276,156 300,191 324,170 348,199 372,184 396,210 420,196 444,216 468,205"/><g transform="translate(300,68)"><rect x="0" y="0" width="172" height="48" fill="#ffffff" fill-opacity="0.85" stroke="#e2e8f0" stroke-width="0.75" rx="4"/><line x1="12" y1="16" x2="34" y2="16" stroke="#2563eb" stroke-width="2"/><text x="42" y="20" font-size="12" fill="#1f2937">full-batch：平滑、近单调</text><line x1="12" y1="36" x2="34" y2="36" stroke="#d97706" stroke-width="2"/><text x="42" y="40" font-size="12" fill="#1f2937">SGD：带噪抖动、每步便宜</text></g></svg><figcaption>图1：full-batch（蓝色，平滑近单调下降）vs SGD（橙色，带噪抖动但更快取得进展）的 loss 曲线对比。数值取自正文实验3的真实运行趋势。</figcaption></figure>
+
+<div class="key"><strong>关键结论：</strong>full-batch 的 loss 曲线平滑、几乎单调下降；SGD 的 loss 曲线带噪、上下抖动，但<strong>单位时间内进展更快</strong>，因为每步便宜太多。实践中我们几乎总用 <strong>mini-batch</strong>（典型 \(B=32\sim 8192\)），在"每步成本"和"梯度方差"之间取折中。</div>
+
+<h3>厘清三个被滥用的词：epoch / batch / iteration</h3>
+<ul>
+<li><strong>batch（批）</strong>：一次前向+反向用到的那一小撮样本，大小 \(B\)。</li>
+<li><strong>iteration（迭代 / step）</strong>：用一个 batch 完成的<strong>一次参数更新</strong>。</li>
+<li><strong>epoch（轮）</strong>：把整个训练集完整过一遍。一个 epoch 包含 \(\lceil N/B\rceil\) 个 iteration。</li>
+</ul>
+<p>举例：\(N=50000\)、\(B=100\)，则一个 epoch = 500 个 iteration。训练 10 个 epoch = 5000 次参数更新。注意 full-batch GD 里"一个 epoch = 一步"，而 SGD/mini-batch 里"一个 epoch = 很多步"——这正是后者收敛快的直观原因。</p>
+
+<div class="ml"><h4><span class="tag">ML</span> 和 ML 的联系：噪声不是纯坏事</h4>
+<p>上一课担心的<strong>鞍点（saddle point）</strong>——梯度为零但既非极小也非极大的点，在高维里多得是。full-batch GD 一旦精确踩到鞍点附近、梯度趋零，就可能<strong>卡住</strong>。而 SGD 的梯度自带随机噪声，相当于不停地轻轻"踹"参数一脚，帮它<strong>抖出鞍点</strong>、逃离尖锐的坏极小值。所以在深度学习里，SGD 的噪声常被看作一种隐式的、有益的正则化，而非缺陷。</p></div>
+
+<h2>二、动量：给小球加上惯性，压住之字形</h2>
+
+<p>回到病态山谷的之字形问题。普通 GD 的麻烦在于：在陡峭方向（大特征值）上步子太大、来回弹跳；在平缓方向（小特征值）上步子太小、推进缓慢。每一步只看<strong>当前</strong>梯度，没有记忆，于是被陡峭方向的反复横跳主导。</p>
+
+<div class="note"><strong>直觉：</strong>想象一个小球从山谷壁上滚下。它不会每一步都听任当前坡度乱拐，而是<strong>带着惯性（momentum）</strong>——往谷底方向积累的速度会保留下来，左右横跳的分量则因为方向反复、正负相消而被抵消。结果：横向震荡被压平，纵向（指向谷底）的速度越滚越快。</div>
+
+<p>把这个"惯性"写成公式，就是维护梯度的累加作为"速度" \(v\)：</p>
+\[ v \leftarrow \beta\, v + \nabla L(\theta),\qquad \theta \leftarrow \theta - \eta\, v. \]
+<p>其中 \(\beta\in[0,1)\)（典型 \(0.9\)）是动量系数。从 \(v_0=0\) 展开看，\(v\) 是历史梯度的加权和 \(v_t=\sum_{k=0}^{t-1}\beta^{\,k}\nabla L(\theta_{t-k})\)：越近的梯度权重越大（当前梯度系数恰为 1），越远的按 \(\beta^k\) 几何衰减。\(\beta=0\) 就退化回普通 GD。</p>
+
+<div class="note"><strong>一个容易踩的坑——这里的 \(v\) 不是"平均"，是"加权和"。</strong>注意上式没有 \(1-\beta\) 因子（这叫<strong>无归一化（un-normalized）</strong>的指数滑动平均，是 SGD-momentum 的默认写法）。在方向一致的稳态下，\(v\) 会趋于约 \(\dfrac{1}{1-\beta}=10\) 倍的单步梯度——它是"把最近约 10 步的梯度按几何权重<strong>累加</strong>"，量级被放大了约 10 倍，而<strong>不是</strong>对它们取平均。所以配套的学习率要相应调小：这正是后面实验 1 里动量用 \(\eta=0.01\)、而 GD 用 \(\eta=0.035\) 差了约一个量级的原因。下一节 RMSProp / Adam 用的是<strong>带 \(1-\beta\) 因子</strong>的归一化形式，那里的 \(v\) 才是真正的"平均"，量级与单步梯度相当，无需为此另调学习率。</div>
+
+<figure class="fig"><svg viewBox="0 0 560 380" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, system-ui, sans-serif" role="img"><title>病态狭长山谷中普通 GD 之字形横跳与带动量直冲谷底的对比</title><defs><marker id="arrOrange" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#d97706"/></marker><marker id="arrBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/></marker></defs><text x="280" y="28" text-anchor="middle" font-size="15" font-weight="bold" fill="#1f2937">动量 = 惯性：之字形 vs 直冲谷底</text><g transform="translate(280,190)"><ellipse cx="0" cy="0" rx="225" ry="52" fill="none" stroke="#e2e8f0" stroke-width="1.5"/><ellipse cx="0" cy="0" rx="172" ry="40" fill="none" stroke="#e2e8f0" stroke-width="1.5"/><ellipse cx="0" cy="0" rx="118" ry="28" fill="none" stroke="#e2e8f0" stroke-width="1.5"/><ellipse cx="0" cy="0" rx="64" ry="15" fill="none" stroke="#e2e8f0" stroke-width="1.5"/><polyline fill="none" stroke="#d97706" stroke-width="2" points="-208,-46 -180,40 -152,-36 -125,32 -100,-27 -77,24 -56,-18 -39,16 -26,-11 -16,10 -9,-6 -3,4"/><line x1="-3" y1="4" x2="0" y2="0" stroke="#d97706" stroke-width="2" marker-end="url(#arrOrange)"/><polyline fill="none" stroke="#2563eb" stroke-width="2.5" points="-208,-46 -166,-17 -120,-5 -76,2 -40,1 -14,0"/><line x1="-14" y1="0" x2="0" y2="0" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrBlue)"/><circle cx="0" cy="0" r="4" fill="#059669"/><text x="9" y="-7" font-size="12" fill="#059669">谷底</text><circle cx="-208" cy="-46" r="4" fill="#1f2937"/><text x="-204" y="-52" font-size="12" fill="#1f2937">起点</text></g><g><circle cx="120" cy="330" r="5" fill="#d97706"/><text x="134" y="335" font-size="13" fill="#1f2937">普通 GD：横向梯度反复，之字形横跳</text><circle cx="120" cy="356" r="5" fill="#2563eb"/><text x="134" y="361" font-size="13" fill="#1f2937">带动量：EMA 抵消横向、累加纵向，更直冲谷底</text></g></svg><figcaption>图2：病态狭长山谷（椭圆等高线）里，普通 GD（橙色）来回之字形横跳，带动量（蓝色）靠惯性更直地冲向谷底。横向反复的梯度被 EMA 平均抵消，纵向梯度累加加速。</figcaption></figure>
+
+<p>为什么能压震荡？在横向（陡峭）方向，相邻梯度<strong>正负交替</strong>，加权平均后大量抵消，\(v\) 的横向分量很小；在纵向（指向谷底）方向，梯度<strong>方向一致</strong>，加权累加，\(v\) 的纵向分量越来越大。于是路径更"直"地冲向谷底——这正是我们在代码里会量化看到的：之字形的符号翻转次数大幅下降。</p>
+
+<div class="example"><h4>例题：手算一步动量更新</h4>
+<p>设某参数 \(\theta=2.0\)，当前梯度 \(\nabla L=4.0\)，上一时刻速度 \(v=1.0\)，取 \(\beta=0.9\)、\(\eta=0.1\)。</p>
+<p>先更新速度：\(v \leftarrow 0.9\times 1.0 + 4.0 = 4.9\)。</p>
+<p>再更新参数：\(\theta \leftarrow 2.0 - 0.1\times 4.9 = 1.51\)。</p>
+<p>对比：若用普通 GD（无动量），这一步只会走 \(2.0-0.1\times4.0=1.6\)。动量因为继承了上一步的速度 \(v=1.0\)，走得更远了一点——在方向一致时这种"加速"正是我们想要的。</p></div>
+
+<h2>三、自适应学习率：从 AdaGrad 到 RMSProp 到 Adam</h2>
+
+<p>动量解决了"方向"问题，但还有个"步长"问题：不同参数该用不同大小的步子。比如 NLP 里高频词的梯度大、低频词的梯度小，用同一个 \(\eta\) 要么对前者太大、要么对后者太小。<strong>自适应学习率（adaptive learning rate）</strong>的思路是：<strong>逐参数</strong>地，让历史上梯度大的方向步子小一点、梯度小的方向步子大一点。</p>
+
+<h3>AdaGrad：累积梯度平方</h3>
+<p>给每个参数维护它历史梯度平方的累加 \(G\leftarrow G+g^2\)，更新时除以 \(\sqrt G\)：</p>
+\[ G \leftarrow G + g^2,\qquad \theta \leftarrow \theta - \frac{\eta}{\sqrt{G}+\epsilon}\,g. \]
+<p>梯度一直很大的方向，\(G\) 累积得快，有效步长 \(\eta/\sqrt G\) 被压小；很少更新的方向步长保持较大。（这里的 \(\epsilon\) 是个防除零的极小数，典型 \(10^{-8}\)，下同。）</p>
+<div class="pitfall"><strong>易错 / 缺陷：</strong>\(G\) 是<strong>单调递增、永不减小</strong>的累加。训练久了 \(G\to\infty\)，于是有效学习率 \(\to 0\)，参数<strong>过早地停止更新</strong>，哪怕还远没收敛。这是 AdaGrad 的致命伤。</div>
+
+<h3>RMSProp：把累加换成滑动平均</h3>
+<p>修复办法很自然：别让 \(G\) 无限累加，改成<strong>指数滑动平均</strong>，只记住"最近"的梯度平方规模：</p>
+\[ v \leftarrow \rho\, v + (1-\rho)\, g^2,\qquad \theta \leftarrow \theta - \frac{\eta}{\sqrt{v}+\epsilon}\,g. \]
+<p>注意这里带了 \(1-\rho\) 因子（归一化 EMA），\(v\) 是梯度平方的<strong>平均</strong>而非累加。\(\rho\)（典型 \(0.99\)）一衰减，旧的梯度平方就被遗忘，\(v\) 不再无限增长，学习率不会过早归零。这就是 RMSProp。</p>
+
+<h3>Adam = 动量 + RMSProp + 偏差修正</h3>
+<p>Adam（Adaptive Moment Estimation）把两条线合一：用一阶矩 \(m\)（梯度的 EMA，即动量）定<strong>方向</strong>，用二阶矩 \(v\)（梯度平方的 EMA，即 RMSProp）定每个参数的<strong>步长</strong>。注意这里的 \(m\) 用的是<strong>带 \(1-\beta_1\) 因子的归一化形式</strong>（与上一节无归一化的动量 \(v\) 略有差别，量级回到与单步梯度相当）：</p>
+\[ m \leftarrow \beta_1 m + (1-\beta_1)\,g,\qquad v \leftarrow \beta_2 v + (1-\beta_2)\,g^2. \]
+<p>但有个细节：\(m,v\) 都从 \(0\) 初始化，训练最初几步它们被"拉向零"，<strong>系统性偏小</strong>（有偏估计）。Adam 用<strong>偏差修正（bias correction）</strong>除掉这个偏：</p>
+\[ \hat m = \frac{m}{1-\beta_1^{\,t}},\qquad \hat v = \frac{v}{1-\beta_2^{\,t}},\qquad \theta \leftarrow \theta - \eta\,\frac{\hat m}{\sqrt{\hat v}+\epsilon}. \]
+<p>其中 \(t\) 是步数（从 1 开始）。\(t\) 很小时分母 \(1-\beta_1^t\) 远小于 1，把被低估的 \(m\) 放大回正常规模；\(t\) 变大后 \(\beta_1^t\to0\)，修正因子 \(\to1\)，自动失效。典型超参：\(\beta_1=0.9,\ \beta_2=0.999,\ \epsilon=10^{-8}\)。</p>
+
+<figure class="fig"><svg viewBox="0 0 560 320" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>Adam 三件套结构图：一阶矩动量定方向、二阶矩 RMSProp 定逐参数步长，经偏差修正后合成最终参数更新</title><defs><marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto-start-reverse"><path d="M0,0 L7,3 L0,6 Z" fill="#94a3b8"/></marker></defs><text x="280" y="26" text-anchor="middle" font-size="15" font-weight="bold" fill="#1f2937">Adam = 动量 + 自适应 + 偏差修正</text><rect x="20" y="58" width="170" height="62" rx="8" fill="#2563eb" fill-opacity="0.12" stroke="#2563eb" stroke-width="1.5"/><text x="105" y="82" text-anchor="middle" font-size="14" font-weight="bold" fill="#1f2937">一阶矩 m（动量）</text><text x="105" y="100" text-anchor="middle" font-size="12" fill="#1f2937">m←β₁m+(1−β₁)g</text><text x="105" y="114" text-anchor="middle" font-size="11" fill="#2563eb">定方向</text><rect x="20" y="198" width="170" height="62" rx="8" fill="#059669" fill-opacity="0.12" stroke="#059669" stroke-width="1.5"/><text x="105" y="222" text-anchor="middle" font-size="14" font-weight="bold" fill="#1f2937">二阶矩 v（RMSProp）</text><text x="105" y="240" text-anchor="middle" font-size="12" fill="#1f2937">v←β₂v+(1−β₂)g²</text><text x="105" y="254" text-anchor="middle" font-size="11" fill="#059669">定逐参数步长</text><rect x="240" y="98" width="148" height="122" rx="8" fill="#d97706" fill-opacity="0.12" stroke="#d97706" stroke-width="1.5"/><text x="314" y="128" text-anchor="middle" font-size="14" font-weight="bold" fill="#1f2937">偏差修正</text><text x="314" y="160" text-anchor="middle" font-size="14" fill="#1f2937">m̂ = m /(1−β₁ᵗ)</text><text x="314" y="190" text-anchor="middle" font-size="14" fill="#1f2937">v̂ = v /(1−β₂ᵗ)</text><rect x="438" y="106" width="110" height="106" rx="8" fill="#db2777" fill-opacity="0.12" stroke="#db2777" stroke-width="1.5"/><text x="493" y="134" text-anchor="middle" font-size="14" font-weight="bold" fill="#1f2937">最终更新</text><text x="493" y="166" text-anchor="middle" font-size="13" fill="#1f2937">θ ← θ −</text><text x="493" y="186" text-anchor="middle" font-size="13" fill="#1f2937">η·m̂</text><text x="493" y="204" text-anchor="middle" font-size="13" fill="#1f2937">/(√v̂+ε)</text><line x1="190" y1="92" x2="237" y2="135" stroke="#94a3b8" stroke-width="2" marker-end="url(#ar)"/><line x1="190" y1="226" x2="237" y2="183" stroke="#94a3b8" stroke-width="2" marker-end="url(#ar)"/><line x1="388" y1="159" x2="435" y2="159" stroke="#94a3b8" stroke-width="2" marker-end="url(#ar)"/><text x="280" y="300" text-anchor="middle" font-size="11" fill="#94a3b8">m 提供方向 · v 提供逐参数缩放 · 修正消除初期偏向 0 的偏差</text></svg><figcaption>图3：Adam 三件套结构图。一阶矩 m（动量，定方向）+ 二阶矩 v（RMSProp，定逐参数步长）→ 偏差修正 m̂, v̂ → 合成最终更新 θ ← θ − η·m̂/(√v̂+ε)。</figcaption></figure>
+
+<div class="example"><h4>例题：手算一步 Adam 更新（含偏差修正）</h4>
+<p>设第 1 步（\(t=1\)），某参数 \(\theta=1.0\)，梯度 \(g=0.2\)，初始 \(m=0,\ v=0\)，取 \(\beta_1=0.9,\ \beta_2=0.999,\ \eta=0.1,\ \epsilon=10^{-8}\)。</p>
+<p>一阶矩：\(m=0.9\cdot0+0.1\cdot0.2=0.02\)。</p>
+<p>二阶矩：\(v=0.999\cdot0+0.001\cdot0.2^2=0.00004\)。</p>
+<p>偏差修正：\(\hat m=\dfrac{0.02}{1-0.9^1}=\dfrac{0.02}{0.1}=0.2\)；\(\quad\hat v=\dfrac{0.00004}{1-0.999^1}=\dfrac{0.00004}{0.001}=0.04\)。</p>
+<p>更新量：\(\eta\dfrac{\hat m}{\sqrt{\hat v}+\epsilon}=0.1\times\dfrac{0.2}{\sqrt{0.04}+10^{-8}}=0.1\times\dfrac{0.2}{0.2}=0.1\)。</p>
+<p>于是 \(\theta\leftarrow 1.0-0.1=0.9\)。</p>
+<p><strong>注意这个漂亮的现象：</strong>偏差修正后，第一步的更新量恰好约等于 \(\eta\)（步长）本身，<strong>几乎与梯度大小无关</strong>。这说明 Adam 把步长"归一化"了——梯度是 0.2 还是 200，第一步走的距离都差不多是 \(\eta\)。这让 Adam 对梯度尺度（scale）非常鲁棒，也是它在各种网络上"开箱即用"的原因。</p>
+<p><strong>但别误以为 Adam 每步都走满 \(\eta\)。</strong>更新量约等于 \(\eta\) 只在某方向上<strong>历史梯度方向一致</strong>时成立——这时 \(|\hat m|\) 与 \(\sqrt{\hat v}\) 同量级，比值约为 1。反过来，若某方向梯度<strong>反复变号、正负相消</strong>，一阶矩 \(\hat m\) 会被抵消得很小、而二阶矩 \(\hat v\)（用平方、永远为正）几乎不变，于是 \(\hat m/\sqrt{\hat v}\) 变小、该方向步长<strong>自动缩小</strong>。这种"噪声方向自动减速"正是 Adam 在带噪 mini-batch 上既快又稳的关键——它和上一节动量"正负相消压横向震荡"其实是同一个直觉的两种体现。</p></div>
+
+<div class="ml"><h4><span class="tag">ML</span> Adam 是"廉价的对角近似二阶方法"</h4>
+<p>理想的二阶方法是<strong>牛顿法</strong>：\(\theta\leftarrow\theta-H^{-1}\nabla L\)，它用 Hessian \(H\) 拉正病态、一步到位。但 \(H\) 是 \(d\times d\) 矩阵，求逆要 \(O(d^3)\)，而深度网络 \(d\) 动辄上亿——<strong>完全不可行</strong>。所以深度学习几乎全用一阶方法。Adam 里的 \(\sqrt{\hat v}\) 可以看作对 Hessian <strong>对角线</strong>的一个廉价估计：用梯度平方近似曲率，逐参数地缩放步长。它不是真二阶，但抓住了二阶"按曲率调步长"的精髓，代价只有 \(O(d)\)。</p></div>
+
+<h2>四、AdamW：为什么不是"Adam + L2"</h2>
+
+<p>训练里常加<strong>权重衰减（weight decay）</strong>把参数往 0 拉，防过拟合。传统做法是在损失里加 L2 正则项 \(\frac\lambda2\|\theta\|^2\)，它的梯度是 \(\lambda\theta\)，直接并进 \(g\) 里。在<strong>最朴素的 SGD（无动量、定学习率）</strong>上，"L2 正则"和"权重衰减"完全等价——把 \(\lambda\theta\) 加进梯度，效果就等于每步把 \(\theta\) 按比例往 0 收缩。</p>
+
+<div class="pitfall"><strong>易错：一旦更新变成"有状态"的，两者就不再等价！</strong>问题的根源是：把 \(\lambda\theta\) 塞进梯度，它就会被卷进优化器的<strong>内部状态</strong>里被扭曲。在<strong>带动量</strong>的 SGD 上已经萌芽——\(\lambda\theta\) 会进入动量缓冲被一起滑动平均，而真正的权重衰减不会。到了 <strong>Adam</strong> 上最严重：\(\lambda\theta\) 会一起被 \(\sqrt{\hat v}\) 除一遍，于是梯度大（\(\hat v\) 大）的参数其衰减被<strong>削弱</strong>、梯度小的参数衰减被放大——衰减力度被自适应分母<strong>扭曲</strong>，不再是我们想要的"对所有参数一视同仁地往 0 拉"。</div>
+
+<p><strong>AdamW</strong> 的修复叫<strong>解耦权重衰减（decoupled weight decay）</strong>：把权重衰减从梯度里拿出来，<strong>不</strong>经过任何优化器状态（动量、自适应分母），直接作用在参数上：</p>
+\[ \theta \leftarrow \theta - \eta\Big(\frac{\hat m}{\sqrt{\hat v}+\epsilon} + \lambda\,\theta\Big). \]
+<p>这样衰减项 \(\lambda\theta\) 干净地、按统一比例把每个参数往 0 收缩，与自适应步长互不干扰。</p>
+
+<div class="key"><strong>关键结论：</strong>AdamW 是当今 <strong>Transformer / 大语言模型（LLM）训练的事实标准</strong>。凡是看到 Transformer 训练脚本，优化器几乎一定是 AdamW 而非朴素 Adam。记住一句话：<em>只要优化器是有状态的（动量或自适应分母），就别把 L2 塞进梯度，改用解耦权重衰减（AdamW）。</em></div>
+
+<h2>五、学习率调度：warmup 与 cosine 衰减</h2>
+
+<p>学习率 \(\eta\) 不必是常数，让它<strong>随训练过程变化</strong>往往更好。两个最常见的部件：</p>
+
+<h3>线性 warmup（预热）</h3>
+<p>训练<strong>最开始</strong>，参数是随机初始化的，\(\hat v\) 的统计量还没积累准、梯度可能很离谱。这时若直接用大学习率，一步走太远，loss 容易直接变成 <code>NaN</code>（爆掉）。<strong>warmup</strong> 让 \(\eta\) 从 0（或很小）<strong>线性</strong>爬升到目标值，给优化器一段"热身"时间稳住统计量。</p>
+<div class="note"><strong>直觉：</strong>冷启动的发动机别一脚地板油。warmup 就是先怠速几分钟再加速。<strong>Transformer 训练几乎必备 warmup</strong>——这是踩过无数 NaN 后的经验共识。</div>
+
+<h3>cosine 衰减</h3>
+<p>热身结束后，让 \(\eta\) 按<strong>余弦曲线</strong>平滑地从峰值降到接近 0。前期大步快速探索，后期小步精细收敛（在极小值附近别再乱跳）。设 warmup 步数 \(T_w\)、总步数 \(T\)、峰值 \(\eta_{\max}\)：</p>
+\[ \eta(t)=\begin{cases}\eta_{\max}\,\dfrac{t}{T_w}, & t<T_w\quad(\text{线性 warmup})\\[2mm] \dfrac{\eta_{\max}}{2}\Big(1+\cos\dfrac{\pi(t-T_w)}{T-T_w}\Big), & t\ge T_w\quad(\text{cosine 衰减}).\end{cases} \]
+
+<figure class="fig"><svg viewBox="0 0 540 340" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>线性 warmup + cosine 衰减的学习率调度曲线</title><defs><marker id="ax" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M0,0 L6,3 L0,6" fill="none" stroke="#94a3b8" stroke-width="1.2"/></marker></defs><text x="270" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="#1f2937">学习率调度：线性 warmup + cosine 衰减</text><line x1="70" y1="80" x2="70" y2="280" stroke="#94a3b8" stroke-width="1" marker-start="url(#ax)"/><line x1="70" y1="270" x2="510" y2="270" stroke="#94a3b8" stroke-width="1" marker-end="url(#ax)"/><line x1="66" y1="85" x2="70" y2="85" stroke="#94a3b8" stroke-width="1"/><text x="60" y="89" text-anchor="end" font-size="12" fill="#1f2937">η_max</text><line x1="66" y1="270" x2="70" y2="270" stroke="#94a3b8" stroke-width="1"/><text x="60" y="274" text-anchor="end" font-size="12" fill="#1f2937">0</text><text x="290" y="305" text-anchor="middle" font-size="13" fill="#1f2937">训练步数 t</text><text x="26" y="180" text-anchor="middle" font-size="13" fill="#1f2937" transform="rotate(-90 26 180)">学习率 η</text><line x1="130" y1="85" x2="130" y2="270" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/><text x="130" y="288" text-anchor="middle" font-size="12" fill="#1f2937">warmup 结束</text><polyline fill="none" stroke="#db2777" stroke-width="2" points="70,270 130,85"/><path d="M130,85 C 175,86 205,100 235,128 C 270,162 300,205 345,238 C 395,262 455,270 490,270" fill="none" stroke="#2563eb" stroke-width="2"/><circle cx="130" cy="85" r="3.5" fill="#d97706"/><text x="138" y="78" font-size="12" fill="#1f2937">峰值 η_max</text><rect x="320" y="92" width="14" height="3" fill="#db2777"/><text x="340" y="98" font-size="12" fill="#1f2937">线性 warmup（防初期 NaN）</text><rect x="320" y="112" width="14" height="3" fill="#2563eb"/><text x="340" y="118" font-size="12" fill="#1f2937">cosine 衰减（精细收敛至 0）</text></svg><figcaption>图4：warmup + cosine 学习率调度曲线。先线性 warmup 从 0 爬升到峰值 η_max（防初期 NaN），再按 cosine 平滑衰减到 0（后期精细收敛）。竖虚线标出 warmup 结束点。</figcaption></figure>
+
+<h3>梯度裁剪（gradient clipping）</h3>
+<p>即便有了 warmup，偶尔还会撞上一个异常大的梯度（尤其 RNN / Transformer），一步把参数甩飞。<strong>梯度裁剪</strong>给梯度范数设上限：若 \(\|g\|>c\)，就把整个梯度按比例缩回到范数为 \(c\)：</p>
+\[ g \leftarrow g\cdot\min\!\Big(1,\ \frac{c}{\|g\|}\Big). \]
+<p>方向不变，只削掉过大的长度。它是防"梯度爆炸（gradient explosion）"导致 NaN 的廉价保险，几乎所有大模型训练都开着（典型 \(c=1.0\)）。</p>
+<div class="pitfall"><strong>易错：裁剪只保证"不爆"，不保证"收敛得好"。</strong>它把梯度范数硬压到不超过 \(c\)，如果 \(c\) 相对真实梯度范数太小，步子会被掐得过死、收敛变慢（你在练习 4 里会亲眼看到：救回来了，但 200 步还远没到谷底）。所以梯度裁剪是<strong>防爆炸的保险</strong>，不是<strong>调步长的手段</strong>——别指望它替你把学习率调对。</div>
+
+<h2>调一调，观察现象</h2>
+<p>下面三个小实验都用同一个病态二次型 \(L(\theta)=\frac12(\theta_1^2+50\,\theta_2^2)\)（条件数 50，谷底在原点），亲手感受三种优化器的差异。改一个东西，先猜会发生什么，再跑验证。</p>
+
+<div class="example"><h4>实验 1：在病态山谷上比 GD / 动量 / Adam</h4>
+<p><strong>改什么：</strong>对同一个起点 \((5,5)\) 跑三种优化器各 200 步。注意三者学习率不同：GD 用 0.035、动量用 0.01、Adam 用 0.2。<strong>动量学习率比 GD 小约一个量级，正是因为前面说过的——动量的 \(v\) 是梯度的"加权和（约 10 倍量级）"而非平均，所以配套 \(\eta\) 要相应调小。</strong><br>
+<strong>预期看到：</strong>最终 loss 大致 GD ≈ \(8\times10^{-6}\) &gt; 动量 ≈ \(2\times10^{-7}\) &gt; Adam ≈ \(4\times10^{-8}\)。即<strong>动量和 Adam 都明显比普通 GD 收敛得更低</strong>。<br>
+<strong>为什么：</strong>病态方向 \(\theta_2\)（曲率 50）逼着 GD 用极小的 \(\eta\)（必须 \(<2/50\)）才不发散，于是平缓方向 \(\theta_1\) 爬得奇慢；动量靠惯性加速平缓方向，Adam 靠 \(\sqrt{\hat v}\) 把两个方向的步长拉到同一量级，两者都绕开了病态的束缚。</p>
+<pre><code>import numpy as np
+a, b = 1.0, 50.0                      # 条件数 = 50（病态）
+def grad(p): return np.array([a*p[0], b*p[1]])
+def loss(p): return 0.5*(a*p[0]**2 + b*p[1]**2)
+
+def gd(eta, steps):
+    p = np.array([5.0, 5.0])
+    for _ in range(steps): p = p - eta*grad(p)
+    return loss(p)
+
+def momentum(eta, beta, steps):
+    p = np.array([5.0, 5.0]); v = np.zeros(2)
+    for _ in range(steps):
+        v = beta*v + grad(p); p = p - eta*v
+    return loss(p)
+
+def adam(eta, steps):
+    p = np.array([5.0, 5.0]); m = np.zeros(2); v = np.zeros(2)
+    b1, b2, eps = 0.9, 0.999, 1e-8
+    for t in range(1, steps+1):
+        g = grad(p)
+        m = b1*m + (1-b1)*g
+        v = b2*v + (1-b2)*g*g
+        mh = m/(1-b1**t); vh = v/(1-b2**t)
+        p = p - eta*mh/(np.sqrt(vh)+eps)
+    return loss(p)
+
+print("GD      :", gd(0.035, 200))         # ~8e-6
+print("Momentum:", momentum(0.01, 0.9, 200))  # ~2e-7
+print("Adam    :", adam(0.2, 200))         # ~4e-8</code></pre></div>
+
+<div class="example"><h4>实验 2：量化动量如何减少之字形</h4>
+<p><strong>改什么：</strong>记录每步后病态坐标 \(\theta_2\) 的符号，数它在 60 步里<strong>翻转</strong>了多少次（翻转 = 越过谷底来回横跳）。<br>
+<strong>预期看到：</strong>普通 GD 约 <strong>59</strong> 次翻转（几乎每步都横跳一次），加动量后骤降到约 <strong>14</strong> 次。<br>
+<strong>为什么：</strong>动量把方向反复的横向梯度平均掉了，路径变"直"，越过谷底的次数自然大减。</p>
+<pre><code>import numpy as np
+a, b = 1.0, 50.0
+def grad(p): return np.array([a*p[0], b*p[1]])
+def flips(ys):
+    s = np.sign(ys)
+    return int(np.sum(s[1:]*s[:-1] < 0))   # 相邻符号相反 = 一次翻转
+
+p = np.array([5.0,5.0]); ys=[]
+for _ in range(60): p = p - 0.035*grad(p); ys.append(p[1])
+print("GD   翻转次数:", flips(ys))          # ~59
+
+p = np.array([5.0,5.0]); v=np.zeros(2); ys=[]
+for _ in range(60): v=0.9*v+grad(p); p=p-0.01*v; ys.append(p[1])
+print("动量 翻转次数:", flips(ys))          # ~14</code></pre></div>
+
+<div class="example"><h4>实验 3：full-batch 平滑 vs SGD 带噪</h4>
+<p><strong>改什么：</strong>同一个线性回归问题，一次用全部样本算梯度，一次每步只随机抽 1 个样本。打印 loss 序列。<br>
+<strong>预期看到：</strong>full-batch 的 loss <strong>单调平滑</strong>下降；SGD 的 loss <strong>上下抖动</strong>但总体也在降。再验证一行：单样本梯度的平均<strong>精确等于</strong>全梯度（无偏）。<br>
+<strong>为什么：</strong>SGD 每步用的是真梯度的无偏但带噪估计，方向平均对、单步有抖动。</p>
+<pre><code>import numpy as np
+rng = np.random.default_rng(0)
+N, d = 200, 5
+X = rng.normal(size=(N,d)); w_true = rng.normal(size=d)
+y = X @ w_true + 0.1*rng.normal(size=N)
+def full_loss(w): r = X@w - y; return 0.5*np.mean(r**2)
+
+w = np.zeros(d)                       # full-batch
+for t in range(30):
+    g = X.T@(X@w - y)/N; w = w - 0.1*g
+    if t%6==0: print("full ", round(full_loss(w),3))
+
+w = np.zeros(d)                       # SGD, batch=1
+for t in range(30):
+    i = rng.integers(N); xi = X[i]
+    g = xi*(xi@w - y[i]); w = w - 0.1*g
+    if t%6==0: print("sgd  ", round(full_loss(w),3))
+
+# 无偏性：逐样本梯度的平均 == 全梯度
+w = rng.normal(size=d)
+full_g = X.T@(X@w - y)/N
+samp   = np.mean([X[i]*(X[i]@w - y[i]) for i in range(N)], axis=0)
+print("无偏（两者相等）:", np.allclose(full_g, samp))   # True</code></pre></div>
+
+<h2>动手练习</h2>
+<ol>
+<li><strong>手算第二步 Adam。</strong>接正文 Adam 例题（第 1 步后 \(\theta=0.9,\ m=0.02,\ v=0.00004\)）。设第 2 步梯度仍是 \(g=0.2\)，手算 \(t=2\) 的 \(m,v,\hat m,\hat v\) 与新的 \(\theta\)，再写代码验证。提示：偏差修正分母用 \(1-\beta_1^2,\ 1-\beta_2^2\)；你应得到 \(m=0.038,\ v\approx8.0\times10^{-5},\ \hat m=0.2,\ \hat v=0.04,\ \theta=0.8\)。</li>
+<li><strong>实现 RMSProp 并和 Adam 比。</strong>在实验 1 的病态二次型上加一个 <code>rmsprop(eta, rho, steps)</code>（无动量、无偏差修正），观察它收敛比 Adam 慢一些——体会"动量 + 偏差修正"带来的增益。</li>
+<li><strong>实现 warmup + cosine 调度。</strong>写一个 <code>lr(t, warm, total, base)</code> 函数（用正文公式），打印 \(t=0,10,\dots,100\)（\(\text{warm}=10,\ \text{total}=100,\ \text{base}=0.1\)）的学习率，确认它在 \(t=10\) 达到峰值 0.1、在 \(t=100\) 降到 0。</li>
+<li><strong>梯度裁剪实验。</strong>在实验 1 的 GD 里把 \(\eta\) 调到 0.05（接近发散阈值 \(2/50=0.04\) 之上）让它爆掉，然后加一行梯度裁剪 \(g\leftarrow g\min(1, c/\|g\|)\)，\(c=1\)，观察是否被救回（loss 不再发散为 inf）。提示：起点 \((5,5)\) 的真实梯度范数约 250，被 \(c=1\) 压成约 \(1/250\)，步子极小——打印裁剪后的 loss 看看，它确实不再爆掉，但 200 步只爬到约 0.03、远没到谷底，亲身体会"防爆 ≠ 收敛好"这个权衡。</li>
+<li><strong>（选做）Rosenbrock 香蕉谷。</strong>把损失换成 \(L(x,y)=(1-x)^2+100(y-x^2)^2\)（最小值在 \((1,1)\)），起点 \((-1.5,1.5)\)，比较 GD 与 Adam 谁更快接近 \((1,1)\)。提示：手算梯度 \(\partial_x L=-2(1-x)-400x(y-x^2),\ \partial_y L=200(y-x^2)\)。</li>
+</ol>
+
+<h2>掌握自检</h2>
+<ul>
+<li>能否用一句话说清"为什么 mini-batch 梯度是无偏估计"，并说出 batch 大小如何影响方差与单步成本？</li>
+<li>给定 \(v,\beta,\nabla L,\eta\)，能否口算一步动量更新，并解释它为何压住病态山谷的之字形？能否说清动量的 \(v\) 是"加权和"而非"平均"，以及这为什么影响配套学习率？</li>
+<li>能否默写 Adam 的 \(m,v,\hat m,\hat v\) 四式和更新式，说出偏差修正在第一步起了什么作用，并解释为什么"反复变号的方向步长会自动缩小"？</li>
+<li>能否解释"为什么在有状态优化器（动量 / Adam）上要用解耦权重衰减，而不是把 L2 加进梯度"？</li>
+<li>能否说出 warmup 防的是什么（初期 NaN）、cosine 衰减解决什么（后期精收敛）、梯度裁剪防的是什么（梯度爆炸），以及为什么裁剪"防爆不等于收敛好"？</li>
+<li>能否解释为什么牛顿法（\(O(d^3)\)）在深度学习不可行，以及 Adam 在何种意义上是"廉价的对角近似二阶"？</li>
+</ul>
+
+<div class="skip"><h4>可以先放过的点</h4><ul>
+<li><strong>动量的精确收敛速率分析</strong>（Polyak heavy-ball、Nesterov 加速的 \(\sqrt\kappa\) 改进）：现在只需记住"惯性压震荡、加速病态方向"，等你需要证明收敛界时再回来。</li>
+<li><strong>Adam 的理论收敛性争议</strong>（AMSGrad 等修正）：知道 Adam 工程上好用、个别情形不收敛即可，深入留到读优化论文时。</li>
+<li><strong>各种学习率调度变体</strong>（one-cycle、带 restart 的 cosine、阶梯衰减）：先吃透 warmup+cosine 这一主力，其余是同一思想的换皮。</li>
+<li><strong>二阶方法的实用近似</strong>（L-BFGS、K-FAC、Shampoo）：等你训练超大模型、对 Adam 不满意时再了解。</li>
+</ul></div>
+
+<p><strong>下一课预告：</strong>优化器我们就讲到这。接下来两课转入<strong>强化学习速成</strong>——状态 \(s\)、动作 \(a\)、奖励 \(r\)、策略 \(\pi(a|s)\)、价值 \(V^\pi,Q^\pi\) 这套语言，正是后面理解 <strong>RLHF（基于人类反馈的强化学习）</strong>对齐大模型的地基。你会看到，策略梯度（policy gradient）本质上又是一次"用采样做无偏估计 + 梯度上升"，和这一课的 SGD 一脉相承。</p>
+</article>
+<div class="navbtns"><a class="prev" href="lesson-07-convexity-gradient-descent.html"><div class="nlabel">← 上一课</div><div class="ntitle">第7课 · 凸性与梯度下降——优化的几何</div></a><a class="next" href="lesson-09-rl-crash-1.html"><div class="nlabel">下一课 →</div><div class="ntitle">第9课 · 强化学习速成 I——MDP、价值与贝尔曼</div></a></div>
+<nav class="toc"><h3>本模块课程表</h3><ol>
+<li><a href="lesson-01-random-variables.html"><span class="ln">第1课</span>概率的语言——随机变量、分布、期望与方差</a></li>
+<li><a href="lesson-02-distributions-covariance.html"><span class="ln">第2课</span>分布动物园与协方差</a></li>
+<li><a href="lesson-03-conditional-bayes.html"><span class="ln">第3课</span>条件概率与贝叶斯</a></li>
+<li><a href="lesson-04-mle-map.html"><span class="ln">第4课</span>从数据到损失——MLE 与 MAP</a></li>
+<li><a href="lesson-05-information-theory.html"><span class="ln">第5课</span>信息论——熵、交叉熵、KL</a></li>
+<li><a href="lesson-06-sampling.html"><span class="ln">第6课</span>采样——逆变换、重参数化与蒙特卡洛</a></li>
+<li><a href="lesson-07-convexity-gradient-descent.html"><span class="ln">第7课</span>凸性与梯度下降——优化的几何</a></li>
+<li class="cur"><span class="ln">第8课</span>现代优化器——SGD、动量、Adam 与调度</li>
+<li><a href="lesson-09-rl-crash-1.html"><span class="ln">第9课</span>强化学习速成 I——MDP、价值与贝尔曼</a></li>
+<li><a href="lesson-10-rl-crash-2.html"><span class="ln">第10课</span>强化学习速成 II——策略梯度到 PPO</a></li>
+</ol></nav>
+</div>
+<!-- pyrunner-injected -->
+<style>
+.pr-cell{border:1px solid #334155;border-radius:10px;margin:1.2em 0;overflow:hidden;background:#0f172a;}
+.pr-head{display:flex;align-items:center;gap:8px;background:#1e293b;color:#cbd5e1;padding:6px 10px;font-size:13px;font-family:system-ui,-apple-system,sans-serif;}
+.pr-title{flex:1;font-weight:600;}
+.pr-status{font-size:12px;color:#94a3b8;white-space:nowrap;max-width:50%;overflow:hidden;text-overflow:ellipsis;}
+.pr-btn{cursor:pointer;border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:6px;padding:3px 11px;font-size:13px;line-height:1.4;}
+.pr-btn:hover{background:#0b1220;}
+.pr-run{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:600;}
+.pr-run:hover{background:#1d4ed8;}
+.pr-cell.collapsed .pr-body{display:none;}
+.pr-editor{position:relative;background:#0f172a;}
+.pr-code,.pr-edit{display:block;width:100%;min-height:68px;border:none;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.55;padding:12px 14px;box-sizing:border-box;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:4;}
+.pr-code{position:absolute;inset:0;margin:0;overflow:hidden;background:#0f172a;color:#dbeafe;pointer-events:none;}
+.pr-edit{position:relative;background:transparent;color:transparent;caret-color:#e2e8f0;resize:vertical;outline:none;-webkit-text-fill-color:transparent;}
+.pr-edit::selection{background:rgba(96,165,250,.34);}
+.tok-kw{color:#c084fc;font-weight:700;}
+.tok-fn{color:#67e8f9;}
+.tok-num{color:#fbbf24;}
+.tok-str{color:#86efac;}
+.tok-comment{color:#94a3b8;font-style:italic;}
+.pr-out{margin:0;padding:10px 14px;border-top:1px solid #334155;background:#0b1220;color:#cbd5e1;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.5;white-space:pre-wrap;max-height:340px;overflow:auto;}
+.pr-out:empty{display:none;}
+.pr-out.err{color:#fca5a5;}
+#pr-fab{position:fixed;right:18px;bottom:18px;z-index:9998;background:#2563eb;color:#fff;border:none;border-radius:999px;padding:10px 17px;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.22);font-family:system-ui,sans-serif;}
+#pr-fab:hover{background:#1d4ed8;}
+#pr-lab{position:fixed;right:18px;bottom:66px;z-index:9999;width:400px;max-width:92vw;background:#0f172a;border:1px solid #334155;border-radius:12px;display:none;flex-direction:column;box-shadow:0 14px 38px rgba(0,0,0,.4);overflow:hidden;}
+#pr-lab.open{display:flex;}
+#pr-lab .pr-edit,#pr-lab .pr-code{min-height:150px;}
+</style>
+<script>
+(function(){
+  var PYBASE="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+  var pyReady=null;
+  function loadPy(status){
+    if(pyReady)return pyReady;
+    pyReady=(async function(){
+      status("正在加载 Python 运行时（首次约 10 秒，需联网）…");
+      await new Promise(function(res,rej){
+        var s=document.createElement("script");s.src=PYBASE+"pyodide.js";
+        s.onload=res;s.onerror=function(){rej(new Error("无法加载 Pyodide（首次运行需要联网）"));};
+        document.head.appendChild(s);
+      });
+      var py=await loadPyodide({indexURL:PYBASE});
+      status("正在加载 NumPy …");
+      await py.loadPackage("numpy");
+      status("Python 就绪 ✓");
+      return py;
+    })();
+    return pyReady;
+  }
+  async function run(code,outEl,statusEl){
+    var setS=function(m){if(statusEl)statusEl.textContent=m;};
+    outEl.classList.remove("err");outEl.textContent="";
+    var py;
+    try{py=await loadPy(setS);}
+    catch(e){outEl.classList.add("err");outEl.textContent="加载失败："+e.message;return;}
+    var buf="";
+    py.setStdout({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    py.setStderr({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    try{
+      var result=await py.runPythonAsync(code);
+      if(result!==undefined&&result!==null){
+        var r;try{r=result.toString();}catch(_){r=String(result);}
+        if(r!=="None")buf+=(buf&&!buf.endsWith("\n")?"\n":"")+r;
+        if(result&&result.destroy)result.destroy();
+      }
+      outEl.textContent=buf||"（运行成功，无输出。用 print(...) 查看结果）";
+    }catch(e){
+      outEl.classList.add("err");
+      outEl.textContent=buf+(buf?"\n":"")+String((e&&e.message)||e);
+    }
+  }
+  var KW={False:1,None:1,True:1,and:1,as:1,assert:1,async:1,await:1,break:1,class:1,continue:1,def:1,del:1,elif:1,else:1,except:1,finally:1,for:1,from:1,global:1,if:1,import:1,in:1,is:1,lambda:1,nonlocal:1,not:1,or:1,pass:1,raise:1,return:1,try:1,while:1,with:1,yield:1};
+  var FN={abs:1,all:1,any:1,array:1,bool:1,dict:1,enumerate:1,float:1,int:1,len:1,list:1,max:1,min:1,np:1,numpy:1,print:1,range:1,round:1,set:1,str:1,sum:1,tuple:1,zip:1};
+  function esc(s){return s.replace(/[&<>]/g,function(c){return c==="&"?"&amp;":c==="<"?"&lt;":"&gt;";});}
+  function colorLine(line){
+    var out="",i=0;
+    while(i<line.length){
+      var ch=line[i];
+      if(ch==="#"){out+='<span class="tok-comment">'+esc(line.slice(i))+"</span>";break;}
+      if(ch==="'"||ch==='"'){
+        var q=ch,triple=line.slice(i,i+3)===q+q+q,end=i+(triple?3:1),done=false;
+        while(end<line.length){
+          if(!triple&&line[end]==="\\"){end+=2;continue;}
+          if(triple&&line.slice(end,end+3)===q+q+q){end+=3;done=true;break;}
+          if(!triple&&line[end]===q){end+=1;done=true;break;}
+          end+=1;
+        }
+        out+='<span class="tok-str">'+esc(line.slice(i,done?end:line.length))+"</span>";
+        i=done?end:line.length;
+        continue;
+      }
+      if(/[0-9]/.test(ch)||(ch==="."&&/[0-9]/.test(line[i+1]||""))){
+        var m=line.slice(i).match(/^(?:0[xX][0-9a-fA-F]+|\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?/);
+        out+='<span class="tok-num">'+esc(m[0])+"</span>";i+=m[0].length;continue;
+      }
+      if(/[A-Za-z_]/.test(ch)){
+        var id=line.slice(i).match(/^[A-Za-z_][A-Za-z0-9_]*/)[0];
+        if(KW[id])out+='<span class="tok-kw">'+id+"</span>";
+        else if(FN[id])out+='<span class="tok-fn">'+id+"</span>";
+        else out+=id;
+        i+=id.length;continue;
+      }
+      out+=esc(ch);i+=1;
+    }
+    return out;
+  }
+  function paint(ta){
+    var pre=ta.closest(".pr-editor").querySelector(".pr-code");
+    pre.innerHTML=ta.value.split("\n").map(colorLine).join("\n")+(ta.value.endsWith("\n")?"\n":"");
+    pre.style.height=ta.style.height;
+    pre.scrollTop=ta.scrollTop;pre.scrollLeft=ta.scrollLeft;
+  }
+  function autosize(ta){ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight+2,460)+"px";}
+  function tune(ta){autosize(ta);paint(ta);}
+  function tabKey(e){
+    if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();var b=this.closest(".pr-cell,#pr-lab").querySelector(".pr-run");if(b)b.click();return;}
+    if(e.key==="Tab"){
+      e.preventDefault();
+      var s=this.selectionStart,en=this.selectionEnd,v=this.value,lineStart=v.lastIndexOf("\n",s-1)+1,lineEnd=v.indexOf("\n",en);
+      if(lineEnd<0)lineEnd=v.length;
+      if(s!==en||e.shiftKey){
+        var block=v.slice(lineStart,lineEnd),lines=block.split("\n"),delta=0;
+        if(e.shiftKey){
+          lines=lines.map(function(line){
+            if(line.startsWith("    ")){delta-=4;return line.slice(4);}
+            if(line.startsWith("\t")){delta-=1;return line.slice(1);}
+            return line;
+          });
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=Math.max(lineStart,s+(s===lineStart?0:Math.max(delta/Math.max(lines.length,1),-4)));
+          this.selectionEnd=Math.max(this.selectionStart,en+delta);
+        }else{
+          lines=lines.map(function(line){delta+=4;return "    "+line;});
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=s+4;
+          this.selectionEnd=en+delta;
+        }
+      }else{
+        this.value=v.slice(0,s)+"    "+v.slice(en);this.selectionStart=this.selectionEnd=s+4;
+      }
+      tune(this);
+      return;
+    }
+    if(e.key==="Enter"){
+      e.preventDefault();
+      var a=this.selectionStart,b=this.selectionEnd,text=this.value,start=text.lastIndexOf("\n",a-1)+1;
+      var prefix=text.slice(start,a),indent=(prefix.match(/^\s*/)||[""])[0],code=prefix.replace(/#.*$/,"").trimEnd();
+      var add="\n"+indent+(/:\s*$/.test(code)?"    ":"");
+      this.value=text.slice(0,a)+add+text.slice(b);
+      this.selectionStart=this.selectionEnd=a+add.length;
+      tune(this);
+      return;
+    }
+  }
+  function makeCell(code){
+    var cell=document.createElement("div");cell.className="pr-cell";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">可运行 · Python (NumPy)</span><span class="pr-status"></span><button class="pr-btn pr-toggle">收起</button><button class="pr-btn pr-run">▶ 运行</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    var ta=cell.querySelector(".pr-edit");ta.value=code;
+    var out=cell.querySelector(".pr-out"),st=cell.querySelector(".pr-status");
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    cell.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    var tog=cell.querySelector(".pr-toggle");
+    tog.onclick=function(){cell.classList.toggle("collapsed");tog.textContent=cell.classList.contains("collapsed")?"展开":"收起";};
+    setTimeout(function(){tune(ta);},0);
+    return cell;
+  }
+  function enhance(){
+    document.querySelectorAll("article pre").forEach(function(pre){
+      if(pre.closest(".pr-cell"))return;
+      var codeEl=pre.querySelector("code")||pre;
+      var code=codeEl.textContent.replace(/\s+$/,"");
+      if(!code)return;
+      pre.replaceWith(makeCell(code));
+    });
+  }
+  function lab(){
+    var fab=document.createElement("button");fab.id="pr-fab";fab.textContent="▶ Python 实验台";
+    var panel=document.createElement("div");panel.id="pr-lab";
+    panel.innerHTML='<div class="pr-head"><span class="pr-title">Python 实验台 · NumPy</span><span class="pr-status"></span><button class="pr-btn pr-run">▶ 运行</button><button class="pr-btn pr-min">收起</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    document.body.appendChild(fab);document.body.appendChild(panel);
+    var ta=panel.querySelector(".pr-edit");
+    ta.value="import numpy as np\na = np.array([3, 2])\nb = np.array([1, 4])\nprint(\"a + b =\", a + b)\nprint(\"a . b =\", a @ b)\nprint(\"|a|  =\", np.linalg.norm(a))\ncos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))\nprint(\"cos =\", round(float(cos), 4))";
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    var out=panel.querySelector(".pr-out"),st=panel.querySelector(".pr-status");
+    panel.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    fab.onclick=function(){panel.classList.toggle("open");};
+    panel.querySelector(".pr-min").onclick=function(){panel.classList.remove("open");};
+    setTimeout(function(){tune(ta);},0);
+  }
+  function init(){enhance();lab();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+
+<script src="../assets/annotator.js"></script>
+</body>
+</html>

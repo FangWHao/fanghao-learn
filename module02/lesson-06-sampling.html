@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块2 · 第6课 · 采样——逆变换、重参数化与蒙特卡洛</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<script src="../assets/theme.js"></script>
+<link rel="stylesheet" href="../assets/annotator.css">
+<link rel="stylesheet" href="../assets/theme.css">
+
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue-bg:#eff6ff;
+--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--pink:#db2777;
+--red:#dc2626;--red-bg:#fef2f2;--bg:#ffffff;--soft:#f8fafc;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);
+font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.85;font-size:17px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:840px;margin:0 auto;padding:0 22px 100px;}
+header.top{background:#fff;border-bottom:1px solid var(--line);padding:26px 22px 22px;margin-bottom:14px;}
+header.top .inner{max-width:840px;margin:0 auto;}
+.crumb{color:var(--muted);font-size:14px;letter-spacing:.3px;margin-bottom:6px;}
+h1{font-size:30px;line-height:1.3;margin:.1em 0 .2em;}
+.sub{color:var(--muted);font-size:15px;}
+article{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:30px 34px;margin-top:18px;}
+h2{font-size:23px;margin:1.7em 0 .6em;padding-bottom:.25em;border-bottom:2px solid var(--line);}
+h2:first-child{margin-top:.2em;}
+h3{font-size:19px;margin:1.3em 0 .4em;color:#0f172a;}
+h4{margin:.2em 0 .5em;font-size:16px;}
+p{margin:.7em 0;}
+ul,ol{padding-left:1.3em;margin:.6em 0;}
+li{margin:.32em 0;}
+code{background:#f1f5f9;padding:.12em .4em;border-radius:5px;font-size:.9em;
+font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a;}
+pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 18px;overflow:auto;font-size:14px;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0;}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:15.5px;}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+thead th{background:var(--soft);}
+figure.fig{margin:1.4em 0;text-align:center;}
+figure.fig svg{max-width:100%;height:auto;}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
+.note,.ml,.key,.pitfall,.example{border-radius:10px;padding:14px 18px;margin:1.2em 0;border:1px solid var(--line);}
+.note{background:var(--soft);border-left:4px solid #94a3b8;}
+.example{background:#fff;border-left:4px solid var(--blue);}
+.ml{background:var(--green-bg);border-left:4px solid var(--green);}
+.key{background:var(--amber-bg);border-left:4px solid var(--amber);}
+.pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.goals{background:var(--blue-bg);border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:10px;padding:14px 20px;margin:.2em 0 1.5em;}
+.goals h4{margin:.1em 0 .5em;color:#1e3a8a;}
+.goals ul{margin:.3em 0;}
+.skip{background:var(--soft);border:1px solid var(--line);border-left:4px solid #94a3b8;border-radius:10px;padding:14px 20px;margin:1.8em 0 0;color:#475569;}
+.skip h4{margin:.1em 0 .5em;color:#475569;}
+.tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
+.toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
+.toc h3{margin:.1em 0 .7em;}
+.toc ol{list-style:none;padding:0;}
+.toc li{padding:7px 10px;border-radius:8px;color:#334155;border:1px solid transparent;}
+.toc li a{color:inherit;text-decoration:none;display:block;}
+.toc li .ln{display:inline-block;min-width:54px;color:var(--muted);font-size:13px;}
+.toc li.cur{background:var(--blue-bg);border-color:#bfdbfe;font-weight:600;color:#1e3a8a;}
+.toc li:not(.cur):hover{background:var(--soft);}
+.navbtns{display:flex;justify-content:space-between;margin-top:22px;gap:12px;}
+.navbtns a{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--ink);}
+.navbtns a:hover{border-color:var(--blue);}
+.navbtns .nlabel{color:var(--muted);font-size:13px;}
+.navbtns .ntitle{font-weight:600;margin-top:3px;}
+.navbtns .next{text-align:right;}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.here{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:6px 0 4px;font-size:15px;color:#1e3a8a;line-height:1.7;}
+.here b{font-weight:700;}
+.cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
+.card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
+.card:hover{border-color:var(--blue);}
+.card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
+.card .ct{font-size:18px;font-weight:600;}
+.card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+.card .cap{margin-left:40px;margin-top:7px;font-size:13px;color:#1e3a8a;}
+.card .cap .lbl{display:inline-block;background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;margin-right:7px;}
+
+.card.soon{opacity:.6;cursor:default;}
+.card.soon:hover{border-color:var(--line);}
+.badge{display:inline-block;background:#e2e8f0;color:#475569;font-size:11px;font-weight:600;padding:1px 8px;border-radius:20px;margin-left:8px;vertical-align:middle;}
+.toc li.soon{color:#94a3b8;}
+.toc li.soon .badge{margin-left:4px;}
+</style>
+</head>
+<body>
+<header class="top"><div class="inner">
+<div class="crumb"><a href="../index.html" style="color:inherit">首页</a>　/　<a href="index.html" style="color:inherit">模块 2 · 概率统计、信息论与最优化</a>　/　第 6 课（共 10 课）</div>
+<h1>采样——逆变换、重参数化与蒙特卡洛</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　阶段0：数学与工具基础　·　<strong>能力点：</strong>采样与重参数化——VAE/扩散/RL/LLM 解码的共同操作</div>
+</div></header>
+<div class="wrap">
+<article>
+<p>上一课我们让三条线汇合：<strong>交叉熵 = 最大似然 = 最小化 \(D_{\mathrm{KL}}(p\|q)\)</strong>。那一课我们一直在"算期望、算 KL"，但有一个问题被悄悄跳过了：<em>这些期望到底怎么算出来？</em> 当分布复杂到积不出闭式时，我们就只能<strong>采样（sampling）</strong>——造一堆样本，用样本平均替代积分。这一课就讲清楚：怎么从一个分布里造样本，怎么用样本估计期望，以及一个让 VAE / 扩散模型能反向传播的关键花招——<strong>重参数化（reparameterization）</strong>。</p>
+
+<div class="goals">
+<h4>读完这一课，你将能够</h4>
+<ul>
+<li>用<strong>蒙特卡洛（Monte Carlo）</strong>把任意期望写成样本平均，并说出误差为什么按 \(1/\sqrt{N}\) 缩小；</li>
+<li>推导并实现<strong>逆变换采样</strong>，把 \(U\sim\mathrm{Uniform}(0,1)\) 变成指数分布等任意分布的样本；</li>
+<li>解释<strong>重参数化技巧</strong>为什么能让梯度"穿过"采样节点，并手算 \(\partial\mathbb{E}[x]/\partial\mu\)；</li>
+<li>分清<strong>拒绝采样</strong>、<strong>重要性采样</strong>、<strong>MCMC</strong> 各自解决什么问题；</li>
+<li>用随机种子（seed）让随机实验可复现，并知道 LLM 解码也是一种采样。</li>
+</ul>
+</div>
+
+<h2>一、为什么要采样</h2>
+
+<p>采样这件事，在机器学习里干三种活：</p>
+<ul>
+<li><strong>生成样本</strong>：你训练了一个图像/文本/分子的分布模型，想"画"出新东西——就得从分布里采样。LLM 每吐一个 token 都是一次采样。</li>
+<li><strong>估计期望</strong>：损失、梯度、价值函数、KL……机器学习里几乎所有目标都是某个期望 \(\mathbb{E}[f(X)]\)。分布一复杂，积分就没有闭式，只能用样本平均近似。</li>
+<li><strong>随机算法</strong>：随机初始化、dropout、SGD 的 mini-batch、强化学习里按策略 \(\pi(a|s)\) 探索动作——本质都是采样。</li>
+</ul>
+
+<div class="note">
+<strong>一句话直觉：</strong>采样把"对整个分布求积分"这件难事，换成"造几个点求平均"这件易事。难点从此转移到——<em>怎么造点</em>，以及<em>造少了误差有多大</em>。这两个问题就是本课的主线。
+</div>
+
+<h2>二、蒙特卡洛估计：用平均代替积分</h2>
+
+<p>回忆本模块第1课：期望就是"按概率加权的平均"。连续情形 \(\mathbb{E}[f(X)]=\int f(x)\,p(x)\,dx\)。如果我们能从 \(p\) 里独立采出 \(x_1,\dots,x_N\)，那么自然的近似是直接求样本平均：</p>
+
+\[
+\mathbb{E}[f(X)] \;\approx\; \hat\mu_N \;=\; \frac{1}{N}\sum_{i=1}^N f(x_i).
+\]
+
+<p>这就是<strong>蒙特卡洛（Monte Carlo, MC）估计</strong>。它为什么对？因为<strong>大数定律</strong>保证 \(\hat\mu_N\) 收敛到真值。但工程上更关心的是：<em>收敛有多快</em>？</p>
+
+<div class="key">
+<strong>关键结论——\(1/\sqrt{N}\) 定律。</strong> 设 \(\mathrm{Var}[f(X)]=\sigma_f^2\)。因为 \(x_i\) 独立，方差可加：
+\[
+\mathrm{Var}[\hat\mu_N]=\mathrm{Var}\!\left[\frac1N\sum_i f(x_i)\right]=\frac{1}{N^2}\sum_i \mathrm{Var}[f(x_i)]=\frac{\sigma_f^2}{N}.
+\]
+所以估计的<strong>标准差</strong>（误差的典型大小）是
+\[
+\mathrm{std}[\hat\mu_N]=\frac{\sigma_f}{\sqrt{N}}.
+\]
+误差按 \(1/\sqrt{N}\) 下降：想把误差<strong>减半，样本要翻 4 倍</strong>；想多一位有效数字（误差 ÷10），样本要 ×100。
+</div>
+
+<div class="note">
+<strong>为什么是 \(\sqrt{N}\) 而不是 \(N\)？</strong> 误差是 \(N\) 个随机数的<em>和</em>。如果它们同向，和会 \(\propto N\)；但它们独立、有正有负，互相抵消，和只 \(\propto\sqrt N\)（这正是"随机游走 \(N\) 步离原点约 \(\sqrt N\)"的同一件事）。再除以 \(N\) 取平均，就得到 \(\sqrt N/N=1/\sqrt N\)。这个 \(1/\sqrt N\) 慢得让人心痛，却<strong>与维度无关</strong>——这正是高维积分宁可用 MC 也不用网格的原因。
+</div>
+
+<figure class="fig"><svg viewBox="0 0 540 360" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif">
+<title>Monte Carlo estimate converging to the true value as N grows, with a 1/sqrt(N) error band</title>
+<defs>
+<marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/>
+</marker>
+</defs>
+
+<text x="270" y="26" text-anchor="middle" font-size="14" fill="#1f2937" font-weight="500">Monte Carlo convergence: estimate to true value</text>
+
+<line x1="80" y1="60" x2="80" y2="290" stroke="#94a3b8" stroke-width="1" marker-end="url(#ar)"/>
+<line x1="80" y1="290" x2="510" y2="290" stroke="#94a3b8" stroke-width="1" marker-end="url(#ar)"/>
+
+<line x1="80" y1="100" x2="500" y2="100" stroke="#e2e8f0" stroke-width="0.75"/>
+<line x1="80" y1="155" x2="500" y2="155" stroke="#e2e8f0" stroke-width="0.75"/>
+<line x1="80" y1="245" x2="500" y2="245" stroke="#e2e8f0" stroke-width="0.75"/>
+
+<text x="72" y="104" text-anchor="end" font-size="11" fill="#94a3b8">1.0</text>
+<text x="72" y="159" text-anchor="end" font-size="11" fill="#94a3b8">0.83</text>
+<text x="72" y="204" text-anchor="end" font-size="11" fill="#94a3b8">0.67</text>
+<text x="72" y="249" text-anchor="end" font-size="11" fill="#94a3b8">0.5</text>
+
+<text x="100" y="312" text-anchor="middle" font-size="12" fill="#1f2937">10</text>
+<text x="190" y="312" text-anchor="middle" font-size="12" fill="#1f2937">100</text>
+<text x="280" y="312" text-anchor="middle" font-size="12" fill="#1f2937">1000</text>
+<text x="370" y="312" text-anchor="middle" font-size="12" fill="#1f2937">10&#8308;</text>
+<text x="460" y="312" text-anchor="middle" font-size="12" fill="#1f2937">10&#8309;</text>
+
+<text x="280" y="340" text-anchor="middle" font-size="14" fill="#1f2937">N  (log scale)</text>
+<text x="28" y="175" text-anchor="middle" font-size="14" fill="#1f2937" transform="rotate(-90 28 175)">estimate</text>
+
+<path d="M 100,100 L 190,140 L 280,165 L 370,180 L 460,185 L 460,205 L 370,210 L 280,217 L 190,250 L 100,290 Z" fill="#2563eb" fill-opacity="0.12"/>
+<path d="M 100,100 L 190,140 L 280,165 L 370,180 L 460,185" fill="none" stroke="#2563eb" stroke-width="1" stroke-dasharray="4 3" stroke-opacity="0.5"/>
+<path d="M 100,290 L 190,250 L 280,217 L 370,210 L 460,205" fill="none" stroke="#2563eb" stroke-width="1" stroke-dasharray="4 3" stroke-opacity="0.5"/>
+
+<line x1="80" y1="195" x2="500" y2="195" stroke="#d97706" stroke-width="1.5" stroke-dasharray="4 3"/>
+<text x="500" y="190" text-anchor="end" font-size="12" fill="#d97706">E[X] = 2/3  (true value)</text>
+
+<polyline points="100,128 190,168 280,178 370,189 460,193" fill="none" stroke="#db2777" stroke-width="2"/>
+<circle cx="100" cy="128" r="3.5" fill="#db2777"/>
+<circle cx="190" cy="168" r="3.5" fill="#db2777"/>
+<circle cx="280" cy="178" r="3.5" fill="#db2777"/>
+<circle cx="370" cy="189" r="3.5" fill="#db2777"/>
+<circle cx="460" cy="193" r="3.5" fill="#db2777"/>
+
+<g transform="translate(120,62)">
+<line x1="0" y1="0" x2="22" y2="0" stroke="#db2777" stroke-width="2"/>
+<circle cx="11" cy="0" r="3" fill="#db2777"/>
+<text x="28" y="4" font-size="12" fill="#1f2937">MC estimate</text>
+<rect x="150" y="-7" width="22" height="12" fill="#2563eb" fill-opacity="0.12" stroke="#2563eb" stroke-width="1" stroke-dasharray="4 3" stroke-opacity="0.5"/>
+<text x="178" y="4" font-size="12" fill="#1f2937">error band &#8733; &#177;&#963;/&#8730;N</text>
+</g>
+
+<text x="248" y="240" font-size="11" fill="#2563eb">band width &#8733; 1/&#8730;N</text>
+</svg><figcaption>蒙特卡洛估计随样本数 N 增大向真值收敛，估计值的波动（误差带）按 1/√N 收窄。横轴对数刻度的 N，纵轴估计值，真值为水平参考线。</figcaption></figure>
+
+<div class="example">
+<h4>例题：估计 \(\mathbb{E}[X]\)，\(X\sim\mathrm{Exp}(\lambda=1.5)\)</h4>
+<p>指数分布的真值是 \(\mathbb{E}[X]=1/\lambda=0.6667\)。这里 \(f(x)=x\)，它的标准差恰好 \(\sigma_f=\mathrm{std}[X]=1/\lambda=0.6667\)——指数分布的均值和标准差都等于 \(1/\lambda\)，<em>纯属巧合</em>，别把这两个"\(0.667\)"搞混（一个是被估的均值，一个是用来算误差量级的标准差）。用固定 <code>seed=0</code>、\(N=2\times10^5\) 个样本（与下面"调一调"同一段代码），得到 \(\hat\mu\approx 0.6645\)；某次实现的偏差 \(|0.6667-0.6645|\approx 0.0021\)，正好落在理论标准差 \(\sigma_f/\sqrt N=0.667/\sqrt{2\times10^5}\approx 0.0015\) 的量级内（约 1σ）。注意这里 \(0.0021\) 是<em>这一次</em>抽样的偏离，而 \(0.0015\) 是偏离的<em>典型大小</em>（标准差）——换个 seed，单次偏差会在 0 上下随机浮动，但其典型尺度始终是 \(0.0015\)。要看"标准差本身"，得像"调一调 1"那样重复很多次再统计：\(N=100\) 时实测约 \(0.065\)、理论 \(0.0667\)；\(N=10^4\) 时实测约 \(0.0067\)、理论 \(0.0067\)——\(1/\sqrt N\) 几乎精确成立。</p>
+</div>
+
+<h2>三、逆变换采样：用 CDF 的逆把均匀数"掰"成任意分布</h2>
+
+<p>蒙特卡洛要求"能从 \(p\) 采样"。可计算机的随机数发生器只会吐<strong>均匀随机数</strong> \(U\sim\mathrm{Uniform}(0,1)\)。怎么把它变成指数分布、高斯分布的样本？</p>
+
+<p><strong>先想机制，别背公式。</strong> 回忆本模块第1课的累积分布函数（CDF）\(F(x)=P(X\le x)\)：它是一条从 0 单调爬到 1 的曲线。关键观察：<em>CDF 的取值本身就均匀分布在 \([0,1]\)</em>。所以反过来——如果我先在 \(y\) 轴上均匀地取一个高度 \(U\)，再沿水平线打到曲线上，竖直落下读出 \(x\)，那么<strong>曲线陡的地方（概率密度大）落点密，曲线平的地方落点稀</strong>——这正好就是 \(p\) 想要的样本分布！</p>
+
+<figure class="fig"><svg viewBox="0 0 520 380" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>逆变换采样：在 y 轴均匀取 U，水平打到 CDF 曲线再竖直落到 x 轴得样本</title><defs><marker id="arrBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/></marker><marker id="arrAmber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#d97706"/></marker><marker id="arrAxis" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs><!-- plot area: x 60..460 (0..4), y 300(bottom,F=0)..60(top,F=1) --><!-- grid --><line x1="60" y1="240" x2="460" y2="240" stroke="#e2e8f0" stroke-width="0.75"/><line x1="60" y1="180" x2="460" y2="180" stroke="#e2e8f0" stroke-width="0.75"/><line x1="60" y1="120" x2="460" y2="120" stroke="#e2e8f0" stroke-width="0.75"/><line x1="60" y1="60" x2="460" y2="60" stroke="#e2e8f0" stroke-width="0.75"/><!-- axes --><line x1="60" y1="300" x2="60" y2="50" stroke="#94a3b8" stroke-width="1" marker-end="url(#arrAxis)"/><line x1="60" y1="300" x2="470" y2="300" stroke="#94a3b8" stroke-width="1" marker-end="url(#arrAxis)"/><!-- axis labels --><text x="46" y="60" fill="#1f2937" font-size="14" text-anchor="end">U</text><text x="44" y="64" fill="#1f2937" font-size="11" text-anchor="end">1.0</text><text x="44" y="304" fill="#1f2937" font-size="11" text-anchor="end">0</text><text x="478" y="304" fill="#1f2937" font-size="14">x</text><!-- x ticks 0..4 --><text x="60" y="318" fill="#1f2937" font-size="11" text-anchor="middle">0</text><text x="160" y="318" fill="#1f2937" font-size="11" text-anchor="middle">1</text><text x="260" y="318" fill="#1f2937" font-size="11" text-anchor="middle">2</text><text x="360" y="318" fill="#1f2937" font-size="11" text-anchor="middle">3</text><text x="460" y="318" fill="#1f2937" font-size="11" text-anchor="middle">4</text><!-- CDF curve F(x)=1-e^{-1.3 x}, mapped: y=300-240*F --><path d="M60,300 C90,247 116,212 140,191 C170,165 200,148 230,135 C268,121 300,113 340,107 C380,102 420,99 460,97" fill="none" stroke="#2563eb" stroke-width="2"/><text x="356" y="128" fill="#2563eb" font-size="13">F(x)=CDF</text><!-- faint guide 1: U small ~0.30 -> steep -> x small/dense; F=0.30 -> y=228, x: 1-e^{-1.3x}=0.30 -> x=0.274 -> px=87 --><line x1="60" y1="228" x2="87" y2="228" stroke="#2563eb" stroke-width="1" stroke-dasharray="4 3" opacity="0.5"/><line x1="87" y1="228" x2="87" y2="300" stroke="#2563eb" stroke-width="1" stroke-dasharray="4 3" opacity="0.5"/><circle cx="87" cy="228" r="2.5" fill="#2563eb" opacity="0.55"/><!-- faint guide 2: U ~0.50 -> F=0.50 y=180, x=0.533 -> px=113 --><line x1="60" y1="180" x2="113" y2="180" stroke="#2563eb" stroke-width="1" stroke-dasharray="4 3" opacity="0.5"/><line x1="113" y1="180" x2="113" y2="300" stroke="#2563eb" stroke-width="1" stroke-dasharray="4 3" opacity="0.5"/><circle cx="113" cy="180" r="2.5" fill="#2563eb" opacity="0.55"/><!-- faint guide 3: U large ~0.90 -> flat -> x large/sparse; F=0.90 y=84, x=1.77 -> px=237 --><line x1="60" y1="84" x2="237" y2="84" stroke="#2563eb" stroke-width="1" stroke-dasharray="4 3" opacity="0.5"/><line x1="237" y1="84" x2="237" y2="300" stroke="#2563eb" stroke-width="1" stroke-dasharray="4 3" opacity="0.5"/><circle cx="237" cy="84" r="2.5" fill="#2563eb" opacity="0.55"/><!-- main U=0.70 -> y=300-240*0.70=132 ; x: 1-e^{-1.3x}=0.70 -> x=0.926 -> px=153 --><!-- U marker on y axis --><circle cx="60" cy="132" r="4" fill="#db2777"/><text x="52" y="128" fill="#db2777" font-size="13" text-anchor="end">U≈0.7</text><!-- horizontal arrow to curve --><line x1="64" y1="132" x2="151" y2="132" stroke="#2563eb" stroke-width="2" marker-end="url(#arrBlue)"/><!-- intersection point --><circle cx="153" cy="132" r="4" fill="#2563eb"/><!-- vertical arrow down to x axis --><line x1="153" y1="134" x2="153" y2="298" stroke="#d97706" stroke-width="2" marker-end="url(#arrAmber)"/><!-- sample point on x axis --><circle cx="153" cy="300" r="4" fill="#d97706"/><text x="153" y="338" fill="#d97706" font-size="13" text-anchor="middle">样本 x = F⁻¹(U)</text><!-- legend --><text x="300" y="200" fill="#1f2937" font-size="12">陡段 → x 小且密</text><text x="300" y="220" fill="#1f2937" font-size="12">平段 → x 大且稀</text></svg><figcaption>逆变换采样：在 y 轴均匀取高度 U，沿水平线打到 CDF 曲线，再竖直落到 x 轴得到样本。CDF 陡（密度大）处落点密集，平缓处稀疏，正好复现目标分布。</figcaption></figure>
+
+<div class="key">
+<strong>逆变换采样（inverse transform sampling）。</strong> 取 \(U\sim\mathrm{Uniform}(0,1)\)，令
+\[
+X = F^{-1}(U),
+\]
+则 \(X\) 服从以 \(F\) 为 CDF 的分布。<br>
+<em>一行证明：</em> \(P(X\le x)=P(F^{-1}(U)\le x)=P(U\le F(x))=F(x)\)，因为 \(U\) 均匀，\(P(U\le t)=t\)（这一步正是在 \(P(U\le F(x))=F(x)\) 处用到的）。证毕——\(X\) 的 CDF 正是 \(F\)。
+</div>
+
+<div class="example">
+<h4>例题：推导指数分布的逆变换公式</h4>
+<p>指数分布 \(\mathrm{Exp}(\lambda)\) 的 CDF 是 \(F(x)=1-e^{-\lambda x}\)（\(x\ge0\)）。令 \(U=F(x)=1-e^{-\lambda x}\)，解出 \(x\)：</p>
+\[
+1-U=e^{-\lambda x}\;\Longrightarrow\;\ln(1-U)=-\lambda x\;\Longrightarrow\;\boxed{\,x=-\dfrac{\ln(1-U)}{\lambda}\,}.
+\]
+<p>于是把均匀数 \(U\) 代进去就得到指数样本。<em>小技巧：</em> \(1-U\) 与 \(U\) 同分布（都均匀），所以常直接写 \(x=-\ln(U)/\lambda\)。代码里我们用 \(1-U\) 以忠实对应推导。</p>
+</div>
+
+<div class="pitfall">
+<strong>易错：</strong> 逆变换<em>好看不好用</em>的前提是 \(F^{-1}\) 有闭式。高斯分布的 CDF 是误差函数 \(\mathrm{erf}\)，没有初等逆——所以实践中高斯不用逆变换，而用别的方法（Box–Muller，或库函数）。逆变换最适合<strong>一维、CDF 可逆</strong>的分布。
+</div>
+
+<h2>四、★重参数化技巧：让梯度穿过采样</h2>
+
+<p>这是本课的"主菜"，也是后面 VAE / 扩散模型反向传播能工作的根。先讲清它解决的痛点。</p>
+
+<p>假设我们有一个高斯 \(\mathcal N(\mu,\sigma^2)\)，参数 \(\mu,\sigma\) 是网络要学的。训练目标常常长这样：</p>
+\[
+L(\mu,\sigma)=\mathbb{E}_{x\sim\mathcal N(\mu,\sigma^2)}[\,f(x)\,].
+\]
+<p>我们想用反向传播（模块1第10课）求 \(\partial L/\partial\mu\)。但问题来了：计算图里有一个<strong>"采样"节点</strong>——\(x\) 是从 \(\mathcal N(\mu,\sigma^2)\) 随机抽的。采样是个掷骰子的离散动作，<strong>不可导</strong>，梯度一到这里就<em>断了</em>，传不回 \(\mu,\sigma\)。</p>
+
+<div class="note">
+<strong>核心花招：把随机性"挪出去"。</strong> 与其说"\(x\) 是从一个依赖 \(\mu,\sigma\) 的分布里抽的"，不如说——<em>先抽一个与参数无关的标准噪声，再用参数把它平移缩放</em>：
+\[
+x=\mu+\sigma\,\varepsilon,\qquad \varepsilon\sim\mathcal N(0,1).
+\]
+现在随机性全锁在 \(\varepsilon\) 里，而 \(\varepsilon\) <strong>不含 \(\mu,\sigma\)</strong>。从 \(\mu,\sigma\) 到 \(x\) 的这一步变成了纯粹的<strong>确定性算术</strong>（加法、乘法），完全可导！梯度于是能顺着 \(x=\mu+\sigma\varepsilon\) 一路回传到 \(\mu,\sigma\)。
+</div>
+
+<figure class="fig"><svg viewBox="0 0 540 460" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>重参数化对比：直接采样梯度断 vs 重参数化梯度通</title><defs><marker id="arrFwd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f2937"/></marker><marker id="arrRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#db2777"/></marker><marker id="arrGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#059669"/></marker></defs><text x="135" y="24" text-anchor="middle" font-size="14" font-weight="bold" fill="#db2777">直接采样：梯度断</text><text x="405" y="24" text-anchor="middle" font-size="14" font-weight="bold" fill="#059669">重参数化：梯度通</text><line x1="270" y1="40" x2="270" y2="448" stroke="#e2e8f0" stroke-width="0.75"/><circle cx="95" cy="64" r="18" fill="#2563eb" fill-opacity="0.12" stroke="#2563eb" stroke-width="2"/><text x="95" y="69" text-anchor="middle" font-size="14" fill="#1f2937">μ</text><circle cx="175" cy="64" r="18" fill="#2563eb" fill-opacity="0.12" stroke="#2563eb" stroke-width="2"/><text x="175" y="69" text-anchor="middle" font-size="14" fill="#1f2937">σ</text><line x1="95" y1="82" x2="123" y2="116" stroke="#1f2937" stroke-width="2" marker-end="url(#arrFwd)"/><line x1="175" y1="82" x2="147" y2="116" stroke="#1f2937" stroke-width="2" marker-end="url(#arrFwd)"/><rect x="55" y="122" width="160" height="40" rx="6" fill="#d97706" fill-opacity="0.1" stroke="#d97706" stroke-width="2" stroke-dasharray="4 3"/><text x="135" y="146" text-anchor="middle" font-size="12" fill="#1f2937">sample  N(μ,σ²)</text><line x1="135" y1="162" x2="135" y2="190" stroke="#1f2937" stroke-width="2" marker-end="url(#arrFwd)"/><circle cx="135" cy="210" r="18" fill="#2563eb" fill-opacity="0.12" stroke="#2563eb" stroke-width="2"/><text x="135" y="215" text-anchor="middle" font-size="14" fill="#1f2937">x</text><line x1="135" y1="228" x2="135" y2="262" stroke="#1f2937" stroke-width="2" marker-end="url(#arrFwd)"/><rect x="100" y="268" width="70" height="36" rx="6" fill="#2563eb" fill-opacity="0.1" stroke="#2563eb" stroke-width="2"/><text x="135" y="291" text-anchor="middle" font-size="13" fill="#1f2937">f(x)</text><line x1="135" y1="304" x2="135" y2="338" stroke="#1f2937" stroke-width="2" marker-end="url(#arrFwd)"/><circle cx="135" cy="358" r="18" fill="#d97706" fill-opacity="0.12" stroke="#d97706" stroke-width="2"/><text x="135" y="363" text-anchor="middle" font-size="14" fill="#1f2937">L</text><path d="M168,355 C215,350 215,300 188,290" fill="none" stroke="#db2777" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arrRed)"/><path d="M170,278 C205,265 200,225 162,213" fill="none" stroke="#db2777" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arrRed)"/><path d="M150,196 C195,180 200,180 178,165" fill="none" stroke="#db2777" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arrRed)"/><g stroke="#db2777" stroke-width="3" stroke-linecap="round"><line x1="201" y1="135" x2="217" y2="151"/><line x1="217" y1="135" x2="201" y2="151"/></g><text x="245" y="118" text-anchor="middle" font-size="11" fill="#db2777">梯度断在</text><text x="245" y="132" text-anchor="middle" font-size="11" fill="#db2777">采样节点</text><circle cx="335" cy="64" r="18" fill="#2563eb" fill-opacity="0.12" stroke="#2563eb" stroke-width="2"/><text x="335" y="69" text-anchor="middle" font-size="14" fill="#1f2937">μ</text><circle cx="405" cy="64" r="18" fill="#2563eb" fill-opacity="0.12" stroke="#2563eb" stroke-width="2"/><text x="405" y="69" text-anchor="middle" font-size="14" fill="#1f2937">σ</text><circle cx="478" cy="64" r="18" fill="#94a3b8" fill-opacity="0.18" stroke="#94a3b8" stroke-width="2"/><text x="478" y="69" text-anchor="middle" font-size="14" fill="#1f2937">ε</text><text x="478" y="98" text-anchor="middle" font-size="11" fill="#64748b">ε~N(0,1) 与参数无关</text><line x1="335" y1="82" x2="365" y2="116" stroke="#1f2937" stroke-width="2" marker-end="url(#arrFwd)"/><line x1="405" y1="82" x2="405" y2="116" stroke="#1f2937" stroke-width="2" marker-end="url(#arrFwd)"/><line x1="478" y1="82" x2="448" y2="116" stroke="#1f2937" stroke-width="2" marker-end="url(#arrFwd)"/><rect x="318" y="122" width="174" height="40" rx="6" fill="#059669" fill-opacity="0.1" stroke="#059669" stroke-width="2"/><text x="405" y="146" text-anchor="middle" font-size="12" fill="#1f2937">x = μ + σ·ε（确定性）</text><line x1="405" y1="162" x2="405" y2="190" stroke="#1f2937" stroke-width="2" marker-end="url(#arrFwd)"/><circle cx="405" cy="210" r="18" fill="#2563eb" fill-opacity="0.12" stroke="#2563eb" stroke-width="2"/><text x="405" y="215" text-anchor="middle" font-size="14" fill="#1f2937">x</text><line x1="405" y1="228" x2="405" y2="262" stroke="#1f2937" stroke-width="2" marker-end="url(#arrFwd)"/><rect x="370" y="268" width="70" height="36" rx="6" fill="#2563eb" fill-opacity="0.1" stroke="#2563eb" stroke-width="2"/><text x="405" y="291" text-anchor="middle" font-size="13" fill="#1f2937">f(x)</text><line x1="405" y1="304" x2="405" y2="338" stroke="#1f2937" stroke-width="2" marker-end="url(#arrFwd)"/><circle cx="405" cy="358" r="18" fill="#d97706" fill-opacity="0.12" stroke="#d97706" stroke-width="2"/><text x="405" y="363" text-anchor="middle" font-size="14" fill="#1f2937">L</text><path d="M438,355 C470,348 470,300 443,290" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#arrGreen)"/><path d="M440,278 C462,262 458,228 423,213" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#arrGreen)"/><path d="M423,196 C450,176 450,176 425,164" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#arrGreen)"/><path d="M388,124 C360,104 345,98 340,84" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#arrGreen)"/><path d="M408,120 C408,108 406,98 405,84" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#arrGreen)"/><text x="405" y="408" text-anchor="middle" font-size="11" fill="#059669">∂x/∂μ=1，∂x/∂σ=ε</text><text x="405" y="424" text-anchor="middle" font-size="11" fill="#059669">梯度可穿过</text></svg><figcaption>重参数化对比两张计算图。左：x 直接从 N(μ,σ²) 采样，采样节点不可导，梯度（红色虚线）在采样处断开，传不回 μ、σ。右：x=μ+σε，ε 独立于参数，从 μ、σ 到 x 全是确定算术，梯度（绿色实线）可一路回传。</figcaption></figure>
+
+<div class="note">
+<strong>为什么这样就能"求导钻进期望"？看参数藏在哪。</strong> 把期望写成积分，参数 \(\mu,\sigma\) 可能出现在两个位置：<em>被积函数</em>里，或<em>概率权重</em>（密度）里。
+<ul>
+<li><strong>旧写法</strong> \(\mathbb E_{x\sim\mathcal N(\mu,\sigma^2)}[f(x)]=\int f(x)\,p_{\mu,\sigma}(x)\,dx\)：参数藏在<strong>权重 \(p_{\mu,\sigma}\)</strong> 里。对 \(\mu\) 求导得动到密度本身，而"从这个密度采样"这一步并不是 \(\mu\) 的可微函数——梯度断在采样节点。</li>
+<li><strong>重参数化后</strong> \(\mathbb E_{\varepsilon\sim\mathcal N(0,1)}[f(\mu+\sigma\varepsilon)]=\int f(\mu+\sigma\varepsilon)\,\phi(\varepsilon)\,d\varepsilon\)：现在<strong>权重 \(\phi(\varepsilon)\) 不含参数</strong>，参数全挪进了<strong>被积函数 \(f(\mu+\sigma\varepsilon)\)</strong>。积分区域和权重都与 \(\mu,\sigma\) 无关，于是求导和求期望<em>可以交换次序</em>——梯度直接落到被积函数上，链式法则照常接力。</li>
+</ul>
+这就是"梯度能穿过采样"的本质：<em>把参数从不可微的权重，搬到可微的被积函数</em>。
+</div>
+
+<p>具体导数（呼应链式法则，模块1第8课）：把 \(\varepsilon\) 当常数，对 \(x=\mu+\sigma\varepsilon\) 求偏导，</p>
+\[
+\frac{\partial x}{\partial \mu}=1,\qquad \frac{\partial x}{\partial \sigma}=\varepsilon.
+\]
+<p>这两个数清清楚楚、处处可导，链式法则可以接力：\(\dfrac{\partial f}{\partial\mu}=f'(x)\cdot 1\)，\(\dfrac{\partial f}{\partial\sigma}=f'(x)\cdot\varepsilon\)。</p>
+
+<div class="example">
+<h4>例题：在重参数化下手算 \(\partial\mathbb{E}[x]/\partial\mu\)</h4>
+<p>取 \(f(x)=x\)，目标 \(L=\mathbb E[x]\)。用重参数化把期望对 \(\varepsilon\) 写：</p>
+\[
+L=\mathbb E_{\varepsilon\sim\mathcal N(0,1)}[\,\mu+\sigma\varepsilon\,]=\mu+\sigma\,\mathbb E[\varepsilon]=\mu+\sigma\cdot 0=\mu.
+\]
+<p>关键一步：因为现在期望是对<strong>不含参数的 \(\varepsilon\)</strong> 求的（参数在被积函数里、不在权重里），求导和求期望可以交换次序（梯度直接钻进期望里）：</p>
+\[
+\frac{\partial L}{\partial\mu}=\mathbb E\!\left[\frac{\partial}{\partial\mu}(\mu+\sigma\varepsilon)\right]=\mathbb E[1]=1,
+\qquad
+\frac{\partial L}{\partial\sigma}=\mathbb E[\varepsilon]=0.
+\]
+<p>代码用同一批固定 \(\varepsilon\) 做数值微分，得到 \(\partial L/\partial\mu\approx 1.000\)、\(\partial L/\partial\sigma\approx 0\)，与手算吻合。</p>
+</div>
+
+<div class="ml">
+<h4><span class="tag">ML</span> 和 ML 的联系</h4>
+<p>这正是 <strong>VAE（变分自编码器）</strong>能用反向传播训练的原因：编码器输出每个隐变量的 \(\mu,\sigma\)，要从 \(\mathcal N(\mu,\sigma^2)\) 采隐编码再喂给解码器。直接采样会切断梯度；写成 \(z=\mu+\sigma\varepsilon\) 后，梯度就能穿过采样、回到编码器。<strong>扩散模型</strong>的前向加噪 \(x_t=\sqrt{\bar\alpha_t}\,x_0+\sqrt{1-\bar\alpha_t}\,\varepsilon\) 是同一个套路的另一张脸。<em>（这两个埋点，等到模块讲生成模型时会正式回收。）</em>对比一下：当随机量没法写成"参数 + 与参数无关的噪声"这种可微变换时（典型如策略梯度里的离散动作 \(a\)，但连续动作同样可能落在这一类），重参数化就用不上，只能换一套更通用、但方差通常更大的办法——REINFORCE / 对数导数技巧，那是后面 RL 的故事。</p>
+</div>
+
+<h2>五、采样工具箱的其余三件：拒绝、重要性、MCMC</h2>
+
+<h3>拒绝采样（rejection sampling）——"撒点，扔掉超出去的"</h3>
+<p>想从一个只知道形状 \(p(x)\)（甚至没归一化）的分布采样，但 \(F^{-1}\) 求不出来。办法：找一个容易采样的"罩子" \(M\,q(x)\ge p(x)\)，从 \(q\) 采一个候选 \(x\)，再以概率 \(p(x)/(M q(x))\) 接受它，否则扔掉重来。直觉上，当罩子 \(q\) 本身是<strong>均匀</strong>分布时，这就像<em>往罩子覆盖的矩形里均匀撒点，落在 \(p\) 曲线下面的留、上面的扔</em>，留下的点就服从 \(p\)（下面练习 3 正是这个最简特例）。\(q\) 非均匀时，"均匀撒点"的图景要换成"先按 \(q\) 撒、再按比值接受"，但留下的样本同样服从 \(p\)。缺点：罩子套得松（\(M\) 大）时拒绝率高、很浪费，高维尤其糟。</p>
+
+<h3>重要性采样（importance sampling）——"借别人的样本，按权重折算"</h3>
+<p>有时我们<em>根本不需要 \(p\) 的样本</em>，只想算 \(\mathbb E_p[f(X)]\)；偏偏从 \(p\) 采样很难，但有个好采样的 \(q\)。做个恒等变形：</p>
+\[
+\mathbb E_p[f(X)]=\int f(x)\,p(x)\,dx=\int f(x)\,\frac{p(x)}{q(x)}\,q(x)\,dx=\mathbb E_q\!\left[f(X)\,\frac{p(X)}{q(X)}\right].
+\]
+<p>于是从 \(q\) 采样，每个样本乘上<strong>重要性权重 \(w(x)=p(x)/q(x)\)</strong> 再平均即可：</p>
+\[
+\mathbb E_p[f(X)]\approx\frac1N\sum_{i=1}^N f(x_i)\,\frac{p(x_i)}{q(x_i)},\qquad x_i\sim q.
+\]
+<p>直觉：\(q\) 在某处采多了（相对 \(p\)），权重 \(p/q<1\) 就把它<em>调低</em>；采少了就<em>调高</em>。<strong>校正"用错了分布采样"这件事。</strong></p>
+
+<figure class="fig"><svg viewBox="0 0 560 320" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, system-ui, sans-serif"><title>重要性采样：从提议分布 q 采样，用权重 w=p/q 折算回目标 p 的期望</title><defs><marker id="isArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#1f2937"/></marker></defs><line x1="70" y1="250" x2="516" y2="250" stroke="#94a3b8" stroke-width="1" marker-end="url(#isArrow)"/><line x1="70" y1="258" x2="70" y2="120" stroke="#94a3b8" stroke-width="1"/><text x="522" y="254" font-size="12" fill="#1f2937">x</text><path d="M 70.0 247.4 L 73.7 247.0 L 77.3 246.5 L 81.0 246.0 L 84.7 245.4 L 88.3 244.8 L 92.0 244.1 L 95.7 243.3 L 99.3 242.4 L 103.0 241.5 L 106.7 240.5 L 110.3 239.4 L 114.0 238.2 L 117.7 236.9 L 121.3 235.5 L 125.0 234.0 L 128.7 232.5 L 132.3 230.8 L 136.0 229.1 L 139.7 227.3 L 143.3 225.4 L 147.0 223.5 L 150.7 221.5 L 154.3 219.4 L 158.0 217.3 L 161.7 215.2 L 165.3 213.1 L 169.0 211.0 L 172.7 208.9 L 176.3 206.8 L 180.0 204.8 L 183.7 202.9 L 187.3 201.0 L 191.0 199.3 L 194.7 197.6 L 198.3 196.1 L 202.0 194.8 L 205.7 193.6 L 209.3 192.5 L 213.0 191.7 L 216.7 191.0 L 220.3 190.5 L 224.0 190.2 L 227.7 190.2 L 231.3 190.3 L 235.0 190.6 L 238.7 191.2 L 242.3 191.9 L 246.0 192.8 L 249.7 193.9 L 253.3 195.1 L 257.0 196.5 L 260.7 198.1 L 264.3 199.8 L 268.0 201.6 L 271.7 203.4 L 275.3 205.4 L 279.0 207.4 L 282.7 209.5 L 286.3 211.6 L 290.0 213.7 L 293.7 215.8 L 297.3 217.9 L 301.0 220.0 L 304.7 222.0 L 308.3 224.0 L 312.0 225.9 L 315.7 227.8 L 319.3 229.6 L 323.0 231.3 L 326.7 232.9 L 330.3 234.4 L 334.0 235.9 L 337.7 237.2 L 341.3 238.5 L 345.0 239.7 L 348.7 240.8 L 352.3 241.8 L 356.0 242.7 L 359.7 243.5 L 363.3 244.3 L 367.0 245.0 L 370.7 245.6 L 374.3 246.1 L 378.0 246.6 L 381.7 247.1 L 385.3 247.5 L 389.0 247.8 L 392.7 248.1 L 396.3 248.4 L 400.0 248.6 L 403.7 248.8 L 407.3 249.0 L 411.0 249.2 L 414.7 249.3 L 418.3 249.4 L 422.0 249.5 L 425.7 249.6 L 429.3 249.7 L 433.0 249.7 L 436.7 249.8 L 440.3 249.8 L 444.0 249.8 L 447.7 249.9 L 451.3 249.9 L 455.0 249.9 L 458.7 249.9 L 462.3 249.9 L 466.0 250.0 L 469.7 250.0 L 473.3 250.0 L 510.0 250.0" fill="none" stroke="#db2777" stroke-width="2" stroke-dasharray="4 3"/><path d="M 198.3 249.9 L 202.0 249.9 L 205.7 249.9 L 209.3 249.8 L 213.0 249.7 L 216.7 249.5 L 220.3 249.3 L 224.0 249.0 L 227.7 248.6 L 231.3 248.0 L 235.0 247.3 L 238.7 246.3 L 242.3 245.0 L 246.0 243.3 L 249.7 241.2 L 253.3 238.6 L 257.0 235.4 L 260.7 231.5 L 264.3 227.0 L 268.0 221.8 L 271.7 215.8 L 275.3 209.2 L 279.0 201.9 L 282.7 194.1 L 286.3 185.8 L 290.0 177.4 L 293.7 169.0 L 297.3 160.8 L 301.0 153.1 L 304.7 146.2 L 308.3 140.3 L 312.0 135.6 L 315.7 132.3 L 319.3 130.6 L 323.0 130.5 L 326.7 132.0 L 330.3 135.0 L 334.0 139.5 L 337.7 145.3 L 341.3 152.1 L 345.0 159.7 L 348.7 167.8 L 352.3 176.2 L 356.0 184.6 L 359.7 192.9 L 363.3 200.8 L 367.0 208.2 L 370.7 214.9 L 374.3 221.0 L 378.0 226.3 L 381.7 230.9 L 385.3 234.9 L 389.0 238.1 L 392.7 240.8 L 396.3 243.0 L 400.0 244.7 L 403.7 246.1 L 407.3 247.1 L 411.0 247.9 L 414.7 248.5 L 418.3 249.0 L 422.0 249.3 L 425.7 249.5 L 429.3 249.7 L 433.0 249.8 L 436.7 249.9 L 440.3 249.9 L 444.0 249.9 L 447.7 250.0" fill="none" stroke="#2563eb" stroke-width="2"/><line x1="352.9" y1="241.9" x2="352.9" y2="177.4" stroke="#d97706" stroke-width="1.2"/><circle cx="352.9" cy="177.4" r="2.6" fill="#2563eb"/><circle cx="352.9" cy="241.9" r="2.6" fill="#db2777"/><line x1="195.7" y1="250" x2="195.7" y2="197.2" stroke="#d97706" stroke-width="1.2"/><circle cx="195.7" cy="250" r="2.6" fill="#2563eb"/><circle cx="195.7" cy="197.2" r="2.6" fill="#db2777"/><text x="360" y="172" font-size="11.5" fill="#d97706" font-weight="600">w 大（调高）</text><text x="360" y="186" font-size="11" fill="#6b7280">p 高 · q 低</text><text x="190" y="193" font-size="11.5" fill="#d97706" font-weight="600" text-anchor="end">w 小（调低）</text><text x="190" y="207" font-size="11" fill="#6b7280" text-anchor="end">p 低 · q 高</text><text x="326" y="124" font-size="14" fill="#2563eb" font-weight="600">p(x)</text><text x="326" y="138" font-size="11" fill="#6b7280">目标 N(3,1)</text><text x="150" y="186" font-size="14" fill="#db2777" font-weight="600">q(x)</text><text x="150" y="200" font-size="11" fill="#6b7280">提议 N(0,2²)</text><text x="486" y="240" font-size="11" fill="#db2777">q 尾巴需覆盖 p</text><text x="280" y="296" font-size="14" fill="#1f2937" text-anchor="middle" font-style="italic">E</text><text x="288" y="299" font-size="11" fill="#1f2937" text-anchor="start" font-style="italic">p</text><text x="293" y="296" font-size="14" fill="#1f2937" text-anchor="start" font-style="italic">[f]  =  E</text><text x="349" y="299" font-size="11" fill="#1f2937" font-style="italic">q</text><text x="354" y="296" font-size="14" fill="#1f2937" font-style="italic">[ f · p/q ]，   w = p/q</text></svg><figcaption>重要性采样：从易采样的 q（提议分布）采点，用权重 w=p/q 折算回目标 p 的期望。p、q 两条曲线 + 权重比值示意。</figcaption></figure>
+
+<div class="pitfall">
+<strong>易错：</strong> 重要性采样的方差对 \(q\) 极其敏感。若某处 \(p\) 大而 \(q\) 几乎为 0，权重 \(p/q\) 会爆炸，少数样本主宰整个估计，结果方差巨大甚至失效。<strong>经验法则：\(q\) 的尾巴要比 \(p\) 厚</strong>（\(q\) 覆盖 \(p\) 的所有高概率区）。这个"分布不匹配导致权重爆炸"的现象，正是 RL 里离策略（off-policy）方法要对概率比 \(p/q\) 加约束的根源——埋个点。
+</div>
+
+<h3>MCMC（马尔可夫链蒙特卡洛）——高维相关采样</h3>
+<p>当分布是高维、强相关、且只知道未归一化形状时，前面几招都失灵。<strong>MCMC</strong> 换个思路：不直接采独立样本，而是造一条<strong>随机游走的链</strong>，让它的长期停留分布恰好是目标 \(p\)。<strong>Metropolis–Hastings</strong>：从当前点提议一个邻近点，按 \(\min(1,\,p_{\text{新}}/p_{\text{旧}})\) 的概率接受（注意只用到<strong>比值</strong>，未知的归一化常数在分子分母上下相消，自动消掉！）。<strong>Gibbs 采样</strong>：每次固定其他维、只按条件分布更新一维，轮流刷。代价是相邻样本<em>相关</em>、需要"烧入期（burn-in）"、且要判断收敛——这一块我们只点到为止。</p>
+
+<table>
+<thead><tr><th>方法</th><th>解决什么</th><th>代价/限制</th></tr></thead>
+<tbody>
+<tr><td>逆变换</td><td>一维、CDF 可逆，精确独立采样</td><td>需要闭式 \(F^{-1}\)</td></tr>
+<tr><td>重参数化</td><td>让梯度穿过采样（可训练）</td><td>需把分布写成 \(g(\theta,\varepsilon)\)，离散变量难办</td></tr>
+<tr><td>拒绝采样</td><td>有形状、无 \(F^{-1}\) 的分布</td><td>高维拒绝率高、浪费</td></tr>
+<tr><td>重要性采样</td><td>\(p\) 难采但只想估期望</td><td>\(q\) 选不好则方差爆炸</td></tr>
+<tr><td>MCMC</td><td>高维、相关、未归一化</td><td>样本相关、需收敛判断</td></tr>
+</tbody>
+</table>
+
+<h2>六、随机种子与可复现，以及 LLM 解码也是采样</h2>
+
+<p>所有这些方法都吃随机数。为了让实验<strong>可复现（reproducible）</strong>，要固定随机种子（seed）：同一个 seed 喂给伪随机数发生器，吐出的随机序列完全一样。本课代码统一用 <code>np.random.default_rng(seed)</code> 建一个独立的发生器——比全局 <code>np.random.seed</code> 更干净、不会被别处偷偷改状态。</p>
+
+<div class="note">
+<strong>埋点：LLM 解码就是采样。</strong> 大模型每一步输出一个词表上的概率分布，"生成下一个 token"就是从这个分布里采一个样本。你调的那几个旋钮全是采样参数：<strong>temperature</strong> \(T\) 把 logits 除以 \(T\) 再 softmax——\(T\) 小分布变尖（更确定、更死板），\(T\) 大变平（更随机、更发散）；<strong>top-k</strong> 只在概率最高的 \(k\) 个候选里采；<strong>top-p（核采样）</strong>先把候选按概率<em>降序</em>排，取累积概率刚达到 \(p\) 的最小前缀集，<em>重新归一化</em>后再在这个集合里采。固定 seed + \(T=0\)（取 argmax）就能让 LLM 输出确定可复现。这块等讲 Transformer 解码时正式展开。
+</div>
+
+<h2>调一调，观察现象</h2>
+<p>下面每个小实验都只用 numpy + print，几秒跑完。先猜，再跑，对不上就回头想机制。</p>
+
+<div class="example">
+<h4>调一调 1：把 N 翻 4 倍，看误差减半</h4>
+<p><strong>改什么 → </strong>对 \(N\in\{100,400,1600,6400\}\) 各重复 2000 次估计 \(\mathbb E[X]\)，记录估计的标准差。<br>
+<strong>预期看到 → </strong>每翻 4 倍，标准差大约<em>减半</em>（相邻比值≈2.0），且与理论列 \(\sigma_f/\sqrt N\) 逐行吻合。<em>（注意：每个标准差本身也是<u>估</u>出来的，重复次数有限会带来 ±几个百分点的抖动；重复次数从 200 提到 2000 后，比值才稳稳收敛到 2.0——所以看整体趋势，而非苛求每一步精确减半。）</em><br>
+<strong>为什么 → </strong>误差 \(\propto 1/\sqrt N\)，\(N\times4\Rightarrow\sqrt N\times2\Rightarrow\)误差 \(\div2\)。</p>
+<pre><code>import numpy as np
+rng = np.random.default_rng(0)
+lam = 1.5
+for N in [100, 400, 1600, 6400]:
+    ests = []
+    for _ in range(2000):                 # 重复多次让 std 估计更稳
+        U = rng.uniform(0, 1, N)
+        X = -np.log(1 - U) / lam          # 逆变换采样
+        ests.append(X.mean())
+    print(f"N={N:>5}  std(estimate)={np.std(ests):.4f}  "
+          f"1/sqrtN*sigma={(1/lam)/np.sqrt(N):.4f}")
+</code></pre>
+</div>
+
+<div class="example">
+<h4>调一调 2：逆变换造的指数样本 vs 理论密度</h4>
+<p><strong>改什么 → </strong>用逆变换造 \(2\times10^5\) 个指数样本，分箱算经验密度，和 \(\lambda e^{-\lambda x}\) 对比。<br>
+<strong>预期看到 → </strong>两列数几乎逐格吻合（如 \(x\approx0.25\) 处经验≈1.06、理论≈1.03，\(x\approx1.25\) 处经验≈0.23、理论≈0.23）；近处的小偏差正是有限样本的统计涨落。<br>
+<strong>为什么 → </strong>逆变换在数学上精确给出目标分布，只剩有限样本的统计涨落。</p>
+<pre><code>import numpy as np
+rng = np.random.default_rng(0)
+lam = 1.5
+U = rng.uniform(0, 1, 200000)
+X = -np.log(1 - U) / lam
+edges = np.linspace(0, 5, 11)
+counts, _ = np.histogram(X, bins=edges, density=True)
+centers = 0.5 * (edges[:-1] + edges[1:])
+theory = lam * np.exp(-lam * centers)
+print("x      :", np.round(centers, 2))
+print("empir. :", np.round(counts, 3))
+print("theory :", np.round(theory, 3))
+</code></pre>
+</div>
+
+<div class="example">
+<h4>调一调 3：固定一批 ε，挪动 μ、σ，看 x 平滑可导地变</h4>
+<p><strong>改什么 → </strong>固定 5 个 \(\varepsilon\)，让 \(\mu\) 从 0 走到 2、\(\sigma\) 变化，打印 \(x=\mu+\sigma\varepsilon\) 和数值梯度。<br>
+<strong>预期看到 → </strong>每行 \(x\) 随 \(\mu\) <em>整体平移、平滑</em>变化；数值 \(\partial\mathbb E[x]/\partial\mu\approx1.000\)；\(\partial\mathbb E[x]/\partial\sigma\) 不会精确等于 0，而是等于<strong>这一批 \(\varepsilon\) 的样本均值</strong> \(\overline\varepsilon\)（本例 seed=1 那批约 \(-0.0046\)）——它只在样本量 \(\to\infty\) 时趋于真值 \(\mathbb E[\varepsilon]=0\)。<br>
+<strong>为什么 → </strong>随机性锁在固定的 \(\varepsilon\) 里，\(x\) 对 \(\mu,\sigma\) 是确定光滑函数，故可导、梯度可穿过；而 \(\partial L/\partial\sigma=\frac1N\sum_i\varepsilon_i=\overline\varepsilon\)，正是该批噪声的样本均值。</p>
+<pre><code>import numpy as np
+rng = np.random.default_rng(1)
+eps = rng.standard_normal(5)
+print("fixed eps:", np.round(eps, 3))
+sigma = 1.0
+for mu in [0.0, 1.0, 2.0]:
+    print(f"mu={mu}: x =", np.round(mu + sigma * eps, 3))
+
+# 同一批大 eps 上做数值微分，验证 dE[x]/dmu=1, dE[x]/dsigma=mean(eps)
+eps = rng.standard_normal(100000)
+mu, sigma, h = 2.0, 0.5, 1e-3
+base = (mu + sigma * eps).mean()
+print("dE/dmu    ~", round(((mu + h + sigma * eps).mean() - base) / h, 4))
+print("dE/dsigma ~", round(((mu + (sigma + h) * eps).mean() - base) / h, 4),
+      " (mean(eps)=", round(eps.mean(), 4), ")")   # 两数应相等
+</code></pre>
+</div>
+
+<h2>动手练习</h2>
+<ol>
+<li><strong>逆变换造别的分布。</strong> 标准 Logistic 分布的 CDF 是 \(F(x)=\frac{1}{1+e^{-x}}\)（就是 sigmoid！）。推导 \(F^{-1}(U)\)，并用下面骨架采样、对比经验均值≈0。
+<pre><code>import numpy as np
+rng = np.random.default_rng(0)
+U = rng.uniform(0, 1, 100000)
+X = np.log(U / (1 - U))   # F^{-1}(U) = logit(U)，自己推一遍
+print("mean:", round(X.mean(), 3), " median:", round(np.median(X), 3))
+</code></pre></li>
+
+<li><strong>重要性采样动手。</strong> 估计 \(\mathbb E_p[X^2]\)，其中 \(p=\mathcal N(3,1)\)（真值 \(=\mu^2+\sigma^2=10\)），但只从 \(q=\mathcal N(0,2^2)\) 采样。补全权重 \(p/q\)。
+<pre><code>import numpy as np
+rng = np.random.default_rng(1)
+p = lambda x: np.exp(-0.5*(x-3)**2)/np.sqrt(2*np.pi)
+q = lambda x: np.exp(-0.5*(x/2)**2)/(2*np.sqrt(2*np.pi))
+xs = rng.normal(0, 2, 200000)
+w  = p(xs) / q(xs)                 # 重要性权重
+print("IS est:", round(np.mean(w * xs**2), 3), " (theory 10)")
+</code></pre>
+现在把 \(q\) 改成 \(\mathcal N(0,0.5^2)\)（尾巴太薄），观察估计变得多么不稳——体会"权重爆炸"。</li>
+
+<li><strong>拒绝采样最小实现。</strong> 从三角形密度 \(p(x)=2x,\ x\in[0,1]\) 采样：用 \(q=\mathrm{Uniform}(0,1)\)、罩子 \(M=2\)。提议 \(x\sim U(0,1)\)，再抽 \(u\sim U(0,1)\)，当 \(u<p(x)/(M\cdot1)=x\) 时接受。统计接受率应≈0.5，经验均值应≈\(2/3\)。（因为这里 \(q\) 均匀，正对应"矩形里均匀撒点、留 \(p\) 曲线下方"的图景。）</li>
+
+<li><strong>验证 \(1/\sqrt N\) 的斜率。</strong> 把调一调 1 的 \((\,\ln N,\ \ln\mathrm{std}\,)\) 打印出来，估计斜率，应接近 \(-0.5\)。</li>
+
+<li><strong>种子可复现。</strong> 用相同 seed 跑两次同一段采样，验证两次结果<em>逐位</em>相同；换 seed 则不同。</li>
+</ol>
+
+<h2>掌握自检</h2>
+<ul>
+<li>为什么蒙特卡洛误差是 \(1/\sqrt N\) 而不是 \(1/N\)？这和"随机游走 \(N\) 步约走 \(\sqrt N\)"是同一回事吗？</li>
+<li>逆变换采样的一行证明里，哪一步用到了"\(U\) 均匀 \(\Rightarrow P(U\le t)=t\)"？</li>
+<li>为什么"直接从 \(\mathcal N(\mu,\sigma^2)\) 采样"会切断梯度，而 \(x=\mu+\sigma\varepsilon\) 不会？随机性被挪到哪了？参数从"权重"挪到了"被积函数"，这为何让求导能与求期望交换？</li>
+<li>不查公式，写出 \(\partial x/\partial\mu\) 和 \(\partial x/\partial\sigma\)。</li>
+<li>重要性采样里权重 \(p/q\) 在"\(q\) 采多了的地方"是大于还是小于 1？为什么 \(q\) 尾巴要比 \(p\) 厚？</li>
+<li>Metropolis–Hastings 的接受概率 \(\min(1,p_{\text{新}}/p_{\text{旧}})\) 为什么只用到 \(p\) 的<strong>比值</strong>？这让我们能对哪类分布（少知道什么）也能采样？</li>
+<li>LLM 的 temperature 调大，输出更随机还是更确定？对应分布变尖还是变平？</li>
+</ul>
+
+<p>下一课我们正式进入<strong>最优化</strong>：凸性与梯度下降的几何——为什么沿负梯度走能下山，Hessian \(H\) 的特征值/条件数（呼应模块1）又如何决定下山的快慢与形状。本课的采样会和它在后面的随机优化、变分推断里重逢。</p>
+
+<div class="skip">
+<h4>可以先放过的点</h4>
+<ul>
+<li><strong>MCMC 的收敛判断、burn-in、自相关</strong>：现在只需记住"高维相关采样有这么个工具，只用比值就行"，等真要做贝叶斯后验采样时再深入。</li>
+<li><strong>重要性采样的方差最优 \(q\) 与自归一化（self-normalized IS）</strong>：知道"\(q\) 选不好方差会爆"即可，公式推导等到 off-policy RL 再回来。</li>
+<li><strong>高斯的 Box–Muller 推导</strong>：知道"高斯没有闭式 \(F^{-1}\)、所以另想办法"就够，细节可跳过。</li>
+<li><strong>离散变量的可微采样（Gumbel-Softmax）</strong>：重参数化对连续变量天然好用，离散情形的技巧等到需要时再学。</li>
+</ul>
+</div>
+</article>
+<div class="navbtns"><a class="prev" href="lesson-05-information-theory.html"><div class="nlabel">← 上一课</div><div class="ntitle">第5课 · 信息论——熵、交叉熵、KL</div></a><a class="next" href="lesson-07-convexity-gradient-descent.html"><div class="nlabel">下一课 →</div><div class="ntitle">第7课 · 凸性与梯度下降——优化的几何</div></a></div>
+<nav class="toc"><h3>本模块课程表</h3><ol>
+<li><a href="lesson-01-random-variables.html"><span class="ln">第1课</span>概率的语言——随机变量、分布、期望与方差</a></li>
+<li><a href="lesson-02-distributions-covariance.html"><span class="ln">第2课</span>分布动物园与协方差</a></li>
+<li><a href="lesson-03-conditional-bayes.html"><span class="ln">第3课</span>条件概率与贝叶斯</a></li>
+<li><a href="lesson-04-mle-map.html"><span class="ln">第4课</span>从数据到损失——MLE 与 MAP</a></li>
+<li><a href="lesson-05-information-theory.html"><span class="ln">第5课</span>信息论——熵、交叉熵、KL</a></li>
+<li class="cur"><span class="ln">第6课</span>采样——逆变换、重参数化与蒙特卡洛</li>
+<li><a href="lesson-07-convexity-gradient-descent.html"><span class="ln">第7课</span>凸性与梯度下降——优化的几何</a></li>
+<li><a href="lesson-08-optimizers.html"><span class="ln">第8课</span>现代优化器——SGD、动量、Adam 与调度</a></li>
+<li><a href="lesson-09-rl-crash-1.html"><span class="ln">第9课</span>强化学习速成 I——MDP、价值与贝尔曼</a></li>
+<li><a href="lesson-10-rl-crash-2.html"><span class="ln">第10课</span>强化学习速成 II——策略梯度到 PPO</a></li>
+</ol></nav>
+</div>
+<!-- pyrunner-injected -->
+<style>
+.pr-cell{border:1px solid #334155;border-radius:10px;margin:1.2em 0;overflow:hidden;background:#0f172a;}
+.pr-head{display:flex;align-items:center;gap:8px;background:#1e293b;color:#cbd5e1;padding:6px 10px;font-size:13px;font-family:system-ui,-apple-system,sans-serif;}
+.pr-title{flex:1;font-weight:600;}
+.pr-status{font-size:12px;color:#94a3b8;white-space:nowrap;max-width:50%;overflow:hidden;text-overflow:ellipsis;}
+.pr-btn{cursor:pointer;border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:6px;padding:3px 11px;font-size:13px;line-height:1.4;}
+.pr-btn:hover{background:#0b1220;}
+.pr-run{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:600;}
+.pr-run:hover{background:#1d4ed8;}
+.pr-cell.collapsed .pr-body{display:none;}
+.pr-editor{position:relative;background:#0f172a;}
+.pr-code,.pr-edit{display:block;width:100%;min-height:68px;border:none;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.55;padding:12px 14px;box-sizing:border-box;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:4;}
+.pr-code{position:absolute;inset:0;margin:0;overflow:hidden;background:#0f172a;color:#dbeafe;pointer-events:none;}
+.pr-edit{position:relative;background:transparent;color:transparent;caret-color:#e2e8f0;resize:vertical;outline:none;-webkit-text-fill-color:transparent;}
+.pr-edit::selection{background:rgba(96,165,250,.34);}
+.tok-kw{color:#c084fc;font-weight:700;}
+.tok-fn{color:#67e8f9;}
+.tok-num{color:#fbbf24;}
+.tok-str{color:#86efac;}
+.tok-comment{color:#94a3b8;font-style:italic;}
+.pr-out{margin:0;padding:10px 14px;border-top:1px solid #334155;background:#0b1220;color:#cbd5e1;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.5;white-space:pre-wrap;max-height:340px;overflow:auto;}
+.pr-out:empty{display:none;}
+.pr-out.err{color:#fca5a5;}
+#pr-fab{position:fixed;right:18px;bottom:18px;z-index:9998;background:#2563eb;color:#fff;border:none;border-radius:999px;padding:10px 17px;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.22);font-family:system-ui,sans-serif;}
+#pr-fab:hover{background:#1d4ed8;}
+#pr-lab{position:fixed;right:18px;bottom:66px;z-index:9999;width:400px;max-width:92vw;background:#0f172a;border:1px solid #334155;border-radius:12px;display:none;flex-direction:column;box-shadow:0 14px 38px rgba(0,0,0,.4);overflow:hidden;}
+#pr-lab.open{display:flex;}
+#pr-lab .pr-edit,#pr-lab .pr-code{min-height:150px;}
+</style>
+<script>
+(function(){
+  var PYBASE="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+  var pyReady=null;
+  function loadPy(status){
+    if(pyReady)return pyReady;
+    pyReady=(async function(){
+      status("正在加载 Python 运行时（首次约 10 秒，需联网）…");
+      await new Promise(function(res,rej){
+        var s=document.createElement("script");s.src=PYBASE+"pyodide.js";
+        s.onload=res;s.onerror=function(){rej(new Error("无法加载 Pyodide（首次运行需要联网）"));};
+        document.head.appendChild(s);
+      });
+      var py=await loadPyodide({indexURL:PYBASE});
+      status("正在加载 NumPy …");
+      await py.loadPackage("numpy");
+      status("Python 就绪 ✓");
+      return py;
+    })();
+    return pyReady;
+  }
+  async function run(code,outEl,statusEl){
+    var setS=function(m){if(statusEl)statusEl.textContent=m;};
+    outEl.classList.remove("err");outEl.textContent="";
+    var py;
+    try{py=await loadPy(setS);}
+    catch(e){outEl.classList.add("err");outEl.textContent="加载失败："+e.message;return;}
+    var buf="";
+    py.setStdout({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    py.setStderr({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    try{
+      var result=await py.runPythonAsync(code);
+      if(result!==undefined&&result!==null){
+        var r;try{r=result.toString();}catch(_){r=String(result);}
+        if(r!=="None")buf+=(buf&&!buf.endsWith("\n")?"\n":"")+r;
+        if(result&&result.destroy)result.destroy();
+      }
+      outEl.textContent=buf||"（运行成功，无输出。用 print(...) 查看结果）";
+    }catch(e){
+      outEl.classList.add("err");
+      outEl.textContent=buf+(buf?"\n":"")+String((e&&e.message)||e);
+    }
+  }
+  var KW={False:1,None:1,True:1,and:1,as:1,assert:1,async:1,await:1,break:1,class:1,continue:1,def:1,del:1,elif:1,else:1,except:1,finally:1,for:1,from:1,global:1,if:1,import:1,in:1,is:1,lambda:1,nonlocal:1,not:1,or:1,pass:1,raise:1,return:1,try:1,while:1,with:1,yield:1};
+  var FN={abs:1,all:1,any:1,array:1,bool:1,dict:1,enumerate:1,float:1,int:1,len:1,list:1,max:1,min:1,np:1,numpy:1,print:1,range:1,round:1,set:1,str:1,sum:1,tuple:1,zip:1};
+  function esc(s){return s.replace(/[&<>]/g,function(c){return c==="&"?"&amp;":c==="<"?"&lt;":"&gt;";});}
+  function colorLine(line){
+    var out="",i=0;
+    while(i<line.length){
+      var ch=line[i];
+      if(ch==="#"){out+='<span class="tok-comment">'+esc(line.slice(i))+"</span>";break;}
+      if(ch==="'"||ch==='"'){
+        var q=ch,triple=line.slice(i,i+3)===q+q+q,end=i+(triple?3:1),done=false;
+        while(end<line.length){
+          if(!triple&&line[end]==="\\"){end+=2;continue;}
+          if(triple&&line.slice(end,end+3)===q+q+q){end+=3;done=true;break;}
+          if(!triple&&line[end]===q){end+=1;done=true;break;}
+          end+=1;
+        }
+        out+='<span class="tok-str">'+esc(line.slice(i,done?end:line.length))+"</span>";
+        i=done?end:line.length;
+        continue;
+      }
+      if(/[0-9]/.test(ch)||(ch==="."&&/[0-9]/.test(line[i+1]||""))){
+        var m=line.slice(i).match(/^(?:0[xX][0-9a-fA-F]+|\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?/);
+        out+='<span class="tok-num">'+esc(m[0])+"</span>";i+=m[0].length;continue;
+      }
+      if(/[A-Za-z_]/.test(ch)){
+        var id=line.slice(i).match(/^[A-Za-z_][A-Za-z0-9_]*/)[0];
+        if(KW[id])out+='<span class="tok-kw">'+id+"</span>";
+        else if(FN[id])out+='<span class="tok-fn">'+id+"</span>";
+        else out+=id;
+        i+=id.length;continue;
+      }
+      out+=esc(ch);i+=1;
+    }
+    return out;
+  }
+  function paint(ta){
+    var pre=ta.closest(".pr-editor").querySelector(".pr-code");
+    pre.innerHTML=ta.value.split("\n").map(colorLine).join("\n")+(ta.value.endsWith("\n")?"\n":"");
+    pre.style.height=ta.style.height;
+    pre.scrollTop=ta.scrollTop;pre.scrollLeft=ta.scrollLeft;
+  }
+  function autosize(ta){ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight+2,460)+"px";}
+  function tune(ta){autosize(ta);paint(ta);}
+  function tabKey(e){
+    if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();var b=this.closest(".pr-cell,#pr-lab").querySelector(".pr-run");if(b)b.click();return;}
+    if(e.key==="Tab"){
+      e.preventDefault();
+      var s=this.selectionStart,en=this.selectionEnd,v=this.value,lineStart=v.lastIndexOf("\n",s-1)+1,lineEnd=v.indexOf("\n",en);
+      if(lineEnd<0)lineEnd=v.length;
+      if(s!==en||e.shiftKey){
+        var block=v.slice(lineStart,lineEnd),lines=block.split("\n"),delta=0;
+        if(e.shiftKey){
+          lines=lines.map(function(line){
+            if(line.startsWith("    ")){delta-=4;return line.slice(4);}
+            if(line.startsWith("\t")){delta-=1;return line.slice(1);}
+            return line;
+          });
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=Math.max(lineStart,s+(s===lineStart?0:Math.max(delta/Math.max(lines.length,1),-4)));
+          this.selectionEnd=Math.max(this.selectionStart,en+delta);
+        }else{
+          lines=lines.map(function(line){delta+=4;return "    "+line;});
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=s+4;
+          this.selectionEnd=en+delta;
+        }
+      }else{
+        this.value=v.slice(0,s)+"    "+v.slice(en);this.selectionStart=this.selectionEnd=s+4;
+      }
+      tune(this);
+      return;
+    }
+    if(e.key==="Enter"){
+      e.preventDefault();
+      var a=this.selectionStart,b=this.selectionEnd,text=this.value,start=text.lastIndexOf("\n",a-1)+1;
+      var prefix=text.slice(start,a),indent=(prefix.match(/^\s*/)||[""])[0],code=prefix.replace(/#.*$/,"").trimEnd();
+      var add="\n"+indent+(/:\s*$/.test(code)?"    ":"");
+      this.value=text.slice(0,a)+add+text.slice(b);
+      this.selectionStart=this.selectionEnd=a+add.length;
+      tune(this);
+      return;
+    }
+  }
+  function makeCell(code){
+    var cell=document.createElement("div");cell.className="pr-cell";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">可运行 · Python (NumPy)</span><span class="pr-status"></span><button class="pr-btn pr-toggle">收起</button><button class="pr-btn pr-run">▶ 运行</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    var ta=cell.querySelector(".pr-edit");ta.value=code;
+    var out=cell.querySelector(".pr-out"),st=cell.querySelector(".pr-status");
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    cell.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    var tog=cell.querySelector(".pr-toggle");
+    tog.onclick=function(){cell.classList.toggle("collapsed");tog.textContent=cell.classList.contains("collapsed")?"展开":"收起";};
+    setTimeout(function(){tune(ta);},0);
+    return cell;
+  }
+  function enhance(){
+    document.querySelectorAll("article pre").forEach(function(pre){
+      if(pre.closest(".pr-cell"))return;
+      var codeEl=pre.querySelector("code")||pre;
+      var code=codeEl.textContent.replace(/\s+$/,"");
+      if(!code)return;
+      pre.replaceWith(makeCell(code));
+    });
+  }
+  function lab(){
+    var fab=document.createElement("button");fab.id="pr-fab";fab.textContent="▶ Python 实验台";
+    var panel=document.createElement("div");panel.id="pr-lab";
+    panel.innerHTML='<div class="pr-head"><span class="pr-title">Python 实验台 · NumPy</span><span class="pr-status"></span><button class="pr-btn pr-run">▶ 运行</button><button class="pr-btn pr-min">收起</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    document.body.appendChild(fab);document.body.appendChild(panel);
+    var ta=panel.querySelector(".pr-edit");
+    ta.value="import numpy as np\na = np.array([3, 2])\nb = np.array([1, 4])\nprint(\"a + b =\", a + b)\nprint(\"a . b =\", a @ b)\nprint(\"|a|  =\", np.linalg.norm(a))\ncos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))\nprint(\"cos =\", round(float(cos), 4))";
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    var out=panel.querySelector(".pr-out"),st=panel.querySelector(".pr-status");
+    panel.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    fab.onclick=function(){panel.classList.toggle("open");};
+    panel.querySelector(".pr-min").onclick=function(){panel.classList.remove("open");};
+    setTimeout(function(){tune(ta);},0);
+  }
+  function init(){enhance();lab();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+
+<script src="../assets/annotator.js"></script>
+</body>
+</html>
