@@ -475,7 +475,16 @@ for i in range(2):
 .pr-run{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:600;}
 .pr-run:hover{background:#1d4ed8;}
 .pr-cell.collapsed .pr-body{display:none;}
-.pr-edit{display:block;width:100%;border:none;background:#0f172a;color:#e2e8f0;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.55;padding:12px 14px;resize:vertical;box-sizing:border-box;outline:none;}
+.pr-editor{position:relative;background:#0f172a;}
+.pr-code,.pr-edit{display:block;width:100%;min-height:68px;border:none;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.55;padding:12px 14px;box-sizing:border-box;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:4;}
+.pr-code{position:absolute;inset:0;margin:0;overflow:hidden;background:#0f172a;color:#dbeafe;pointer-events:none;}
+.pr-edit{position:relative;background:transparent;color:transparent;caret-color:#e2e8f0;resize:vertical;outline:none;-webkit-text-fill-color:transparent;}
+.pr-edit::selection{background:rgba(96,165,250,.34);}
+.tok-kw{color:#c084fc;font-weight:700;}
+.tok-fn{color:#67e8f9;}
+.tok-num{color:#fbbf24;}
+.tok-str{color:#86efac;}
+.tok-comment{color:#94a3b8;font-style:italic;}
 .pr-out{margin:0;padding:10px 14px;border-top:1px solid #334155;background:#0b1220;color:#cbd5e1;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.5;white-space:pre-wrap;max-height:340px;overflow:auto;}
 .pr-out:empty{display:none;}
 .pr-out.err{color:#fca5a5;}
@@ -483,7 +492,7 @@ for i in range(2):
 #pr-fab:hover{background:#1d4ed8;}
 #pr-lab{position:fixed;right:18px;bottom:66px;z-index:9999;width:400px;max-width:92vw;background:#0f172a;border:1px solid #334155;border-radius:12px;display:none;flex-direction:column;box-shadow:0 14px 38px rgba(0,0,0,.4);overflow:hidden;}
 #pr-lab.open{display:flex;}
-#pr-lab .pr-edit{min-height:150px;}
+#pr-lab .pr-edit,#pr-lab .pr-code{min-height:150px;}
 </style>
 <script>
 (function(){
@@ -528,7 +537,49 @@ for i in range(2):
       outEl.textContent=buf+(buf?"\n":"")+String((e&&e.message)||e);
     }
   }
+  var KW={False:1,None:1,True:1,and:1,as:1,assert:1,async:1,await:1,break:1,class:1,continue:1,def:1,del:1,elif:1,else:1,except:1,finally:1,for:1,from:1,global:1,if:1,import:1,in:1,is:1,lambda:1,nonlocal:1,not:1,or:1,pass:1,raise:1,return:1,try:1,while:1,with:1,yield:1};
+  var FN={abs:1,all:1,any:1,array:1,bool:1,dict:1,enumerate:1,float:1,int:1,len:1,list:1,max:1,min:1,np:1,numpy:1,print:1,range:1,round:1,set:1,str:1,sum:1,tuple:1,zip:1};
+  function esc(s){return s.replace(/[&<>]/g,function(c){return c==="&"?"&amp;":c==="<"?"&lt;":"&gt;";});}
+  function colorLine(line){
+    var out="",i=0;
+    while(i<line.length){
+      var ch=line[i];
+      if(ch==="#"){out+='<span class="tok-comment">'+esc(line.slice(i))+"</span>";break;}
+      if(ch==="'"||ch==='"'){
+        var q=ch,triple=line.slice(i,i+3)===q+q+q,end=i+(triple?3:1),done=false;
+        while(end<line.length){
+          if(!triple&&line[end]==="\\"){end+=2;continue;}
+          if(triple&&line.slice(end,end+3)===q+q+q){end+=3;done=true;break;}
+          if(!triple&&line[end]===q){end+=1;done=true;break;}
+          end+=1;
+        }
+        out+='<span class="tok-str">'+esc(line.slice(i,done?end:line.length))+"</span>";
+        i=done?end:line.length;
+        continue;
+      }
+      if(/[0-9]/.test(ch)||(ch==="."&&/[0-9]/.test(line[i+1]||""))){
+        var m=line.slice(i).match(/^(?:0[xX][0-9a-fA-F]+|\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?/);
+        out+='<span class="tok-num">'+esc(m[0])+"</span>";i+=m[0].length;continue;
+      }
+      if(/[A-Za-z_]/.test(ch)){
+        var id=line.slice(i).match(/^[A-Za-z_][A-Za-z0-9_]*/)[0];
+        if(KW[id])out+='<span class="tok-kw">'+id+"</span>";
+        else if(FN[id])out+='<span class="tok-fn">'+id+"</span>";
+        else out+=id;
+        i+=id.length;continue;
+      }
+      out+=esc(ch);i+=1;
+    }
+    return out;
+  }
+  function paint(ta){
+    var pre=ta.closest(".pr-editor").querySelector(".pr-code");
+    pre.innerHTML=ta.value.split("\n").map(colorLine).join("\n")+(ta.value.endsWith("\n")?"\n":"");
+    pre.style.height=ta.style.height;
+    pre.scrollTop=ta.scrollTop;pre.scrollLeft=ta.scrollLeft;
+  }
   function autosize(ta){ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight+2,460)+"px";}
+  function tune(ta){autosize(ta);paint(ta);}
   function tabKey(e){
     if(e.key==="Tab"){e.preventDefault();var s=this.selectionStart,en=this.selectionEnd;
       this.value=this.value.slice(0,s)+"    "+this.value.slice(en);this.selectionStart=this.selectionEnd=s+4;}
@@ -536,15 +587,16 @@ for i in range(2):
   }
   function makeCell(code){
     var cell=document.createElement("div");cell.className="pr-cell";
-    cell.innerHTML='<div class="pr-head"><span class="pr-title">可运行 · Python (NumPy)</span><span class="pr-status"></span><button class="pr-btn pr-toggle">收起</button><button class="pr-btn pr-run">▶ 运行</button></div><div class="pr-body"><textarea class="pr-edit" spellcheck="false"></textarea><pre class="pr-out"></pre></div>';
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">可运行 · Python (NumPy)</span><span class="pr-status"></span><button class="pr-btn pr-toggle">收起</button><button class="pr-btn pr-run">▶ 运行</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
     var ta=cell.querySelector(".pr-edit");ta.value=code;
     var out=cell.querySelector(".pr-out"),st=cell.querySelector(".pr-status");
-    ta.addEventListener("input",function(){autosize(ta);});
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
     ta.addEventListener("keydown",tabKey);
     cell.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
     var tog=cell.querySelector(".pr-toggle");
     tog.onclick=function(){cell.classList.toggle("collapsed");tog.textContent=cell.classList.contains("collapsed")?"展开":"收起";};
-    setTimeout(function(){autosize(ta);},0);
+    setTimeout(function(){tune(ta);},0);
     return cell;
   }
   function enhance(){
@@ -559,15 +611,18 @@ for i in range(2):
   function lab(){
     var fab=document.createElement("button");fab.id="pr-fab";fab.textContent="▶ Python 实验台";
     var panel=document.createElement("div");panel.id="pr-lab";
-    panel.innerHTML='<div class="pr-head"><span class="pr-title">Python 实验台 · NumPy</span><span class="pr-status"></span><button class="pr-btn pr-run">▶ 运行</button><button class="pr-btn pr-min">收起</button></div><div class="pr-body"><textarea class="pr-edit" spellcheck="false"></textarea><pre class="pr-out"></pre></div>';
+    panel.innerHTML='<div class="pr-head"><span class="pr-title">Python 实验台 · NumPy</span><span class="pr-status"></span><button class="pr-btn pr-run">▶ 运行</button><button class="pr-btn pr-min">收起</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
     document.body.appendChild(fab);document.body.appendChild(panel);
     var ta=panel.querySelector(".pr-edit");
     ta.value="import numpy as np\na = np.array([3, 2])\nb = np.array([1, 4])\nprint(\"a + b =\", a + b)\nprint(\"a . b =\", a @ b)\nprint(\"|a|  =\", np.linalg.norm(a))\ncos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))\nprint(\"cos =\", round(float(cos), 4))";
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
     ta.addEventListener("keydown",tabKey);
     var out=panel.querySelector(".pr-out"),st=panel.querySelector(".pr-status");
     panel.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
     fab.onclick=function(){panel.classList.toggle("open");};
     panel.querySelector(".pr-min").onclick=function(){panel.classList.remove("open");};
+    setTimeout(function(){tune(ta);},0);
   }
   function init(){enhance();lab();}
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
