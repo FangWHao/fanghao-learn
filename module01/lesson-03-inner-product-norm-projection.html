@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>模块1 · 第3课 · 内积、范数与投影——度量与几何</title>
+<title>模块1 · 第3课 · 内积、范数与投影</title>
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
@@ -48,6 +48,11 @@ figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
 .ml{background:var(--green-bg);border-left:4px solid var(--green);}
 .key{background:var(--amber-bg);border-left:4px solid var(--amber);}
 .pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.goals{background:var(--blue-bg);border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:10px;padding:14px 20px;margin:.2em 0 1.5em;}
+.goals h4{margin:.1em 0 .5em;color:#1e3a8a;}
+.goals ul{margin:.3em 0;}
+.skip{background:var(--soft);border:1px solid var(--line);border-left:4px solid #94a3b8;border-radius:10px;padding:14px 20px;margin:1.8em 0 0;color:#475569;}
+.skip h4{margin:.1em 0 .5em;color:#475569;}
 .tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
 .toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
 .toc h3{margin:.1em 0 .7em;}
@@ -64,23 +69,27 @@ figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
 .navbtns .ntitle{font-weight:600;margin-top:3px;}
 .navbtns .next{text-align:right;}
 mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.here{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:6px 0 4px;font-size:15px;color:#1e3a8a;line-height:1.7;}
+.here b{font-weight:700;}
 .cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
 .card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
 .card:hover{border-color:var(--blue);}
 .card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
 .card .ct{font-size:18px;font-weight:600;}
 .card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+.card .cap{margin-left:40px;margin-top:7px;font-size:13px;color:#1e3a8a;}
+.card .cap .lbl{display:inline-block;background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;margin-right:7px;}
 </style>
 </head>
 <body>
 <header class="top"><div class="inner">
 <div class="crumb"><a href="index.html" style="color:inherit">模块 1 · 线性代数与微积分</a>　/　第 3 课（共 10 课）</div>
-<h1>内积、范数与投影——度量与几何</h1>
-<div class="sub">从零到前沿 ML 自学课程　·　第一阶段：数学与工具基础</div>
+<h1>内积、范数与投影</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　阶段0：数学与工具基础　·　<strong>能力点：</strong>度量与正则化的几何——L2 损失、权重衰减、余弦相似度、最小二乘</div>
 </div></header>
 <div class="wrap">
 <article>
-<h2>1. 开场：给空间装上"尺子"和"量角器"</h2>
+<div class="goals"><h4>读完这一课，你将能够</h4><ul><li>说出内积的三条公理，并解释长度 \(\|a\|=\sqrt{\langle a,a\rangle}\) 与夹角为何都由内积派生。</li><li>心算同一向量的 L1 / L2 / L∞ 范数，并说清"圆把权重收小、尖角把权重清零"为何对应 L2 与 L1 正则。</li><li>用 \(\operatorname{proj}_a(b)=\dfrac{a\cdot b}{\|a\|^2}a\) 手算投影与残差，并验证残差与 \(a\) 正交。</li><li>把"最小二乘"翻译成"把 \(b\) 投影到列空间"，并由"残差 ⊥ 列空间"推出正规方程 \(A^\top Aw=A^\top b\)。</li><li>用 NumPy 解直线拟合，验证残差与每个特征列正交、投影矩阵 \(P\) 幂等。</li></ul></div><h2>1. 开场：给空间装上"尺子"和"量角器"</h2>
 
 <p>上一课我们学会把矩阵看成<strong>线性变换 linear transformation</strong>——它把整个空间拉伸、旋转、剪切。但变换前后，我们还缺一样东西：<em>度量</em>。两个向量有多长？它们之间夹角多大？谁离谁更近？谁和谁垂直？这些"几何问题"，统统由一个运算回答——<strong>内积 inner product</strong>。</p>
 
@@ -353,7 +362,34 @@ P = X @ np.linalg.inv(X.T @ X) @ X.T
 print("P @ y == pred :", np.allclose(P @ y, pred))   # True
 print("P 幂等 P@P==P :", np.allclose(P @ P, P))       # True</code></pre>
 
-<h2>动手练习</h2>
+<h2>调一调，观察现象</h2><p>下面三个小实验都只用 numpy 和 print，几秒跑完。每个都先猜结果，再运行核对——把"投影、范数、共线"这三件事从公式变成你亲眼见过的现象。</p>
+
+<div class="example"><h4>实验 1：改投影目标的方向，看标量系数的符号翻转</h4><p><strong>改什么</strong>：固定 \(a=[2,1]\)，把目标 \(b\) 换成与 \(a\) 成锐角、垂直、钝角的三种向量。<br><strong>预期现象</strong>：标量系数 \(c=\dfrac{a\cdot b}{\|a\|^2}\) 依次为 <code>+2.00</code>（锐角同侧，影子是 \([4,2]\)）、<code>0.00</code>（垂直，投影是零向量 \([0,0]\)）、<code>-1.40</code>（钝角，影子是 \([-2.8,-1.4]\)，指向 \(a\) 的反方向）。<br><strong>为什么</strong>：投影系数带的正是 \(a\cdot b\) 的符号；点积锐角为正、垂直为零、钝角为负，所以"影子"会跟着翻到 \(a\) 的反侧——这就是课文强调的"投影是带符号的"。</p>
+<pre><code>import numpy as np
+a = np.array([2., 1.])
+for b in ([3., 4.], [-1., 2.], [-3., -1.]):
+    b = np.array(b)
+    c = (a @ b) / (a @ a)
+    print(f"b={b}  dot={a@b:5.1f}  coef={c:5.2f}  proj={c*a}")
+</code></pre></div>
+
+<div class="example"><h4>实验 2：增大岭回归的 λ，看权重范数被往零收缩</h4><p><strong>改什么</strong>：在二次拟合数据上，让正则强度 \(\lambda\) 从 0 一路增大到 100，闭式解 \(w=(X^\top X+\lambda I)^{-1}X^\top y\)。<br><strong>预期现象</strong>：\(\|w\|_2\) 单调下降，约 <code>1.94 → 1.79 → 1.31 → 0.71 → 0.38</code>；权重整体被往零拉，但在每个 \(\lambda&gt;0\) 上都没有哪一维被精确压成 0（打印出来全是非零的小数）。<br><strong>为什么</strong>：L2 正则的等高线是圆，把权重<em>均匀收小</em>。这正是课文那句"圆把权重收小"——要想把权重精确清零得换成 L1 的尖角，那是后话。</p>
+<pre><code>import numpy as np
+x = np.array([0., 1., 2., 3.]); y = np.array([1., 3., 4., 6.])
+X = np.column_stack([np.ones_like(x), x, x**2])
+for lam in [0., 0.1, 1., 10., 100.]:
+    w = np.linalg.inv(X.T @ X + lam * np.eye(3)) @ X.T @ y
+    print(f"lambda={lam:6.1f}  ||w||={np.linalg.norm(w):.4f}  w={np.round(w,3)}")
+</code></pre></div>
+
+<div class="example"><h4>实验 3：把一列改成另一列的倍数，看 \(\det(X^\top X)\) 塌成 0</h4><p><strong>改什么</strong>：先用正常的两列（常数项 + \(x\)），再把第三列故意设成第二列的 2 倍（人为共线）。<br><strong>预期现象</strong>：正常时 \(\det(X^\top X)=20.0\)（可逆，正规方程有解）；共线时 \(\det=0.0\)（奇异，求逆会爆炸）。<br><strong>为什么</strong>：正规方程要求 \(X\) 的列线性无关，\(X^\top X\) 才可逆。一旦两列成比例，列空间"塌了一维"，\(X^\top X\) 行列式归零——这就是课文易错框里"特征共线 → 求逆数值爆炸"的根源，也是岭回归 \(+\lambda I\) 来救场的理由。</p>
+<pre><code>import numpy as np
+x = np.array([0., 1., 2., 3.])
+X_ok = np.column_stack([np.ones_like(x), x])
+print("正常两列 det(X^T X) =", round(np.linalg.det(X_ok.T @ X_ok), 6))
+X_bad = np.column_stack([np.ones_like(x), x, 2 * x])   # 第3列 = 第2列的2倍
+print("含共线列 det(X^T X) =", round(np.linalg.det(X_bad.T @ X_bad), 6))
+</code></pre></div><h2>动手练习</h2>
 <ol>
 <li>把 \(b=[1,2,2]\) 投影到 \(a=[2,0,0]\)。手算 \(\operatorname{proj}_a(b)\) 与残差，并用代码核对残差与 \(a\) 正交。
 <pre><code>import numpy as np
@@ -405,7 +441,7 @@ X = np.column_stack([np.ones_like(x), x, x**2])
 <p>内积是空间的度量地基：它一手定义长度（范数），一手定义角度（正交）。投影是"沿某方向走到离目标最近的点"，残差必与该方向正交；把方向换成子空间，投影矩阵 \(P=A(A^\top A)^{-1}A^\top\) 就给出最小二乘解。<strong>L2 损失、权重衰减、余弦相似度、线性回归、正交初始化——全是这一课几何的直接应用。</strong></p>
 </div>
 
-<p>下一课，我们要问一个新问题：一个线性变换里，有没有某些<strong>特殊方向</strong>，被变换作用后<em>方向不变、只被缩放</em>？这就是<strong>特征值与特征向量 eigenvalue &amp; eigenvector</strong>——它会揭示一个变换"骨子里"的样子。</p>
+<p>下一课，我们要问一个新问题：一个线性变换里，有没有某些<strong>特殊方向</strong>，被变换作用后<em>方向不变、只被缩放</em>？这就是<strong>特征值与特征向量 eigenvalue &amp; eigenvector</strong>——它会揭示一个变换"骨子里"的样子。</p><div class="skip"><h4>可以先放过的点</h4><ul><li>内积"对第二个参数线性可由对称性白送推出"以及"双线性"这套形式化论证——现在只要会用标准点积就够，等你真的遇到非标准内积时再回来抠它。</li><li>投影矩阵的幂等 \(P^2=P\) 和对称 \(P^\top=P\) 的证明，不必现在手推。先记住"影子再投影还是它自己"这个直觉，第 9 节代码会帮你眼见为实。</li><li>Gram-Schmidt 和它埋的那根 QR 分解的线，第 8 节看个大概即可——这是后面专门一课的内容，现在卡在这里不值得，先把投影和最小二乘吃透。</li><li>L1 正则为什么"没有闭式解、要靠坐标下降"，纯属预告。你只需体会几何上的稀疏现象，具体算法等讲优化时再说。</li></ul></div>
 </article>
 <div class="navbtns"><a class="prev" href="lesson-02-matrix-linear-transformation.html"><div class="nlabel">← 上一课</div><div class="ntitle">第2课 · 矩阵即线性变换</div></a><a class="next" href="lesson-04-eigenvalues-eigenvectors.html"><div class="nlabel">下一课 →</div><div class="ntitle">第4课 · 特征值与特征向量</div></a></div>
 <nav class="toc"><h3>本模块课程表</h3><ol>

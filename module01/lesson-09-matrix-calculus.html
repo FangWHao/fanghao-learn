@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>模块1 · 第9课 · 矩阵求导——把梯度向量化</title>
+<title>模块1 · 第9课 · 矩阵求导</title>
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
@@ -48,6 +48,11 @@ figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
 .ml{background:var(--green-bg);border-left:4px solid var(--green);}
 .key{background:var(--amber-bg);border-left:4px solid var(--amber);}
 .pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.goals{background:var(--blue-bg);border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:10px;padding:14px 20px;margin:.2em 0 1.5em;}
+.goals h4{margin:.1em 0 .5em;color:#1e3a8a;}
+.goals ul{margin:.3em 0;}
+.skip{background:var(--soft);border:1px solid var(--line);border-left:4px solid #94a3b8;border-radius:10px;padding:14px 20px;margin:1.8em 0 0;color:#475569;}
+.skip h4{margin:.1em 0 .5em;color:#475569;}
 .tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
 .toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
 .toc h3{margin:.1em 0 .7em;}
@@ -64,23 +69,27 @@ figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
 .navbtns .ntitle{font-weight:600;margin-top:3px;}
 .navbtns .next{text-align:right;}
 mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.here{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:6px 0 4px;font-size:15px;color:#1e3a8a;line-height:1.7;}
+.here b{font-weight:700;}
 .cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
 .card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
 .card:hover{border-color:var(--blue);}
 .card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
 .card .ct{font-size:18px;font-weight:600;}
 .card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+.card .cap{margin-left:40px;margin-top:7px;font-size:13px;color:#1e3a8a;}
+.card .cap .lbl{display:inline-block;background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;margin-right:7px;}
 </style>
 </head>
 <body>
 <header class="top"><div class="inner">
 <div class="crumb"><a href="index.html" style="color:inherit">模块 1 · 线性代数与微积分</a>　/　第 9 课（共 10 课）</div>
-<h1>矩阵求导——把梯度向量化</h1>
-<div class="sub">从零到前沿 ML 自学课程　·　第一阶段：数学与工具基础</div>
+<h1>矩阵求导</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　阶段0：数学与工具基础　·　<strong>能力点：</strong>整层网络的梯度——矩阵求导与 ∂L/∂W 同形约定</div>
 </div></header>
 <div class="wrap">
 <article>
-<p>上一课我们用计算图，把损失对每个<em>标量</em>的偏导一个一个地反向传播出来。那很扎实，但当一层网络有成千上万个权重时，逐元素写偏导既慢又容易错。这一课我们把同样的事情<strong>向量化</strong>：直接对整个向量、整个矩阵求导，让一行公式 \(\partial L/\partial W=\delta\,x^\top\) 替代成千上万行链式法则。</p>
+<div class="goals"><h4>读完这一课，你将能够</h4><ul><li>说出本课全程使用的"分母布局"约定，并解释为什么 \(\partial L/\partial W\) 必须与 \(W\) 同形。</li><li>对任意梯度表达式立刻做 shape check，仅凭形状判断它"不可能对"还是"可能对"。</li><li>从第一性原理（逐元素或微分法）独立推出 \(\partial(x^\top Ax)/\partial x=(A+A^\top)x\) 和 \(\partial\|x\|^2/\partial x=2x\)，不靠背表。</li><li>背下并解释线性层三大梯度 \(\partial L/\partial W=\delta x^\top\)、\(\partial L/\partial b=\delta\)、\(\partial L/\partial x=W^\top\delta\)，说清那个外积为什么自动与 \(W\) 同形。</li><li>推出 softmax+交叉熵的 \(\partial L/\partial z=\hat y-y\)，并用中心差分 numgrad 数值验证任意解析梯度。</li></ul></div><p>上一课我们用计算图，把损失对每个<em>标量</em>的偏导一个一个地反向传播出来。那很扎实，但当一层网络有成千上万个权重时，逐元素写偏导既慢又容易错。这一课我们把同样的事情<strong>向量化</strong>：直接对整个向量、整个矩阵求导，让一行公式 \(\partial L/\partial W=\delta\,x^\top\) 替代成千上万行链式法则。</p>
 
 <div class="note">
 <p><strong>一句话动机：</strong>反向传播的本质是"损失对参数的梯度"。参数是矩阵，所以我们需要"对矩阵求导"的语言。学会它，你看任何深度学习公式都会从"天书"变成"一眼看穿形状"。</p>
@@ -545,7 +554,26 @@ print("[3] softmax+CE 相对误差 =", relerr(g3, numgrad(ce, z.copy())))
 <p>另外，要<strong>避免在不可导点附近测</strong>——例如 ReLU 在 \(0\)、绝对值 \(|x|\) 在 \(0\)、\(\max\) 在两分支相等处：这些点的解析梯度与有限差分会对不上（差分跨过了"拐点"）。本课的 softmax 不在此列：它处处可导，代码里的 <code>z.max()</code> 只是减一个常数做数值稳定（softmax 平移不变），不影响可导性，所以那段验证的相对误差稳稳落在 \(10^{-10}\) 量级。</p>
 </div>
 
-<h2>动手练习</h2>
+<h2>调一调，观察现象</h2><p>下面三个小实验都只用 numpy 和 print，几秒钟跑完。改一个数、看一个现象，把本课的公式从"看懂"变成"亲眼见过"。</p><div class="example"><h4>实验 1：对称还是不对称？看 \(2Ax\) 何时会骗你</h4><p><strong>改什么：</strong>用一个<em>非对称</em>的 \(A\)，分别用正确公式 \((A+A^\top)x\) 和"偷懒公式"\(2Ax\) 算梯度。<br><strong>预期现象：</strong>两者给出<strong>不同</strong>的结果（\([6,14]\) vs \([10,12]\)）；但当你把 \(A\) 换成它的对称化 \(A_{\text{sym}}=\tfrac12(A+A^\top)\) 后，\(2A_{\text{sym}}x\) 又和 \((A+A^\top)x\) 重新相等（都回到 \([6,14]\)）。<br><strong>为什么：</strong>只有 \(A=A^\top\) 时 \((A+A^\top)x\) 才简化为 \(2Ax\)；非对称的 \(A\) 偷用 \(2Ax\) 就会错。这正是 §2.3、例题1 里强调的坑。</p><pre><code>import numpy as np
+A = np.array([[1.,2.],[0.,3.]])   # 故意非对称
+x = np.array([1.,2.])
+print("正确 (A+A^T)x =", (A + A.T) @ x)   # [ 6. 14.]
+print("偷懒 2Ax       =", 2 * A @ x)       # [10. 12.]  —— 不一样！
+As = 0.5*(A + A.T)                          # 对称化
+print("对称化后 2*As*x =", 2 * As @ x)      # [ 6. 14.]  —— 又对上了</code></pre></div><div class="example"><h4>实验 2：梯度 \(\delta x^\top\) 是个外积——它的秩永远是 1</h4><p><strong>改什么：</strong>用 §4 的外积公式算 \(\partial L/\partial W=\delta x^\top\)，打印它的形状和矩阵的秩。<br><strong>预期现象：</strong>形状是 \((2,3)\)，与 \(W\) 同形；而<strong>矩阵的秩永远是 1</strong>，无论 \(\delta\)、\(x\) 取什么非零值。<br><strong>为什么：</strong>外积"列向量 × 行向量"得到的矩阵每一列都是 \(\delta\) 的倍数（倍数是 \(x\) 的各分量），所以列空间是一维的，秩恒为 1。这就是单样本反传梯度的固有结构（batch 版才靠求和把秩提上去）。</p><pre><code>import numpy as np
+delta = np.array([0.5, -2.0])     # m=2 上游梯度
+xv    = np.array([1., 0., -1.])   # n=3 本层输入
+dW = np.outer(delta, xv)          # delta x^T
+print("dW =\n", dW)
+print("dW.shape =", dW.shape, " 应与 W 同形 (2,3)")
+print("rank(dW) =", np.linalg.matrix_rank(dW))   # 永远是 1</code></pre></div><div class="example"><h4>实验 3：softmax+CE 梯度——分量和恒为 0，越自信梯度越小</h4><p><strong>改什么：</strong>把 logits 从 \([2,1,0]\) 调成更"自信"的 \([5,1,0]\)（真标签都是第 0 类），各算一次 \(\hat y-y\)。<br><strong>预期现象：</strong>两种情况梯度分量之和都<strong>恰好为 0</strong>；而更自信那组的梯度幅度明显更小（正确类从 \(-0.335\) 缩到 \(-0.024\)）。<br><strong>为什么：</strong>因为 \(\sum\hat y=\sum y=1\)，差的和必为 0（§5 的固有性质）；预测越接近真标签 \(\hat y\to y\)，梯度 \(\hat y-y\to 0\)，正是"预测对了梯度近 0、错得越离谱梯度越大"的直觉。</p><pre><code>import numpy as np
+def softmax(z):
+    z = z - z.max(); e = np.exp(z); return e/e.sum()
+y = np.array([1.,0.,0.])               # 真标签=第0类
+for z in ([2.,1.,0.], [5.,1.,0.]):
+    g = softmax(np.array(z)) - y
+    print("logits", z, "-> grad", np.round(g,3),
+          " sum =", round(g.sum() + 0.0, 12))   # 两组都打印 0.0</code></pre></div><h2>动手练习</h2>
 <ol>
 <li><strong>对称化二次型。</strong>证明对任意 \(A\)，\(x^\top A x=x^\top A_{\text{sym}}x\)，其中 \(A_{\text{sym}}=\tfrac12(A+A^\top)\)。由此说明为何梯度公式里只出现 \(A+A^\top\)（"反对称部分对二次型无贡献"）。再用 numpy 取一个随机非对称 \(A\)，数值验证 \(x^\top A x=x^\top A_{\text{sym}}x\)。
 <pre><code>import numpy as np
@@ -590,7 +618,7 @@ print("dW.shape =", dW.shape, " 应为", W.shape)
 <li>我会写中心差分 <code>numgrad</code> 去验证任意解析梯度，知道 \(\epsilon\) 不能取太小，也知道要避开 ReLU/绝对值/max 这类不可导点。</li>
 </ul>
 
-<p>下一课，我们把第 1 模块的所有零件——向量、矩阵变换、链式法则、计算图、以及本课的矩阵求导——拼到一起，<strong>从零手写并训练一个两层神经网络</strong>，亲眼看着损失曲线降下来。</p>
+<p>下一课，我们把第 1 模块的所有零件——向量、矩阵变换、链式法则、计算图、以及本课的矩阵求导——拼到一起，<strong>从零手写并训练一个两层神经网络</strong>，亲眼看着损失曲线降下来。</p><div class="skip"><h4>可以先放过的点</h4><ul><li>§2.2 那个"\(\partial(Wx)/\partial x\) 到底是 \(W\) 还是 \(W^\top\)"——正文已经说了"不必背"。现在不用纠结，等下一课《亲手实现反向传播》里，谁该转置会被 shape check 自动决定，到时回头看一眼就通了。</li><li>分子布局 vs 分母布局的全部细节对照（§1.1 那张四类形状表的第二行）。新手现在只要死死记住"标量损失对参数 → 与参数同形"这一条就够用了，其余等你真遇到向量对向量的雅可比再回来查表。</li><li>微分法里迹的循环性证明（§3、§4.1 把 \(dW\) 用 \(\operatorname{tr}(AB)=\operatorname{tr}(BA)\) 凑到末尾那步）。第一遍能看懂"为什么读出 \(G=\delta x^\top\)"就行，机械推导熟练度等你下一课亲手写反传、多用几次自然就有了。</li><li>softmax 雅可比 \(\hat y_k(\delta_{ki}-\hat y_i)\) 的完整商法则推导（§5 第一步）。这步偏证明，记住最终结论 \(\partial L/\partial z=\hat y-y\) 就能直接拿去写代码；想吃透中间过程可以等做完练习 4 再回来。</li></ul></div>
 </article>
 <div class="navbtns"><a class="prev" href="lesson-08-chain-rule-computational-graph.html"><div class="nlabel">← 上一课</div><div class="ntitle">第8课 · 链式法则与计算图</div></a><a class="next" href="lesson-10-backprop-from-scratch.html"><div class="nlabel">下一课 →</div><div class="ntitle">第10课 · 亲手实现反向传播</div></a></div>
 <nav class="toc"><h3>本模块课程表</h3><ol>

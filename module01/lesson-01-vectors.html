@@ -48,6 +48,11 @@ figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
 .ml{background:var(--green-bg);border-left:4px solid var(--green);}
 .key{background:var(--amber-bg);border-left:4px solid var(--amber);}
 .pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.goals{background:var(--blue-bg);border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:10px;padding:14px 20px;margin:.2em 0 1.5em;}
+.goals h4{margin:.1em 0 .5em;color:#1e3a8a;}
+.goals ul{margin:.3em 0;}
+.skip{background:var(--soft);border:1px solid var(--line);border-left:4px solid #94a3b8;border-radius:10px;padding:14px 20px;margin:1.8em 0 0;color:#475569;}
+.skip h4{margin:.1em 0 .5em;color:#475569;}
 .tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
 .toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
 .toc h3{margin:.1em 0 .7em;}
@@ -64,23 +69,27 @@ figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
 .navbtns .ntitle{font-weight:600;margin-top:3px;}
 .navbtns .next{text-align:right;}
 mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.here{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:6px 0 4px;font-size:15px;color:#1e3a8a;line-height:1.7;}
+.here b{font-weight:700;}
 .cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
 .card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
 .card:hover{border-color:var(--blue);}
 .card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
 .card .ct{font-size:18px;font-weight:600;}
 .card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+.card .cap{margin-left:40px;margin-top:7px;font-size:13px;color:#1e3a8a;}
+.card .cap .lbl{display:inline-block;background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;margin-right:7px;}
 </style>
 </head>
 <body>
 <header class="top"><div class="inner">
 <div class="crumb"><a href="index.html" style="color:inherit">模块 1 · 线性代数与微积分</a>　/　第 1 课（共 10 课）</div>
 <h1>向量——机器学习的原子</h1>
-<div class="sub">从零到前沿 ML 自学课程　·　第一阶段：数学与工具基础</div>
+<div class="sub">从零到前沿 ML 自学课程　·　阶段0：数学与工具基础　·　<strong>能力点：</strong>向量化思维——一切建模的起点（数据点/嵌入/权重都是向量）</div>
 </div></header>
 <div class="wrap">
 <article>
-<h2>1. 开场：为什么从向量讲起</h2>
+<div class="goals"><h4>读完这一课，你将能够</h4><ul><li>把一个样本说成向量，并在"数据行 / 几何箭头 / 坐标列"三种视角间自由切换。</li><li>手算范数 \(\|a\|=\sqrt{\sum a_i^2}\)，并预测 \(2a\)、\(-0.5a\)、\(0\cdot a\) 的长度与方向。</li><li>判断两个向量张成的是一条过原点的直线还是整个平面，并说清线性相关与无关的区别。</li><li>用 \(\sum a_i b_i\) 和 \(\|a\|\|b\|\cos\theta\) 两种方式算出同一个点积，并说出它度量"方向有多接近"。</li><li>从点积推出余弦相似度，解释它为什么是语义检索 / RAG 的核心。</li></ul></div><h2>1. 开场：为什么从向量讲起</h2>
 
 <p>如果把机器学习（machine learning）拆到最底层，你会发现一个反复出现的"原子"——<strong>向量 vector</strong>。无论是一个数据点、一张图片、一个词的语义、还是模型自己的参数，在计算机眼里它们统统是<strong>一串有序的数</strong>。理解了向量，你就拿到了打开后面所有内容（矩阵、梯度、神经网络、注意力机制）的钥匙。</p>
 
@@ -596,7 +605,42 @@ a\cdot b=\|a\|\cdot\|b\|\cos\theta+0\cdot\|b\|\sin\theta=\|a\|\,\|b\|\cos\theta
 </ul>
 </div>
 
-<h2>动手练习</h2>
+<h2>调一调，观察现象</h2><p>下面三个小实验都只用 numpy 和 print，几秒就能跑完。建议你先猜结果，再运行对照——"猜错"的地方往往就是直觉需要修正的地方。</p>
+
+<div class="example"><h4>实验 1：数乘只缩放长度，方向感由符号决定</h4><p><strong>改什么</strong>：把同一个向量 \(a=[3,4]\) 分别乘以 \(2、0.5、-1、0\)。<br><strong>预期看到</strong>：范数依次变成 \(10、2.5、5、0\)（即原长 \(5\) 的 \(2、0.5、1、0\) 倍）；\(-1\) 那档长度没变但每个分量都翻了号（变成 \([-3,-4]\)），\(0\) 那档变成零向量。<br><strong>为什么</strong>：数乘 \(c\,a\) 把范数缩放 \(|c|\) 倍，所以 \(c=-1\) 长度不变、只是反向；\(c=0\) 把向量压到原点。</p>
+<pre><code>import numpy as np
+a = np.array([3.0, 4.0])
+for c in [2, 0.5, -1, 0]:
+    v = c * a
+    print("c=", c, "vec=", v, "norm=", np.linalg.norm(v))
+# norm 依次: 10.0, 2.5, 5.0, 0.0  (= 原长5 的 2,0.5,1,0 倍)
+# vec  依次: [6. 8.], [1.5 2.], [-3. -4.], [0. 0.]
+</code></pre></div>
+
+<div class="example"><h4>实验 2：转动第二个向量，看点积如何从正穿过零再变负</h4><p><strong>改什么</strong>：固定 \(u=[1,0]\)，让 \(v\) 依次取同向、垂直、钝角、反向四种方向。<br><strong>预期看到</strong>：夹角依次约 \(0^\circ、90^\circ、135^\circ、180^\circ\)，余弦依次约 \(1、0、-0.707、-1\)，点积符号跟着由正 → 零 → 负。<br><strong>为什么</strong>：点积 \(=\|u\|\|v\|\cos\theta\)，符号完全由 \(\cos\theta\) 决定——垂直时点积恰为 \(0\)（正交），这正是课文里的三个锚点。</p>
+<pre><code>import numpy as np
+u = np.array([1.0, 0.0])
+for v in [[1,0], [0,1], [-1,1], [-1,0]]:
+    v = np.array(v, float)
+    d = u @ v
+    cos = d / (np.linalg.norm(u) * np.linalg.norm(v))
+    deg = np.degrees(np.arccos(np.clip(cos, -1, 1)))
+    print("v=", v, "dot=", d, "cos=", round(cos,3), "deg=", round(deg,1))
+# dot: 1.0, 0.0, -1.0, -1.0 ; cos: 1.0, 0.0, -0.707, -1.0 ; deg: 0, 90, 135, 180
+</code></pre></div>
+
+<div class="example"><h4>实验 3：共线就"塌成一条线"——用面积判 span</h4><p><strong>改什么</strong>：用 \(2\times2\) 行列式（= 两向量张成的平行四边形带符号面积）判断三组向量。<br><strong>预期看到</strong>：\(\{[1,0],[0,1]\}\) 行列式 \(=1\)，\(\{[2,1],[4,2]\}\) 行列式 \(=0\)，\(\{[1,1],[1,-1]\}\) 行列式 \(=-2\)。<br><strong>为什么</strong>：行列式为 \(0\) 说明面积塌没了、两向量共线，span 只是一条过原点的直线；非 \(0\) 则不共线，张成整个平面。（行列式的正负号只反映两向量的左右次序，判 span 只看它是不是 \(0\)。）</p>
+<pre><code>import numpy as np
+sets = {
+    "e1,e2":    ([1,0], [0,1]),
+    "collinear":([2,1], [4,2]),
+    "indep":    ([1,1], [1,-1]),
+}
+for name, (p, q) in sets.items():
+    M = np.array([p, q], float).T   # 两向量作为列
+    print(name, "det=", round(np.linalg.det(M), 3))
+# det: 1.0(平面), 0.0(直线), -2.0(平面)
+</code></pre></div><h2>动手练习</h2>
 
 <ol>
 <li><strong>手算热身</strong>：设 \(a=[1,2,2]\)，\(b=[2,2,1]\)。手算 \(a+b\)、\(\|a\|\)、\(\|b\|\)、\(a\cdot b\) 与 \(\cos\theta\)。（提示：\(\|a\|=3\)，\(a\cdot b=8\)，\(\cos\theta=8/9\approx0.889\)。）</li>
@@ -655,7 +699,7 @@ print("angle (deg)       =", np.degrees(theta_rad))# 期望 ~16.26
 <div class="key">
 <h4>要点：小结与下一课预告</h4>
 <p>本课我们确立了 ML 的"原子"——向量，掌握了三种视角、范数（长度）、加法与数乘的几何（含零向量）、线性组合 / span / 基这套地基，以及点积的两副面孔和由它衍生的投影与余弦相似度。<strong>下一课：矩阵 = 线性变换</strong>。如果说向量是空间里的"点"，那么矩阵就是"移动整个空间的动作"——旋转、拉伸、投影。我们会看到，"换一组基 = 换坐标系"如何用矩阵表达，以及神经网络的每一层，本质上就是一次"矩阵变换 + 非线性"。</p>
-</div>
+</div><div class="skip"><h4>可以先放过的点</h4><ul><li>点积"两副面孔为何等价"那段旋转不变性的推导，现在只要记住"代数版 = 几何版、结果是同一个数"就够了，等下一课《矩阵即线性变换》学了正交矩阵，再回来补严格证明。</li><li>投影向量 \(\operatorname{proj}_a(b)\) 和"正交分解"暂时不必吃透，它真正发力是在后面 PCA 和最小二乘那几课，到时你会反复用到它。</li><li>"基不唯一 = 换坐标系"这句话现在听个直觉印象即可，下一课用矩阵表达"换一组基"时它会突然变得很具体。</li><li>词向量"国王 − 男人 + 女人 ≈ 王后"这种线性结构，知道它体现了 span 思想就好，别纠结它为什么不总成立，那是研究层面的细节。</li></ul></div>
 </article>
 <div class="navbtns"><a class="prev" href="index.html"><div class="nlabel">←</div><div class="ntitle">模块目录</div></a><a class="next" href="lesson-02-matrix-linear-transformation.html"><div class="nlabel">下一课 →</div><div class="ntitle">第2课 · 矩阵即线性变换</div></a></div>
 <nav class="toc"><h3>本模块课程表</h3><ol>

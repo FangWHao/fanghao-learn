@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>模块1 · 第8课 · 链式法则与计算图——梯度如何流动</title>
+<title>模块1 · 第8课 · 链式法则与计算图</title>
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
@@ -48,6 +48,11 @@ figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
 .ml{background:var(--green-bg);border-left:4px solid var(--green);}
 .key{background:var(--amber-bg);border-left:4px solid var(--amber);}
 .pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.goals{background:var(--blue-bg);border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:10px;padding:14px 20px;margin:.2em 0 1.5em;}
+.goals h4{margin:.1em 0 .5em;color:#1e3a8a;}
+.goals ul{margin:.3em 0;}
+.skip{background:var(--soft);border:1px solid var(--line);border-left:4px solid #94a3b8;border-radius:10px;padding:14px 20px;margin:1.8em 0 0;color:#475569;}
+.skip h4{margin:.1em 0 .5em;color:#475569;}
 .tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
 .toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
 .toc h3{margin:.1em 0 .7em;}
@@ -64,23 +69,27 @@ figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
 .navbtns .ntitle{font-weight:600;margin-top:3px;}
 .navbtns .next{text-align:right;}
 mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.here{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:6px 0 4px;font-size:15px;color:#1e3a8a;line-height:1.7;}
+.here b{font-weight:700;}
 .cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
 .card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
 .card:hover{border-color:var(--blue);}
 .card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
 .card .ct{font-size:18px;font-weight:600;}
 .card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+.card .cap{margin-left:40px;margin-top:7px;font-size:13px;color:#1e3a8a;}
+.card .cap .lbl{display:inline-block;background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;margin-right:7px;}
 </style>
 </head>
 <body>
 <header class="top"><div class="inner">
 <div class="crumb"><a href="index.html" style="color:inherit">模块 1 · 线性代数与微积分</a>　/　第 8 课（共 10 课）</div>
-<h1>链式法则与计算图——梯度如何流动</h1>
-<div class="sub">从零到前沿 ML 自学课程　·　第一阶段：数学与工具基础</div>
+<h1>链式法则与计算图</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　阶段0：数学与工具基础　·　<strong>能力点：</strong>反向传播为何成立、为何高效（反向模式 = 一串 VJP）</div>
 </div></header>
 <div class="wrap">
 <article>
-<p>上一课我们用<strong>雅可比 Jacobian</strong> 和<strong>海森 Hessian</strong> 描述了多元函数局部如何弯曲；这一课要回答一个更具体、也更"机械"的问题：当一个值经过层层运算最终变成损失 \(L\) 时，<strong>每个输入的微小改动对 \(L\) 的影响是怎样一步步传回来的</strong>。答案是<strong>链式法则 chain rule</strong>，而把它图形化、自动化的工具叫<strong>计算图 computational graph</strong>。这正是反向传播 backpropagation 的全部秘密。</p>
+<div class="goals"><h4>读完这一课，你将能够</h4><ul><li>用"沿路径相乘、跨路径相加"复述多元链式法则，并说出扇出节点的梯度为什么要累加而非覆盖。</li><li>给 \(f=\sigma(wx+b)\) 这类小表达式画出计算图、标注每条边的局部导数，手工跑一次前向 + 一次反向，得到各输入的伴随 \(\bar w,\bar x,\bar b\)。</li><li>用"上游梯度 × 局部梯度"这一条规则，逐节点回传并核对它等价于多元链式法则。</li><li>说清正向模式与反向模式的差别，并解释为什么"标量损失 + 海量参数"必须选反向模式（一趟反向，代价≈一次前向的常数倍）。</li><li>用 numpy 手写前向+反向，并用中心差分做梯度检验，判断"反向传播算对了没有"。</li></ul></div><p>上一课我们用<strong>雅可比 Jacobian</strong> 和<strong>海森 Hessian</strong> 描述了多元函数局部如何弯曲；这一课要回答一个更具体、也更"机械"的问题：当一个值经过层层运算最终变成损失 \(L\) 时，<strong>每个输入的微小改动对 \(L\) 的影响是怎样一步步传回来的</strong>。答案是<strong>链式法则 chain rule</strong>，而把它图形化、自动化的工具叫<strong>计算图 computational graph</strong>。这正是反向传播 backpropagation 的全部秘密。</p>
 
 <div class="note">
 <p>说明一个记号约定：本课为了把例子讲简单，主例的<strong>最终输出</strong>记作 \(f\)（一个 sigmoid 输出）；在真实训练里，图的最终输出是<strong>标量损失 \(L\)</strong>。二者在计算图里<strong>地位完全相同</strong>——都是"我们要对它求梯度的那个终点节点"。所以你看到 \(f\) 和 \(L\) 时，请把它们理解成<strong>同一个角色</strong>（本例恰好 \(L=f\)）。第六节起讨论训练时会改用 \(L\)。</p>
@@ -402,7 +411,27 @@ for k in ["w", "x", "b"]:
 
 <p>运行后会看到解析梯度 \(\{w:-0.1491,\ x:0.2983,\ b:0.1491\}\) 与数值梯度几乎相同，三个相对误差都在 \(10^{-8}\) 量级——这就是"反向传播算对了"的标准自检方法（<strong>gradient check 梯度检验</strong>）。</p>
 
-<h2>动手练习</h2>
+<h2>调一调，观察现象</h2><p>下面三个微改都基于本课已验证的主例，改一个数、跑几秒，就能把"梯度怎么流"看成可复现的现象。</p><div class="example"><h4>任务 1：改 sigmoid 的输入 z，看局部梯度如何"饱和衰减"</h4><p><strong>改什么：</strong>把进入 sigmoid 的 \(z\) 从 0 一路调大到 10。<strong>预期现象：</strong>局部梯度 \(\sigma'(z)=f(1-f)\) 从 0.25 单调塌向 0——z=1.5 时约 0.149，z=3 时约 0.045，z=6 时已不足 0.003（约 0.00247），z=10 时只剩约 0.000045。<strong>为什么：</strong>反向时每条经过 sigmoid 的边都要乘这个数，一旦神经元饱和（\(f\to 0\) 或 1），梯度就被乘没了——这就是"梯度消失"的最小现场。</p><pre><code>import numpy as np
+def sigmoid(t): return 1.0/(1.0+np.exp(-t))
+for z in [0.0, 1.5, 3.0, 6.0, 10.0]:
+    f = sigmoid(z)
+    print("z=%5.1f  f=%.6f  sigma'(z)=f(1-f)=%.6f" % (z, f, f*(1-f)))
+</code></pre></div><div class="example"><h4>任务 2：改扇出节点 x 的两条出边，看梯度是累加还是覆盖</h4><p><strong>改什么：</strong>在 \(g=x^2+xy\) 里，先把 x 的梯度按本课规则用 <code>+=</code> 从两条出边累加，再故意改成只取第二条（赋值覆盖）。<strong>预期现象：</strong>累加版始终给出正确的 \(\partial g/\partial x=2x+y\)（在 \(x=3,y=2\) 得 8，在 \(x=1,y=5\) 得 7，在 \(x=-2,y=4\) 得 0）；覆盖版只剩第二条出边的 \(y\)（分别是 2、5、4），凭空丢了第一条 \(2x\)（如 \(x=3\) 处丢了 6）。<strong>为什么：</strong>扇出节点同时影响多个下游，各路贡献必须叠加；写成赋值会让后一条出边把前一条冲掉——这正是手写反向最常见的 bug。</p><pre><code>import numpy as np
+for (x, y) in [(3.0, 2.0), (1.0, 5.0), (-2.0, 4.0)]:
+    pbar, qbar = 1.0, 1.0          # g = p + q, p=x^2, q=x*y
+    accumulate = pbar*(2*x) + qbar*y   # 累加（正确）
+    overwrite  = qbar*y                # 只取第二条出边（错误）
+    print("x=%.1f y=%.1f  累加=%.1f (2x+y=%.1f)  覆盖=%.1f" %
+          (x, y, accumulate, 2*x+y, overwrite))
+</code></pre></div><div class="example"><h4>任务 3：对 x 做 detach，看"值照传、梯度截断"</h4><p><strong>改什么：</strong>在主例 \(f=\sigma(wx+b)\) 的反向里，把回到 x 那条边的局部梯度强制设为 0（即 detach x），其余不动。<strong>预期现象：</strong>\(\partial f/\partial x\) 从 0.2983 变成 0，而 \(\partial f/\partial w=-0.1491\) 和前向输出 \(f=0.182426\) 完全不变。<strong>为什么：</strong>detach 只把那条边的梯度截断，数值照常前向参与，所以其他参数的梯度毫发无损——这就是 stop-gradient 的本质。</p><pre><code>import numpy as np
+def sigmoid(t): return 1.0/(1.0+np.exp(-t))
+w, x, b = 2.0, -1.0, 0.5
+u = w*x; z = u + b; f = sigmoid(z)
+zbar = 1.0*(f*(1-f))               # 反向到 z
+print("前向 f=%.6f（detach 不改前向）" % f)
+print("正常: df/dw=%.4f  df/dx=%.4f" % (zbar*x, zbar*w))
+print("detach x: df/dw=%.4f  df/dx=%.4f" % (zbar*x, zbar*0.0))
+</code></pre></div><h2>动手练习</h2>
 <ol>
 <li><strong>线性回归损失。</strong> 设 \(L=(wx-y)^2\)，给定 \(w=1.5,\ x=2,\ y=1\)。先画计算图（节点：\(p=wx,\ r=p-y,\ L=r^2\)），手算 \(\partial L/\partial w,\ \partial L/\partial x\)，再用下面骨架的反向与有限差分对照。
 <pre><code>import numpy as np
@@ -441,7 +470,7 @@ print("L=", L, "grads=", backward(c))
 <li>我知道 <code>detach</code>/<code>stop_gradient</code> 只截断梯度、不改前向值，并能预测它对各参数 <code>.grad</code> 的影响，也能区分它和 <code>no_grad</code>。</li>
 </ul>
 
-<p>下一课，我们把这套"节点—边—局部梯度"的机制升级成<strong>矩阵形式（矩阵求导）</strong>：当节点不再是标量而是向量、矩阵时，每个运算的 VJP 怎么写成干净的矩阵公式，从而一次性给<strong>整层网络</strong>求出梯度。届时会正式声明<strong>分母布局 denominator layout</strong>（\(\partial L/\partial W\) 与 \(W\) 同形）这一深度学习惯例，并把本课 VJP 的行/列向量与转置约定彻底敲定。</p>
+<p>下一课，我们把这套"节点—边—局部梯度"的机制升级成<strong>矩阵形式（矩阵求导）</strong>：当节点不再是标量而是向量、矩阵时，每个运算的 VJP 怎么写成干净的矩阵公式，从而一次性给<strong>整层网络</strong>求出梯度。届时会正式声明<strong>分母布局 denominator layout</strong>（\(\partial L/\partial W\) 与 \(W\) 同形）这一深度学习惯例，并把本课 VJP 的行/列向量与转置约定彻底敲定。</p><div class="skip"><h4>可以先放过的点</h4><ul><li>第六节的 VJP 公式 \(\bar x=\bar y\,J\) 以及行/列向量、转置的精确约定——现在记住"每步反向 = 上游梯度乘这一步的局部雅可比、且永不显式构造大矩阵"这个直觉就够了，精确布局（分母布局）下一课《矩阵求导》会统一敲定。</li><li>正向模式 vs 反向模式的 \(n\) 趟/\(m\) 趟代价分析，不必背公式。你只要抓住结论："多输入、单输出（标量损失）就用反向"，等到真正训练网络时它自然会变得显然。</li><li>第七节 <code>detach</code> 和 <code>no_grad</code> 的细微区别，第一遍可以只记"detach 切单条边的梯度、值照传"。等你上手 PyTorch、真的遇到某个参数 <code>.grad</code> 莫名为 0 时再回来对照，会一下子记牢。</li><li>那条最一般的"多路径求和"装箱公式，现在有个印象即可——本课后面全靠单路径主例落地，扇出也只用了一个 \(g=x^2+xy\) 的最小例子，不需要你去枚举路径。</li></ul></div>
 </article>
 <div class="navbtns"><a class="prev" href="lesson-07-jacobian-hessian.html"><div class="nlabel">← 上一课</div><div class="ntitle">第7课 · 雅可比与海森</div></a><a class="next" href="lesson-09-matrix-calculus.html"><div class="nlabel">下一课 →</div><div class="ntitle">第9课 · 矩阵求导</div></a></div>
 <nav class="toc"><h3>本模块课程表</h3><ol>

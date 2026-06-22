@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>模块1 · 第10课 · 亲手实现反向传播——两层网络与 micrograd</title>
+<title>模块1 · 第10课 · 亲手实现反向传播</title>
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
@@ -48,6 +48,11 @@ figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
 .ml{background:var(--green-bg);border-left:4px solid var(--green);}
 .key{background:var(--amber-bg);border-left:4px solid var(--amber);}
 .pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.goals{background:var(--blue-bg);border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:10px;padding:14px 20px;margin:.2em 0 1.5em;}
+.goals h4{margin:.1em 0 .5em;color:#1e3a8a;}
+.goals ul{margin:.3em 0;}
+.skip{background:var(--soft);border:1px solid var(--line);border-left:4px solid #94a3b8;border-radius:10px;padding:14px 20px;margin:1.8em 0 0;color:#475569;}
+.skip h4{margin:.1em 0 .5em;color:#475569;}
 .tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
 .toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
 .toc h3{margin:.1em 0 .7em;}
@@ -64,23 +69,27 @@ figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
 .navbtns .ntitle{font-weight:600;margin-top:3px;}
 .navbtns .next{text-align:right;}
 mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.here{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:6px 0 4px;font-size:15px;color:#1e3a8a;line-height:1.7;}
+.here b{font-weight:700;}
 .cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
 .card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
 .card:hover{border-color:var(--blue);}
 .card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
 .card .ct{font-size:18px;font-weight:600;}
 .card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+.card .cap{margin-left:40px;margin-top:7px;font-size:13px;color:#1e3a8a;}
+.card .cap .lbl{display:inline-block;background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;margin-right:7px;}
 </style>
 </head>
 <body>
 <header class="top"><div class="inner">
 <div class="crumb"><a href="index.html" style="color:inherit">模块 1 · 线性代数与微积分</a>　/　第 10 课（共 10 课）</div>
-<h1>亲手实现反向传播——两层网络与 micrograd</h1>
-<div class="sub">从零到前沿 ML 自学课程　·　第一阶段：数学与工具基础</div>
+<h1>亲手实现反向传播</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　阶段0：数学与工具基础　·　<strong>能力点：</strong>阶段0 capstone——不靠框架，亲手实现 .backward()</div>
 </div></header>
 <div class="wrap">
 <article>
-<h2>1. 开场：把九课的工具拼成一台机器</h2>
+<div class="goals"><h4>读完这一课，你将能够</h4><ul><li>从 \(\delta_2=\hat y-y\) 起手，沿计算图反向独立推出两层网络的全部四个梯度 \(\partial L/\partial W_1,b_1,W_2,b_2\)，并用形状自检解释每个转置与左右摆放。</li><li>说出 softmax 的 log-sum-exp 稳定化为什么按行减最大值就不改变结果、又能防止 \(e^z\) 上溢成 nan。</li><li>用纯 numpy 实现前向、反向与中心差分梯度检查，并判断相对误差 \(<10^{-7}\) 才算反向写对。</li><li>讲清 batch 维下"权重梯度对 N 平均、偏置沿 axis=0 求和"的来历，并说出漏除 N 或写错求和轴会怎样。</li><li>用一句话说明 <code>loss.backward()</code> 的本质（计算图 + 拓扑逆序 + 局部链式法则 + 梯度累加），并指出 ReLU 掩码如何造成梯度消失。</li></ul></div><h2>1. 开场：把九课的工具拼成一台机器</h2>
 
 <p>上一课我们把<strong>矩阵求导 matrix calculus</strong>讲透了：知道了 \(\partial L/\partial W\) 长什么形状、怎么用链式法则一层层往回传。这一课是模块 1 的<strong>压轴实战</strong>——我们不再做孤立的公式练习，而是把前九课的全部工具（向量、矩阵变换、内积、ReLU、softmax、链式法则、矩阵求导）拼装成一台真正会"学习"的机器：一个<strong>两层全连接神经网络 two-layer fully-connected network</strong>，并亲手实现它的<strong>反向传播 backpropagation</strong>。</p>
 
@@ -505,7 +514,57 @@ print("n2 =", n2.data, " dx =", x2.grad, " dw =", w2.grad, " db =", b2.grad)
 <p>以后调模型遇到 <strong>loss 变 NaN</strong>，你会第一时间想到 softmax 没做 log-sum-exp 稳定化、或 <code>log(0)</code>；遇到 <strong>梯度消失</strong>，你会想到 ReLU 掩码把信号乘成了 0、或链太长导致 \(W^\top\) 连乘衰减；遇到 <strong>梯度爆炸</strong>，你会想到同一条 \(W^\top\) 连乘反过来把梯度越放越大；遇到 <strong>loss 不降</strong>，你会去查学习率、初始化、或梯度方向写反了。这些"据"，全部来自你今天亲手走过的那一遍反向传播。</p>
 </div>
 
-<h2>动手练习</h2>
+<h2>调一调，观察现象</h2><p>下面三个微任务都基于本课已验证的代码，改一个地方、跑几秒，亲手看反向传播的几个关键约定"坏掉"或"生效"。建议每个都先猜结果再运行。</p>
+
+<div class="example"><h4>任务 1：扫学习率，看收敛 / 减速 / 变差</h4><p><strong>改什么：</strong>对同一网络，把学习率 <code>eta</code> 依次设为 0.01、0.4、5.0，各训练 300 步，打印最终 loss 与准确率。<br><strong>预期看到：</strong>eta=0.4 收敛得最充分（loss≈0.40、acc≈0.835）；eta=0.01 降得太慢、300 步还没收敛到位（loss 仍≈0.45，比 0.4 那档高出一截，而 acc 恰好也到了 0.835——准确率先到顶、loss 还在慢慢压）；eta=5.0 步子太大、反而把 loss 顶高（loss≈0.52、acc 掉到 0.78）。<br><strong>为什么：</strong>梯度下降每步沿负梯度走 <code>eta</code> 倍。太小则每步挪动太少、loss 收敛慢；太大则越过谷底来回振荡、loss 不降反升。学习率是本课训练循环里最敏感的旋钮。</p>
+<pre><code>import numpy as np
+rng = np.random.default_rng(42)
+def make_blobs(n_per=200):
+    centers = np.array([[1.3,0.0],[-1.0,1.1],[-0.7,-1.1]])
+    X,y=[],[]
+    for k,c in enumerate(centers):
+        X.append(rng.normal(c,0.95,size=(n_per,2))); y.append(np.full(n_per,k))
+    X=np.vstack(X); y=np.concatenate(y); idx=rng.permutation(len(y))
+    return X[idx],y[idx]
+X,y=make_blobs(); N,D=X.shape; C=3; Y=np.eye(C)[y]; H=16
+def softmax(Z):
+    Z=Z-Z.max(axis=1,keepdims=True); e=np.exp(Z); return e/e.sum(axis=1,keepdims=True)
+def forward(X,W1,b1,W2,b2):
+    z1=X@W1+b1; a1=np.maximum(z1,0); z2=a1@W2+b2; return softmax(z2),(X,z1,a1,z2)
+def loss_fn(yh,Y): return -np.sum(Y*np.log(yh+1e-12))/Y.shape[0]
+def backward(c,Y,W2):
+    X,z1,a1,z2=c; N=X.shape[0]
+    dz2=(softmax(z2)-Y)/N; dW2=a1.T@dz2; db2=dz2.sum(0)
+    dz1=(dz2@W2.T)*(z1>0); return X.T@dz1, dz1.sum(0), dW2, db2
+for eta in [0.01,0.4,5.0]:
+    r=np.random.default_rng(0)
+    W1=r.normal(0,np.sqrt(2/D),(D,H)); b1=np.zeros(H)
+    W2=r.normal(0,np.sqrt(2/H),(H,C)); b2=np.zeros(C)
+    for _ in range(300):
+        yh,c=forward(X,W1,b1,W2,b2); dW1,db1,dW2,db2=backward(c,Y,W2)
+        W1-=eta*dW1; b1-=eta*db1; W2-=eta*dW2; b2-=eta*db2
+    yh,_=forward(X,W1,b1,W2,b2)
+    print(f"eta={eta:&lt;5} loss={loss_fn(yh,Y):.4f} acc={(yh.argmax(1)==y).mean():.3f}")
+</code></pre></div>
+
+<div class="example"><h4>任务 2：删掉 log-sum-exp，亲眼看 nan</h4><p><strong>改什么：</strong>对同一组 logits，一次用"不减最大值"的 softmax，一次用"按行减最大值"的稳定版，其中一个 logit 故意取 1000。<br><strong>预期看到：</strong>不稳定版打印 <code>[0, 0, nan]</code>（还伴随 overflow / invalid value 警告）；稳定版打印 <code>[0, 0, 1]</code>，干净正确。<br><strong>为什么：</strong>\(e^{1000}\) 直接上溢成 <code>inf</code>，<code>inf/inf=nan</code>。按行减最大值后指数输入最大是 0、\(e^0=1\) 不溢出，而结果因分子分母同乘 \(e^{-m}\) 完全不变。这就是代码里那行 <code>Z - Z.max(...)</code> 一个都不能省的原因。</p>
+<pre><code>import numpy as np
+z = np.array([[1.0, 2.0, 1000.0]])
+e_bad = np.exp(z)
+print("unstable:", e_bad / e_bad.sum(axis=1, keepdims=True))
+zs = z - z.max(axis=1, keepdims=True)
+e = np.exp(zs)
+print("stable:  ", e / e.sum(axis=1, keepdims=True))
+</code></pre></div>
+
+<div class="example"><h4>任务 3：把偏置求和写错轴，看梯度走样</h4><p><strong>改什么：</strong>对同一个上游梯度 <code>dz2</code>（形状 (N,C)），分别用 <code>dz2.sum(axis=0)</code>（正确，沿样本维）和 <code>dz2.sum()</code>（错误，全求和成标量）算偏置梯度。<br><strong>预期看到：</strong>正确版是形状 (C,) 的向量 <code>[-0.2994, 0.4063, 0.241]</code>，每类一个值；错误版塌成一个标量 <code>0.3479</code>。把这个标量当 <code>db2</code> 去更新会被广播到所有类、方向全错——若拿它跑本课的 <code>grad_check()</code>，b2 的相对误差会从约 <code>5.8e-9</code> 飙到 <code>1e0</code> 量级（接近 1.0，这是该相对误差度量的上限），一眼就能看出"反向写错了"。<br><strong>为什么：</strong>同一个 \(b\) 被加到每个样本上，它的总梯度是各样本贡献沿样本维（axis=0）之和，每个类别各自独立；<code>.sum()</code> 把不同类别也加到一起，丢掉了"每类一个偏置"的结构。</p>
+<pre><code>import numpy as np
+rng = np.random.default_rng(1)
+N, C = 8, 3
+dz2 = rng.normal(size=(N, C)) / N
+print("correct db (axis=0):", dz2.sum(axis=0).round(4), "shape", dz2.sum(axis=0).shape)
+print("wrong   db (scalar):", round(float(dz2.sum()), 4))
+</code></pre></div><h2>动手练习</h2>
 <ol>
 <li><strong>手推 + 复核。</strong> 用第 5 节的同一组数字，但把真实标签改成第 1 类（\(y=[0,1]^\top\)），手推出 \(\delta_2,\ \partial L/\partial W_2,\ \partial L/\partial W_1\)，再用下面骨架核对。<strong>进阶：</strong>再换一组让 \(z_1\) 全为正的输入（例如 \(x=[2,1]^\top\)）重推一遍，体会当所有隐藏单元都被激活时，各梯度项都非零、外积是"满"的——不像例题里那样退化得稀疏。
 <pre><code>import numpy as np
@@ -536,7 +595,7 @@ print("dW1",np.outer(dz1,x))
 <li>我能用一句话说明 <code>loss.backward()</code> 的本质（计算图 + 拓扑逆序 + 局部链式法则 + 梯度累加），并解释 ReLU 掩码如何引起梯度消失、\(W^\top\) 连乘如何引起梯度消失或爆炸。</li>
 </ul>
 
-<p class="sub" style="margin-top:1.5em">到这里，<strong>模块 1（线性代数与微积分）全部完成</strong>——你已经备齐了驱动一切模型的数学引擎。下一模块我们换一套语言：进入<strong>概率、信息论与最优化</strong>（含强化学习速成），去回答"模型该有多自信""信息怎么量化""梯度下降之外还有哪些更聪明的优化器"。</p>
+<p class="sub" style="margin-top:1.5em">到这里，<strong>模块 1（线性代数与微积分）全部完成</strong>——你已经备齐了驱动一切模型的数学引擎。下一模块我们换一套语言：进入<strong>概率、信息论与最优化</strong>（含强化学习速成），去回答"模型该有多自信""信息怎么量化""梯度下降之外还有哪些更聪明的优化器"。</p><div class="skip"><h4>可以先放过的点</h4><ul><li>He 初始化里那个 \(\sqrt{2/n}\) 为什么恰好是 2 而不是别的数——本课照用即可，背后的方差推导等到下一模块《概率、信息论与最优化》讲优化与初始化时再回来，会一下子通透。</li><li>梯度爆炸的应对手段（梯度裁剪、归一化、残差连接）现在只要知道"和梯度消失是同一个 \(W^\top\) 连乘机制的两个极端"就够了，具体方法是后面深度网络模块的内容，不必现在硬记。</li><li>micrograd 里 <code>backward()</code> 的拓扑排序代码看不懂没关系——抓住"先处理离输出近的节点、梯度用 += 累加"这个直觉即可，等你真要写自定义算子时再逐行抠。</li><li>softmax+交叉熵合并求导那一步的雅可比化简（为什么偏偏化简成 \(\hat y-y\)）第 9 课已给过，这里当结论用，暂时不必自己再推一遍。</li></ul></div>
 </article>
 <div class="navbtns"><a class="prev" href="lesson-09-matrix-calculus.html"><div class="nlabel">← 上一课</div><div class="ntitle">第9课 · 矩阵求导</div></a><a class="next" href="index.html"><div class="nlabel">→</div><div class="ntitle">模块完成 · 回目录</div></a></div>
 <nav class="toc"><h3>本模块课程表</h3><ol>

@@ -43,6 +43,11 @@ figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
 .ml{background:var(--green-bg);border-left:4px solid var(--green);}
 .key{background:var(--amber-bg);border-left:4px solid var(--amber);}
 .pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.goals{background:var(--blue-bg);border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:10px;padding:14px 20px;margin:.2em 0 1.5em;}
+.goals h4{margin:.1em 0 .5em;color:#1e3a8a;}
+.goals ul{margin:.3em 0;}
+.skip{background:var(--soft);border:1px solid var(--line);border-left:4px solid #94a3b8;border-radius:10px;padding:14px 20px;margin:1.8em 0 0;color:#475569;}
+.skip h4{margin:.1em 0 .5em;color:#475569;}
 .tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
 .toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
 .toc h3{margin:.1em 0 .7em;}
@@ -59,34 +64,39 @@ figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
 .navbtns .ntitle{font-weight:600;margin-top:3px;}
 .navbtns .next{text-align:right;}
 mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.here{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:6px 0 4px;font-size:15px;color:#1e3a8a;line-height:1.7;}
+.here b{font-weight:700;}
 .cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
 .card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
 .card:hover{border-color:var(--blue);}
 .card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
 .card .ct{font-size:18px;font-weight:600;}
 .card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+.card .cap{margin-left:40px;margin-top:7px;font-size:13px;color:#1e3a8a;}
+.card .cap .lbl{display:inline-block;background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;margin-right:7px;}
 </style>
 </head>
 <body>
 <header class="top"><div class="inner">
-<div class="crumb">从零到前沿 ML 自学课程　·　第一阶段：数学与工具基础</div>
+<div class="crumb">从零到前沿 ML 自学课程　·　阶段0：数学与工具基础</div>
 <h1>模块 1 · 线性代数与微积分</h1>
 <div class="sub">用"几何直觉 + 动手计算"打通向量 → 矩阵 → 特征值/SVD → 梯度 → 矩阵求导 → 亲手实现反向传播</div>
 </div></header>
 <div class="wrap">
 <article>
-<p>本模块共 <strong>10 课</strong>，循序渐进。每课都是<strong>公式（MathJax 渲染）+ 示意图 + 已解例题 + 可在浏览器内直接运行的 NumPy 练习 + 掌握自检</strong>，并都经过逐条数学对抗校验。点开任意一课即可开始；右下角有"Python 实验台"小窗可随手验证。</p>
+<div class="here"><b>📍 你在这里：</b>完整路线共 6 阶段 / 14 模块。当前 = <b>阶段0 · 模块1（线性代数与微积分）</b>，整条路线的第一站。学完它，你将具备读懂后续深度学习/Transformer/扩散/LLM 所需的全部数学语言；下一站是 <b>模块2 · 概率统计、信息论与最优化（含 RL 速成）</b>。</div>
+<p>本模块共 <strong>10 课</strong>，循序渐进。每课都是<strong>学习产出（开头）+ 公式（MathJax）+ 示意图 + 已解例题 + 可在浏览器内直接运行/可改的 NumPy 练习 + 调一调观察现象 + 掌握自检 + 可以先放过的点（结尾）</strong>，并都经过逐条数学对抗校验。右下角"Python 实验台"小窗可随手验证。</p>
 <div class="cards">
-<a class="card" href="lesson-01-vectors.html"><span class="num">1</span><span class="ct">向量——机器学习的原子</span><div class="cb">万物皆向量；三种视角、范数、加法数乘、span/基、点积与余弦相似度</div></a>
-<a class="card" href="lesson-02-matrix-linear-transformation.html"><span class="num">2</span><span class="ct">矩阵即线性变换</span><div class="cb">矩阵=变换；列=基向量落点、行列式、复合、秩与零空间</div></a>
-<a class="card" href="lesson-03-inner-product-norm-projection.html"><span class="num">3</span><span class="ct">内积、范数与投影</span><div class="cb">内积/范数族、正交、投影、最小二乘几何</div></a>
-<a class="card" href="lesson-04-eigenvalues-eigenvectors.html"><span class="num">4</span><span class="ct">特征值与特征向量</span><div class="cb">不动方向、对角化、谱定理、PCA、稳定性</div></a>
-<a class="card" href="lesson-05-svd-low-rank.html"><span class="num">5</span><span class="ct">SVD 与低秩压缩</span><div class="cb">U Σ Vᵀ 几何、Eckart-Young、条件数、LoRA 根基</div></a>
-<a class="card" href="lesson-06-derivatives-gradients.html"><span class="num">6</span><span class="ct">导数与梯度</span><div class="cb">偏导、梯度最速上升、等高线正交、梯度下降</div></a>
-<a class="card" href="lesson-07-jacobian-hessian.html"><span class="num">7</span><span class="ct">雅可比与海森</span><div class="cb">向量值导数、曲率、凸性、临界点判别</div></a>
-<a class="card" href="lesson-08-chain-rule-computational-graph.html"><span class="num">8</span><span class="ct">链式法则与计算图</span><div class="cb">计算图、反向传播原理、为何反向模式高效</div></a>
-<a class="card" href="lesson-09-matrix-calculus.html"><span class="num">9</span><span class="ct">矩阵求导</span><div class="cb">布局约定、核心公式、线性层与 softmax+CE 梯度</div></a>
-<a class="card" href="lesson-10-backprop-from-scratch.html"><span class="num">10</span><span class="ct">亲手实现反向传播</span><div class="cb">两层网络前向+反向、梯度检查、纯 NumPy 训练</div></a>
+<a class="card" href="lesson-01-vectors.html"><span class="num">1</span><span class="ct">向量——机器学习的原子</span><div class="cb">万物皆向量；三种视角、范数、加法数乘、span/基、点积与余弦相似度</div><div class="cap"><span class="lbl">能力点</span>向量化思维——一切建模的起点（数据点/嵌入/权重都是向量）</div></a>
+<a class="card" href="lesson-02-matrix-linear-transformation.html"><span class="num">2</span><span class="ct">矩阵即线性变换</span><div class="cb">矩阵=变换；列=基向量落点、行列式、复合、秩与零空间</div><div class="cap"><span class="lbl">能力点</span>矩阵 = 线性变换——看懂神经网络每一层 Wx+b 在做什么</div></a>
+<a class="card" href="lesson-03-inner-product-norm-projection.html"><span class="num">3</span><span class="ct">内积、范数与投影</span><div class="cb">内积/范数族、正交、投影、最小二乘几何</div><div class="cap"><span class="lbl">能力点</span>度量与正则化的几何——L2 损失、权重衰减、余弦相似度、最小二乘</div></a>
+<a class="card" href="lesson-04-eigenvalues-eigenvectors.html"><span class="num">4</span><span class="ct">特征值与特征向量</span><div class="cb">不动方向、对角化、谱定理、PCA、稳定性</div><div class="cap"><span class="lbl">能力点</span>谱视角——PCA、协方差，以及梯度消失/爆炸的根因</div></a>
+<a class="card" href="lesson-05-svd-low-rank.html"><span class="num">5</span><span class="ct">SVD 与低秩压缩</span><div class="cb">U Σ Vᵀ 几何、Eckart-Young、条件数、LoRA 根基</div><div class="cap"><span class="lbl">能力点</span>SVD——PCA 与 LoRA 低秩微调的共同数学根基</div></a>
+<a class="card" href="lesson-06-derivatives-gradients.html"><span class="num">6</span><span class="ct">导数与梯度</span><div class="cb">偏导、梯度最速上升、等高线正交、梯度下降</div><div class="cap"><span class="lbl">能力点</span>梯度下降——训练一切模型的引擎</div></a>
+<a class="card" href="lesson-07-jacobian-hessian.html"><span class="num">7</span><span class="ct">雅可比与海森</span><div class="cb">向量值导数、曲率、凸性、临界点判别</div><div class="cap"><span class="lbl">能力点</span>二阶信息——用曲率理解优化为何有难有易</div></a>
+<a class="card" href="lesson-08-chain-rule-computational-graph.html"><span class="num">8</span><span class="ct">链式法则与计算图</span><div class="cb">计算图、反向传播原理、为何反向模式高效</div><div class="cap"><span class="lbl">能力点</span>反向传播为何成立、为何高效（反向模式 = 一串 VJP）</div></a>
+<a class="card" href="lesson-09-matrix-calculus.html"><span class="num">9</span><span class="ct">矩阵求导</span><div class="cb">布局约定、核心公式、线性层与 softmax+CE 梯度</div><div class="cap"><span class="lbl">能力点</span>整层网络的梯度——矩阵求导与 ∂L/∂W 同形约定</div></a>
+<a class="card" href="lesson-10-backprop-from-scratch.html"><span class="num">10</span><span class="ct">亲手实现反向传播</span><div class="cb">两层网络前向+反向、梯度检查、纯 NumPy 训练</div><div class="cap"><span class="lbl">能力点</span>阶段0 capstone——不靠框架，亲手实现 .backward()</div></a>
 </div>
 </article>
 </div>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>模块1 · 第7课 · 雅可比与海森——向量值函数的导数与曲率</title>
+<title>模块1 · 第7课 · 雅可比与海森</title>
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
@@ -48,6 +48,11 @@ figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
 .ml{background:var(--green-bg);border-left:4px solid var(--green);}
 .key{background:var(--amber-bg);border-left:4px solid var(--amber);}
 .pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.goals{background:var(--blue-bg);border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:10px;padding:14px 20px;margin:.2em 0 1.5em;}
+.goals h4{margin:.1em 0 .5em;color:#1e3a8a;}
+.goals ul{margin:.3em 0;}
+.skip{background:var(--soft);border:1px solid var(--line);border-left:4px solid #94a3b8;border-radius:10px;padding:14px 20px;margin:1.8em 0 0;color:#475569;}
+.skip h4{margin:.1em 0 .5em;color:#475569;}
 .tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
 .toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
 .toc h3{margin:.1em 0 .7em;}
@@ -64,23 +69,27 @@ figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
 .navbtns .ntitle{font-weight:600;margin-top:3px;}
 .navbtns .next{text-align:right;}
 mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.here{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:6px 0 4px;font-size:15px;color:#1e3a8a;line-height:1.7;}
+.here b{font-weight:700;}
 .cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
 .card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
 .card:hover{border-color:var(--blue);}
 .card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
 .card .ct{font-size:18px;font-weight:600;}
 .card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+.card .cap{margin-left:40px;margin-top:7px;font-size:13px;color:#1e3a8a;}
+.card .cap .lbl{display:inline-block;background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;margin-right:7px;}
 </style>
 </head>
 <body>
 <header class="top"><div class="inner">
 <div class="crumb"><a href="index.html" style="color:inherit">模块 1 · 线性代数与微积分</a>　/　第 7 课（共 10 课）</div>
-<h1>雅可比与海森——向量值函数的导数与曲率</h1>
-<div class="sub">从零到前沿 ML 自学课程　·　第一阶段：数学与工具基础</div>
+<h1>雅可比与海森</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　阶段0：数学与工具基础　·　<strong>能力点：</strong>二阶信息——用曲率理解优化为何有难有易</div>
 </div></header>
 <div class="wrap">
 <article>
-<p>上一课我们为标量函数 \(f:\mathbb{R}^n\to\mathbb{R}\) 装上了"梯度 \(\nabla f\)"这台指南针，它在每个点指向上升最快的方向。但神经网络里到处是<strong>向量进、向量出</strong>的映射：一层把激活向量变成另一个激活向量。这一课我们把导数推广到向量值函数，得到<strong>雅可比矩阵 Jacobian</strong>；再回头给标量函数装上"二阶导数"——<strong>海森矩阵 Hessian</strong>，它描述函数的<em>弯曲程度（曲率 curvature）</em>，正是优化难易、鞍点、二阶方法的几何根源。</p>
+<div class="goals"><h4>读完这一课，你将能够</h4><ul><li>对一个 \(f:\mathbb{R}^n\to\mathbb{R}^m\)，立刻说出雅可比的形状 \(m\times n\)、哪个下标是行哪个是列，并逐分量手写出一个 \(2\times2\) 雅可比。</li><li>解释 \(f(x+\Delta)\approx f(x)+J\Delta\) 是"用切平面贴弯曲映射"，并说明 \(m=n\) 时 \(|\det J|\) 是局部体积缩放、\(\det J<0\) 是镜像翻面。</li><li>写出标量函数的海森、说清"海森 = 梯度的雅可比"，并用二阶泰勒展开把临界点的局部形状归到二次型 \(\tfrac12\Delta^\top H\Delta\)。</li><li>给一个 \(2\times2\) 海森，算特征值并判定极小/极大/鞍点，并说出"凸 ⇔ 海森半正定"。</li><li>用一句话说出牛顿法 \(x\leftarrow x-H^{-1}\nabla f\) 的直觉，以及条件数 \(\kappa=\lambda_{\max}/\lambda_{\min}\) 为何决定一阶法快慢。</li></ul></div><p>上一课我们为标量函数 \(f:\mathbb{R}^n\to\mathbb{R}\) 装上了"梯度 \(\nabla f\)"这台指南针，它在每个点指向上升最快的方向。但神经网络里到处是<strong>向量进、向量出</strong>的映射：一层把激活向量变成另一个激活向量。这一课我们把导数推广到向量值函数，得到<strong>雅可比矩阵 Jacobian</strong>；再回头给标量函数装上"二阶导数"——<strong>海森矩阵 Hessian</strong>，它描述函数的<em>弯曲程度（曲率 curvature）</em>，正是优化难易、鞍点、二阶方法的几何根源。</p>
 
 <h2>一、雅可比：向量值函数的导数</h2>
 
@@ -551,7 +560,47 @@ print("临界点 (0,0) 类型 ->", kind)        # -> 鞍点
 
 <p>运行后你会看到数值结果与手算几乎逐位吻合：雅可比为 \([[\pi,1],[1,0]]\)、行列式 \(-1\)，海森为 \(\mathrm{diag}(2,-2)\)、特征值 \(\{2,-2\}\)，判定为鞍点。</p>
 
-<h2>动手练习</h2>
+<h2>调一调，观察现象</h2><p>下面三个微任务都基于本课已验证的公式，改一个数、看一个数怎么变，把"曲率、行列式、条件数"从符号变成你亲眼跑出来的现象。每段都只用 numpy 和 print，几秒跑完。</p>
+
+<div class="example"><h4>任务一：把扰动缩小 10 倍，看线性化误差缩小约 100 倍</h4><p><strong>改什么：</strong>对例题里的 \(f(x,y)=[x^2y,\ x+\sin y]\)，在 \(p=(1,\pi/2)\) 处把扰动 \(\Delta\) 从 \([0.01,-0.02]\) 缩小 10 倍到 \([0.001,-0.002]\)。<br><strong>预期现象：</strong>线性近似 \(f(p)+J\Delta\) 与真值之差的范数从约 \(3.16\times10^{-4}\) 掉到约 \(3.15\times10^{-6}\)，即缩小约 100 倍。<br><strong>为什么：</strong>一阶线性化的误差是 \(O(\|\Delta\|^2)\)，\(\Delta\) 缩小 10 倍，二次项就缩小 \(10^2=100\) 倍。</p>
+<pre><code>import numpy as np
+def f(v):
+    x, y = v
+    return np.array([x**2 * y, x + np.sin(y)])
+p = np.array([1.0, np.pi/2])
+J = np.array([[2*p[0]*p[1], p[0]**2],
+              [1.0,          np.cos(p[1])]])   # = [[pi,1],[1,0]]
+for d in [np.array([0.01, -0.02]), np.array([0.001, -0.002])]:
+    err = np.linalg.norm(f(p+d) - (f(p) + J @ d))
+    print("delta =", d, " 线性化误差 =", err)
+# 第二行误差约为第一行的 1/100</code></pre></div>
+
+<div class="example"><h4>任务二：换海森的对角元符号，看临界点在极小/极大/鞍点之间跳</h4><p><strong>改什么：</strong>把 \(2\times2\) 对角海森的两个特征值符号依次设为 (+,+)、(+,−)、(−,−)。<br><strong>预期现象：</strong>判定依次输出"极小、鞍点、极大"——只要出现一正一负就是鞍点。<br><strong>为什么：</strong>对角阵的对角元就是特征值；临界点类型只看这组特征值的符号，全正是碗（极小）、全负是穹顶（极大）、有正有负是马鞍（鞍点）。</p>
+<pre><code>import numpy as np
+def classify(H):
+    eig = np.linalg.eigvalsh(H)        # 对称阵用 eigvalsh
+    if np.all(eig > 0): k = "极小"
+    elif np.all(eig < 0): k = "极大"
+    else: k = "鞍点"
+    return np.round(eig, 2), k
+for a, b in [(2, 2), (2, -2), (-2, -2)]:
+    H = np.diag([a, b]).astype(float)
+    print("对角元", (a, b), " 特征值/类型 ->", classify(H))</code></pre></div>
+
+<div class="example"><h4>任务三：拉大条件数 \(\kappa\)，看一阶法的收敛步数暴涨</h4><p><strong>改什么：</strong>对二次函数 \(f(x)=\tfrac12 x^\top H x\)，把 \(H\) 从 \(\mathrm{diag}(1,1)\) 换到 \(\mathrm{diag}(1,10)\) 再到 \(\mathrm{diag}(1,100)\)（每个都用它各自的最优学习率）。<br><strong>预期现象：</strong>收敛到 \(\|x\|<10^{-3}\) 的步数依次为 1 → 37 → 363，随 \(\kappa\) 几乎线性增长。<br><strong>为什么：</strong>步长被 \(\lambda_{\max}\) 卡死（再大就发散），收敛被 \(\lambda_{\min}\) 拖死（平缓方向爬得慢），两者之比 \(\kappa=\lambda_{\max}/\lambda_{\min}\) 就是一阶法变慢的元凶。</p>
+<pre><code>import numpy as np
+def steps_to_converge(H, tol=1e-3, max_iter=100000):
+    lam = np.diag(H)
+    eta = 2.0 / (lam.max() + lam.min())   # 各自的最优学习率
+    x = np.ones(H.shape[0])
+    for k in range(max_iter):
+        if np.linalg.norm(x) < tol:
+            return k
+        x = x - eta * (H @ x)             # 梯度 = H x
+    return max_iter
+for H in [np.diag([1., 1.]), np.diag([1., 10.]), np.diag([1., 100.])]:
+    print(f"kappa={np.linalg.cond(H):6.1f}  收敛步数={steps_to_converge(H)}")
+# 1 -> 37 -> 363：条件数越大，一阶法越慢</code></pre></div><h2>动手练习</h2>
 <ol>
 <li><strong>写雅可比。</strong> 对极坐标映射 \(f(r,\theta)=[\,r\cos\theta,\ r\sin\theta\,]\) 手推 \(J\)，并证明 \(\det J=r\)（这正是二重积分换元里的 \(r\,dr\,d\theta\) 因子）。用下面骨架在 \((r,\theta)=(2,\pi/3)\) 处验证：
 <pre><code>import numpy as np
@@ -593,7 +642,7 @@ for H in [np.diag([1.0, 1.0]), np.diag([1.0, 100.0])]:
 <li>我能复述"反向传播 = 一串 VJP（\(v^\top J\) 或等价的 \(J^\top v\)）"，说明为何不显式存雅可比，并知道梯度默认按列向量约定。</li>
 </ul>
 
-<p>下一课，我们把这些一阶导数（每层的雅可比/VJP）用<strong>链式法则</strong>沿<strong>计算图</strong>从输出端一路乘回输入端——这串 VJP 的连乘，就是驱动整个深度学习的<strong>反向传播</strong>。</p>
+<p>下一课，我们把这些一阶导数（每层的雅可比/VJP）用<strong>链式法则</strong>沿<strong>计算图</strong>从输出端一路乘回输入端——这串 VJP 的连乘，就是驱动整个深度学习的<strong>反向传播</strong>。</p><div class="skip"><h4>可以先放过的点</h4><ul><li>概率密度变量替换里那个 \(|\det J|^{-1}\) 因子、以及指数 \(\pm1\) 取决于正向还是逆向雅可比——现在只要记住"体积放大、密度就得除回去"这个直觉就够了，等学到生成模型里的标准化流时再回来抠正负号。</li><li>牛顿法在海森不定时为何会奔向鞍点、以及信赖域/正则化修正——这是二阶优化的深水区，本课你只需吃透"海森正定时一步到极小"这半句，其余等真正用到二阶方法时再深究。</li><li>VJP（\(v^\top J\) 与 \(J^\top v\)）里那个向量 \(v\) 到底是哪来的——本课故意没剧透，下一课《链式法则与计算图》会告诉你它就是"损失对本层输出的梯度"，现在只要相信"反向传播 = 一串 VJP"即可。</li><li>克莱罗定理、谱定理、西尔维斯特判据这些"为什么成立"的证明——会用结论（海森对称、可正交对角化、靠特征值符号判类型）就行，证明不必现在啃。</li></ul></div>
 </article>
 <div class="navbtns"><a class="prev" href="lesson-06-derivatives-gradients.html"><div class="nlabel">← 上一课</div><div class="ntitle">第6课 · 导数与梯度</div></a><a class="next" href="lesson-08-chain-rule-computational-graph.html"><div class="nlabel">下一课 →</div><div class="ntitle">第8课 · 链式法则与计算图</div></a></div>
 <nav class="toc"><h3>本模块课程表</h3><ol>

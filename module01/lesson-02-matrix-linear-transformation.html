@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>模块1 · 第2课 · 矩阵即线性变换——把空间“掰弯”</title>
+<title>模块1 · 第2课 · 矩阵即线性变换</title>
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
@@ -48,6 +48,11 @@ figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
 .ml{background:var(--green-bg);border-left:4px solid var(--green);}
 .key{background:var(--amber-bg);border-left:4px solid var(--amber);}
 .pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.goals{background:var(--blue-bg);border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:10px;padding:14px 20px;margin:.2em 0 1.5em;}
+.goals h4{margin:.1em 0 .5em;color:#1e3a8a;}
+.goals ul{margin:.3em 0;}
+.skip{background:var(--soft);border:1px solid var(--line);border-left:4px solid #94a3b8;border-radius:10px;padding:14px 20px;margin:1.8em 0 0;color:#475569;}
+.skip h4{margin:.1em 0 .5em;color:#475569;}
 .tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
 .toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
 .toc h3{margin:.1em 0 .7em;}
@@ -64,23 +69,27 @@ figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
 .navbtns .ntitle{font-weight:600;margin-top:3px;}
 .navbtns .next{text-align:right;}
 mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.here{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:6px 0 4px;font-size:15px;color:#1e3a8a;line-height:1.7;}
+.here b{font-weight:700;}
 .cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
 .card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
 .card:hover{border-color:var(--blue);}
 .card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
 .card .ct{font-size:18px;font-weight:600;}
 .card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+.card .cap{margin-left:40px;margin-top:7px;font-size:13px;color:#1e3a8a;}
+.card .cap .lbl{display:inline-block;background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;margin-right:7px;}
 </style>
 </head>
 <body>
 <header class="top"><div class="inner">
 <div class="crumb"><a href="index.html" style="color:inherit">模块 1 · 线性代数与微积分</a>　/　第 2 课（共 10 课）</div>
-<h1>矩阵即线性变换——把空间“掰弯”</h1>
-<div class="sub">从零到前沿 ML 自学课程　·　第一阶段：数学与工具基础</div>
+<h1>矩阵即线性变换</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　阶段0：数学与工具基础　·　<strong>能力点：</strong>矩阵 = 线性变换——看懂神经网络每一层 Wx+b 在做什么</div>
 </div></header>
 <div class="wrap">
 <article>
-<p>上一课我们确立了"万物皆向量"，并用点积衡量两个向量的关系。这一课，我们让<strong>整个空间</strong>动起来：矩阵不再是一张死板的数表，而是一台<strong>变换空间的机器</strong>——它把每个向量搬到新位置，让网格被缩放、旋转、剪切、压扁。理解了这一点，你就拿到了打开线性代数（以及神经网络）的钥匙。</p>
+<div class="goals"><h4>读完这一课，你将能够</h4><ul><li>读出任意 \(2\times2\) 矩阵把 \(\hat{\imath},\hat{\jmath}\) 搬到的两个落点（即两列），并用列视角手算 \(Av\)，说出它把向量搬到了哪</li><li>判断一个变换是否线性（保加法、保数乘、原点不动），并说清 \(Wx+b\) 为什么是仿射而非线性</li><li>对给定矩阵算 \(\det\)，并用大小、符号、为零三种情形解释面积缩放、定向翻转、压扁降维的几何后果</li><li>用 \((AB)x=A(Bx)\) 把矩阵乘法理解为变换复合，举例说明 \(AB\neq BA\)，并默念形状契约 \((m\times n)(n\times p)=(m\times p)\)</li><li>对一个被压扁的矩阵亲手数出秩与零空间，验证"秩 + 零空间维 = 列数"</li></ul></div><p>上一课我们确立了"万物皆向量"，并用点积衡量两个向量的关系。这一课，我们让<strong>整个空间</strong>动起来：矩阵不再是一张死板的数表，而是一台<strong>变换空间的机器</strong>——它把每个向量搬到新位置，让网格被缩放、旋转、剪切、压扁。理解了这一点，你就拿到了打开线性代数（以及神经网络）的钥匙。</p>
 
 <div class="note">
 <p><strong>记号衔接：</strong>沿用上一课的约定，向量记作斜体 \(v\)（默认是列向量），矩阵记作大写 \(A\)。零向量特别记作粗体 \(\mathbf{0}\)，以便和标量 \(0\) 区分开——本课里只有零向量加粗，普通向量都用斜体。</p>
@@ -553,7 +562,54 @@ print("det(A)*det(B) =", round(np.linalg.det(A) * np.linalg.det(B), 6),
 
 <p>运行后你会看到：基向量落点恰是 \(A\) 的两列；\(\det A=6\) 与四角围成的面积一致；\(R[3,2]^\top=[-2,3]^\top\)；两条复合路线都给 \([7,3]^\top\)；而 \(AB\neq BA\)，但 \(\det(AB)=\det A\det B=6\)。</p>
 
-<h2>动手练习</h2>
+<h2>调一调，观察现象</h2><p>下面三个小实验都只用 numpy 和 print，几秒跑完。每个都先猜结果再运行，重点是把"改一个数 → 几何上发生了什么"对应起来。</p>
+
+<div class="example">
+<h4>实验一：调剪切强度 k，看基向量落点变、行列式不变</h4>
+<p><strong>改什么：</strong>把剪切矩阵 \(\begin{bmatrix}1&k\\0&1\end{bmatrix}\) 里的 \(k\) 从 0 调到 1 再到 3。</p>
+<p><strong>预期现象：</strong>\(\hat{\jmath}\) 的落点从 \((0,1)\) 滑到 \((1,1)\) 再到 \((3,1)\)（竖直网格越推越斜），但三种情况 \(\det\) 全是 \(1.0\)。</p>
+<p><strong>为什么：</strong>剪切只把平行四边形"推歪"，底和高没变，面积不变，所以行列式恒为 1——这正是第五节"行列式 = 面积缩放因子"的体现。</p>
+<pre><code>import numpy as np
+for k in [0., 1., 3.]:
+    S = np.array([[1., k],
+                  [0., 1.]])
+    print("k =", k,
+          " j_hat 落点 =", S @ np.array([0., 1.]),
+          " det =", round(np.linalg.det(S), 6))
+</code></pre>
+</div>
+
+<div class="example">
+<h4>实验二：交换两行，看行列式符号翻转</h4>
+<p><strong>改什么：</strong>把 \(A=\begin{bmatrix}2&1\\0&3\end{bmatrix}\) 的第一行和第二行对调。</p>
+<p><strong>预期现象：</strong>\(\det A = 6.0\)，交换两行后变成 \(-6.0\)，大小不变、符号翻了。</p>
+<p><strong>为什么：</strong>交换两行相当于额外做了一次反射，把空间的定向翻转了一次（右手系变左手系），所以行列式由正变负——正对应第五节"\(\det<0\) 表示翻转"。</p>
+<pre><code>import numpy as np
+A = np.array([[2., 1.],
+              [0., 3.]])
+A_swap = A[[1, 0], :]          # 对调两行
+print("det(A)      =", round(np.linalg.det(A), 6))       # 期望 6.0
+print("det(行交换) =", round(np.linalg.det(A_swap), 6))   # 期望 -6.0
+</code></pre>
+</div>
+
+<div class="example">
+<h4>实验三：换不同矩阵，看 det 落在哪个区间</h4>
+<p><strong>改什么：</strong>分别取旋转矩阵、缩放 \(\mathrm{diag}(2,5)\)、投影 \(\begin{bmatrix}1&0\\0&0\end{bmatrix}\)，各算一次行列式。</p>
+<p><strong>预期现象：</strong>旋转的 \(\det=1.0\)（保面积、不翻转），缩放的 \(\det=10.0\)（面积放大 \(2\times5\) 倍），投影的 \(\det=0.0\)（被压扁、不可逆）。</p>
+<p><strong>为什么：</strong>旋转只转不缩、缩放按两轴倍数相乘放大面积、投影把平面压到一条线上面积塌成 0——三档分别对应行列式 \(=1\)、\(>1\)、\(=0\) 三种几何命运。</p>
+<pre><code>import numpy as np
+th = 0.7
+R = np.array([[np.cos(th), -np.sin(th)],
+              [np.sin(th),  np.cos(th)]])     # 旋转
+D = np.diag([2., 5.])                         # 缩放
+P = np.array([[1., 0.],
+              [0., 0.]])                      # 投影
+print("det(旋转) =", round(np.linalg.det(R), 6))   # 期望 1.0
+print("det(缩放) =", round(np.linalg.det(D), 6))   # 期望 10.0
+print("det(投影) =", round(np.linalg.det(P), 6))   # 期望 0.0
+</code></pre>
+</div><h2>动手练习</h2>
 <ol>
 <li><strong>手算 + 列视角。</strong>给定 \(M=\begin{bmatrix}3&-1\\2&2\end{bmatrix}\)，(a) 写出它把 \(\hat{\imath},\hat{\jmath}\) 搬到的落点；(b) 用列视角算 \(M\begin{bmatrix}1\\2\end{bmatrix}\)；(c) 算 \(\det M\) 并说出面积放大几倍、有没有翻转。
 <pre><code>import numpy as np
@@ -596,7 +652,7 @@ print("det(P) =", round(np.linalg.det(P), 6))  # 期望 0.0
 <li>我能讲出为什么"线性层之间必须插非线性"，以及 \(QK^\top\) 在算什么。</li>
 </ul>
 
-<p>下一课，我们把"点积"升级为<strong>内积</strong>，用它一次讲透<strong>度量、正交、投影、最小二乘</strong>——也就是机器学习里"拟合"与"误差最小化"的几何本质。</p>
+<p>下一课，我们把"点积"升级为<strong>内积</strong>，用它一次讲透<strong>度量、正交、投影、最小二乘</strong>——也就是机器学习里"拟合"与"误差最小化"的几何本质。</p><div class="skip"><h4>可以先放过的点</h4><ul><li>秩-零化度定理"秩 + 零空间维 = 列数"的<strong>正式证明</strong>现在不必死磕，会用投影例子手验一次守恒律就够了，证明等到后面线性方程组那课再回来补。</li><li>零空间、核 kernel 这套词如果暂时觉得抽象，记住"被压到原点的向量"这一句直觉即可，等下一课《内积、范数与投影》讲到正交补、投影时，它会自然变清晰。</li><li>注意力机制里的 \(QK^\top\) 这段 ML 联系只需留个印象——知道它在"批量算点积相似度"就行，真正展开是 Transformer 专题的事，现在看不懂完全正常。</li><li>非方阵 \(m\times n\) 的升维/降维只要能看懂 \(2\times3\) 那个丢掉 \(z\) 的例子就够，更一般的形状变换等到神经网络层那课再细究。</li></ul></div>
 </article>
 <div class="navbtns"><a class="prev" href="lesson-01-vectors.html"><div class="nlabel">← 上一课</div><div class="ntitle">第1课 · 向量——机器学习的原子</div></a><a class="next" href="lesson-03-inner-product-norm-projection.html"><div class="nlabel">下一课 →</div><div class="ntitle">第3课 · 内积、范数与投影</div></a></div>
 <nav class="toc"><h3>本模块课程表</h3><ol>
