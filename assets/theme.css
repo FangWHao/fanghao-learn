@@ -354,16 +354,22 @@ html {
 }
 
 mjx-container {
-  display: inline-block;
   max-width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
   vertical-align: middle;
+}
+
+mjx-container:not([display="true"]) {
+  display: inline-block;
+  max-width: none;
+  overflow: visible;
 }
 
 mjx-container[display="true"] {
   display: block;
   width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 mjx-container[display="true"] > svg {
