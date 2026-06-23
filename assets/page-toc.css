@@ -37,7 +37,6 @@
 .page-toc-link {
   display: block;
   padding: 7px 8px;
-  border-left: 3px solid transparent;
   border-radius: 6px;
   color: #475569;
   text-decoration: none;
@@ -51,9 +50,8 @@
 }
 
 .page-toc-link.active {
-  border-left-color: #2563eb;
-  background: #eff6ff;
-  color: #1e3a8a;
+  background: #f1f5f9;
+  color: #1d4ed8;
   font-weight: 750;
 }
 
@@ -112,9 +110,8 @@ html[data-theme="dark"] .page-toc-link:hover {
 }
 
 html[data-theme="dark"] .page-toc-link.active {
-  border-left-color: #60a5fa;
-  background: #0d2a47;
-  color: #dbeafe;
+  background: #182235;
+  color: #bfdbfe;
 }
 
 html[data-theme="dark"] .page-toc-toggle {
