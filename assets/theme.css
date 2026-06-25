@@ -169,6 +169,12 @@ html[data-theme="dark"] .card .cap .lbl {
   color: #bfdbfe;
 }
 
+html[data-theme="dark"] .card .cap .lbl {
+  background: #1e3a8a;
+  border: 1px solid #2563eb;
+  color: #dbeafe;
+}
+
 html[data-theme="dark"] .card .num,
 html[data-theme="dark"] .card-label,
 html[data-theme="dark"] .brand-mark {
