@@ -14,6 +14,7 @@
   function readStore() {
     try {
       return JSON.parse(localStorage.getItem(storeKey) || "[]").filter(function (item) {
+        if (item.target === "formula") return Number.isFinite(item.formulaIndex);
         return Number.isFinite(item.start) && Number.isFinite(item.end) && item.end > item.start;
       });
     } catch (_) {
@@ -40,7 +41,16 @@
     root.querySelectorAll("span.fh-ann").forEach(function (span) {
       span.replaceWith(document.createTextNode(span.textContent || ""));
     });
+    root.querySelectorAll("mjx-container.fh-ann-formula").forEach(function (formula) {
+      formula.classList.remove("fh-ann-formula", "fh-ann-highlight", "fh-ann-underline", "fh-ann-note");
+      formula.removeAttribute("data-ids");
+      formula.removeAttribute("title");
+    });
     root.normalize();
+  }
+
+  function formulaNodes() {
+    return Array.from(root.querySelectorAll("mjx-container"));
   }
 
   function textNodes() {
@@ -104,6 +114,20 @@
       }
       entry.node.replaceWith(frag);
     });
+    formulaNodes().forEach(function (formula, index) {
+      var covers = annotations.filter(function (ann) {
+        return ann.target === "formula" && ann.formulaIndex === index;
+      });
+      if (!covers.length) return;
+      var types = covers.map(function (ann) { return ann.type; });
+      formula.classList.add("fh-ann-formula");
+      if (types.includes("highlight")) formula.classList.add("fh-ann-highlight");
+      if (types.includes("underline")) formula.classList.add("fh-ann-underline");
+      if (types.includes("note")) formula.classList.add("fh-ann-note");
+      formula.dataset.ids = covers.map(function (ann) { return ann.id; }).join(",");
+      var note = covers.find(function (ann) { return ann.type === "note" && ann.note; });
+      if (note) formula.title = note.note;
+    });
   }
 
   function selectionInfo() {
@@ -139,15 +163,21 @@
 
   function saveAnnotation(type, note) {
     if (!lastSelection) return;
-    annotations.push({
+    var ann = {
       id: uid(),
       type: type,
-      start: lastSelection.start,
-      end: lastSelection.end,
       text: lastSelection.text.slice(0, 280),
       note: note || "",
       createdAt: new Date().toISOString()
-    });
+    };
+    if (lastSelection.target === "formula") {
+      ann.target = "formula";
+      ann.formulaIndex = lastSelection.formulaIndex;
+    } else {
+      ann.start = lastSelection.start;
+      ann.end = lastSelection.end;
+    }
+    annotations.push(ann);
     writeStore();
     applyMarks();
     renderList();
@@ -192,6 +222,11 @@
     var mark = Array.from(root.querySelectorAll(".fh-ann")).find(function (el) {
       return (el.dataset.ids || "").split(",").includes(id);
     });
+    if (!mark) {
+      mark = Array.from(root.querySelectorAll("mjx-container.fh-ann-formula")).find(function (el) {
+        return (el.dataset.ids || "").split(",").includes(id);
+      });
+    }
     if (!mark) return;
     mark.scrollIntoView({ behavior: "smooth", block: "center" });
     mark.animate([{ outline: "2px solid #2563eb" }, { outline: "2px solid transparent" }], { duration: 1200 });
@@ -295,6 +330,14 @@
     applyMarks();
     renderList();
 
+    if (window.MathJax && window.MathJax.startup && window.MathJax.startup.promise) {
+      window.MathJax.startup.promise.then(function () {
+        applyMarks();
+      });
+    } else {
+      setTimeout(applyMarks, 900);
+    }
+
     document.addEventListener("mouseup", function () {
       setTimeout(function () {
         var info = selectionInfo();
@@ -309,6 +352,30 @@
       if (!event.target.closest(".fh-annot-toolbar,.fh-annot-editor")) hideToolbar();
     });
     root.addEventListener("click", function (event) {
+      var formula = event.target.closest("mjx-container");
+      if (formula && root.contains(formula)) {
+        event.preventDefault();
+        event.stopPropagation();
+        var ids = (formula.dataset.ids || "").split(",");
+        var existingNote = annotations.find(function (item) {
+          return ids.includes(item.id) && item.type === "note";
+        });
+        if (existingNote) {
+          lastSelection = { target: "formula", formulaIndex: formulaNodes().indexOf(formula), text: existingNote.text, rect: formula.getBoundingClientRect() };
+          openEditor(existingNote.id);
+          return;
+        }
+        var rect = formula.getBoundingClientRect();
+        var raw = (formula.getAttribute("aria-label") || formula.textContent || "公式").replace(/\s+/g, " ").trim();
+        lastSelection = {
+          target: "formula",
+          formulaIndex: formulaNodes().indexOf(formula),
+          text: raw || "公式",
+          rect: rect
+        };
+        showToolbar(lastSelection);
+        return;
+      }
       var mark = event.target.closest(".fh-ann-note");
       if (!mark) return;
       var ids = (mark.dataset.ids || "").split(",");
