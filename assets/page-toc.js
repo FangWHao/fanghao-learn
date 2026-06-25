@@ -52,6 +52,21 @@
     document.body.appendChild(nav);
     document.body.appendChild(toggle);
 
+    var placeToc = function () {
+      if (!window.matchMedia("(min-width: 1360px)").matches) {
+        nav.style.top = "";
+        nav.style.maxHeight = "";
+        return;
+      }
+      var header = document.querySelector("header.top");
+      var top = 92;
+      if (header) top = Math.max(top, Math.ceil(header.getBoundingClientRect().bottom + 32));
+      nav.style.top = top + "px";
+      nav.style.maxHeight = "calc(100vh - " + (top + 40) + "px)";
+    };
+    placeToc();
+    window.addEventListener("resize", placeToc);
+
     toggle.addEventListener("click", function () {
       var isOpen = nav.classList.toggle("open");
       toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
@@ -93,6 +108,7 @@
     }
 
     var updateFromScroll = function () {
+      placeToc();
       var current = headings[0];
       headings.forEach(function (heading) {
         if (heading.getBoundingClientRect().top <= 110) current = heading;
