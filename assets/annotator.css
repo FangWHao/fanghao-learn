@@ -260,13 +260,37 @@ mjx-container.fh-ann-formula.fh-ann-note {
 }
 
 @media (max-width: 640px) {
+  .fh-annot-toolbar {
+    max-width: calc(100vw - 20px);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .fh-annot-fab {
-    left: 12px;
-    bottom: 12px;
+    left: 10px;
+    bottom: 14px;
+    min-height: 38px;
+    padding: 9px 13px;
+    font-size: 13px;
   }
 
   .fh-annot-panel {
-    left: 12px;
-    bottom: 58px;
+    right: 10px;
+    left: 10px;
+    bottom: 64px;
+    width: auto;
+    max-height: calc(100vh - 88px);
+  }
+
+  .fh-annot-panel-head {
+    padding: 10px 12px;
+  }
+
+  .fh-annot-list {
+    padding: 8px;
+  }
+
+  .fh-annot-editor {
+    width: min(360px, calc(100vw - 20px));
   }
 }

@@ -382,16 +382,257 @@ mjx-container[display="true"] > svg {
   max-width: none;
 }
 
-@media (max-width: 640px) {
-  body {
+@media (max-width: 760px) {
+  html body {
     overflow-x: hidden;
+    font-size: 16px;
+    line-height: 1.75;
   }
 
-  .theme-toggle {
+  html body .theme-toggle {
     top: auto;
-    right: 12px;
-    bottom: 70px;
+    right: 10px;
+    bottom: 132px;
     min-height: 34px;
     padding: 7px 10px;
+    font-size: 12px;
+  }
+
+  @supports selector(body:has(header.top)) {
+    html body:has(header.top) .theme-toggle {
+      top: 10px;
+      bottom: auto;
+    }
+  }
+
+  html body header.top {
+    margin-bottom: 8px;
+    padding: 18px 12px 16px;
+  }
+
+  html body header.top .inner {
+    max-width: none;
+  }
+
+  html body header.top .crumb {
+    padding-right: 82px;
+    font-size: 12.5px;
+    line-height: 1.55;
+    letter-spacing: 0;
+  }
+
+  html body header.top h1 {
+    padding-right: 78px;
+    font-size: clamp(24px, 7vw, 30px);
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  html body header.top .sub {
+    font-size: 13.5px;
+    line-height: 1.6;
+  }
+
+  html body .wrap {
+    width: 100%;
+    max-width: none;
+    padding: 0 10px 92px;
+  }
+
+  html body .wrap > article {
+    margin-top: 10px;
+    border-radius: 10px;
+    padding: 18px 14px;
+  }
+
+  html body .wrap > article h2 {
+    margin: 1.45em 0 0.55em;
+    font-size: 21px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  html body .wrap > article h3 {
+    margin: 1.2em 0 0.4em;
+    font-size: 18px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+
+  html body .wrap > article h4 {
+    font-size: 15.5px;
+    line-height: 1.4;
+  }
+
+  html body .wrap > article p,
+  html body .wrap > article li {
+    overflow-wrap: anywhere;
+  }
+
+  html body .wrap > article ul,
+  html body .wrap > article ol {
+    padding-left: 1.15em;
+  }
+
+  html body .wrap > article code {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  html body .wrap > article pre {
+    max-width: 100%;
+    margin-right: -2px;
+    margin-left: -2px;
+    padding: 12px 13px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-size: 13px;
+    line-height: 1.55;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  html body .wrap > article table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    font-size: 13.5px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  html body .wrap > article th,
+  html body .wrap > article td {
+    padding: 8px 9px;
+  }
+
+  html body .wrap > article figure.fig {
+    margin: 1.1em -4px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  html body .wrap > article figure.fig svg {
+    max-width: 100%;
+    min-width: 0;
+    height: auto;
+  }
+
+  html body .wrap > article figcaption {
+    padding: 0 4px;
+    font-size: 12.5px;
+    line-height: 1.55;
+  }
+
+  html body .wrap > article .note,
+  html body .wrap > article .ml,
+  html body .wrap > article .key,
+  html body .wrap > article .pitfall,
+  html body .wrap > article .example,
+  html body .wrap > article .goals,
+  html body .wrap > article .skip,
+  html body .wrap > article .here,
+  html body .wrap > article .toc {
+    border-radius: 9px;
+    padding: 12px 13px;
+  }
+
+  html body .wrap > article .toc li {
+    padding: 8px 6px;
+  }
+
+  html body .wrap > article .navbtns {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  html body .wrap > article .navbtns a {
+    padding: 12px 13px;
+  }
+
+  html body .wrap > article .navbtns .next {
+    text-align: left;
+  }
+
+  html body .wrap > article .cards {
+    gap: 10px;
+  }
+
+  html body .wrap > article .card {
+    border-radius: 10px;
+    padding: 13px 12px;
+  }
+
+  html body .wrap > article .card .num {
+    margin-bottom: 8px;
+  }
+
+  html body .wrap > article .card .ct {
+    font-size: 16px;
+    line-height: 1.35;
+  }
+
+  html body .wrap > article .card .cb,
+  html body .wrap > article .card .cap {
+    margin-left: 0;
+  }
+
+  mjx-container[display="true"] {
+    padding-bottom: 2px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  mjx-container[display="true"]::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+
+  html body .wrap > article mjx-container:not([display="true"]) {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  html body .wrap > article mjx-container:not([display="true"])::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+
+  html body #pr-fab {
+    right: 10px !important;
+    bottom: 14px !important;
+    max-width: calc(100vw - 96px) !important;
+    min-height: 38px !important;
+    padding: 9px 13px !important;
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+  }
+
+  html body #pr-lab {
+    right: 10px !important;
+    left: 10px !important;
+    bottom: 64px !important;
+    width: auto !important;
+    max-width: none !important;
+    max-height: calc(100vh - 88px) !important;
+  }
+
+  html body #pr-lab .pr-edit,
+  html body #pr-lab .pr-code {
+    min-height: 132px !important;
+  }
+}
+
+@media (max-width: 420px) {
+  html body .wrap {
+    padding-right: 8px;
+    padding-left: 8px;
+  }
+
+  html body .wrap > article {
+    padding-right: 12px;
+    padding-left: 12px;
   }
 }
