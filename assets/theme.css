@@ -359,6 +359,23 @@ html {
   overflow-x: hidden;
 }
 
+@media (min-width: 761px) {
+  html body header.top .inner,
+  html body .wrap {
+    max-width: 1120px;
+  }
+
+  html body .wrap {
+    padding-right: 24px;
+    padding-left: 24px;
+  }
+
+  html body .wrap > article {
+    padding-right: 42px;
+    padding-left: 42px;
+  }
+}
+
 mjx-container {
   max-width: 100%;
   vertical-align: middle;

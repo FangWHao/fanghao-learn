@@ -4,8 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>模块3 · 第3课 · PyTorch 张量、设备与 dtype</title>
-<script src="../assets/theme.js"></script>
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<script src="../assets/theme.js"></script>
+<link rel="stylesheet" href="../assets/annotator.css">
+<link rel="stylesheet" href="../assets/theme.css">
+<link rel="stylesheet" href="../assets/page-toc.css">
 
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
 svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
@@ -87,13 +90,10 @@ mjx-container{max-width:100%;vertical-align:middle;}mjx-container:not([display="
 .toc li.soon{color:#94a3b8;}
 .toc li.soon .badge{margin-left:4px;}
 </style>
-<link rel="stylesheet" href="../assets/annotator.css">
-<link rel="stylesheet" href="../assets/theme.css">
-<link rel="stylesheet" href="../assets/page-toc.css">
 </head>
 <body>
 <header class="top"><div class="inner">
-<div class="crumb"><a href="../index.html" style="color:inherit">首页</a>　/　<a href="index.html" style="color:inherit">模块 3 · Python、NumPy、PyTorch 与实验工程</a>　/　第 3 课（共 10 课）</div>
+<div class="crumb"><a href="index.html" style="color:inherit">模块 3 · Python、NumPy、PyTorch 与实验工程</a>　/　第 3 课（共 10 课）</div>
 <h1>PyTorch 张量、设备与 dtype</h1>
 <div class="sub">从零到前沿 ML 自学课程　·　阶段0：数学与工具基础　·　<strong>能力点：</strong>PyTorch 张量——device/dtype/requires_grad 三属性；吃掉最高频报错</div>
 </div></header>
@@ -709,13 +709,14 @@ print(v.astype(np.int8))    # 改这里：换成 np.int16</code></pre>
 <li class="cur"><span class="ln">第3课</span>PyTorch 张量、设备与 dtype</li>
 <li><a href="lesson-04-autograd.html"><span class="ln">第4课</span>Autograd 自动微分</a></li>
 <li><a href="lesson-05-nn-module.html"><span class="ln">第5课</span>nn.Module 与模型构建</a></li>
-<li class="soon"><span class="ln">第6课</span>从零写训练循环（核心）　<span class="badge">即将上线</span></li>
-<li class="soon"><span class="ln">第7课</span>数据加载 Dataset 与 DataLoader　<span class="badge">即将上线</span></li>
-<li class="soon"><span class="ln">第8课</span>GPU/CUDA 与混合精度　<span class="badge">即将上线</span></li>
-<li class="soon"><span class="ln">第9课</span>实验管理、可复现与调试方法论　<span class="badge">即将上线</span></li>
-<li class="soon"><span class="ln">第10课</span>Hugging Face 生态入门　<span class="badge">即将上线</span></li>
+<li><a href="lesson-06-training-loop-from-scratch.html"><span class="ln">第6课</span>从零写训练循环（核心）</a></li>
+<li><a href="lesson-07-dataset-dataloader.html"><span class="ln">第7课</span>数据加载 Dataset 与 DataLoader</a></li>
+<li><a href="lesson-08-gpu-amp.html"><span class="ln">第8课</span>GPU/CUDA 与混合精度</a></li>
+<li><a href="lesson-09-experiment-repro-debugging.html"><span class="ln">第9课</span>实验管理、可复现与调试方法论</a></li>
+<li><a href="lesson-10-huggingface.html"><span class="ln">第10课</span>Hugging Face 生态入门</a></li>
 </ol></nav>
 </div>
+<!-- pyrunner-injected -->
 <style>
 .pr-cell{border:1px solid #334155;border-radius:10px;margin:1.2em 0;overflow:hidden;background:#0f172a;}
 .pr-head{display:flex;align-items:center;gap:8px;background:#1e293b;color:#cbd5e1;padding:6px 10px;font-size:13px;font-family:system-ui,-apple-system,sans-serif;}
@@ -748,6 +749,17 @@ print(v.astype(np.int8))    # 改这里：换成 np.int16</code></pre>
 #pr-lab{position:fixed;right:18px;bottom:66px;z-index:9999;width:400px;max-width:92vw;background:#0f172a;border:1px solid #334155;border-radius:12px;display:none;flex-direction:column;box-shadow:0 14px 38px rgba(0,0,0,.4);overflow:hidden;}
 #pr-lab.open{display:flex;}
 #pr-lab .pr-edit,#pr-lab .pr-code{min-height:150px;}
+@media (max-width:640px){
+  .pr-cell{border-radius:9px;margin:1em 0;}
+  .pr-head{flex-wrap:wrap;padding:7px 9px;}
+  .pr-title{min-width:0;}
+  .pr-status{order:3;max-width:100%;flex-basis:100%;}
+  .pr-code,.pr-edit{font-size:13px;line-height:1.55;padding:11px 12px;}
+  .pr-out{font-size:12.5px;padding:9px 12px;}
+  #pr-fab{right:10px;bottom:14px;max-width:calc(100vw - 96px);min-height:38px;padding:9px 13px;font-size:13px;line-height:1.2;}
+  #pr-lab{right:10px;left:10px;bottom:64px;width:auto;max-width:none;max-height:calc(100vh - 88px);}
+  #pr-lab .pr-edit,#pr-lab .pr-code{min-height:132px;}
+}
 </style>
 <script>
 (function(){
@@ -929,6 +941,7 @@ print(v.astype(np.int8))    # 改这里：换成 np.int16</code></pre>
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
 })();
 </script>
+
 <script src="../assets/page-toc.js"></script>
 <script src="../assets/annotator.js"></script>
 </body>

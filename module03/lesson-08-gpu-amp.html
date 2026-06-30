@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块3 · 第8课 · GPU/CUDA 与混合精度</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<script src="../assets/theme.js"></script>
+<link rel="stylesheet" href="../assets/annotator.css">
+<link rel="stylesheet" href="../assets/theme.css">
+<link rel="stylesheet" href="../assets/page-toc.css">
+
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue-bg:#eff6ff;
+--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--pink:#db2777;
+--red:#dc2626;--red-bg:#fef2f2;--bg:#ffffff;--soft:#f8fafc;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);
+font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.85;font-size:17px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:840px;margin:0 auto;padding:0 22px 100px;}
+header.top{background:#fff;border-bottom:1px solid var(--line);padding:26px 22px 22px;margin-bottom:14px;}
+header.top .inner{max-width:840px;margin:0 auto;}
+.crumb{color:var(--muted);font-size:14px;letter-spacing:.3px;margin-bottom:6px;}
+h1{font-size:30px;line-height:1.3;margin:.1em 0 .2em;}
+.sub{color:var(--muted);font-size:15px;}
+article{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:30px 34px;margin-top:18px;}
+h2{font-size:23px;margin:1.7em 0 .6em;padding-bottom:.25em;border-bottom:2px solid var(--line);}
+h2:first-child{margin-top:.2em;}
+h3{font-size:19px;margin:1.3em 0 .4em;color:#0f172a;}
+h4{margin:.2em 0 .5em;font-size:16px;}
+p{margin:.7em 0;}
+ul,ol{padding-left:1.3em;margin:.6em 0;}
+li{margin:.32em 0;}
+code{background:#f1f5f9;padding:.12em .4em;border-radius:5px;font-size:.9em;
+font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a;}
+pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 18px;overflow:auto;font-size:14px;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0;}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:15.5px;}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+thead th{background:var(--soft);}
+figure.fig{margin:1.4em 0;text-align:center;}
+figure.fig svg{max-width:100%;height:auto;}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
+.note,.ml,.key,.pitfall,.example{border-radius:10px;padding:14px 18px;margin:1.2em 0;border:1px solid var(--line);}
+.note{background:var(--soft);border-left:4px solid #94a3b8;}
+.example{background:#fff;border-left:4px solid var(--blue);}
+.ml{background:var(--green-bg);border-left:4px solid var(--green);}
+.key{background:var(--amber-bg);border-left:4px solid var(--amber);}
+.pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.goals{background:var(--blue-bg);border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:10px;padding:14px 20px;margin:.2em 0 1.5em;}
+.goals h4{margin:.1em 0 .5em;color:#1e3a8a;}
+.goals ul{margin:.3em 0;}
+.skip{background:var(--soft);border:1px solid var(--line);border-left:4px solid #94a3b8;border-radius:10px;padding:14px 20px;margin:1.8em 0 0;color:#475569;}
+.skip h4{margin:.1em 0 .5em;color:#475569;}
+.tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
+.toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
+.toc h3{margin:.1em 0 .7em;}
+.toc ol{list-style:none;padding:0;}
+.toc li{padding:7px 10px;border-radius:8px;color:#334155;border:1px solid transparent;}
+.toc li a{color:inherit;text-decoration:none;display:block;}
+.toc li .ln{display:inline-block;min-width:54px;color:var(--muted);font-size:13px;}
+.toc li.cur{background:var(--blue-bg);border-color:#bfdbfe;font-weight:600;color:#1e3a8a;}
+.toc li:not(.cur):hover{background:var(--soft);}
+.navbtns{display:flex;justify-content:space-between;margin-top:22px;gap:12px;}
+.navbtns a{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--ink);}
+.navbtns a:hover{border-color:var(--blue);}
+.navbtns .nlabel{color:var(--muted);font-size:13px;}
+.navbtns .ntitle{font-weight:600;margin-top:3px;}
+.navbtns .next{text-align:right;}
+mjx-container{max-width:100%;vertical-align:middle;}mjx-container:not([display="true"]){display:inline-block;max-width:none;overflow:visible;}mjx-container[display="true"]{display:block;width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;}
+.here{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:6px 0 4px;font-size:15px;color:#1e3a8a;line-height:1.7;}
+.here b{font-weight:700;}
+.cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
+.card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
+.card:hover{border-color:var(--blue);}
+.card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
+.card .ct{font-size:18px;font-weight:600;}
+.card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+.card .cap{margin-left:40px;margin-top:7px;font-size:13px;color:#1e3a8a;}
+.card .cap .lbl{display:inline-block;background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;margin-right:7px;}
+
+.card.soon{opacity:.6;cursor:default;}
+.card.soon:hover{border-color:var(--line);}
+.badge{display:inline-block;background:#e2e8f0;color:#475569;font-size:11px;font-weight:600;padding:1px 8px;border-radius:20px;margin-left:8px;vertical-align:middle;}
+.toc li.soon{color:#94a3b8;}
+.toc li.soon .badge{margin-left:4px;}
+</style>
+</head>
+<body>
+<header class="top"><div class="inner">
+<div class="crumb"><a href="index.html" style="color:inherit">模块 3 · Python、NumPy、PyTorch 与实验工程</a>　/　第 8 课（共 10 课）</div>
+<h1>GPU/CUDA 与混合精度</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　阶段0：数学与工具基础　·　<strong>能力点：</strong>GPU 与混合精度——显存四大块 + AMP/GradScaler 省一半显存（LoRA/QLoRA 前提）</div>
+</div></header>
+<div class="wrap">
+<article>
+<p>上一课我们把数据用<strong>数据加载器（DataLoader）</strong>稳定地喂进训练循环——现在数据流通了，下一个问题是：怎么让它<em>更快、更省显存</em>。这一课不改训练逻辑，而是给你的训练循环装上两个加速器：把计算交给 <strong>GPU</strong> 的成千上万个线程并行做，以及用<strong>混合精度（mixed precision，AMP）</strong>让前向更快、激活省一半显存。这两件事看起来高级，但底层只是两个朴素的工程直觉：搬运数据有成本、低精度数有表示范围。把这两点吃透，你才真正理解后面 LoRA/QLoRA「在小显存上微调大模型」为什么成立。</p>
+
+<div class="goals"><h4>读完这一课，你将能够</h4>
+<ul>
+<li>用一句话解释 GPU 为何擅长大矩阵乘，以及为什么循环里频繁 <code>.item()</code>/<code>.cpu()</code> 会拖慢训练。</li>
+<li>把训练显存拆成「参数 + 梯度 + 优化器状态 + 激活」四块，并算出 Adam 状态≈2×参数。</li>
+<li>解释 fp16 为何会下溢成 0，以及 <code>GradScaler</code> 的 loss scaling 如何救回小梯度。</li>
+<li>说清 bf16 与 fp16 在「范围 vs 精度」上的区别，判断什么时候需要 loss scaling。</li>
+<li>读懂一个标准 AMP 训练循环的三件套：<code>autocast</code> / <code>scaler.scale(loss).backward()</code> / <code>scaler.step</code>+<code>scaler.update</code>。</li>
+</ul></div>
+
+<h2>GPU 并行直觉：为什么大矩阵乘在 GPU 上飞快</h2>
+
+<p>一次矩阵乘 \( (N, D) \times (D, M) \) 要算 \( N\times M \) 个输出，每个输出是一条长度为 \( D \) 的点积。关键在于：<strong>这些输出之间互不依赖</strong>，可以同时算。CPU 有几个到几十个强力核心，擅长复杂的串行逻辑；GPU 有成千上万个弱小核心，擅长「同一种简单运算、海量数据、各自独立」的场景——矩阵乘恰好是教科书式的例子。神经网络的绝大部分计算就是矩阵乘和逐元素运算，所以天然适配 GPU。</p>
+
+<p>但有一个隐藏成本经常被忽略：<strong>CPU 和 GPU 是两块独立的内存，数据来回搬运要走 PCIe 总线，很慢。</strong>张量在 GPU 上算得再快，每次你把它拉回 CPU，都要等总线传输 + 等 GPU 把手头排队的活算完。这就引出本课第一个高频误区。</p>
+
+<h3>误区：循环里频繁 <code>.item()</code> / <code>.cpu()</code> / <code>print(tensor)</code></h3>
+
+<p>GPU 的计算是<strong>异步</strong>的：你写 <code>loss = model(x)</code> 时，Python 只是把任务塞进 GPU 的队列就立刻返回，GPU 在后台慢慢算。这种「下了单不等菜」的流水线让 CPU 能持续派活、GPU 满负荷运转。但下面这些操作会<strong>强制同步（synchronize）</strong>——CPU 必须停下来，等 GPU 把队列里所有活都算完，才能拿到那个具体数值：</p>
+<ul>
+<li><code>loss.item()</code>：把标量从 GPU 取回 Python float。</li>
+<li><code>tensor.cpu()</code> / <code>tensor.numpy()</code>：把张量搬回主机内存。</li>
+<li><code>print(some_gpu_tensor)</code>：打印要先把值读回来。</li>
+</ul>
+<p>每个 step 里只要有一次这类调用，流水线就被打断一次。把它们从「每个 step」挪到「每 N 个 step 打一次日志」，往往是零成本的提速。</p>
+
+<pre class="ref" data-lang="PyTorch"><code># 慢：每个 step 都同步一次
+for x, y in loader:
+    loss = step(x, y)
+    print(loss.item())          # 每步都强制 CPU-GPU 同步
+
+# 快：累加在 GPU 上，少数步才同步一次
+running = 0.0
+for i, (x, y) in enumerate(loader):
+    loss = step(x, y)
+    running += loss.detach()    # 仍在 GPU 上，不同步
+    if i % 50 == 0:
+        print(running.item() / 50)   # 每 50 步才同步一次
+        running = 0.0</code></pre>
+
+<h2>显存四大块：你的显卡装得下吗</h2>
+
+<p>「显存够不够」几乎是训练能不能跑起来的第一道门槛。训练时的显存主要由四块构成，记住它们的相对大小，你就能在不跑代码的情况下估出一个模型要多大的卡。设参数量为 \( P \)，fp32 下每个数占 4 字节：</p>
+
+<table>
+<thead><tr><th>显存块</th><th>大小（fp32）</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>参数（parameters）</td><td>\( 4P \) 字节</td><td>模型权重本身</td></tr>
+<tr><td>梯度（gradients）</td><td>\( 4P \) 字节</td><td>每个参数一个梯度，≈参数大小</td></tr>
+<tr><td>优化器状态（optimizer states）</td><td>\( 8P \) 字节</td><td>Adam 为每个参数存动量 \(m\) 和方差 \(v\)，≈2×参数</td></tr>
+<tr><td>激活（activations）</td><td>随 batch / 序列长变化</td><td>前向中间结果，反向要用；越大的 batch / 越长的序列越占</td></tr>
+</tbody>
+</table>
+
+<p>这里最反直觉的一点：<strong>很多人只数参数，却忘了后面三块。</strong>光是「参数 + 梯度 + Adam 状态」就已经是参数本身的 <strong>4 倍</strong>（\(4P+4P+8P=16P\)）。注意区分两个倍数基准：Adam 状态本身是参数的 2 倍（\(8P\)），而「参数+梯度+Adam」三块合计才是参数的 4 倍（\(16P\)）。激活则是另一条独立的轴——它不随参数量、而随 batch size 和序列长度涨，这正是「显存爆了，把 batch 调小就好了」的原因。下面这个纯 Python 估算器把前三块算给你看。</p>
+
+<figure class="fig"><svg viewBox="0 0 760 560" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="8" height="8" fill="#f1f5f9"/>
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#94a3b8" stroke-width="1.4"/>
+    </pattern>
+  </defs>
+
+  <!-- Title -->
+  <text x="380" y="34" text-anchor="middle" font-size="20" font-weight="700" fill="#1f2937">训练显存四大块</text>
+  <text x="380" y="56" text-anchor="middle" font-size="12" fill="#64748b">以参数大小为 1 个单位（设参数量 = P，FP32 每个数 4 字节）</text>
+
+  <!-- Y axis scale reference -->
+  <line x1="150" y1="90" x2="150" y2="490" stroke="#94a3b8" stroke-width="1.2"/>
+  <text x="142" y="490" text-anchor="end" font-size="11" fill="#64748b">0</text>
+  <line x1="146" y1="410" x2="150" y2="410" stroke="#94a3b8" stroke-width="1.2"/>
+  <text x="142" y="414" text-anchor="end" font-size="11" fill="#64748b">1×</text>
+  <line x1="146" y1="330" x2="150" y2="330" stroke="#94a3b8" stroke-width="1.2"/>
+  <text x="142" y="334" text-anchor="end" font-size="11" fill="#64748b">2×</text>
+  <line x1="146" y1="250" x2="150" y2="250" stroke="#94a3b8" stroke-width="1.2"/>
+  <text x="142" y="254" text-anchor="end" font-size="11" fill="#64748b">3×</text>
+  <line x1="146" y1="170" x2="150" y2="170" stroke="#94a3b8" stroke-width="1.2"/>
+  <text x="142" y="174" text-anchor="end" font-size="11" fill="#64748b">4×</text>
+  <text x="105" y="290" text-anchor="middle" font-size="12" fill="#64748b" transform="rotate(-90 105 290)">相对大小（×参数）</text>
+
+  <!-- ===== Stacked bar (bottom -> top): each unit = 80px ===== -->
+  <!-- bar x: 200..360 -->
+
+  <!-- (1) parameters: y 410..490 (h=1) blue -->
+  <rect x="200" y="410" width="160" height="80" fill="#2563eb" stroke="#1e40af" stroke-width="1.5"/>
+  <text x="280" y="445" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">① 参数 parameters</text>
+  <text x="280" y="465" text-anchor="middle" font-size="12" fill="#dbeafe">高度 = 1　|　4P 字节</text>
+
+  <!-- (2) gradients: y 330..410 (h=1) green -->
+  <rect x="200" y="330" width="160" height="80" fill="#059669" stroke="#047857" stroke-width="1.5"/>
+  <text x="280" y="365" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">② 梯度 gradients</text>
+  <text x="280" y="385" text-anchor="middle" font-size="12" fill="#d1fae5">高度 ≈ 1（≈参数）　|　4P 字节</text>
+
+  <!-- (3) optimizer states: y 170..330 (h=2) orange -->
+  <rect x="200" y="170" width="160" height="160" fill="#d97706" stroke="#b45309" stroke-width="1.5"/>
+  <text x="280" y="232" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">③ 优化器状态</text>
+  <text x="280" y="252" text-anchor="middle" font-size="12" fill="#fef3c7">Adam: m + v 各一份</text>
+  <text x="280" y="272" text-anchor="middle" font-size="12" font-weight="700" fill="#fffbeb">高度 = 2（≈2×参数，占大头）</text>
+  <text x="280" y="290" text-anchor="middle" font-size="12" fill="#fef3c7">8P 字节</text>
+
+  <!-- (4) activations: variable, dashed + hatch, y ~70..170 -->
+  <rect x="200" y="70" width="160" height="100" fill="url(#hatch)" stroke="#64748b" stroke-width="1.6" stroke-dasharray="7 5"/>
+  <text x="280" y="108" text-anchor="middle" font-size="14" font-weight="700" fill="#334155">④ 激活 activations</text>
+  <text x="280" y="128" text-anchor="middle" font-size="12" fill="#475569">高度可变（虚线 = 不固定）</text>
+  <text x="280" y="146" text-anchor="middle" font-size="12" fill="#475569">随 batch / 序列长变化</text>
+
+  <!-- ===== Brace on the right: ①+②+③ = 4×参数 ===== -->
+  <!-- brace spans y 170 (top of optimizer) .. 490 (bottom of params) -->
+  <path d="M 378 170
+           Q 392 170 392 184
+           L 392 322
+           Q 392 330 402 330
+           Q 392 330 392 338
+           L 392 476
+           Q 392 490 378 490"
+        fill="none" stroke="#db2777" stroke-width="2"/>
+  <text x="412" y="318" font-size="15" font-weight="700" fill="#db2777">①+②+③ = 4×参数</text>
+  <text x="412" y="340" font-size="12" fill="#9d174d">即 4P + 4P + 8P = 16P 字节</text>
+  <text x="412" y="362" font-size="12" fill="#9d174d">与 batch / 序列长无关，恒定开销</text>
+
+  <!-- callout: 只数参数会低估 -->
+  <line x1="412" y1="430" x2="365" y2="450" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+  <text x="416" y="428" font-size="12" fill="#64748b">⚠ 「只数参数」= 只看蓝色这 1 块</text>
+  <text x="416" y="446" font-size="12" font-weight="700" fill="#1f2937">前三块合计就是参数的 4 倍</text>
+
+  <!-- caption -->
+  <text x="380" y="525" text-anchor="middle" font-size="11.5" fill="#64748b">蓝/绿/橙为恒定开销（≈4×参数）；灰色激活随 batch 与序列长单独增长，是省显存的主要可调项。</text>
+  <text x="380" y="544" text-anchor="middle" font-size="11" fill="#94a3b8">（混合精度下各块字节会变化，但「优化器状态占大头、只数参数严重低估」的结构不变。）</text>
+</svg><figcaption>训练显存四大块堆叠条形图：以参数大小为 1 个单位，梯度≈1、Adam 优化器状态≈2（m 和 v 各一份）、激活随 batch/序列长单独成一块。直观展示「只数参数」会严重低估，前三块合计就是参数的 4 倍。</figcaption></figure>
+
+<pre><code>def estimate_memory(P, bytes_per=4):
+    GB = 1024 ** 3
+    params = P * bytes_per          # 参数
+    grads  = P * bytes_per          # 梯度 ≈ 参数
+    adam   = P * bytes_per * 2      # Adam 的 m, v ≈ 2×参数
+    total  = params + grads + adam
+    return params/GB, grads/GB, adam/GB, total/GB
+
+P = 1.3e8   # 1.3 亿参数（约等于 BERT-base 量级）
+p, g, a, t = estimate_memory(P)
+print(f"参数        : {p:.2f} GB")
+print(f"梯度        : {g:.2f} GB")
+print(f"Adam 状态   : {a:.2f} GB  <- 占大头")
+print(f"合计(不含激活): {t:.2f} GB")
+print(f"= 参数的 {t/p:.0f} 倍")</code></pre>
+
+<p>运行会得到：参数 0.48 GB，梯度 0.48 GB，Adam 状态 0.97 GB，合计约 1.94 GB——是参数的整整 4 倍，而且<strong>还没算激活</strong>。把 <code>P</code> 改成 7e9（7B 模型）你立刻明白：为什么 70 亿参数的模型，全量 + Adam 微调要 100 GB 量级的显存，而 LoRA 这类只更新极小一部分参数、从而砍掉绝大部分「梯度 + 优化器状态」的方法，才能让大模型在一张消费级卡上微调。</p>
+
+<h2>混合精度的数值原理：fp16 的范围有多窄</h2>
+
+<p>提速和省显存的另一把钥匙是<strong>降低精度</strong>：把计算从 32 位浮点（fp32）切到 16 位。16 位的数搬得快、算得快，激活只占一半显存。但天下没有免费的午餐——16 位能表示的数<strong>范围</strong>和<strong>精度</strong>都缩水了。要理解后面的 <code>GradScaler</code>，必须先亲眼看看 fp16 窄到什么程度。</p>
+
+<p>下面这段纯 NumPy 代码演示三件事：fp16 的最大值、超过它会<strong>溢出（overflow）</strong>成 <code>inf</code>、以及很小的「梯度」会<strong>下溢（underflow）</strong>成 0——这正是训练 fp16 时梯度凭空消失的元凶。</p>
+
+<pre><code>import numpy as np
+
+# 1) fp16 能表示的最大值
+fmax = np.finfo(np.float16).max
+print("fp16 最大值 =", fmax)          # 约 6.55e4（numpy 打印 65500.0；fp16 真正最大值是 65504）
+
+# 2) 溢出：超过最大值 -> inf
+#    这一步会打印一条 "RuntimeWarning: overflow encountered in cast"，
+#    那不是报错，正是 numpy 在告诉你溢出了；下一行的结果仍是 inf。
+big = np.float16(70000.0)
+print("70000 转 fp16 =", big)         # inf
+
+# 3) 下溢：很小的梯度 -> 0
+grad = 1e-8
+print("1e-8 转 fp16 =", np.float16(grad))   # 0.0  <- 梯度没了！</code></pre>
+
+<p>第三行是混合精度训练的核心痛点：深度网络里很多梯度天然就很小（\(10^{-7}\) 量级很常见），一转 fp16 就被压成 0，参数得不到更新，训练悄悄崩掉。注意 bf16 不太有这个问题（下一节解释），<strong>这个下溢主要是 fp16 的麻烦</strong>。</p>
+
+<p>多说一句关于「多小才会下溢成 0」：fp16 除了正规数（normal），还有<strong>次正规数（subnormal）</strong>把可表示范围一直往下延伸到约 \(6\times10^{-8}\)（精确是 \(2^{-24}\approx5.96\times10^{-8}\)）。所以判 0 的真正门槛不是「最小正规数」（约 \(6.1\times10^{-5}\)），而是这个更低的<strong>最小可表示数约 \(6\times10^{-8}\)</strong>——比它还小（严格说小到约 \(3\times10^{-8}\) 以下）才会被四舍五入到 0。后文凡是讲「下溢成 0」，都以这个约 \(6\times10^{-8}\) 的下限为准。</p>
+
+<h2>GradScaler：用 loss scaling 把小梯度抬回可表示区</h2>
+
+<p>救法巧妙又朴素：既然小梯度落在了 fp16 表示不了的「太小」区域（小于约 \(6\times10^{-8}\) 就会被压到 0），那就<strong>在反向传播前把 loss 乘一个大数</strong>（如 1024）。由链式法则，loss 放大多少倍，所有梯度就同比放大多少倍——原本下溢成 0 的小梯度被抬回 fp16 能表示的区间。等梯度算完、要更新参数前，再<strong>除回这个倍数</strong>，数值就还原了。这个「乘大数 → backward → 除回来」的把戏就叫 <strong>loss scaling</strong>，PyTorch 用 <code>GradScaler</code> 自动帮你做（还会自动挑倍数、遇到 inf 就跳过这一步）。下面演示里的 <code>1024</code> 只是个固定的演示值，真实的 <code>GradScaler</code> 初始倍数约为 65536，并会在训练中动态调整。</p>
+
+<pre><code>import numpy as np
+
+grad = 1e-8
+scale = 1024
+
+# 不缩放：直接转 fp16 -> 下溢成 0
+print("不缩放:", np.float16(grad))                 # 0.0
+
+# 缩放：先乘 1024 再转 fp16 -> 救回来了
+scaled = np.float16(grad * scale)
+print("乘 1024 后转 fp16:", scaled)                # 约 1.02e-05，非 0
+
+# 更新参数前，把梯度除回原倍数（用 fp32 还原）
+recovered = np.float32(scaled) / scale
+print("除回 1024 还原:", recovered)                # 约 1.0e-8，回来了</code></pre>
+
+<p>跑出来：直接转是 <code>0.0</code>，乘 1024 后变成约 <code>1.02e-05</code>（活了），除回去约 <code>1.0e-8</code>（还原）。这就是 <code>GradScaler</code> 在底层做的全部事情——理解了这 8 行，你就不会再对「为什么 fp16 训练要套一个 scaler」感到神秘。</p>
+
+<figure class="fig"><svg viewBox="0 0 760 520" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif">
+  <defs>
+    <marker id="arrGreen" orient="auto-start-reverse" markerWidth="9" markerHeight="9" refX="7" refY="4.5">
+      <path d="M0,0 L9,4.5 L0,9 Z" fill="#059669"/>
+    </marker>
+    <style>
+      .lbl{font-size:12px;fill:#1f2937}
+      .note{font-size:11px}
+      .tag{font-size:11px;fill:#1f2937}
+      .ti{font-size:14px;font-weight:600;fill:#1f2937}
+      .bit{stroke:#fff;stroke-width:1}
+    </style>
+  </defs>
+
+  <!-- Title -->
+  <text x="20" y="26" class="ti">fp16 vs bf16：均为 16 位，指数=范围 / 尾数=精度</text>
+
+  <!-- ===== legend ===== -->
+  <g transform="translate(560,14)">
+    <rect x="0" y="0" width="14" height="14" rx="2" fill="#94a3b8"/><text x="19" y="11" class="note" fill="#1f2937">符号</text>
+    <rect x="0" y="20" width="14" height="14" rx="2" fill="#d97706"/><text x="19" y="31" class="note" fill="#1f2937">指数(范围)</text>
+    <rect x="0" y="40" width="14" height="14" rx="2" fill="#2563eb"/><text x="19" y="51" class="note" fill="#1f2937">尾数(精度)</text>
+  </g>
+
+  <!-- common geometry: bit width = 13.5 for 32 bits over 432px -->
+  <!-- x0=70, each bit 12.5 -->
+
+  <!-- ===== fp32 reference ===== -->
+  <g transform="translate(0,60)">
+    <text x="20" y="22" class="lbl" font-weight="600">fp32</text>
+    <text x="20" y="38" class="note" fill="#64748b">参照基准</text>
+    <!-- 1 + 8 + 23 = 32 bits, width 400 -> 12.5/bit -->
+    <rect x="100" y="8" width="12.5" height="24" class="bit" fill="#94a3b8"/>
+    <rect x="112.5" y="8" width="100" height="24" class="bit" fill="#d97706"/>
+    <rect x="212.5" y="8" width="287.5" height="24" class="bit" fill="#2563eb"/>
+    <text x="162" y="25" class="tag" fill="#fff" text-anchor="middle">8 指数</text>
+    <text x="356" y="25" class="tag" fill="#fff" text-anchor="middle">23 尾数</text>
+    <text x="510" y="25" class="note" fill="#64748b">32 位</text>
+  </g>
+
+  <!-- ===== fp16 ===== -->
+  <g transform="translate(0,110)">
+    <text x="20" y="22" class="lbl" font-weight="600">fp16</text>
+    <!-- 1 + 5 + 10 = 16 bits, each 25px wide -> width 400 -->
+    <rect x="100" y="8" width="25" height="24" class="bit" fill="#94a3b8"/>
+    <rect x="125" y="8" width="125" height="24" class="bit" fill="#d97706"/>
+    <rect x="250" y="8" width="250" height="24" class="bit" fill="#2563eb"/>
+    <text x="187" y="25" class="tag" fill="#fff" text-anchor="middle">5 指数</text>
+    <text x="375" y="25" class="tag" fill="#fff" text-anchor="middle">10 尾数</text>
+    <text x="510" y="20" class="note" fill="#db2777">范围小，</text>
+    <text x="510" y="34" class="note" fill="#db2777">易下溢</text>
+  </g>
+
+  <!-- ===== bf16 ===== -->
+  <g transform="translate(0,160)">
+    <text x="20" y="22" class="lbl" font-weight="600">bf16</text>
+    <!-- 1 + 8 + 7 = 16 bits, each 25px -->
+    <rect x="100" y="8" width="25" height="24" class="bit" fill="#94a3b8"/>
+    <rect x="125" y="8" width="200" height="24" class="bit" fill="#d97706"/>
+    <rect x="325" y="8" width="175" height="24" class="bit" fill="#2563eb"/>
+    <text x="225" y="25" class="tag" fill="#fff" text-anchor="middle">8 指数 (更宽)</text>
+    <text x="412" y="25" class="tag" fill="#fff" text-anchor="middle">7 尾数</text>
+    <text x="510" y="20" class="note" fill="#059669">范围≈fp32，</text>
+    <text x="510" y="34" class="note" fill="#059669">精度低</text>
+  </g>
+
+  <!-- 指数宽度 = 范围 对齐示意 -->
+  <text x="20" y="226" class="note" fill="#64748b">指数位越多 → 动态范围越大；尾数位越多 → 精度越高（同为 16 位，二者此消彼长）</text>
+
+  <!-- divider -->
+  <line x1="20" y1="248" x2="740" y2="248" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- ===== loss scaling number line ===== -->
+  <g transform="translate(0,270)">
+    <text x="20" y="20" class="ti" font-size="14">loss scaling：把下溢的小梯度抬回 fp16 可表示区</text>
+
+    <!-- log axis -->
+    <line x1="80" y1="120" x2="700" y2="120" stroke="#94a3b8" stroke-width="2"/>
+    <text x="700" y="140" class="note" fill="#64748b" text-anchor="end">梯度数值 (对数刻度) →</text>
+
+    <!-- ticks -->
+    <g class="note" fill="#64748b" text-anchor="middle">
+      <line x1="160" y1="115" x2="160" y2="125" stroke="#94a3b8"/><text x="160" y="108">1e-8</text>
+      <line x1="300" y1="115" x2="300" y2="125" stroke="#94a3b8"/><text x="300" y="108">1e-6</text>
+      <line x1="440" y1="115" x2="440" y2="125" stroke="#94a3b8"/><text x="440" y="108">1e-4</text>
+      <line x1="580" y1="115" x2="580" y2="125" stroke="#94a3b8"/><text x="580" y="108">1e-2</text>
+    </g>
+
+    <!-- fp16 representable region boundary at ~1e-7 (x=230) -->
+    <rect x="230" y="130" width="470" height="22" rx="3" fill="#059669" opacity="0.12"/>
+    <line x1="230" y1="118" x2="230" y2="175" stroke="#059669" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <text x="240" y="168" class="note" fill="#059669">fp16 可表示区边界（约 6e-8）</text>
+    <text x="465" y="145" class="note" fill="#059669" text-anchor="middle">fp16 可表示区</text>
+
+    <!-- underflow region -->
+    <rect x="80" y="130" width="150" height="22" rx="3" fill="#db2777" opacity="0.10"/>
+    <text x="150" y="145" class="note" fill="#db2777" text-anchor="middle">下溢区</text>
+
+    <!-- small gradient point (out of region, red) -->
+    <circle cx="160" cy="120" r="6" fill="#db2777"/>
+    <text x="160" y="195" class="note" fill="#db2777" text-anchor="middle">小梯度 1e-8</text>
+    <text x="160" y="210" class="note" fill="#db2777" text-anchor="middle">→ 下溢 = 0</text>
+
+    <!-- arrow x1024 pushing into region -->
+    <line x1="166" y1="120" x2="406" y2="120" stroke="#059669" stroke-width="2.5" marker-end="url(#arrGreen)"/>
+    <text x="290" y="112" class="note" fill="#059669" text-anchor="middle" font-weight="600">× 1024 (loss scaling)</text>
+
+    <!-- rescued point (in region, green) -->
+    <circle cx="415" cy="120" r="6" fill="#059669"/>
+    <text x="415" y="195" class="note" fill="#059669" text-anchor="middle">≈1e-5（可表示）</text>
+    <text x="415" y="210" class="note" fill="#059669" text-anchor="middle">→ 救回</text>
+  </g>
+</svg><figcaption>fp16 与 bf16 的位布局对比：均为 16 位，fp16=1 符号+5 指数+10 尾数，bf16=1 符号+8 指数+7 尾数；下方示意 loss scaling 把下溢到「fp16 表示不了」区域的小梯度乘以倍数、抬回可表示区。</figcaption></figure>
+
+<h2>bf16 vs fp16：别把它俩当一回事</h2>
+
+<p>这是第二个高频误区：<strong>以为 bf16 = fp16</strong>。它们都是 16 位，但 16 位的「预算」分配方式完全不同。浮点数由符号位、<strong>指数位（exponent，决定范围）</strong>、<strong>尾数位（mantissa，决定精度）</strong>三部分组成：</p>
+
+<table>
+<thead><tr><th>类型</th><th>符号</th><th>指数位</th><th>尾数位</th><th>特点</th></tr></thead>
+<tbody>
+<tr><td>fp32</td><td>1</td><td>8</td><td>23</td><td>基准：范围大、精度高</td></tr>
+<tr><td>fp16</td><td>1</td><td>5</td><td>10</td><td>范围小（易溢出/下溢），尾数还行</td></tr>
+<tr><td>bf16</td><td>1</td><td>8</td><td>7</td><td>范围像 fp32，尾数少=精度低</td></tr>
+</tbody>
+</table>
+
+<p>关键洞察：<strong>bf16 把预算砸在指数位上</strong>，指数位和 fp32 一样多（8 位），所以动态范围和 fp32 几乎一致——小梯度<em>不会</em>下溢成 0，因此<strong>一般不需要 GradScaler</strong>。代价是尾数只有 7 位，精度低（相邻可表示的数之间间隔更大），但对深度学习这通常无所谓。而 <strong>fp16</strong> 指数位只有 5 位，范围窄，才会有上一节的溢出/下溢问题，<strong>必须配 GradScaler</strong>。</p>
+
+<ul>
+<li>新硬件（Ampere 及以后的 NVIDIA 卡、TPU）→ <strong>优先 bf16</strong>，省心，无需 loss scaling。</li>
+<li>只有 fp16 可用（较老的卡）→ 用 fp16 + <code>GradScaler</code>。</li>
+<li>记忆口诀：<strong>bf16 拼范围、fp16 拼精度</strong>；范围不够才会下溢，所以是 fp16 需要救、bf16 不太需要。</li>
+</ul>
+
+<h2>把它们拼进训练循环：标准 AMP 三件套</h2>
+
+<p>第 6 课你已经手写过完整训练循环（<code>forward → loss → backward → step → zero_grad</code>）。混合精度只是在这个骨架上加两样东西，逻辑一行没改：</p>
+<ol>
+<li><code>with autocast(...)</code> 包住<strong>前向 + 算 loss</strong>：PyTorch 自动把里面的运算切到 bf16/fp16（矩阵乘等），算得快、激活省一半显存。</li>
+<li>用 <code>GradScaler</code> 包住反向与更新（fp16 时需要；bf16 可省）：<code>scaler.scale(loss).backward()</code> 先放大再反向，<code>scaler.step(opt)</code> 内部除回缩放再更新，<code>scaler.update()</code> 调整下次的缩放倍数。</li>
+</ol>
+
+<p>注意 AMP 主要省的是<strong>激活</strong>（前向中间结果用低精度存），它<em>不会</em>把参数、梯度、Adam 状态那 \(16P\) 也减半——为了数值稳定，这些通常仍保留 fp32 主副本。所以 AMP 省显存的口径是「激活减半」，而不是「整块显存减半」。</p>
+
+<pre class="ref" data-lang="PyTorch"><code>import torch
+from torch.amp import autocast, GradScaler
+
+device = "cuda"
+model.to(device)
+opt = torch.optim.Adam(model.parameters(), lr=1e-3)
+scaler = GradScaler("cuda")                 # fp16 才需要；bf16 可不用（推荐显式传设备）
+
+for x, y in loader:
+    x, y = x.to(device), y.to(device)
+    opt.zero_grad()
+
+    with autocast(device_type="cuda", dtype=torch.float16):  # ① 前向降精度
+        pred = model(x)
+        loss = loss_fn(pred, y)
+
+    scaler.scale(loss).backward()           # ② 放大 loss 再反向（救小梯度）
+    scaler.step(opt)                         #    内部把梯度除回再 step
+    scaler.update()                          #    动态调整缩放倍数
+    # 注意：不要在这里 loss.item()，攒几步再打日志</code></pre>
+
+<pre class="ref" data-lang="PyTorch"><code># 用 bf16 时更简单：不需要 GradScaler
+with autocast(device_type="cuda", dtype=torch.bfloat16):
+    pred = model(x)
+    loss = loss_fn(pred, y)
+loss.backward()
+opt.step()
+opt.zero_grad()</code></pre>
+
+<p>另外两个你会反复听到、但<strong>这一课只需知道名字</strong>的工具：<code>torch.compile(model)</code> 把模型编译成更快的融合算子（一行包一下，常有几成提速）；<strong>分布式数据并行（DDP，DistributedDataParallel）</strong>把同一个模型复制到多张卡、各算一部分 batch 再同步梯度，是多卡训练的标准做法。两者的细节留到规模化的模块再展开。</p>
+
+<h2>调一调，观察现象</h2>
+
+<p><strong>微任务 1：把缩放倍数调小，看小梯度还能不能救回来。</strong>把 <code>scale</code> 从 1024 改成 1。预期现象：<code>1e-8 * 1 = 1e-8</code> 仍然小于 fp16 能表示的<em>最小可表示数（约 \(6\times10^{-8}\)，含次正规数）</em>，转 fp16 后<em>还是 0</em>，救不回来；而 <code>scale=8</code> 时 <code>8e-8</code> 已经超过这个下限，能被表示成约 <code>6e-08</code>，就救回来了。为什么：loss scaling 要把梯度抬到 fp16 的最小可表示数（约 \(6\times10^{-8}\)）之上，倍数太小就抬不够——这也是为什么 <code>GradScaler</code> 会从一个很大的初始倍数（如 65536）开始动态调。下面代码把这条「倍数从抬不够到抬够」的分界线一次跑给你看。</p>
+<pre><code>import numpy as np
+grad = 1e-8
+for scale in [1, 8, 256, 1024, 65536]:
+    s = np.float16(grad * scale)
+    print(f"scale={scale:>6}: fp16={s}  {'救回' if s != 0 else '仍为0'}")
+# 预期：scale=1 仍为0；scale>=8 起都救回（8 -> 约 6e-08）</code></pre>
+
+<p><strong>微任务 2：换成 bf16，看下溢问题是否消失。</strong>把下溢的值用 <code>np.float16</code> 和 <code>bfloat16</code> 各转一次（NumPy 无原生 bfloat16，我们用「指数位和 fp32 一样、所以范围一样」这个事实手动验证：bf16 能表示 \(10^{-8}\)）。预期现象：fp16 下溢成 0，而 bf16 的范围足够、不为 0。为什么：bf16 有 8 位指数，动态范围≈fp32，所以一般不需要 loss scaling。</p>
+<pre><code>import numpy as np
+grad = 1e-8
+print("fp16:", np.float16(grad))            # 0.0，下溢
+# bf16 指数位=8，最小正规数约 1.18e-38，远小于 1e-8
+# 故 bf16 能表示 1e-8（这里用 fp32 近似其“范围”验证）
+print("fp32(模拟 bf16 的范围):", np.float32(grad))  # 1e-8，不为 0
+print("=> bf16 范围足够，无需 loss scaling")
+# 提醒：这里只借 fp32 验证“范围”（指数位相同），bf16 的精度（尾数 7 位）
+#       仍远低于 fp32，别把 bf16 和 fp32 等同起来。</code></pre>
+
+<p><strong>微任务 3：把模型规模放大，看显存怎么涨。</strong>在显存估算器里把 <code>P</code> 从 1.3e8 改成 7e9。预期现象：合计从约 1.9 GB 跳到约 100 GB，且 Adam 状态始终是参数的 2 倍、合计始终是参数的 4 倍。为什么：四大块里前三块都正比于 \(P\)，所以「能不能装下」基本由参数量线性决定——这也是 LoRA 砍掉梯度+优化器状态后能省一大截的根因。</p>
+<pre><code>def estimate_memory(P, bytes_per=4):
+    GB = 1024 ** 3
+    total = (P + P + 2*P) * bytes_per       # 参数+梯度+Adam
+    return total / GB
+
+for P in [1.3e8, 1.3e9, 7e9]:
+    print(f"P={P:.1e}: 合计(不含激活) ≈ {estimate_memory(P):.1f} GB")</code></pre>
+
+<h2>动手练习</h2>
+
+<ol>
+<li><strong>写一个「精度损失」演示。</strong>用 NumPy 验证 fp16 尾数只有 10 位带来的精度问题：计算 <code>np.float16(1.0) + np.float16(0.0005)</code>，打印结果，并解释为什么它没有正确加上 0.0005（提示：1.0 附近 fp16 的最小间隔约 0.001，0.0005 约为半个间隔，按「四舍五入到最近可表示数」实际会显示 <code>1.001</code>，即只前进了<em>一个</em>最小间隔，而不是停在 1.0——总之 0.0005 这个量级在 fp16 里没法被精确表示）。再用 fp32 做同样的加法对比（会得到 1.0005）。</li>
+<li><strong>给显存估算器加上「激活」和「混合精度」两个开关。</strong>扩展 <code>estimate_memory</code>：(a) 接收一个 <code>act_gb</code> 参数表示激活占用，加进合计；(b) 增加一个 <code>amp=True</code> 选项，让激活减半（混合精度的主要省显存来源在激活）。用 \(P=1.3\times10^8\)、激活 2 GB，对比开/关 AMP 的合计。注意：AMP 通常<em>只</em>减少激活，参数/梯度/Adam 那 \(16P\) 仍按 fp32 主副本算，别把它们也减半。</li>
+<li><strong>（纸面题，可选）</strong>解释下面这段代码慢在哪、怎么改：循环里写了 <code>if loss.item() &lt; best: best = loss.item()</code>。指出它每步同步两次，并改写成「在 GPU 上比较、每 50 步才取一次最优值」。</li>
+</ol>
+
+<h2>掌握自检</h2>
+<ul>
+<li>我能说出 GPU 擅长矩阵乘的一句话理由（海量独立的简单运算并行做）。</li>
+<li>我知道 <code>.item()</code>/<code>.cpu()</code>/<code>print(tensor)</code> 为什么慢，并能把日志从「每步」改成「每 N 步」。</li>
+<li>我能不查表写出训练显存的四大块，并算出「参数+梯度+Adam ≈ 4×参数」（其中 Adam 状态本身是 2×参数）。</li>
+<li>我能解释 fp16 为何会下溢成 0（小于最小可表示数约 \(6\times10^{-8}\)），以及 loss scaling 的「乘大数→backward→除回来」三步。</li>
+<li>我能说清 bf16（多指数位=范围大，一般不用 scaler）与 fp16（范围小=需 scaler）的区别，不再混为一谈。</li>
+<li>我能读懂 AMP 三件套：<code>autocast</code> 包前向、<code>scaler.scale(loss).backward()</code>、<code>scaler.step</code>+<code>scaler.update</code>。</li>
+</ul>
+
+<div class="skip"><h4>可以先放过的点</h4>
+<ul>
+<li><strong>GradScaler 怎么动态选倍数、遇到 inf 怎么跳过 step</strong>——知道「它会自动调、自动跳坏 step」就够了，底层策略等你真的上手 fp16 训练再回来看。</li>
+<li><strong>torch.compile 的编译原理、DDP 的梯度同步通信</strong>——这两个只需记住名字和用途，规模化训练的模块会专门讲；现在硬啃会偏离「写出一个能跑的训练循环」这条主线。</li>
+<li><strong>哪些算子在 autocast 里会被降精度、哪些保持 fp32</strong>（如 softmax、求和这类对精度敏感的会留在 fp32）——PyTorch 已经替你做好白名单，等你遇到具体数值不稳的 bug 再深入。</li>
+<li><strong>bf16 精度低会不会影响最终效果</strong>——绝大多数情况不影响，这是个工程经验结论，先信任它，等做大规模训练对比实验时再验证。</li>
+</ul></div>
+</article>
+<div class="navbtns"><a class="prev" href="lesson-07-dataset-dataloader.html"><div class="nlabel">← 上一课</div><div class="ntitle">第7课 · 数据加载 Dataset 与 DataLoader</div></a><a class="next" href="lesson-09-experiment-repro-debugging.html"><div class="nlabel">下一课 →</div><div class="ntitle">第9课 · 实验管理、可复现与调试方法论</div></a></div>
+<nav class="toc"><h3>本模块课程表</h3><ol>
+<li><a href="lesson-01-env-scientific-stack.html"><span class="ln">第1课</span>Python 科学计算栈与环境工程</a></li>
+<li><a href="lesson-02-numpy-vectorization-broadcasting.html"><span class="ln">第2课</span>NumPy 数组、向量化与广播</a></li>
+<li><a href="lesson-03-pytorch-tensors-device-dtype.html"><span class="ln">第3课</span>PyTorch 张量、设备与 dtype</a></li>
+<li><a href="lesson-04-autograd.html"><span class="ln">第4课</span>Autograd 自动微分</a></li>
+<li><a href="lesson-05-nn-module.html"><span class="ln">第5课</span>nn.Module 与模型构建</a></li>
+<li><a href="lesson-06-training-loop-from-scratch.html"><span class="ln">第6课</span>从零写训练循环（核心）</a></li>
+<li><a href="lesson-07-dataset-dataloader.html"><span class="ln">第7课</span>数据加载 Dataset 与 DataLoader</a></li>
+<li class="cur"><span class="ln">第8课</span>GPU/CUDA 与混合精度</li>
+<li><a href="lesson-09-experiment-repro-debugging.html"><span class="ln">第9课</span>实验管理、可复现与调试方法论</a></li>
+<li><a href="lesson-10-huggingface.html"><span class="ln">第10课</span>Hugging Face 生态入门</a></li>
+</ol></nav>
+</div>
+<!-- pyrunner-injected -->
+<style>
+.pr-cell{border:1px solid #334155;border-radius:10px;margin:1.2em 0;overflow:hidden;background:#0f172a;}
+.pr-head{display:flex;align-items:center;gap:8px;background:#1e293b;color:#cbd5e1;padding:6px 10px;font-size:13px;font-family:system-ui,-apple-system,sans-serif;}
+.pr-title{flex:1;font-weight:600;}
+.pr-status{font-size:12px;color:#94a3b8;white-space:nowrap;max-width:50%;overflow:hidden;text-overflow:ellipsis;}
+.pr-btn{cursor:pointer;border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:6px;padding:3px 11px;font-size:13px;line-height:1.4;}
+.pr-btn:hover{background:#0b1220;}
+.pr-run{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:600;}
+.pr-run:hover{background:#1d4ed8;}
+.pr-cell.collapsed .pr-body{display:none;}
+.pr-editor{position:relative;background:#0f172a;}
+.pr-code,.pr-edit{display:block;width:100%;min-height:68px;border:none;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.55;padding:12px 14px;box-sizing:border-box;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:4;}
+.pr-code{position:absolute;inset:0;margin:0;overflow:hidden;background:#0f172a;color:#dbeafe;pointer-events:none;}
+.pr-edit{position:relative;background:transparent;color:transparent;caret-color:#e2e8f0;resize:vertical;outline:none;-webkit-text-fill-color:transparent;}
+.pr-edit::selection{background:rgba(96,165,250,.34);}
+.tok-kw{color:#c084fc;font-weight:700;}
+.tok-fn{color:#67e8f9;}
+.tok-num{color:#fbbf24;}
+.tok-str{color:#86efac;}
+.tok-comment{color:#94a3b8;font-style:italic;}
+.pr-out{margin:0;padding:10px 14px;border-top:1px solid #334155;background:#0b1220;color:#cbd5e1;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.5;white-space:pre-wrap;max-height:340px;overflow:auto;}
+.pr-out:empty{display:none;}
+.pr-out.err{color:#fca5a5;}
+.pr-cell.ref-cell{border-color:#475569;}
+.pr-cell.ref-cell .pr-head{background:#172033;color:#cbd5e1;}
+.pr-cell.ref-cell .pr-status{color:#fbbf24;font-style:italic;}
+.pr-code.pr-static{position:static;pointer-events:auto;overflow:auto;min-height:auto;background:#0f172a;color:#dbeafe;}
+#pr-fab{position:fixed;right:18px;bottom:18px;z-index:9998;background:#2563eb;color:#fff;border:none;border-radius:999px;padding:10px 17px;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.22);font-family:system-ui,sans-serif;}
+#pr-fab:hover{background:#1d4ed8;}
+#pr-lab{position:fixed;right:18px;bottom:66px;z-index:9999;width:400px;max-width:92vw;background:#0f172a;border:1px solid #334155;border-radius:12px;display:none;flex-direction:column;box-shadow:0 14px 38px rgba(0,0,0,.4);overflow:hidden;}
+#pr-lab.open{display:flex;}
+#pr-lab .pr-edit,#pr-lab .pr-code{min-height:150px;}
+@media (max-width:640px){
+  .pr-cell{border-radius:9px;margin:1em 0;}
+  .pr-head{flex-wrap:wrap;padding:7px 9px;}
+  .pr-title{min-width:0;}
+  .pr-status{order:3;max-width:100%;flex-basis:100%;}
+  .pr-code,.pr-edit{font-size:13px;line-height:1.55;padding:11px 12px;}
+  .pr-out{font-size:12.5px;padding:9px 12px;}
+  #pr-fab{right:10px;bottom:14px;max-width:calc(100vw - 96px);min-height:38px;padding:9px 13px;font-size:13px;line-height:1.2;}
+  #pr-lab{right:10px;left:10px;bottom:64px;width:auto;max-width:none;max-height:calc(100vh - 88px);}
+  #pr-lab .pr-edit,#pr-lab .pr-code{min-height:132px;}
+}
+</style>
+<script>
+(function(){
+  var PYBASE="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+  var pyReady=null;
+  function loadPy(status){
+    if(pyReady)return pyReady;
+    pyReady=(async function(){
+      status("正在加载 Python 运行时（首次约 10 秒，需联网）…");
+      await new Promise(function(res,rej){
+        var s=document.createElement("script");s.src=PYBASE+"pyodide.js";
+        s.onload=res;s.onerror=function(){rej(new Error("无法加载 Pyodide（首次运行需要联网）"));};
+        document.head.appendChild(s);
+      });
+      var py=await loadPyodide({indexURL:PYBASE});
+      status("正在加载 NumPy …");
+      await py.loadPackage("numpy");
+      status("Python 就绪 ✓");
+      return py;
+    })();
+    return pyReady;
+  }
+  async function run(code,outEl,statusEl){
+    var setS=function(m){if(statusEl)statusEl.textContent=m;};
+    outEl.classList.remove("err");outEl.textContent="";
+    var py;
+    try{py=await loadPy(setS);}
+    catch(e){outEl.classList.add("err");outEl.textContent="加载失败："+e.message;return;}
+    var buf="";
+    py.setStdout({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    py.setStderr({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    try{
+      var result=await py.runPythonAsync(code);
+      if(result!==undefined&&result!==null){
+        var r;try{r=result.toString();}catch(_){r=String(result);}
+        if(r!=="None")buf+=(buf&&!buf.endsWith("\n")?"\n":"")+r;
+        if(result&&result.destroy)result.destroy();
+      }
+      outEl.textContent=buf||"（运行成功，无输出。用 print(...) 查看结果）";
+    }catch(e){
+      outEl.classList.add("err");
+      outEl.textContent=buf+(buf?"\n":"")+String((e&&e.message)||e);
+    }
+  }
+  var KW={False:1,None:1,True:1,and:1,as:1,assert:1,async:1,await:1,break:1,class:1,continue:1,def:1,del:1,elif:1,else:1,except:1,finally:1,for:1,from:1,global:1,if:1,import:1,in:1,is:1,lambda:1,nonlocal:1,not:1,or:1,pass:1,raise:1,return:1,try:1,while:1,with:1,yield:1};
+  var FN={abs:1,all:1,any:1,array:1,bool:1,dict:1,enumerate:1,float:1,int:1,len:1,list:1,max:1,min:1,np:1,numpy:1,print:1,range:1,round:1,set:1,str:1,sum:1,tuple:1,zip:1,torch:1,nn:1,tensor:1,F:1,super:1,isinstance:1,getattr:1,setattr:1,hasattr:1,sorted:1,type:1,object:1,property:1};
+  function esc(s){return s.replace(/[&<>]/g,function(c){return c==="&"?"&amp;":c==="<"?"&lt;":"&gt;";});}
+  function colorLine(line){
+    var out="",i=0;
+    while(i<line.length){
+      var ch=line[i];
+      if(ch==="#"){out+='<span class="tok-comment">'+esc(line.slice(i))+"</span>";break;}
+      if(ch==="'"||ch==='"'){
+        var q=ch,triple=line.slice(i,i+3)===q+q+q,end=i+(triple?3:1),done=false;
+        while(end<line.length){
+          if(!triple&&line[end]==="\\"){end+=2;continue;}
+          if(triple&&line.slice(end,end+3)===q+q+q){end+=3;done=true;break;}
+          if(!triple&&line[end]===q){end+=1;done=true;break;}
+          end+=1;
+        }
+        out+='<span class="tok-str">'+esc(line.slice(i,done?end:line.length))+"</span>";
+        i=done?end:line.length;
+        continue;
+      }
+      if(/[0-9]/.test(ch)||(ch==="."&&/[0-9]/.test(line[i+1]||""))){
+        var m=line.slice(i).match(/^(?:0[xX][0-9a-fA-F]+|\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?/);
+        out+='<span class="tok-num">'+esc(m[0])+"</span>";i+=m[0].length;continue;
+      }
+      if(/[A-Za-z_]/.test(ch)){
+        var id=line.slice(i).match(/^[A-Za-z_][A-Za-z0-9_]*/)[0];
+        if(KW[id])out+='<span class="tok-kw">'+id+"</span>";
+        else if(FN[id])out+='<span class="tok-fn">'+id+"</span>";
+        else out+=id;
+        i+=id.length;continue;
+      }
+      out+=esc(ch);i+=1;
+    }
+    return out;
+  }
+  function paint(ta){
+    var pre=ta.closest(".pr-editor").querySelector(".pr-code");
+    pre.innerHTML=ta.value.split("\n").map(colorLine).join("\n")+(ta.value.endsWith("\n")?"\n":"");
+    pre.style.height=ta.style.height;
+    pre.scrollTop=ta.scrollTop;pre.scrollLeft=ta.scrollLeft;
+  }
+  function autosize(ta){ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight+2,460)+"px";}
+  function tune(ta){autosize(ta);paint(ta);}
+  function tabKey(e){
+    if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();var b=this.closest(".pr-cell,#pr-lab").querySelector(".pr-run");if(b)b.click();return;}
+    if(e.key==="Tab"){
+      e.preventDefault();
+      var s=this.selectionStart,en=this.selectionEnd,v=this.value,lineStart=v.lastIndexOf("\n",s-1)+1,lineEnd=v.indexOf("\n",en);
+      if(lineEnd<0)lineEnd=v.length;
+      if(s!==en||e.shiftKey){
+        var block=v.slice(lineStart,lineEnd),lines=block.split("\n"),delta=0;
+        if(e.shiftKey){
+          lines=lines.map(function(line){
+            if(line.startsWith("    ")){delta-=4;return line.slice(4);}
+            if(line.startsWith("\t")){delta-=1;return line.slice(1);}
+            return line;
+          });
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=Math.max(lineStart,s+(s===lineStart?0:Math.max(delta/Math.max(lines.length,1),-4)));
+          this.selectionEnd=Math.max(this.selectionStart,en+delta);
+        }else{
+          lines=lines.map(function(line){delta+=4;return "    "+line;});
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=s+4;
+          this.selectionEnd=en+delta;
+        }
+      }else{
+        this.value=v.slice(0,s)+"    "+v.slice(en);this.selectionStart=this.selectionEnd=s+4;
+      }
+      tune(this);
+      return;
+    }
+    if(e.key==="Enter"){
+      e.preventDefault();
+      var a=this.selectionStart,b=this.selectionEnd,text=this.value,start=text.lastIndexOf("\n",a-1)+1;
+      var prefix=text.slice(start,a),indent=(prefix.match(/^\s*/)||[""])[0],code=prefix.replace(/#.*$/,"").trimEnd();
+      var add="\n"+indent+(/:\s*$/.test(code)?"    ":"");
+      this.value=text.slice(0,a)+add+text.slice(b);
+      this.selectionStart=this.selectionEnd=a+add.length;
+      tune(this);
+      return;
+    }
+  }
+  function makeCell(code){
+    var cell=document.createElement("div");cell.className="pr-cell";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">可运行 · Python (NumPy)</span><span class="pr-status"></span><button class="pr-btn pr-toggle">收起</button><button class="pr-btn pr-run">▶ 运行</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    var ta=cell.querySelector(".pr-edit");ta.value=code;
+    var out=cell.querySelector(".pr-out"),st=cell.querySelector(".pr-status");
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    cell.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    var tog=cell.querySelector(".pr-toggle");
+    tog.onclick=function(){cell.classList.toggle("collapsed");tog.textContent=cell.classList.contains("collapsed")?"展开":"收起";};
+    setTimeout(function(){tune(ta);},0);
+    return cell;
+  }
+  function makeRef(code,lang){
+    var cell=document.createElement("div");cell.className="pr-cell ref-cell";
+    var L=lang||"参考";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">参考代码 · '+esc(L)+'</span><span class="pr-status">不在浏览器运行</span></div><pre class="pr-code pr-static"></pre>';
+    cell.querySelector(".pr-static").innerHTML=code.split("\n").map(colorLine).join("\n");
+    return cell;
+  }
+  function enhance(){
+    document.querySelectorAll("article pre").forEach(function(pre){
+      if(pre.closest(".pr-cell"))return;
+      var codeEl=pre.querySelector("code")||pre;
+      var code=codeEl.textContent.replace(/\s+$/,"");
+      if(!code)return;
+      if(pre.classList.contains("ref")){
+        pre.replaceWith(makeRef(code,pre.getAttribute("data-lang")));
+      }else{
+        pre.replaceWith(makeCell(code));
+      }
+    });
+  }
+  function lab(){
+    var fab=document.createElement("button");fab.id="pr-fab";fab.textContent="▶ Python 实验台";
+    var panel=document.createElement("div");panel.id="pr-lab";
+    panel.innerHTML='<div class="pr-head"><span class="pr-title">Python 实验台 · NumPy</span><span class="pr-status"></span><button class="pr-btn pr-run">▶ 运行</button><button class="pr-btn pr-min">收起</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    document.body.appendChild(fab);document.body.appendChild(panel);
+    var ta=panel.querySelector(".pr-edit");
+    ta.value="import numpy as np\na = np.array([3, 2])\nb = np.array([1, 4])\nprint(\"a + b =\", a + b)\nprint(\"a . b =\", a @ b)\nprint(\"|a|  =\", np.linalg.norm(a))\ncos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))\nprint(\"cos =\", round(float(cos), 4))";
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    var out=panel.querySelector(".pr-out"),st=panel.querySelector(".pr-status");
+    panel.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    fab.onclick=function(){panel.classList.toggle("open");};
+    panel.querySelector(".pr-min").onclick=function(){panel.classList.remove("open");};
+    setTimeout(function(){tune(ta);},0);
+  }
+  function init(){enhance();lab();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+
+<script src="../assets/page-toc.js"></script>
+<script src="../assets/annotator.js"></script>
+</body>
+</html>

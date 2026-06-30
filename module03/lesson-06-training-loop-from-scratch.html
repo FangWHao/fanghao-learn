@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块3 · 第6课 · 从零写训练循环（核心）</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<script src="../assets/theme.js"></script>
+<link rel="stylesheet" href="../assets/annotator.css">
+<link rel="stylesheet" href="../assets/theme.css">
+<link rel="stylesheet" href="../assets/page-toc.css">
+
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue-bg:#eff6ff;
+--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--pink:#db2777;
+--red:#dc2626;--red-bg:#fef2f2;--bg:#ffffff;--soft:#f8fafc;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);
+font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.85;font-size:17px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:840px;margin:0 auto;padding:0 22px 100px;}
+header.top{background:#fff;border-bottom:1px solid var(--line);padding:26px 22px 22px;margin-bottom:14px;}
+header.top .inner{max-width:840px;margin:0 auto;}
+.crumb{color:var(--muted);font-size:14px;letter-spacing:.3px;margin-bottom:6px;}
+h1{font-size:30px;line-height:1.3;margin:.1em 0 .2em;}
+.sub{color:var(--muted);font-size:15px;}
+article{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:30px 34px;margin-top:18px;}
+h2{font-size:23px;margin:1.7em 0 .6em;padding-bottom:.25em;border-bottom:2px solid var(--line);}
+h2:first-child{margin-top:.2em;}
+h3{font-size:19px;margin:1.3em 0 .4em;color:#0f172a;}
+h4{margin:.2em 0 .5em;font-size:16px;}
+p{margin:.7em 0;}
+ul,ol{padding-left:1.3em;margin:.6em 0;}
+li{margin:.32em 0;}
+code{background:#f1f5f9;padding:.12em .4em;border-radius:5px;font-size:.9em;
+font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a;}
+pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 18px;overflow:auto;font-size:14px;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0;}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:15.5px;}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+thead th{background:var(--soft);}
+figure.fig{margin:1.4em 0;text-align:center;}
+figure.fig svg{max-width:100%;height:auto;}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
+.note,.ml,.key,.pitfall,.example{border-radius:10px;padding:14px 18px;margin:1.2em 0;border:1px solid var(--line);}
+.note{background:var(--soft);border-left:4px solid #94a3b8;}
+.example{background:#fff;border-left:4px solid var(--blue);}
+.ml{background:var(--green-bg);border-left:4px solid var(--green);}
+.key{background:var(--amber-bg);border-left:4px solid var(--amber);}
+.pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.goals{background:var(--blue-bg);border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:10px;padding:14px 20px;margin:.2em 0 1.5em;}
+.goals h4{margin:.1em 0 .5em;color:#1e3a8a;}
+.goals ul{margin:.3em 0;}
+.skip{background:var(--soft);border:1px solid var(--line);border-left:4px solid #94a3b8;border-radius:10px;padding:14px 20px;margin:1.8em 0 0;color:#475569;}
+.skip h4{margin:.1em 0 .5em;color:#475569;}
+.tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
+.toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
+.toc h3{margin:.1em 0 .7em;}
+.toc ol{list-style:none;padding:0;}
+.toc li{padding:7px 10px;border-radius:8px;color:#334155;border:1px solid transparent;}
+.toc li a{color:inherit;text-decoration:none;display:block;}
+.toc li .ln{display:inline-block;min-width:54px;color:var(--muted);font-size:13px;}
+.toc li.cur{background:var(--blue-bg);border-color:#bfdbfe;font-weight:600;color:#1e3a8a;}
+.toc li:not(.cur):hover{background:var(--soft);}
+.navbtns{display:flex;justify-content:space-between;margin-top:22px;gap:12px;}
+.navbtns a{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--ink);}
+.navbtns a:hover{border-color:var(--blue);}
+.navbtns .nlabel{color:var(--muted);font-size:13px;}
+.navbtns .ntitle{font-weight:600;margin-top:3px;}
+.navbtns .next{text-align:right;}
+mjx-container{max-width:100%;vertical-align:middle;}mjx-container:not([display="true"]){display:inline-block;max-width:none;overflow:visible;}mjx-container[display="true"]{display:block;width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;}
+.here{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:6px 0 4px;font-size:15px;color:#1e3a8a;line-height:1.7;}
+.here b{font-weight:700;}
+.cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
+.card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
+.card:hover{border-color:var(--blue);}
+.card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
+.card .ct{font-size:18px;font-weight:600;}
+.card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+.card .cap{margin-left:40px;margin-top:7px;font-size:13px;color:#1e3a8a;}
+.card .cap .lbl{display:inline-block;background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;margin-right:7px;}
+
+.card.soon{opacity:.6;cursor:default;}
+.card.soon:hover{border-color:var(--line);}
+.badge{display:inline-block;background:#e2e8f0;color:#475569;font-size:11px;font-weight:600;padding:1px 8px;border-radius:20px;margin-left:8px;vertical-align:middle;}
+.toc li.soon{color:#94a3b8;}
+.toc li.soon .badge{margin-left:4px;}
+</style>
+</head>
+<body>
+<header class="top"><div class="inner">
+<div class="crumb"><a href="index.html" style="color:inherit">模块 3 · Python、NumPy、PyTorch 与实验工程</a>　/　第 6 课（共 10 课）</div>
+<h1>从零写训练循环（核心）</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　阶段0：数学与工具基础　·　<strong>能力点：</strong>从零训练循环（核心）——五步骨架，阶段0 硬指标，后续所有模型共用</div>
+</div></header>
+<div class="wrap">
+<article>
+<p>前五课里你已经把零件备齐了：会用 NumPy 向量化算 forward，会用 PyTorch 张量管理设备与 dtype，亲手写过 autograd 算反向，还从零搭了迷你 <code>nn.Module</code>。这一课把这些零件拼成一台会学习的机器——<strong>训练循环（training loop）</strong>。它是整个模块的核心、也是阶段 0 的硬指标：你要能不看资料默写出"五步骨架"，并真正写出一个 loss 单调下降、准确率上升的循环。后面 4 课（数据加载、GPU 混合精度、实验管理、HuggingFace）都只是给这台机器换更好的零件，骨架不变。</p>
+
+<div class="goals"><h4>读完这一课，你将能够</h4>
+<ul>
+<li>默写训练循环五步骨架（<code>zero_grad → forward → loss → backward → step</code>），并说清漏掉或颠倒任一步的具体后果。</li>
+<li>用纯 NumPy 从零写出一个两层 MLP 的完整训练循环，让 loss 真的下降、准确率真的上升。</li>
+<li>解释为什么用 <code>CrossEntropyLoss</code> 时模型最后一层<strong>不要</strong>手动加 softmax。</li>
+<li>正确分离训练与验证：验证时用 <code>model.eval()</code> + <code>torch.no_grad()</code>，并说出各自的作用。</li>
+<li>说清 <code>scheduler.step()</code> 该每 step 还是每 epoch 调用，以及梯度裁剪、梯度累积分别解决什么问题。</li>
+</ul>
+</div>
+
+<h2>五步骨架：训练循环的心脏</h2>
+
+<p>不管模型多复杂、数据多大，每个训练步（一个 batch）都在重复同样的五步。把它当肌肉记忆背下来：</p>
+
+<pre class="ref" data-lang="五步骨架"><code>optimizer.zero_grad()   # 1. 清空上一步累积的梯度
+output = model(x)        # 2. forward：算预测
+loss = loss_fn(output, y)# 3. 算损失（一个标量）
+loss.backward()          # 4. backward：反向传播，填充每个参数的 .grad
+optimizer.step()         # 5. 用梯度更新参数</code></pre>
+
+<p><strong>机制直觉：</strong>把参数想成一堆旋钮。forward 把旋钮当前的设定跑出一个预测，loss 量化"错得多离谱"，backward 算出"每个旋钮往哪拧、拧多少能让 loss 变小"（即梯度），step 真正去拧旋钮。zero_grad 是因为 PyTorch 的 <code>.grad</code> 默认是<em>累加</em>的——不清零，这一步的梯度会叠在上一步残留之上。</p>
+
+<p>每一步漏了或顺序错了，后果都很具体、且常常"不报错只是学不动"，最坑：</p>
+
+<table>
+<thead><tr><th>错误</th><th>后果</th><th>症状</th></tr></thead>
+<tbody>
+<tr><td>漏 <code>zero_grad()</code></td><td>梯度跨 batch 累加，步子越来越乱</td><td>loss 震荡 / 发散，不收敛</td></tr>
+<tr><td>漏 <code>backward()</code></td><td><code>.grad</code> 还是 None / 旧值，没新梯度</td><td>loss 纹丝不动</td></tr>
+<tr><td>漏 <code>step()</code></td><td>算了梯度却不更新参数</td><td>loss 纹丝不动</td></tr>
+<tr><td><code>step()</code> 在 <code>backward()</code> 之前</td><td>用的是上一步的旧梯度更新</td><td>能动但方向滞后、收敛慢/乱</td></tr>
+</tbody>
+</table>
+
+<figure class="fig"><svg viewBox="0 0 760 560" xmlns="http://www.w3.org/2000/svg" font-family="system-ui">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrowLoop" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#059669"/>
+    </marker>
+    <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#db2777"/>
+    </marker>
+  </defs>
+
+  <text x="380" y="30" text-anchor="middle" font-size="19" font-weight="700" fill="#1f2937">训练循环五步骨架闭环图</text>
+  <text x="380" y="52" text-anchor="middle" font-size="12" fill="#64748b">每个 batch 重复这一整圈</text>
+
+  <!-- Node positions: pentagon-ish vertical loop. We'll lay 5 nodes around a ring. -->
+  <!-- Node 1: zero_grad (top) -->
+  <g>
+    <rect x="290" y="78" width="180" height="48" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+    <text x="380" y="100" text-anchor="middle" font-size="14" font-weight="700" fill="#1d4ed8">zero_grad()</text>
+    <text x="380" y="118" text-anchor="middle" font-size="11" fill="#1f2937">清空上一步梯度</text>
+    <text x="380" y="142" text-anchor="middle" font-size="11" fill="#db2777">⚠ 漏了 → 梯度累加震荡</text>
+  </g>
+
+  <!-- Node 2: forward (right) -->
+  <g>
+    <rect x="540" y="195" width="190" height="48" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+    <text x="635" y="217" text-anchor="middle" font-size="14" font-weight="700" fill="#1d4ed8">forward</text>
+    <text x="635" y="235" text-anchor="middle" font-size="11" fill="#1f2937">算预测 output = model(x)</text>
+  </g>
+
+  <!-- Node 3: loss (bottom right) -->
+  <g>
+    <rect x="450" y="365" width="190" height="48" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+    <text x="545" y="387" text-anchor="middle" font-size="14" font-weight="700" fill="#1d4ed8">loss</text>
+    <text x="545" y="405" text-anchor="middle" font-size="11" fill="#1f2937">量化错得多离谱 (标量)</text>
+  </g>
+
+  <!-- Node 4: backward (bottom left) -->
+  <g>
+    <rect x="120" y="365" width="200" height="48" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+    <text x="220" y="387" text-anchor="middle" font-size="14" font-weight="700" fill="#1d4ed8">backward()</text>
+    <text x="220" y="405" text-anchor="middle" font-size="11" fill="#1f2937">反向传播，填每个参数的 .grad</text>
+    <text x="220" y="430" text-anchor="middle" font-size="11" fill="#db2777">⚠ 漏了 → 没新梯度, loss 不动</text>
+  </g>
+
+  <!-- Node 5: step (left) -->
+  <g>
+    <rect x="30" y="195" width="190" height="48" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+    <text x="125" y="217" text-anchor="middle" font-size="14" font-weight="700" fill="#1d4ed8">step()</text>
+    <text x="125" y="235" text-anchor="middle" font-size="11" fill="#1f2937">用梯度拧旋钮 (更新参数)</text>
+    <text x="125" y="259" text-anchor="middle" font-size="11" fill="#db2777">⚠ 漏了 → 不更新, loss 不动</text>
+  </g>
+
+  <!-- Arrows around the ring (blue) -->
+  <!-- zero_grad -> forward -->
+  <path d="M 470 112 C 560 130, 620 155, 635 192" fill="none" stroke="#2563eb" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <!-- forward -> loss -->
+  <path d="M 620 243 C 600 295, 570 330, 552 362" fill="none" stroke="#2563eb" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <!-- loss -> backward -->
+  <line x1="448" y1="389" x2="323" y2="389" stroke="#2563eb" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <!-- backward -> step -->
+  <path d="M 160 362 C 130 330, 112 295, 112 246" fill="none" stroke="#2563eb" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <!-- step -> zero_grad (loop back, green emphasis) -->
+  <path d="M 140 192 C 160 140, 230 110, 287 104" fill="none" stroke="#059669" stroke-width="2.6" stroke-dasharray="7 4" marker-end="url(#arrowLoop)"/>
+
+  <!-- center loop label -->
+  <g>
+    <circle cx="380" cy="265" r="58" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 4"/>
+    <text x="380" y="258" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">下一个 batch</text>
+    <text x="380" y="277" text-anchor="middle" font-size="11" fill="#64748b">循环往复</text>
+  </g>
+
+  <!-- order-error note: step before backward -->
+  <g>
+    <rect x="250" y="480" width="370" height="56" rx="8" fill="#fdf2f8" stroke="#db2777" stroke-width="1.5"/>
+    <text x="435" y="502" text-anchor="middle" font-size="12" font-weight="700" fill="#db2777">顺序陷阱：step 排在 backward 之前</text>
+    <text x="435" y="522" text-anchor="middle" font-size="11" fill="#1f2937">→ 用旧梯度，更新方向滞后一步</text>
+  </g>
+  <path d="M 220 415 C 230 450, 270 470, 320 478" fill="none" stroke="#db2777" stroke-width="1.6" stroke-dasharray="5 3" marker-end="url(#arrowRed)"/>
+</svg><figcaption>训练循环五步骨架闭环图</figcaption></figure>
+
+<h2>核心：纯 NumPy 从零写训练循环</h2>
+
+<p>先不靠任何框架，把五步骨架彻底吃透。下面是一个两层 MLP（结构 <code>(2)→(16)→(2)</code>，沿用上一课 <code>nn.Module</code> 的思路）在"两团高斯"二分类玩具数据上的<strong>完整可跑</strong>训练循环。forward 手写、反向用解析梯度（复用模块 1 的反向传播和第 4 课的链式法则），更新用最朴素的 SGD。注释里标出了五步骨架对应的位置。</p>
+
+<pre><code>import numpy as np
+rng = np.random.default_rng(0)
+
+# 玩具二分类：两团高斯。X (N,2), y (N,) in {0,1}
+N = 200
+Xa = rng.normal([-2,-2], 1.0, (N//2, 2))
+Xb = rng.normal([ 2, 2], 1.0, (N//2, 2))
+X = np.vstack([Xa, Xb]); y = np.array([0]*(N//2) + [1]*(N//2))
+
+H = 16                                  # 两层 MLP: (2)->(16)->(2)
+W1 = rng.normal(0,0.5,(2,H)); b1 = np.zeros(H)
+W2 = rng.normal(0,0.5,(H,2)); b2 = np.zeros(2)
+
+def softmax(z):
+    z = z - z.max(1, keepdims=True)     # 减最大值，数值稳定
+    e = np.exp(z); return e / e.sum(1, keepdims=True)
+
+lr = 0.1
+# 注：这里每个 epoch 的 dW 都是重新赋值算出来的（不累加），
+#     所以不需要显式 zero_grad；PyTorch 的 .grad 默认累加才要清零。
+for epoch in range(1, 41):
+    z1 = X @ W1 + b1; a1 = np.maximum(0, z1)   # 2.forward (ReLU)
+    logits = a1 @ W2 + b2                       #   注意：不手动 softmax
+    p = softmax(logits)
+    loss = -np.log(p[np.arange(N), y] + 1e-12).mean()   # 3.loss=交叉熵
+    dlogits = p.copy(); dlogits[np.arange(N), y] -= 1; dlogits /= N  # 4.backward
+    dW2 = a1.T @ dlogits; db2 = dlogits.sum(0)
+    dz1 = (dlogits @ W2.T) * (z1 > 0)
+    dW1 = X.T @ dz1;      db1 = dz1.sum(0)
+    W2 -= lr*dW2; b2 -= lr*db2; W1 -= lr*dW1; b1 -= lr*db1   # 5.step (SGD)
+    if epoch % 8 == 0 or epoch == 1:
+        print(f"epoch {epoch:2d}  loss {loss:.4f}  acc {(p.argmax(1)==y).mean():.3f}")</code></pre>
+
+<p>跑出来 loss 从 ~1.72 一路降到 ~0.02，这就是"会学习"的样子。要留意的是：因为这份"两团高斯"数据本身极易分，准确率早早就饱和了——大约第 8 个 epoch 起 acc 就稳定在 1.0，后面的二十多个 epoch loss 仍在从 ~0.07 继续磨到 ~0.02，但 acc 已经不再变化。所以别误以为 acc 在缓慢爬升：先到 1.0 的是 acc，继续下降的是 loss。这里没显式写 <code>zero_grad</code>，是因为每个 epoch 的 <code>dW</code> 都是<em>重新赋值</em>算出来的，本身不累加；PyTorch 里 <code>.grad</code> 默认累加，才需要主动清零（见下一节对照）。注意 <code>softmax</code> 里先减最大值——这是数值稳定的标准手法，避免 <code>exp</code> 溢出。</p>
+
+<h2>CrossEntropyLoss 吃 logits，别手动 softmax</h2>
+
+<p>上面的 NumPy 版我们手写了 softmax 再算交叉熵。换到 PyTorch，<code>nn.CrossEntropyLoss</code> 内部已经 <code>= log_softmax + NLL（负对数似然）</code>，所以它要的输入是<strong>原始 logits</strong>，不是概率。</p>
+
+<ul>
+<li><strong>为什么不要再手动 softmax：</strong>否则就成了"对 softmax 的结果再 softmax"——双重 softmax，分布被压平，梯度信号变弱，模型学得慢甚至学不动。</li>
+<li><strong>顺带还赚了数值稳定：</strong><code>log_softmax</code> 内部用了 log-sum-exp 技巧（就是上面的"减最大值"），比"先 softmax 再取 log"更不容易上溢/下溢。把这一步交给框架，正是它的价值。</li>
+<li><strong>记忆口诀：</strong>模型最后一层输出 logits 就停手，softmax 交给 loss（训练时）或交给推理时的 <code>argmax</code>（预测时 argmax 不受单调 softmax 影响，连 softmax 都不必算）。</li>
+</ul>
+
+<h2>参考：PyTorch 等价训练循环</h2>
+
+<p>同一个任务用真实 PyTorch 写，逐行能和上面的手写版对应起来。这就是你后面会反复写的标准模板：</p>
+
+<pre class="ref" data-lang="PyTorch"><code>import torch, torch.nn as nn
+
+model = nn.Sequential(nn.Linear(2,16), nn.ReLU(), nn.Linear(16,2))  # 不加 Softmax！
+loss_fn = nn.CrossEntropyLoss()                 # 内部 = log_softmax + NLL
+optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
+
+X = torch.tensor(X, dtype=torch.float32)        # 接住上面的玩具数据
+y = torch.tensor(y, dtype=torch.long)           # 类别标签是整数，dtype=long
+
+for epoch in range(40):
+    optimizer.zero_grad()        # 1. 清梯度（PyTorch 的 .grad 默认累加）
+    logits = model(X)            # 2. forward → 直接出 logits
+    loss = loss_fn(logits, y)    # 3. loss（喂 logits，不喂概率）
+    loss.backward()              # 4. backward → 自动填 .grad
+    optimizer.step()             # 5. step → 更新参数
+    if epoch % 8 == 0:
+        acc = (logits.argmax(1) == y).float().mean()
+        print(f"epoch {epoch:2d}  loss {loss.item():.4f}  acc {acc:.3f}")</code></pre>
+
+<p>对照看：手写版的 <code>dW = ...</code> 整段，在 PyTorch 里就是 <code>loss.backward()</code> 一行（autograd 替你做）；手写版的 <code>W -= lr*dW</code>，就是 <code>optimizer.step()</code>。框架没变魔法，只是把你已经会的反向传播自动化了。</p>
+
+<h2>epoch / batch 双层循环，训练与验证分离</h2>
+
+<p>真实训练有两层循环：外层 <strong>epoch</strong>（把整个数据集过一遍叫一个 epoch），内层 <strong>batch</strong>（每次只喂一小批数据，五步骨架走一遍）。下一课的 <code>DataLoader</code> 负责切 batch，这课先理解骨架在哪。</p>
+
+<p>更要紧的是：训练完一个 epoch，要在<strong>验证集</strong>上看真实水平。验证和训练必须分离，两个开关缺一不可：</p>
+
+<ul>
+<li><strong><code>model.eval()</code>：</strong>切换到评估模式。它影响 <strong>Dropout</strong>（评估时关掉随机丢弃，用全部神经元）和 <strong>BatchNorm</strong>（评估时用训练期累积的全局均值/方差，而非当前 batch 的统计量）。忘了它，验证指标会因为这些层的"训练态行为"而不稳、偏低。</li>
+<li><strong><code>torch.no_grad()</code>：</strong>告诉 autograd "这段别建计算图"。验证只看指标、不更新参数，建图纯属浪费——<code>no_grad</code> 省显存、还跑得更快。</li>
+</ul>
+
+<p>两者正交：<code>eval()</code> 管"层的行为模式"，<code>no_grad()</code> 管"要不要建图"。验证时两个都要开；训练时记得用 <code>model.train()</code> 切回来。</p>
+
+<figure class="fig"><svg viewBox="0 0 760 560" xmlns="http://www.w3.org/2000/svg" font-family="system-ui">
+  <defs>
+    <marker id="arrB" orient="auto-start-reverse" markerWidth="9" markerHeight="9" refX="7" refY="4.5">
+      <path d="M0,0 L9,4.5 L0,9 Z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrG" orient="auto-start-reverse" markerWidth="9" markerHeight="9" refX="7" refY="4.5">
+      <path d="M0,0 L9,4.5 L0,9 Z" fill="#059669"/>
+    </marker>
+  </defs>
+
+  <text x="380" y="30" text-anchor="middle" font-size="19" font-weight="700" fill="#1f2937">训练 vs 验证：两条路径的对比</text>
+
+  <!-- divider -->
+  <line x1="380" y1="56" x2="380" y2="488" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 5"/>
+
+  <!-- ============ LEFT: TRAIN ============ -->
+  <text x="190" y="74" text-anchor="middle" font-size="15" font-weight="700" fill="#2563eb">训练  model.train()</text>
+
+  <!-- batch -->
+  <rect x="130" y="90" width="120" height="34" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="190" y="112" text-anchor="middle" font-size="12.5" fill="#1f2937">一个 batch 进入模型</text>
+  <line x1="190" y1="124" x2="190" y2="148" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arrB)"/>
+
+  <!-- autograd graph (active: dashed grid/chain) -->
+  <rect x="120" y="152" width="140" height="74" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="190" y="170" text-anchor="middle" font-size="12.5" font-weight="600" fill="#2563eb">建立计算图 (autograd)</text>
+  <!-- grid/chain nodes -->
+  <g stroke="#2563eb" stroke-width="1.3" stroke-dasharray="4 3" fill="none">
+    <line x1="140" y1="200" x2="240" y2="200"/>
+    <line x1="140" y1="214" x2="240" y2="214"/>
+    <line x1="160" y1="190" x2="160" y2="224"/>
+    <line x1="190" y1="190" x2="190" y2="224"/>
+    <line x1="220" y1="190" x2="220" y2="224"/>
+  </g>
+  <g fill="#2563eb">
+    <circle cx="160" cy="200" r="3"/><circle cx="190" cy="200" r="3"/><circle cx="220" cy="200" r="3"/>
+    <circle cx="160" cy="214" r="3"/><circle cx="190" cy="214" r="3"/><circle cx="220" cy="214" r="3"/>
+  </g>
+  <line x1="190" y1="226" x2="190" y2="250" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arrB)"/>
+
+  <!-- backward fills grad -->
+  <rect x="130" y="254" width="120" height="34" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="190" y="276" text-anchor="middle" font-size="12.5" fill="#1f2937">backward 填梯度</text>
+  <line x1="190" y1="288" x2="190" y2="312" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arrB)"/>
+
+  <!-- optimizer: knob turned -->
+  <rect x="130" y="316" width="120" height="58" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="190" y="334" text-anchor="middle" font-size="12.5" font-weight="600" fill="#2563eb">optimizer 更新参数</text>
+  <!-- knob being turned -->
+  <circle cx="170" cy="356" r="13" fill="#fff" stroke="#2563eb" stroke-width="1.8"/>
+  <line x1="170" y1="356" x2="178" y2="347" stroke="#2563eb" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M186 350 a10 10 0 0 1 4 9" fill="none" stroke="#d97706" stroke-width="1.8" marker-end="url(#arrB)"/>
+  <text x="210" y="360" text-anchor="middle" font-size="11" fill="#d97706">拧动</text>
+
+  <!-- note -->
+  <rect x="118" y="392" width="144" height="56" rx="6" fill="#fdf2f8" stroke="#db2777" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <text x="190" y="411" text-anchor="middle" font-size="11.5" fill="#db2777">Dropout 随机丢弃</text>
+  <text x="190" y="430" text-anchor="middle" font-size="11.5" fill="#db2777">BN 用当前 batch 统计量</text>
+
+  <!-- ============ RIGHT: EVAL ============ -->
+  <text x="570" y="74" text-anchor="middle" font-size="15" font-weight="700" fill="#059669">验证  model.eval() + torch.no_grad()</text>
+
+  <!-- batch -->
+  <rect x="510" y="90" width="120" height="34" rx="6" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+  <text x="570" y="112" text-anchor="middle" font-size="12.5" fill="#1f2937">一个 batch 进入模型</text>
+  <line x1="570" y1="124" x2="570" y2="148" stroke="#059669" stroke-width="1.6" marker-end="url(#arrG)"/>
+
+  <!-- no graph (crossed out / grey) -->
+  <rect x="500" y="152" width="140" height="74" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="570" y="170" text-anchor="middle" font-size="12.5" font-weight="600" fill="#94a3b8">不建图</text>
+  <g stroke="#cbd5e1" stroke-width="1.3" fill="none">
+    <line x1="520" y1="200" x2="620" y2="200"/>
+    <line x1="520" y1="214" x2="620" y2="214"/>
+    <line x1="540" y1="190" x2="540" y2="224"/>
+    <line x1="570" y1="190" x2="570" y2="224"/>
+    <line x1="600" y1="190" x2="600" y2="224"/>
+  </g>
+  <!-- crossed out -->
+  <line x1="512" y1="186" x2="628" y2="222" stroke="#db2777" stroke-width="2.4"/>
+  <line x1="628" y1="186" x2="512" y2="222" stroke="#db2777" stroke-width="2.4"/>
+  <line x1="570" y1="226" x2="570" y2="250" stroke="#059669" stroke-width="1.6" marker-end="url(#arrG)"/>
+
+  <!-- no grad -->
+  <rect x="510" y="254" width="120" height="34" rx="6" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+  <text x="570" y="276" text-anchor="middle" font-size="12.5" fill="#1f2937">不算梯度</text>
+  <line x1="570" y1="288" x2="570" y2="312" stroke="#059669" stroke-width="1.6" marker-end="url(#arrG)"/>
+
+  <!-- no update: knob locked -->
+  <rect x="510" y="316" width="120" height="58" rx="6" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+  <text x="570" y="334" text-anchor="middle" font-size="12.5" font-weight="600" fill="#059669">不更新参数</text>
+  <circle cx="552" cy="356" r="13" fill="#fff" stroke="#94a3b8" stroke-width="1.8"/>
+  <line x1="552" y1="356" x2="552" y2="346" stroke="#94a3b8" stroke-width="2.2" stroke-linecap="round"/>
+  <!-- lock -->
+  <rect x="576" y="352" width="14" height="11" rx="1.5" fill="#fff" stroke="#1f2937" stroke-width="1.4"/>
+  <path d="M579 352 v-3 a4 4 0 0 1 8 0 v3" fill="none" stroke="#1f2937" stroke-width="1.4"/>
+  <text x="606" y="360" text-anchor="middle" font-size="11" fill="#1f2937">锁住</text>
+
+  <!-- read metric: gauge -->
+  <line x1="570" y1="374" x2="570" y2="392" stroke="#059669" stroke-width="1.6" marker-end="url(#arrG)"/>
+  <rect x="498" y="396" width="144" height="52" rx="6" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+  <text x="588" y="418" text-anchor="middle" font-size="12" font-weight="600" fill="#059669">只读出指标</text>
+  <!-- gauge -->
+  <path d="M518 432 a18 18 0 0 1 36 0" fill="none" stroke="#94a3b8" stroke-width="2.4"/>
+  <line x1="536" y1="432" x2="548" y2="421" stroke="#d97706" stroke-width="2.2" stroke-linecap="round"/>
+  <text x="588" y="436" text-anchor="middle" font-size="10.5" fill="#1f2937">准确率</text>
+
+  <!-- note -->
+  <rect x="498" y="456" width="158" height="40" rx="6" fill="#fdf2f8" stroke="#db2777" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <text x="577" y="472" text-anchor="middle" font-size="11" fill="#db2777">Dropout 关闭 / BN 用全局统计量</text>
+  <text x="577" y="488" text-anchor="middle" font-size="11" fill="#db2777">省显存、更快</text>
+
+  <!-- bottom takeaway -->
+  <rect x="60" y="512" width="640" height="36" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.2"/>
+  <text x="380" y="535" text-anchor="middle" font-size="12.5" fill="#1f2937"><tspan font-weight="700" fill="#2563eb">eval()</tspan> 管层的行为模式，<tspan font-weight="700" fill="#059669">no_grad()</tspan> 管要不要建图；两者正交、验证时都要开。</text>
+</svg><figcaption>训练 vs 验证：两条路径的对比</figcaption></figure>
+
+<pre class="ref" data-lang="PyTorch"><code>for epoch in range(num_epochs):
+    model.train()                          # 训练模式：Dropout/BN 用训练态行为
+    for xb, yb in train_loader:            # 内层：batch 循环
+        optimizer.zero_grad()
+        loss = loss_fn(model(xb), yb)
+        loss.backward()
+        optimizer.step()
+
+    model.eval()                           # 切到评估模式
+    with torch.no_grad():                  # 不建图、省显存
+        correct = 0
+        for xb, yb in val_loader:
+            correct += (model(xb).argmax(1) == yb).sum().item()
+        print("val acc:", correct / len(val_set))</code></pre>
+
+<h2>调度器、梯度裁剪、梯度累积（点到为止）</h2>
+
+<p>这三个是训练循环上常见的"附加件"，先认识它们解决什么问题，细节后面课程再展开。</p>
+
+<ul>
+<li><strong>学习率调度器（scheduler）：</strong>训练中动态调整 <code>lr</code>（比如逐渐衰减）。关键是 <code>scheduler.step()</code> 的<strong>时机</strong>：多数按 epoch 衰减的调度器每 epoch 末调用一次；但 <strong>warmup</strong>（开头几百步把 lr 从小慢慢升上来）一般<strong>每个 step</strong> 调用。放错位置，lr 曲线会快/慢几十倍，是常见隐蔽 bug。</li>
+<li><strong>梯度裁剪 <code>clip_grad_norm_</code>：</strong>在 <code>backward()</code> 之后、<code>step()</code> 之前，把梯度的整体范数限制在某个上限内，防止偶发的超大梯度（梯度爆炸）把参数一脚踹飞。RNN/Transformer 里常用。</li>
+<li><strong>梯度累积（gradient accumulation）：</strong>显存装不下大 batch 时，跑几个小 batch、<strong>不清零</strong>地让梯度累加，攒够再 <code>step()</code> 一次——等效于一个大 batch。这正是"<code>.grad</code> 默认累加"这一设计派上用场的地方：平时它是坑，这里是特性。</li>
+</ul>
+
+<pre class="ref" data-lang="PyTorch"><code># 梯度裁剪：夹在 backward 和 step 之间
+loss.backward()
+torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+optimizer.step()
+
+# warmup 调度器：每个 step 调用（注意位置）
+for xb, yb in train_loader:
+    optimizer.zero_grad(); loss = loss_fn(model(xb), yb)
+    loss.backward(); optimizer.step()
+    scheduler.step()        # warmup：每 step；普通衰减：移到 epoch 末</code></pre>
+
+<h2>调一调，观察现象</h2>
+
+<p><strong>微任务 1：把学习率 lr 从 0.1 调到 5.0，看 loss 轨迹怎么变。</strong>预期现象：lr=5.0 时 loss 不再平稳下降，而是<strong>第 1～2 个 epoch 就暴涨到 ~13</strong>（步子太大，一脚把权重踹过了头），随后才慢慢塌回。为什么：步子太大，越过最低点冲到对面更高处。<strong>注意一个反直觉的细节：</strong>这份"两团高斯"数据离得很远、本就极易分，所以即便大步乱踹，ReLU+softmax 最终还是能把两团完全分开，logits 被推到极大、softmax 饱和、loss 反而塌回 ≈0（甚至因 <code>exp</code> 下溢打印出 <code>-0.0000</code>）。也就是说：<strong>在这种太好分的玩具数据上，lr=5 看得到剧烈震荡，却演示不出"稳定发散到 nan"</strong>——真要看到彻底发散，得换更难的数据或更大的模型。关键是把 print 放进内层循环逐 epoch 打，才能亲眼看见中途那次暴涨；只打"最终 loss"会把全过程吞掉，两行都接近 0，什么现象都看不到。</p>
+
+<pre><code>import numpy as np
+rng = np.random.default_rng(0)
+N=200
+X=np.vstack([rng.normal([-2,-2],1,(N//2,2)), rng.normal([2,2],1,(N//2,2))])
+y=np.array([0]*(N//2)+[1]*(N//2))
+H=16
+W1=rng.normal(0,0.5,(2,H));b1=np.zeros(H);W2=rng.normal(0,0.5,(H,2));b2=np.zeros(2)
+def sm(z): z=z-z.max(1,keepdims=True);e=np.exp(z);return e/e.sum(1,keepdims=True)
+for lr in [0.1, 5.0]:                       # 改这一行对比
+    w1,b_1,w2,b_2 = W1.copy(),b1.copy(),W2.copy(),b2.copy()
+    print(f"=== lr={lr} ===")
+    for ep in range(1, 9):
+        z1=X@w1+b_1;a1=np.maximum(0,z1);p=sm(a1@w2+b_2)
+        loss=-np.log(p[np.arange(N),y]+1e-12).mean()
+        d=p.copy();d[np.arange(N),y]-=1;d/=N
+        dz1=(d@w2.T)*(z1>0)
+        w2-=lr*(a1.T@d);b_2-=lr*d.sum(0);w1-=lr*(X.T@dz1);b_1-=lr*dz1.sum(0)
+        print(f"  ep {ep:2d}  loss {loss:.4f}")   # 逐 epoch 打印，才看得见暴涨</code></pre>
+
+<p>跑出来 lr=0.1 是 <code>1.7250 → 0.3658 → 0.1688 → …</code> 一路平稳下降；lr=5.0 则是 <code>1.7250 → 13.5111 → 10.2235 → 0.1382 → … → -0.0000</code>——第 2 个 epoch 暴涨到 13.5，再侥幸塌回。这就是"步子太大"的真实样子。</p>
+
+<p><strong>微任务 2：把 <code>zero_grad</code> 漏掉，看梯度跨 step 累加的效果。</strong>预期现象（要诚实）：<strong>在这个极易分的玩具任务上，即便不清零，loss 也照样平稳单调下降，未必震荡或发散。</strong>下面的 NumPy 模拟里 <code>gW1</code> 一直累加，结果 loss 从 ep3 的 0.1143 一路降到 ep15 的 0.0135——甚至比基线还快。为什么不炸：这里只对 <code>W1</code> 做累加，而每步的梯度增量本身在快速衰减，累加后等效于一个"偏大但方向仍大致正确"的步长，在这份太好分的数据上照样收敛。<strong>但这不代表漏 zero_grad 没事</strong>：更新方向已经被历史梯度污染、步长被悄悄放大，换到更难的任务或更大的模型上，这种污染就会暴露成真正的震荡/发散。换句话说，"漏 zero_grad → 发散"是会发生的典型故障，只是这个玩具数据太宽容、掩盖了它。</p>
+
+<pre><code>import numpy as np
+rng=np.random.default_rng(0)
+N=200
+X=np.vstack([rng.normal([-2,-2],1,(N//2,2)),rng.normal([2,2],1,(N//2,2))])
+y=np.array([0]*(N//2)+[1]*(N//2))
+H=16
+W1=rng.normal(0,0.5,(2,H));b1=np.zeros(H);W2=rng.normal(0,0.5,(H,2));b2=np.zeros(2)
+def sm(z):z=z-z.max(1,keepdims=True);e=np.exp(z);return e/e.sum(1,keepdims=True)
+gW1=np.zeros_like(W1)  # 模拟一个会累加的 .grad 缓冲
+for ep in range(1,16):
+    z1=X@W1+b1;a1=np.maximum(0,z1);p=sm(a1@W2+b2)
+    loss=-np.log(p[np.arange(N),y]+1e-12).mean()
+    d=p.copy();d[np.arange(N),y]-=1;d/=N;dz1=(d@W2.T)*(z1>0)
+    gW1 += X.T@dz1        # 忘了清零：梯度一直累加！
+    W1-=0.1*gW1           # 用被污染的梯度更新 W1
+    W2-=0.1*(a1.T@d);b2-=0.1*d.sum(0);b1-=0.1*dz1.sum(0)
+    if ep%3==0: print(f"ep {ep:2d} loss {loss:.4f}")</code></pre>
+
+<p><strong>微任务 3：把隐藏层宽度 H 从 16 改成 2，再改成 64。</strong>预期现象（以 loss 为准）：<code>H=2</code> 容量不足，loss 降得最慢、末值最高（~0.16），acc 也略低；<code>H=16</code> 已经足够，loss ~0.02、acc 1.0；<code>H=64</code> 的 <strong>loss 降得更低一点</strong>（~0.01）。为什么：更宽的隐藏层表达能力更强，但也更吃算力——这是容量与成本的权衡。不过别盯着 acc 找"越宽越好"的规律：这份数据太好分，<code>H=16</code> 起 acc 就都接近满分，<code>H=64</code> 的 acc（~0.995）反而可能因玩具数据的噪声略低于 <code>H=16</code> 的 1.0，提升的边际很小。这种简单任务上加宽收益不明显，主要看 loss，而非笼统的"更稳"。把本节核心代码的 <code>H=16</code> 改一个数自己试。</p>
+
+<h2>动手练习</h2>
+
+<ol>
+<li><strong>默写不看稿。</strong>关掉本页，在纸上或编辑器里写出五步骨架的五行代码（PyTorch 版），并在每行旁注一句"漏了会怎样"。写完回来对照本课第一张表。</li>
+<li><strong>把玩具数据换成 XOR。</strong>用四个点 <code>X=[[0,0],[0,1],[1,0],[1,1]]</code>、<code>y=[0,1,1,0]</code> 替换核心代码里的两团高斯（其余不动，epoch 调到 400、lr 调到 0.5）。验证：线性不可分的 XOR，单层做不到，但你这个带 ReLU 隐藏层的两层 MLP 能把 loss 压到很低、四个点全分对。这说明隐藏层带来了非线性表达力。</li>
+<li><strong>给手写版加一行"验证"。</strong>在两团高斯上另外采 40 个点当验证集，每 8 个 epoch 在<em>验证集</em>上算一次准确率并打印。体会"训练指标"和"验证指标"是两回事——即便这个玩具任务上它们会很接近。</li>
+</ol>
+
+<h2>掌握自检</h2>
+
+<ul>
+<li>我能不看资料默写五步骨架，并说出漏掉 zero_grad / backward / step 各自的症状。</li>
+<li>我能说清为什么 <code>step()</code> 必须在 <code>backward()</code> 之后，颠倒会怎样。</li>
+<li>我写的 NumPy 训练循环真能跑，loss 单调下降、准确率上升（不是抄答案，是自己改得动）。</li>
+<li>我知道用 <code>CrossEntropyLoss</code> 时模型末层输出 logits、不加 softmax，并能解释双重 softmax 的害处。</li>
+<li>我能说出验证时为什么同时要 <code>model.eval()</code> 和 <code>torch.no_grad()</code>，以及两者各管什么。</li>
+<li>我知道 warmup 调度器一般每 step 调 <code>scheduler.step()</code>，并知道梯度裁剪、梯度累积各解决什么问题。</li>
+</ul>
+
+<div class="skip"><h4>可以先放过的点</h4>
+<p>第一遍只要拿下两件事：<strong>(1) 五步骨架能默写</strong>，<strong>(2) 纯 NumPy 训练循环你能跑通并看懂 loss 为什么降</strong>。这两条是阶段 0 的硬指标，其余都能往后放：</p>
+<ul>
+<li><strong>调度器、梯度裁剪、梯度累积</strong>——现在知道"它们存在、各解决什么问题"就够。等你训练真实模型遇到 lr 不对、梯度爆炸、显存不够时再回来，那时一看就懂。</li>
+<li><strong>BatchNorm 的训练/评估差异细节</strong>——等学到含 BN 的网络（后续模块）再深究，这课只需记住"<code>eval()</code> 会改 Dropout/BN 的行为"。</li>
+<li><strong>手写反向传播的每一步求导</strong>——如果第 4 课的链式法则还没完全消化，这里允许你先把反向那几行当"黑盒"用，重点先放在循环结构上，回头再补导数推导。</li>
+</ul>
+</div>
+</article>
+<div class="navbtns"><a class="prev" href="lesson-05-nn-module.html"><div class="nlabel">← 上一课</div><div class="ntitle">第5课 · nn.Module 与模型构建</div></a><a class="next" href="lesson-07-dataset-dataloader.html"><div class="nlabel">下一课 →</div><div class="ntitle">第7课 · 数据加载 Dataset 与 DataLoader</div></a></div>
+<nav class="toc"><h3>本模块课程表</h3><ol>
+<li><a href="lesson-01-env-scientific-stack.html"><span class="ln">第1课</span>Python 科学计算栈与环境工程</a></li>
+<li><a href="lesson-02-numpy-vectorization-broadcasting.html"><span class="ln">第2课</span>NumPy 数组、向量化与广播</a></li>
+<li><a href="lesson-03-pytorch-tensors-device-dtype.html"><span class="ln">第3课</span>PyTorch 张量、设备与 dtype</a></li>
+<li><a href="lesson-04-autograd.html"><span class="ln">第4课</span>Autograd 自动微分</a></li>
+<li><a href="lesson-05-nn-module.html"><span class="ln">第5课</span>nn.Module 与模型构建</a></li>
+<li class="cur"><span class="ln">第6课</span>从零写训练循环（核心）</li>
+<li><a href="lesson-07-dataset-dataloader.html"><span class="ln">第7课</span>数据加载 Dataset 与 DataLoader</a></li>
+<li><a href="lesson-08-gpu-amp.html"><span class="ln">第8课</span>GPU/CUDA 与混合精度</a></li>
+<li><a href="lesson-09-experiment-repro-debugging.html"><span class="ln">第9课</span>实验管理、可复现与调试方法论</a></li>
+<li><a href="lesson-10-huggingface.html"><span class="ln">第10课</span>Hugging Face 生态入门</a></li>
+</ol></nav>
+</div>
+<!-- pyrunner-injected -->
+<style>
+.pr-cell{border:1px solid #334155;border-radius:10px;margin:1.2em 0;overflow:hidden;background:#0f172a;}
+.pr-head{display:flex;align-items:center;gap:8px;background:#1e293b;color:#cbd5e1;padding:6px 10px;font-size:13px;font-family:system-ui,-apple-system,sans-serif;}
+.pr-title{flex:1;font-weight:600;}
+.pr-status{font-size:12px;color:#94a3b8;white-space:nowrap;max-width:50%;overflow:hidden;text-overflow:ellipsis;}
+.pr-btn{cursor:pointer;border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:6px;padding:3px 11px;font-size:13px;line-height:1.4;}
+.pr-btn:hover{background:#0b1220;}
+.pr-run{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:600;}
+.pr-run:hover{background:#1d4ed8;}
+.pr-cell.collapsed .pr-body{display:none;}
+.pr-editor{position:relative;background:#0f172a;}
+.pr-code,.pr-edit{display:block;width:100%;min-height:68px;border:none;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.55;padding:12px 14px;box-sizing:border-box;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:4;}
+.pr-code{position:absolute;inset:0;margin:0;overflow:hidden;background:#0f172a;color:#dbeafe;pointer-events:none;}
+.pr-edit{position:relative;background:transparent;color:transparent;caret-color:#e2e8f0;resize:vertical;outline:none;-webkit-text-fill-color:transparent;}
+.pr-edit::selection{background:rgba(96,165,250,.34);}
+.tok-kw{color:#c084fc;font-weight:700;}
+.tok-fn{color:#67e8f9;}
+.tok-num{color:#fbbf24;}
+.tok-str{color:#86efac;}
+.tok-comment{color:#94a3b8;font-style:italic;}
+.pr-out{margin:0;padding:10px 14px;border-top:1px solid #334155;background:#0b1220;color:#cbd5e1;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.5;white-space:pre-wrap;max-height:340px;overflow:auto;}
+.pr-out:empty{display:none;}
+.pr-out.err{color:#fca5a5;}
+.pr-cell.ref-cell{border-color:#475569;}
+.pr-cell.ref-cell .pr-head{background:#172033;color:#cbd5e1;}
+.pr-cell.ref-cell .pr-status{color:#fbbf24;font-style:italic;}
+.pr-code.pr-static{position:static;pointer-events:auto;overflow:auto;min-height:auto;background:#0f172a;color:#dbeafe;}
+#pr-fab{position:fixed;right:18px;bottom:18px;z-index:9998;background:#2563eb;color:#fff;border:none;border-radius:999px;padding:10px 17px;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.22);font-family:system-ui,sans-serif;}
+#pr-fab:hover{background:#1d4ed8;}
+#pr-lab{position:fixed;right:18px;bottom:66px;z-index:9999;width:400px;max-width:92vw;background:#0f172a;border:1px solid #334155;border-radius:12px;display:none;flex-direction:column;box-shadow:0 14px 38px rgba(0,0,0,.4);overflow:hidden;}
+#pr-lab.open{display:flex;}
+#pr-lab .pr-edit,#pr-lab .pr-code{min-height:150px;}
+@media (max-width:640px){
+  .pr-cell{border-radius:9px;margin:1em 0;}
+  .pr-head{flex-wrap:wrap;padding:7px 9px;}
+  .pr-title{min-width:0;}
+  .pr-status{order:3;max-width:100%;flex-basis:100%;}
+  .pr-code,.pr-edit{font-size:13px;line-height:1.55;padding:11px 12px;}
+  .pr-out{font-size:12.5px;padding:9px 12px;}
+  #pr-fab{right:10px;bottom:14px;max-width:calc(100vw - 96px);min-height:38px;padding:9px 13px;font-size:13px;line-height:1.2;}
+  #pr-lab{right:10px;left:10px;bottom:64px;width:auto;max-width:none;max-height:calc(100vh - 88px);}
+  #pr-lab .pr-edit,#pr-lab .pr-code{min-height:132px;}
+}
+</style>
+<script>
+(function(){
+  var PYBASE="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+  var pyReady=null;
+  function loadPy(status){
+    if(pyReady)return pyReady;
+    pyReady=(async function(){
+      status("正在加载 Python 运行时（首次约 10 秒，需联网）…");
+      await new Promise(function(res,rej){
+        var s=document.createElement("script");s.src=PYBASE+"pyodide.js";
+        s.onload=res;s.onerror=function(){rej(new Error("无法加载 Pyodide（首次运行需要联网）"));};
+        document.head.appendChild(s);
+      });
+      var py=await loadPyodide({indexURL:PYBASE});
+      status("正在加载 NumPy …");
+      await py.loadPackage("numpy");
+      status("Python 就绪 ✓");
+      return py;
+    })();
+    return pyReady;
+  }
+  async function run(code,outEl,statusEl){
+    var setS=function(m){if(statusEl)statusEl.textContent=m;};
+    outEl.classList.remove("err");outEl.textContent="";
+    var py;
+    try{py=await loadPy(setS);}
+    catch(e){outEl.classList.add("err");outEl.textContent="加载失败："+e.message;return;}
+    var buf="";
+    py.setStdout({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    py.setStderr({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    try{
+      var result=await py.runPythonAsync(code);
+      if(result!==undefined&&result!==null){
+        var r;try{r=result.toString();}catch(_){r=String(result);}
+        if(r!=="None")buf+=(buf&&!buf.endsWith("\n")?"\n":"")+r;
+        if(result&&result.destroy)result.destroy();
+      }
+      outEl.textContent=buf||"（运行成功，无输出。用 print(...) 查看结果）";
+    }catch(e){
+      outEl.classList.add("err");
+      outEl.textContent=buf+(buf?"\n":"")+String((e&&e.message)||e);
+    }
+  }
+  var KW={False:1,None:1,True:1,and:1,as:1,assert:1,async:1,await:1,break:1,class:1,continue:1,def:1,del:1,elif:1,else:1,except:1,finally:1,for:1,from:1,global:1,if:1,import:1,in:1,is:1,lambda:1,nonlocal:1,not:1,or:1,pass:1,raise:1,return:1,try:1,while:1,with:1,yield:1};
+  var FN={abs:1,all:1,any:1,array:1,bool:1,dict:1,enumerate:1,float:1,int:1,len:1,list:1,max:1,min:1,np:1,numpy:1,print:1,range:1,round:1,set:1,str:1,sum:1,tuple:1,zip:1,torch:1,nn:1,tensor:1,F:1,super:1,isinstance:1,getattr:1,setattr:1,hasattr:1,sorted:1,type:1,object:1,property:1};
+  function esc(s){return s.replace(/[&<>]/g,function(c){return c==="&"?"&amp;":c==="<"?"&lt;":"&gt;";});}
+  function colorLine(line){
+    var out="",i=0;
+    while(i<line.length){
+      var ch=line[i];
+      if(ch==="#"){out+='<span class="tok-comment">'+esc(line.slice(i))+"</span>";break;}
+      if(ch==="'"||ch==='"'){
+        var q=ch,triple=line.slice(i,i+3)===q+q+q,end=i+(triple?3:1),done=false;
+        while(end<line.length){
+          if(!triple&&line[end]==="\\"){end+=2;continue;}
+          if(triple&&line.slice(end,end+3)===q+q+q){end+=3;done=true;break;}
+          if(!triple&&line[end]===q){end+=1;done=true;break;}
+          end+=1;
+        }
+        out+='<span class="tok-str">'+esc(line.slice(i,done?end:line.length))+"</span>";
+        i=done?end:line.length;
+        continue;
+      }
+      if(/[0-9]/.test(ch)||(ch==="."&&/[0-9]/.test(line[i+1]||""))){
+        var m=line.slice(i).match(/^(?:0[xX][0-9a-fA-F]+|\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?/);
+        out+='<span class="tok-num">'+esc(m[0])+"</span>";i+=m[0].length;continue;
+      }
+      if(/[A-Za-z_]/.test(ch)){
+        var id=line.slice(i).match(/^[A-Za-z_][A-Za-z0-9_]*/)[0];
+        if(KW[id])out+='<span class="tok-kw">'+id+"</span>";
+        else if(FN[id])out+='<span class="tok-fn">'+id+"</span>";
+        else out+=id;
+        i+=id.length;continue;
+      }
+      out+=esc(ch);i+=1;
+    }
+    return out;
+  }
+  function paint(ta){
+    var pre=ta.closest(".pr-editor").querySelector(".pr-code");
+    pre.innerHTML=ta.value.split("\n").map(colorLine).join("\n")+(ta.value.endsWith("\n")?"\n":"");
+    pre.style.height=ta.style.height;
+    pre.scrollTop=ta.scrollTop;pre.scrollLeft=ta.scrollLeft;
+  }
+  function autosize(ta){ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight+2,460)+"px";}
+  function tune(ta){autosize(ta);paint(ta);}
+  function tabKey(e){
+    if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();var b=this.closest(".pr-cell,#pr-lab").querySelector(".pr-run");if(b)b.click();return;}
+    if(e.key==="Tab"){
+      e.preventDefault();
+      var s=this.selectionStart,en=this.selectionEnd,v=this.value,lineStart=v.lastIndexOf("\n",s-1)+1,lineEnd=v.indexOf("\n",en);
+      if(lineEnd<0)lineEnd=v.length;
+      if(s!==en||e.shiftKey){
+        var block=v.slice(lineStart,lineEnd),lines=block.split("\n"),delta=0;
+        if(e.shiftKey){
+          lines=lines.map(function(line){
+            if(line.startsWith("    ")){delta-=4;return line.slice(4);}
+            if(line.startsWith("\t")){delta-=1;return line.slice(1);}
+            return line;
+          });
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=Math.max(lineStart,s+(s===lineStart?0:Math.max(delta/Math.max(lines.length,1),-4)));
+          this.selectionEnd=Math.max(this.selectionStart,en+delta);
+        }else{
+          lines=lines.map(function(line){delta+=4;return "    "+line;});
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=s+4;
+          this.selectionEnd=en+delta;
+        }
+      }else{
+        this.value=v.slice(0,s)+"    "+v.slice(en);this.selectionStart=this.selectionEnd=s+4;
+      }
+      tune(this);
+      return;
+    }
+    if(e.key==="Enter"){
+      e.preventDefault();
+      var a=this.selectionStart,b=this.selectionEnd,text=this.value,start=text.lastIndexOf("\n",a-1)+1;
+      var prefix=text.slice(start,a),indent=(prefix.match(/^\s*/)||[""])[0],code=prefix.replace(/#.*$/,"").trimEnd();
+      var add="\n"+indent+(/:\s*$/.test(code)?"    ":"");
+      this.value=text.slice(0,a)+add+text.slice(b);
+      this.selectionStart=this.selectionEnd=a+add.length;
+      tune(this);
+      return;
+    }
+  }
+  function makeCell(code){
+    var cell=document.createElement("div");cell.className="pr-cell";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">可运行 · Python (NumPy)</span><span class="pr-status"></span><button class="pr-btn pr-toggle">收起</button><button class="pr-btn pr-run">▶ 运行</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    var ta=cell.querySelector(".pr-edit");ta.value=code;
+    var out=cell.querySelector(".pr-out"),st=cell.querySelector(".pr-status");
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    cell.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    var tog=cell.querySelector(".pr-toggle");
+    tog.onclick=function(){cell.classList.toggle("collapsed");tog.textContent=cell.classList.contains("collapsed")?"展开":"收起";};
+    setTimeout(function(){tune(ta);},0);
+    return cell;
+  }
+  function makeRef(code,lang){
+    var cell=document.createElement("div");cell.className="pr-cell ref-cell";
+    var L=lang||"参考";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">参考代码 · '+esc(L)+'</span><span class="pr-status">不在浏览器运行</span></div><pre class="pr-code pr-static"></pre>';
+    cell.querySelector(".pr-static").innerHTML=code.split("\n").map(colorLine).join("\n");
+    return cell;
+  }
+  function enhance(){
+    document.querySelectorAll("article pre").forEach(function(pre){
+      if(pre.closest(".pr-cell"))return;
+      var codeEl=pre.querySelector("code")||pre;
+      var code=codeEl.textContent.replace(/\s+$/,"");
+      if(!code)return;
+      if(pre.classList.contains("ref")){
+        pre.replaceWith(makeRef(code,pre.getAttribute("data-lang")));
+      }else{
+        pre.replaceWith(makeCell(code));
+      }
+    });
+  }
+  function lab(){
+    var fab=document.createElement("button");fab.id="pr-fab";fab.textContent="▶ Python 实验台";
+    var panel=document.createElement("div");panel.id="pr-lab";
+    panel.innerHTML='<div class="pr-head"><span class="pr-title">Python 实验台 · NumPy</span><span class="pr-status"></span><button class="pr-btn pr-run">▶ 运行</button><button class="pr-btn pr-min">收起</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    document.body.appendChild(fab);document.body.appendChild(panel);
+    var ta=panel.querySelector(".pr-edit");
+    ta.value="import numpy as np\na = np.array([3, 2])\nb = np.array([1, 4])\nprint(\"a + b =\", a + b)\nprint(\"a . b =\", a @ b)\nprint(\"|a|  =\", np.linalg.norm(a))\ncos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))\nprint(\"cos =\", round(float(cos), 4))";
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    var out=panel.querySelector(".pr-out"),st=panel.querySelector(".pr-status");
+    panel.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    fab.onclick=function(){panel.classList.toggle("open");};
+    panel.querySelector(".pr-min").onclick=function(){panel.classList.remove("open");};
+    setTimeout(function(){tune(ta);},0);
+  }
+  function init(){enhance();lab();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+
+<script src="../assets/page-toc.js"></script>
+<script src="../assets/annotator.js"></script>
+</body>
+</html>

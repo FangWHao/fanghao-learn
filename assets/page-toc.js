@@ -53,7 +53,7 @@
     document.body.appendChild(toggle);
 
     var placeToc = function () {
-      if (!window.matchMedia("(min-width: 1360px)").matches) {
+      if (!window.matchMedia("(min-width: 1680px)").matches) {
         nav.style.top = "";
         nav.style.maxHeight = "";
         return;

@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块3 · 第9课 · 实验管理、可复现与调试方法论</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<script src="../assets/theme.js"></script>
+<link rel="stylesheet" href="../assets/annotator.css">
+<link rel="stylesheet" href="../assets/theme.css">
+<link rel="stylesheet" href="../assets/page-toc.css">
+
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue-bg:#eff6ff;
+--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--pink:#db2777;
+--red:#dc2626;--red-bg:#fef2f2;--bg:#ffffff;--soft:#f8fafc;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);
+font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.85;font-size:17px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:840px;margin:0 auto;padding:0 22px 100px;}
+header.top{background:#fff;border-bottom:1px solid var(--line);padding:26px 22px 22px;margin-bottom:14px;}
+header.top .inner{max-width:840px;margin:0 auto;}
+.crumb{color:var(--muted);font-size:14px;letter-spacing:.3px;margin-bottom:6px;}
+h1{font-size:30px;line-height:1.3;margin:.1em 0 .2em;}
+.sub{color:var(--muted);font-size:15px;}
+article{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:30px 34px;margin-top:18px;}
+h2{font-size:23px;margin:1.7em 0 .6em;padding-bottom:.25em;border-bottom:2px solid var(--line);}
+h2:first-child{margin-top:.2em;}
+h3{font-size:19px;margin:1.3em 0 .4em;color:#0f172a;}
+h4{margin:.2em 0 .5em;font-size:16px;}
+p{margin:.7em 0;}
+ul,ol{padding-left:1.3em;margin:.6em 0;}
+li{margin:.32em 0;}
+code{background:#f1f5f9;padding:.12em .4em;border-radius:5px;font-size:.9em;
+font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a;}
+pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 18px;overflow:auto;font-size:14px;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0;}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:15.5px;}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+thead th{background:var(--soft);}
+figure.fig{margin:1.4em 0;text-align:center;}
+figure.fig svg{max-width:100%;height:auto;}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
+.note,.ml,.key,.pitfall,.example{border-radius:10px;padding:14px 18px;margin:1.2em 0;border:1px solid var(--line);}
+.note{background:var(--soft);border-left:4px solid #94a3b8;}
+.example{background:#fff;border-left:4px solid var(--blue);}
+.ml{background:var(--green-bg);border-left:4px solid var(--green);}
+.key{background:var(--amber-bg);border-left:4px solid var(--amber);}
+.pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.goals{background:var(--blue-bg);border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:10px;padding:14px 20px;margin:.2em 0 1.5em;}
+.goals h4{margin:.1em 0 .5em;color:#1e3a8a;}
+.goals ul{margin:.3em 0;}
+.skip{background:var(--soft);border:1px solid var(--line);border-left:4px solid #94a3b8;border-radius:10px;padding:14px 20px;margin:1.8em 0 0;color:#475569;}
+.skip h4{margin:.1em 0 .5em;color:#475569;}
+.tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
+.toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
+.toc h3{margin:.1em 0 .7em;}
+.toc ol{list-style:none;padding:0;}
+.toc li{padding:7px 10px;border-radius:8px;color:#334155;border:1px solid transparent;}
+.toc li a{color:inherit;text-decoration:none;display:block;}
+.toc li .ln{display:inline-block;min-width:54px;color:var(--muted);font-size:13px;}
+.toc li.cur{background:var(--blue-bg);border-color:#bfdbfe;font-weight:600;color:#1e3a8a;}
+.toc li:not(.cur):hover{background:var(--soft);}
+.navbtns{display:flex;justify-content:space-between;margin-top:22px;gap:12px;}
+.navbtns a{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--ink);}
+.navbtns a:hover{border-color:var(--blue);}
+.navbtns .nlabel{color:var(--muted);font-size:13px;}
+.navbtns .ntitle{font-weight:600;margin-top:3px;}
+.navbtns .next{text-align:right;}
+mjx-container{max-width:100%;vertical-align:middle;}mjx-container:not([display="true"]){display:inline-block;max-width:none;overflow:visible;}mjx-container[display="true"]{display:block;width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;}
+.here{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:6px 0 4px;font-size:15px;color:#1e3a8a;line-height:1.7;}
+.here b{font-weight:700;}
+.cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
+.card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
+.card:hover{border-color:var(--blue);}
+.card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
+.card .ct{font-size:18px;font-weight:600;}
+.card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+.card .cap{margin-left:40px;margin-top:7px;font-size:13px;color:#1e3a8a;}
+.card .cap .lbl{display:inline-block;background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;margin-right:7px;}
+
+.card.soon{opacity:.6;cursor:default;}
+.card.soon:hover{border-color:var(--line);}
+.badge{display:inline-block;background:#e2e8f0;color:#475569;font-size:11px;font-weight:600;padding:1px 8px;border-radius:20px;margin-left:8px;vertical-align:middle;}
+.toc li.soon{color:#94a3b8;}
+.toc li.soon .badge{margin-left:4px;}
+</style>
+</head>
+<body>
+<header class="top"><div class="inner">
+<div class="crumb"><a href="index.html" style="color:inherit">模块 3 · Python、NumPy、PyTorch 与实验工程</a>　/　第 9 课（共 10 课）</div>
+<h1>实验管理、可复现与调试方法论</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　阶段0：数学与工具基础　·　<strong>能力点：</strong>实验管理与调试——可复现清单 + 故障诊断树 + 先过拟合一个 batch（90% 时间在调试）</div>
+</div></header>
+<div class="wrap">
+<article>
+<p>第6课你已经能从零写出一个完整的训练循环，第7、8课让它吃得进数据、跑得上 GPU。但当你真的把它放出去训练，会发现一个残酷的事实：写代码只花了 10% 的时间，剩下 90% 都耗在"为什么 loss 是 NaN""为什么它就是不降""为什么换台机器结果对不上"。本课不教新模型，而是教一套<strong>工程肌肉</strong>——让你的实验可复现、可追踪、出了问题能系统排查而不是抓瞎调参。这是把"会写训练循环"变成"能可靠地做实验"的最后一块拼图。</p>
+
+<div class="goals">
+<h4>读完这一课，你将能够</h4>
+<ul>
+<li>列出并实现一份可复现清单（随机种子、cudnn、环境锁、数据划分、commit hash），并区分"逐位可复现"与"结果可比"。</li>
+<li>面对训练故障，用诊断树定位到 NaN/Inf、loss 不降、显存溢出（OOM）、过拟合 四类中的一类，并对症下药。</li>
+<li>执行"先过拟合一个 batch"这一黄金第一步，用它判断前向/loss/反向通路是否接对。</li>
+<li>用 np.isnan / np.isfinite 主动侦测发散，做 shape/device/dtype 三连排查。</li>
+<li>用实验追踪工具（W&B 或 TensorBoard）记录曲线，并坚持"一次只改一个变量"。</li>
+</ul>
+</div>
+
+<h2>可复现：让"同一个实验"真的相同</h2>
+
+<p><strong>机制直觉。</strong>神经网络训练里到处是随机：权重初始化、数据 shuffle、dropout、数据增强……每一处随机都来自伪随机数生成器（PRNG），而 PRNG 由一个<strong>种子（seed）</strong>决定。固定种子，随机序列就完全确定，两次运行才会一致。问题是 Python 里同时存在好几个独立的 PRNG，你必须把它们<strong>全部</strong>钉住，漏一个就前功尽弃。</p>
+
+<p>要区分两个层次的"可复现"：</p>
+<ul>
+<li><strong>严格逐位可复现（bitwise）</strong>：两次运行每个数字都一模一样。需要固定全部种子、关掉 GPU 上的非确定性算法、锁死环境。代价是可能变慢。</li>
+<li><strong>结果可比（comparable）</strong>：两次运行曲线走势、最终指标在合理波动内一致，足以支撑"A 方案比 B 方案好"的结论。日常实验通常追求这个就够了。</li>
+</ul>
+
+<p><strong>最小可跑。</strong>下面这段只用 NumPy 演示种子的威力：固定种子跑两次，结果逐位相同；去掉种子，两次就不同。</p>
+
+<pre><code>import numpy as np
+
+def run_once(seed=None):
+    if seed is not None:
+        np.random.seed(seed)        # 钉住 numpy 的全局 PRNG
+    W = np.random.randn(3, 2)       # 随机初始化
+    x = np.random.randn(2)
+    for _ in range(3):              # 几步"更新"
+        W -= 0.1 * np.outer(W @ x, x)
+    return W.sum()
+
+print("seed=0 第一次:", run_once(0))
+print("seed=0 第二次:", run_once(0))     # 与上行完全一致
+print("不固定 第一次:", run_once())
+print("不固定 第二次:", run_once())       # 与上行不同
+</code></pre>
+
+<p>输出里前两行逐位相同（都是 5.3736...），后两行各不相同。这就是"固定种子"的全部意义。</p>
+
+<p><strong>真实 API 当指针。</strong>在 PyTorch 里你要钉住的不止 numpy 一个，而是四处，外加关掉 cudnn 的非确定性：</p>
+
+<pre class="ref" data-lang="PyTorch"><code>import os, random, numpy as np, torch
+
+def set_seed(seed=42):
+    random.seed(seed)                       # Python 标准库 random
+    np.random.seed(seed)                    # NumPy
+    torch.manual_seed(seed)                 # PyTorch CPU
+    torch.cuda.manual_seed_all(seed)        # 所有 GPU
+    os.environ["PYTHONHASHSEED"] = str(seed)
+
+set_seed(42)
+# 追求严格逐位可复现时再加这两行（会变慢）：
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False      # benchmark=True 会为速度选非确定算法
+</code></pre>
+
+<p>（注：新版 PyTorch 若要真正严格逐位一致，往往还需 <code>torch.use_deterministic_algorithms(True)</code> 并设 <code>CUBLAS_WORKSPACE_CONFIG</code> 环境变量；本课只作指针，知道"还有这层"即可，细节到要做逐位复现时再查。）</p>
+
+<p><strong>完整可复现清单</strong>不止种子。配图给出五项打勾清单：</p>
+
+<figure class="fig"><svg viewBox="0 0 760 560" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif">
+  <rect x="40" y="20" width="680" height="500" rx="16" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+  <rect x="40" y="20" width="680" height="64" rx="16" fill="#ecfdf5"/>
+  <rect x="40" y="68" width="680" height="16" fill="#ecfdf5"/>
+  <line x1="40" y1="84" x2="720" y2="84" stroke="#94a3b8" stroke-width="1"/>
+
+  <circle cx="74" cy="52" r="16" fill="#059669"/>
+  <path d="M66 52 l5 5 l9 -11" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="102" y="58" font-size="22" font-weight="700" fill="#1f2937">可复现清单</text>
+  <text x="708" y="57" text-anchor="end" font-size="13" fill="#059669" font-weight="600">五项打勾，缺一不可</text>
+
+  <!-- side bracket: strict bit-exact = first two -->
+  <path d="M58 108 h-10 v92 h10" fill="none" stroke="#2563eb" stroke-width="2"/>
+  <text x="34" y="158" font-size="11" fill="#2563eb" transform="rotate(-90 34 158)" text-anchor="middle" font-weight="600">严格逐位可复现</text>
+
+  <!-- Row 1 -->
+  <g>
+    <circle cx="86" cy="130" r="13" fill="#059669"/>
+    <path d="M79 130 l4 4 l8 -9" fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="116" y="126" font-size="16" font-weight="700" fill="#1f2937">① 固定随机种子</text>
+    <text x="116" y="146" font-size="13" fill="#94a3b8">random / numpy / torch / cuda 四处都要</text>
+  </g>
+  <line x1="76" y1="160" x2="700" y2="160" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- Row 2 -->
+  <g>
+    <circle cx="86" cy="190" r="13" fill="#059669"/>
+    <path d="M79 190 l4 4 l8 -9" fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="116" y="186" font-size="16" font-weight="700" fill="#1f2937">② cudnn 确定性</text>
+    <text x="116" y="206" font-size="13" fill="#94a3b8">deterministic=True, benchmark=False</text>
+  </g>
+  <line x1="76" y1="220" x2="700" y2="220" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- Row 3 -->
+  <g>
+    <circle cx="86" cy="250" r="13" fill="#059669"/>
+    <path d="M79 250 l4 4 l8 -9" fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="116" y="246" font-size="16" font-weight="700" fill="#1f2937">③ 锁环境</text>
+    <text x="116" y="266" font-size="13" fill="#94a3b8">钉死依赖版本（requirements / conda）</text>
+  </g>
+  <line x1="76" y1="280" x2="700" y2="280" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- Row 4 -->
+  <g>
+    <circle cx="86" cy="310" r="13" fill="#059669"/>
+    <path d="M79 310 l4 4 l8 -9" fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="116" y="306" font-size="16" font-weight="700" fill="#1f2937">④ 固定数据划分</text>
+    <text x="116" y="326" font-size="13" fill="#94a3b8">train / val / test 切分用固定索引</text>
+  </g>
+  <line x1="76" y1="340" x2="700" y2="340" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- Row 5 -->
+  <g>
+    <circle cx="86" cy="370" r="13" fill="#059669"/>
+    <path d="M79 370 l4 4 l8 -9" fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="116" y="366" font-size="16" font-weight="700" fill="#1f2937">⑤ 记 commit hash</text>
+    <text x="116" y="386" font-size="13" fill="#94a3b8">git rev-parse HEAD 写进日志</text>
+  </g>
+
+  <!-- bracket: all five = engineering standard -->
+  <path d="M714 120 h10 v272 h-10" fill="none" stroke="#d97706" stroke-width="2"/>
+  <text x="742" y="256" font-size="11" fill="#d97706" transform="rotate(90 742 256)" text-anchor="middle" font-weight="600">全部五项 = 工程实践标配</text>
+
+  <!-- bottom warning -->
+  <rect x="76" y="424" width="624" height="72" rx="10" fill="#fdf2f8" stroke="#db2777" stroke-width="1.2"/>
+  <circle cx="106" cy="460" r="14" fill="#db2777"/>
+  <text x="106" y="466" text-anchor="middle" font-size="18" font-weight="700" fill="#ffffff">!</text>
+  <text x="134" y="453" font-size="14" font-weight="700" fill="#db2777">漏一项 → 换台机器 / 隔天结果对不上</text>
+  <text x="134" y="476" font-size="12" fill="#94a3b8">前两项保证逐位一致；后三项保证可追溯、可重建实验</text>
+</svg><figcaption>可复现清单：五项打勾，缺一不可。</figcaption></figure>
+
+<ul>
+<li><strong>固定随机种子</strong>：random / numpy / torch / cuda 四处都要。</li>
+<li><strong>cudnn 确定性</strong>：deterministic=True、benchmark=False（只在需要逐位复现时）。</li>
+<li><strong>锁环境</strong>：上接第1课——锁死依赖版本（如 requirements.txt 钉死版本号或 conda 环境文件），换台机器才能装出同样的栈。</li>
+<li><strong>固定数据划分</strong>：train/val/test 的切分要用固定种子或落盘成固定索引，否则今天的验证集是明天的训练集，指标毫无意义。</li>
+<li><strong>记 commit hash</strong>：每次实验把当前代码的 git commit 记进日志（<code>git rev-parse HEAD</code>）。三个月后想复现某条曲线，你得知道当时跑的是哪版代码。</li>
+</ul>
+
+<h2>黄金第一步：先过拟合一个 batch</h2>
+
+<p><strong>机制直觉。</strong>新手遇到"loss 不降"第一反应是调学习率（learning rate, lr）。但很多时候问题根本不在调参，而在<strong>通路接错了</strong>：前向算错、loss 写反、反向没接上、标签和输入对不齐。怎么一眼区分"通路问题"和"调参问题"？</p>
+
+<p>答案是：拿<strong>单个</strong> batch，反复在它上面训练。一个足够大的网络<strong>一定</strong>能把这区区几个样本背下来，loss 应当被压到接近 0。如果连一个 batch 都过拟合不了，那不是 lr 的问题，是你的前向/loss/反向通路某处断了。这是开始任何认真训练前的<strong>黄金第一步</strong>——几十秒就能跑完，却能挡掉一整天的盲调。</p>
+
+<p><strong>最小可跑。</strong>一个纯 NumPy 两层网络，在单个玩具 batch 上做二分类，把 loss 从 1.1 压到接近 0：</p>
+
+<pre><code>import numpy as np
+np.random.seed(0)
+X = np.random.randn(8, 4)                 # 单个 batch: 8 个样本
+y = (np.random.rand(8) > 0.5).astype(float)
+W1 = np.random.randn(4, 16) * 0.5; b1 = np.zeros(16)
+W2 = np.random.randn(16, 1) * 0.5; b2 = np.zeros(1)
+sigmoid = lambda z: 1/(1+np.exp(-z))
+lr = 0.5
+for step in range(201):
+    h = np.maximum(0, X @ W1 + b1)        # 前向: ReLU
+    p = sigmoid(h @ W2 + b2).ravel()
+    loss = -np.mean(y*np.log(p+1e-7) + (1-y)*np.log(1-p+1e-7))
+    dz = (p - y).reshape(-1,1) / len(y)   # 反向
+    dW2 = h.T @ dz; db2 = dz.sum(0)
+    dh = dz @ W2.T; dh[h<=0] = 0
+    dW1 = X.T @ dh; db1 = dh.sum(0)
+    for p_, g_ in [(W2,dW2),(b2,db2),(W1,dW1),(b1,db1)]:
+        p_ -= lr * g_                      # 原地更新
+    if step % 50 == 0:
+        print(f"step {step:3d}  loss={loss:.4f}")
+</code></pre>
+
+<p>你会看到 loss 一步步往下走：step0≈1.11 → step50≈0.04 → step200≈0.006，<strong>最终降到 0.01 量级以下</strong>。注意前半程（step50）还在 0.04，别一看没立刻到 0.01 就以为跑错了——只要它<strong>持续单调下降</strong>，就说明<strong>通路是通的</strong>。这时再把它接到完整数据集上，如果反而不降，问题就缩小到了"数据/调参"层面，而不是"代码 bug"层面——排查范围一下小了一半。</p>
+
+<h2>故障诊断树：四类病、对症下药</h2>
+
+<p><strong>机制直觉。</strong>训练出问题时，先别动手改参数，先<strong>分类</strong>。绝大多数故障落进四个桶，每个桶有典型症状、常见原因和标准对策。下图是这棵诊断树，遇到问题先走一遍：</p>
+
+<figure class="fig"><svg viewBox="0 0 980 640" xmlns="http://www.w3.org/2000/svg" font-family="system-ui">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <!-- root -->
+  <rect x="400" y="20" width="180" height="48" rx="6" fill="#1f2937"/>
+  <text x="490" y="50" text-anchor="middle" font-size="16" font-weight="700" fill="#ffffff">训练出问题？</text>
+
+  <!-- branch lines from root to four headers -->
+  <line x1="490" y1="68" x2="120"  y2="116" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar)"/>
+  <line x1="490" y1="68" x2="370"  y2="116" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar)"/>
+  <line x1="490" y1="68" x2="620"  y2="116" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar)"/>
+  <line x1="490" y1="68" x2="870"  y2="116" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar)"/>
+
+  <!-- ===== Branch 1: NaN/Inf (blue) ===== -->
+  <g>
+    <rect x="20" y="116" width="200" height="40" rx="6" fill="#2563eb"/>
+    <text x="120" y="141" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">① NaN / Inf</text>
+
+    <line x1="120" y1="156" x2="120" y2="186" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ar)"/>
+    <rect x="20" y="186" width="200" height="48" rx="5" fill="#eff6ff" stroke="#bfdbfe"/>
+    <text x="30" y="204" font-size="11" font-weight="700" fill="#2563eb">症状</text>
+    <text x="30" y="222" font-size="11" fill="#1f2937">loss 变 nan / inf</text>
+
+    <line x1="120" y1="234" x2="120" y2="258" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ar)"/>
+    <rect x="20" y="258" width="200" height="78" rx="5" fill="#dbeafe" stroke="#93c5fd"/>
+    <text x="30" y="276" font-size="11" font-weight="700" fill="#1d4ed8">常见原因</text>
+    <text x="30" y="294" font-size="11" fill="#1f2937">lr 太大</text>
+    <text x="30" y="310" font-size="11" fill="#1f2937">log(0) / 除 0</text>
+    <text x="30" y="326" font-size="11" fill="#1f2937">混合精度溢出</text>
+
+    <line x1="120" y1="336" x2="120" y2="360" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ar)"/>
+    <rect x="20" y="360" width="200" height="96" rx="5" fill="#2563eb"/>
+    <text x="30" y="378" font-size="11" font-weight="700" fill="#bfdbfe">对策</text>
+    <text x="30" y="396" font-size="11" fill="#ffffff">调小 lr</text>
+    <text x="30" y="412" font-size="11" fill="#ffffff">加 eps</text>
+    <text x="30" y="428" font-size="11" fill="#ffffff">梯度裁剪</text>
+    <text x="30" y="444" font-size="11" fill="#ffffff">loss scaling</text>
+  </g>
+
+  <!-- ===== Branch 2: loss 不降 (green) ===== -->
+  <g>
+    <rect x="270" y="116" width="200" height="40" rx="6" fill="#059669"/>
+    <text x="370" y="141" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">② loss 不降</text>
+
+    <line x1="370" y1="156" x2="370" y2="186" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ar)"/>
+    <rect x="270" y="186" width="200" height="48" rx="5" fill="#ecfdf5" stroke="#a7f3d0"/>
+    <text x="280" y="204" font-size="11" font-weight="700" fill="#059669">症状</text>
+    <text x="280" y="222" font-size="11" fill="#1f2937">loss 水平不动</text>
+
+    <line x1="370" y1="234" x2="370" y2="258" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ar)"/>
+    <rect x="270" y="258" width="200" height="96" rx="5" fill="#d1fae5" stroke="#6ee7b7"/>
+    <text x="280" y="276" font-size="11" font-weight="700" fill="#047857">常见原因</text>
+    <text x="280" y="294" font-size="11" fill="#1f2937">lr 太小</text>
+    <text x="280" y="310" font-size="11" fill="#1f2937">标签错位</text>
+    <text x="280" y="326" font-size="11" fill="#1f2937">忘 shuffle</text>
+    <text x="280" y="342" font-size="11" fill="#1f2937">模型太小</text>
+
+    <line x1="370" y1="354" x2="370" y2="378" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ar)"/>
+    <rect x="270" y="378" width="200" height="78" rx="5" fill="#059669"/>
+    <text x="280" y="396" font-size="11" font-weight="700" fill="#a7f3d0">对策</text>
+    <text x="280" y="414" font-size="11" fill="#ffffff">先过拟合一个 batch</text>
+    <text x="280" y="430" font-size="11" fill="#ffffff">lr range test</text>
+    <text x="280" y="446" font-size="11" fill="#ffffff">查数据对齐</text>
+  </g>
+
+  <!-- ===== Branch 3: OOM (orange) ===== -->
+  <g>
+    <rect x="520" y="116" width="200" height="40" rx="6" fill="#d97706"/>
+    <text x="620" y="141" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">③ OOM 显存溢出</text>
+
+    <line x1="620" y1="156" x2="620" y2="186" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ar)"/>
+    <rect x="520" y="186" width="200" height="48" rx="5" fill="#fffbeb" stroke="#fde68a"/>
+    <text x="530" y="204" font-size="11" font-weight="700" fill="#d97706">症状</text>
+    <text x="530" y="222" font-size="11" fill="#1f2937">CUDA out of memory</text>
+
+    <line x1="620" y1="234" x2="620" y2="258" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ar)"/>
+    <rect x="520" y="258" width="200" height="78" rx="5" fill="#fef3c7" stroke="#fcd34d"/>
+    <text x="530" y="276" font-size="11" font-weight="700" fill="#b45309">常见原因</text>
+    <text x="530" y="294" font-size="11" fill="#1f2937">batch / 序列太大</text>
+    <text x="530" y="310" font-size="11" fill="#1f2937">累加带图张量</text>
+    <text x="530" y="326" font-size="11" fill="#1f2937">显存泄漏</text>
+
+    <line x1="620" y1="336" x2="620" y2="360" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ar)"/>
+    <rect x="520" y="360" width="200" height="78" rx="5" fill="#d97706"/>
+    <text x="530" y="378" font-size="11" font-weight="700" fill="#fde68a">对策</text>
+    <text x="530" y="396" font-size="11" fill="#ffffff">减小 batch</text>
+    <text x="530" y="412" font-size="11" fill="#ffffff">累加用 .item()</text>
+    <text x="530" y="428" font-size="11" fill="#ffffff">梯度累积</text>
+  </g>
+
+  <!-- ===== Branch 4: 过拟合 (rose) ===== -->
+  <g>
+    <rect x="770" y="116" width="200" height="40" rx="6" fill="#db2777"/>
+    <text x="870" y="141" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">④ 过拟合</text>
+
+    <line x1="870" y1="156" x2="870" y2="186" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ar)"/>
+    <rect x="770" y="186" width="200" height="48" rx="5" fill="#fdf2f8" stroke="#fbcfe8"/>
+    <text x="780" y="204" font-size="11" font-weight="700" fill="#db2777">症状</text>
+    <text x="780" y="222" font-size="11" fill="#1f2937">train 降 val 升</text>
+
+    <line x1="870" y1="234" x2="870" y2="258" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ar)"/>
+    <rect x="770" y="258" width="200" height="60" rx="5" fill="#fce7f3" stroke="#f9a8d4"/>
+    <text x="780" y="276" font-size="11" font-weight="700" fill="#be185d">常见原因</text>
+    <text x="780" y="294" font-size="11" fill="#1f2937">模型太大</text>
+    <text x="780" y="310" font-size="11" fill="#1f2937">训练过久</text>
+
+    <line x1="870" y1="318" x2="870" y2="342" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ar)"/>
+    <rect x="770" y="342" width="200" height="78" rx="5" fill="#db2777"/>
+    <text x="780" y="360" font-size="11" font-weight="700" fill="#fbcfe8">对策</text>
+    <text x="780" y="378" font-size="11" fill="#ffffff">正则化</text>
+    <text x="780" y="394" font-size="11" fill="#ffffff">数据增强</text>
+    <text x="780" y="410" font-size="11" fill="#ffffff">早停 early stop</text>
+  </g>
+
+  <!-- legend -->
+  <text x="490" y="500" text-anchor="middle" font-size="12" fill="#64748b">每支自上而下：症状（浅）→ 常见原因（中）→ 对策（高亮）</text>
+
+  <!-- caption -->
+  <text x="490" y="540" text-anchor="middle" font-size="13" font-weight="700" fill="#1f2937">训练故障诊断树</text>
+  <text x="490" y="562" text-anchor="middle" font-size="11" fill="#64748b">根节点“训练出问题”分出四大分支，每支沿“症状→常见原因→对策”展开</text>
+</svg><figcaption>训练故障诊断树：根节点&quot;训练出问题&quot;分出四大分支，每支沿&quot;症状→常见原因→对策&quot;展开。</figcaption></figure>
+
+<table>
+<thead><tr><th>类别</th><th>症状</th><th>常见原因</th><th>对策</th></tr></thead>
+<tbody>
+<tr>
+<td><strong>① NaN / Inf</strong></td>
+<td>loss 突然变 nan 或 inf，之后全乱</td>
+<td>lr 太大导致发散；log(0)/除 0；混合精度下数值溢出；梯度爆炸</td>
+<td>调小 lr；给 log 加 eps（epsilon，一个防 0 的小常数）；做梯度裁剪；混合精度用 loss scaling（损失缩放，第8课）；用 isnan 定位是哪一步先炸</td>
+</tr>
+<tr>
+<td><strong>② loss 不降</strong></td>
+<td>loss 几乎水平，不动或抖动</td>
+<td>lr 太小；标签/数据错位；忘了 shuffle；模型太小/容量不够；忘了把梯度清零</td>
+<td>先过拟合一个 batch；做 lr range test；检查 dataloader 的 (X, y) 是否对齐；确认 shuffle=True</td>
+</tr>
+<tr>
+<td><strong>③ OOM（显存溢出）</strong></td>
+<td>CUDA out of memory，常在第一步或若干步后崩</td>
+<td>batch/序列太大；显存泄漏=把<strong>带计算图的</strong>张量累加进列表（如 <code>total += loss</code> 而非 <code>loss.item()</code>）</td>
+<td>调小 batch/序列长度；累计标量时用 <code>.item()</code> 或 <code>.detach()</code>；用梯度累积换等效大 batch；混合精度省显存</td>
+</tr>
+<tr>
+<td><strong>④ 过拟合</strong></td>
+<td>train loss 一直降，val loss 先降后升</td>
+<td>模型相对数据太大；训练过久；没有正则</td>
+<td>加正则（weight decay 权重衰减/dropout）；数据增强；早停（early stopping）；减小模型或加数据</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>最小可跑——NaN 侦测。</strong>不要在 loss 变 nan 后盲目调参，要<strong>主动抓</strong>。下面故意用过大的 lr 造发散，再用 <code>np.isfinite</code> 在第一时间拦截。注意：发散时 <code>np.exp</code> 类运算会在 stderr 打印 <code>RuntimeWarning: overflow</code>，这<strong>正是发散的征兆，属预期</strong>，不是"报错"：</p>
+
+<pre><code>import numpy as np
+np.random.seed(1)
+W = np.random.randn(5); x = np.random.randn(5)
+lr = 50.0                                  # 故意过大 -> 发散
+for step in range(60):                     # 步数留够, 让它真的炸到 inf
+    grad = (W @ x - 1.0) * x               # 拟合 W·x = 1 的玩具目标
+    W -= lr * grad
+    loss = (W @ x - 1.0)**2
+    if not np.isfinite(loss):              # 主动侦测!
+        print(f"step {step}: 检测到非有限值 -> 停止")
+        print("isnan:", np.isnan(loss), " isfinite:", np.isfinite(loss))
+        break
+    print(f"step {step}  loss={loss:.3e}")
+</code></pre>
+
+<p>你会看到 loss 以指数速度爆炸：几步内就冲到 1e+38 量级（step6 已是 5e+38），但 float64 上限约 1.8e308，所以要再多跑几十步才会真正 overflow 成 <code>inf</code>。到那一刻（本例约 step 57），<code>np.isfinite(loss)</code> 终于返回 False，<code>break</code> 分支<strong>真的触发一次</strong>，打印出"检测到非有限值"。关键不是"它炸了"，而是 <code>np.isnan</code> / <code>np.isfinite</code> 让你在炸的瞬间就<strong>定位到 step 几、哪个张量</strong>，而不是事后对着一屏 nan 发呆。真实工程里，会在训练循环里对 loss 和关键梯度加这种断言。</p>
+
+<h2>shape / device / dtype 三连，与最重要的超参 lr</h2>
+
+<p><strong>机制直觉。</strong>张量类 bug 八成出在三件事上，养成<strong>出错先打印这三样</strong>的肌肉记忆：</p>
+<ul>
+<li><strong>shape</strong>：广播（broadcasting，第2课）把 (N, 1) 和 (N,) 悄悄"算对"成 (N, N)，loss 看着能跑但全错。打印 <code>.shape</code> 是第一动作。</li>
+<li><strong>device</strong>：CPU 张量和 GPU 张量相加会直接报错；模型在 GPU、数据在 CPU 是最常见的 device 不匹配（第3课）。</li>
+<li><strong>dtype</strong>：float32 vs float64、float16 溢出、整型标签当成浮点喂进 loss——打印 <code>.dtype</code> 一眼看穿。</li>
+</ul>
+
+<p><strong>lr 是最重要的超参。</strong>四类故障里，NaN（太大）和 loss 不降（太小）都直指 lr。找 lr 的标准做法是 <strong>lr range test</strong>：让 lr 从极小指数级增大，画 loss-lr 曲线，loss 下降最快的那段对应的 lr 就是好起点。其他超参搜索方式——网格搜索（grid search）、随机搜索（random search）、贝叶斯优化（Bayesian optimization）——一句带过：随机搜索通常比网格更高效，贝叶斯在评估昂贵时更省，但<strong>先把 lr 调对，收益远大于纠结其他超参</strong>。</p>
+
+<h2>实验追踪：让每次实验都留下证据</h2>
+
+<p><strong>机制直觉。</strong>跑十个实验后，你绝不可能靠记忆回答"哪个 lr 配哪个 batch 得到了那条最好的曲线"。实验追踪工具（experiment tracking）把每次运行的<strong>超参、loss/指标曲线、资源占用</strong>自动记录、可视化、可对比。</p>
+
+<p>配套一条铁律——<strong>一次只改一个变量</strong>。如果这次同时改了 lr 和 batch size，结果变好了，你<strong>无法归因</strong>是哪个起的作用；结果变差了同样不知道怪谁。科学实验的对照原则在这里一模一样适用。</p>
+
+<p><strong>真实 API 当指针。</strong>两个主流选择，TensorBoard（轻量、本地）与 W&B（云端、协作强）：</p>
+
+<pre class="ref" data-lang="PyTorch"><code># 方案 A：TensorBoard
+from torch.utils.tensorboard import SummaryWriter
+writer = SummaryWriter("runs/exp_lr0.001")        # 一个实验一个目录
+for step, (x, y) in enumerate(loader):
+    loss = train_step(x, y)
+    writer.add_scalar("train/loss", loss.item(), step)
+    writer.add_scalar("train/lr", optimizer.param_groups[0]["lr"], step)
+writer.close()
+# 终端运行: tensorboard --logdir runs
+</code></pre>
+
+<pre class="ref" data-lang="PyTorch"><code># 方案 B：Weights & Biases (W&B)
+import wandb
+wandb.init(project="my-proj", config={"lr": 1e-3, "batch_size": 64},
+           notes=f"commit {git_hash}")            # 超参 + commit 一并记下
+for step, (x, y) in enumerate(loader):
+    loss = train_step(x, y)
+    wandb.log({"train/loss": loss.item()}, step=step)   # 自动画曲线
+wandb.finish()
+</code></pre>
+
+<p>注意 W&B 的 <code>config</code> 把超参和（上一节的）commit hash 一起钉进这次运行——可复现清单和实验追踪在这里汇合。</p>
+
+<h2>调一调，观察现象</h2>
+
+<p><strong>微任务 1：去掉种子。</strong>把可复现 demo 里 <code>run_once(0)</code> 改成 <code>run_once()</code>（不传种子）跑两次。预期现象：两次结果不同。为什么：没钉住 numpy 的 PRNG，每次 <code>randn</code> 从系统状态接着往下取，序列不再确定。</p>
+
+<pre><code>import numpy as np
+def run_once(seed=None):
+    if seed is not None: np.random.seed(seed)
+    W = np.random.randn(3, 2); x = np.random.randn(2)
+    for _ in range(3): W -= 0.1 * np.outer(W @ x, x)
+    return W.sum()
+print(run_once(), run_once())   # 改成 run_once(0), run_once(0) 对比
+</code></pre>
+
+<p><strong>微任务 2：把 lr 调到压不下去。</strong>把"过拟合一个 batch"里的 <code>lr = 0.5</code> 改成 <code>lr = 0.001</code>。预期现象：200 步后 loss 几乎没动（实测 step0≈1.11 → step200≈0.75，远没背下来）。为什么：单个 batch 本该能过拟合，压不下去说明此刻是 <strong>lr 太小</strong>（而非通路 bug）——这正演示了诊断树"loss 不降"分支里"lr 太小"和"通路错"如何区分。（运行时可能看到 <code>overflow encountered in exp</code> 警告，属预期，不影响结论。）</p>
+
+<pre><code>import numpy as np
+np.random.seed(0)
+X = np.random.randn(8,4); y = (np.random.rand(8)>0.5).astype(float)
+W1 = np.random.randn(4,16)*0.5; b1 = np.zeros(16)
+W2 = np.random.randn(16,1)*0.5; b2 = np.zeros(1)
+sig = lambda z: 1/(1+np.exp(-z)); lr = 0.001    # 改这个数
+for step in range(201):
+    h = np.maximum(0, X@W1+b1); p = sig(h@W2+b2).ravel()
+    loss = -np.mean(y*np.log(p+1e-7)+(1-y)*np.log(1-p+1e-7))
+    dz = (p-y).reshape(-1,1)/len(y); dW2 = h.T@dz; db2 = dz.sum(0)
+    dh = dz@W2.T; dh[h<=0]=0; dW1 = X.T@dh; db1 = dh.sum(0)
+    W2-=lr*dW2; b2-=lr*db2; W1-=lr*dW1; b1-=lr*db1
+    if step%100==0: print(f"step {step}  loss={loss:.4f}")
+</code></pre>
+
+<p><strong>微任务 3：制造 log(0)。</strong>把上面 loss 里的 <code>+1e-7</code>（即 eps）全删掉，并把 <code>lr</code> 调回大值（如 5.0）让某些 <code>p</code> 被推到 0 或 1。预期现象：很可能在某步 loss 变成 nan / -inf（实测 lr=5.0 下约 step4 就触发）；<strong>若没出现，就把 lr 再调大或多跑几步</strong>。为什么：<code>log(0) = -inf</code>，这就是诊断树 NaN 分支里"log(0)"那一条的真身；eps 的作用就是堵住这个洞。</p>
+
+<h2>动手练习</h2>
+
+<ol>
+<li><strong>写一份 set_seed。</strong>仿照参考块写一个 <code>set_seed(seed)</code>，钉住 random/numpy（torch 部分用注释写出即可）。然后用纯 NumPy 验证：调用 <code>set_seed(7)</code> 后生成的随机数组，两次调用逐位相同；不调用则不同。</li>
+<li><strong>给训练循环加 NaN 守卫。</strong>在"过拟合一个 batch"的循环里加一行：每步用 <code>np.isfinite(loss)</code> 检查，一旦非有限就打印当前 step 和触发的张量形状并 break。把 lr 调到 100 触发它。</li>
+<li><strong>过拟合判定（综合）。</strong>给"过拟合一个 batch"的网络故意制造一个 bug——把反向里 <code>(p - y)</code> 写成 <code>(p + y)</code>（梯度方向错）。观察 loss 是否还能压到接近 0？预期现象：<strong>loss 不降反升、卡在 6 左右压不下去</strong>（你可能还会看到 exp overflow 警告）。用这个例子向自己解释："过拟合一个 batch 失败"为什么是<strong>通路 bug</strong>的信号而非调参问题。</li>
+</ol>
+
+<h2>掌握自检</h2>
+<ul>
+<li>我能说出固定种子时必须钉住的四个 PRNG，并解释漏掉一个会怎样。</li>
+<li>我能区分"严格逐位可复现"与"结果可比"，并说出各自代价与适用场景。</li>
+<li>我能默写可复现清单的五项：种子 / cudnn / 环境锁 / 数据划分 / commit hash。</li>
+<li>遇到训练故障，我会先归类到 NaN/不降/OOM/过拟合 四桶之一，而不是直接调参。</li>
+<li>我会把"先过拟合一个 batch"当作认真训练前的第一步，并能解释它为何能区分通路 bug 与调参问题。</li>
+<li>我知道出现张量 bug 时先打印 shape/device/dtype，且知道 lr 是最该先调对的超参。</li>
+<li>我理解"一次只改一个变量"是归因的前提，并会用 W&B/TensorBoard 记录每次实验。</li>
+</ul>
+
+<div class="skip">
+<h4>可以先放过的点</h4>
+<p>现在不必纠结的：贝叶斯优化、混合精度的 loss scaling 细节、cudnn 各算法的确定性差异、W&B 的高级功能（sweep、artifact）。这些是"做大规模实验时的优化"，不是"能不能正确做实验"的关卡。<strong>等到你已经稳定地跑通若干实验、开始为找最优超参或加速而烦恼时</strong>，再回来研究自动超参搜索和分布式可复现。本课你真正要带走的只有三句：固定种子再调参、出问题先过拟合一个 batch、一次只改一个变量。把这三条变成肌肉记忆，就足以支撑你后面所有的训练实验。</p>
+</div>
+</article>
+<div class="navbtns"><a class="prev" href="lesson-08-gpu-amp.html"><div class="nlabel">← 上一课</div><div class="ntitle">第8课 · GPU/CUDA 与混合精度</div></a><a class="next" href="lesson-10-huggingface.html"><div class="nlabel">下一课 →</div><div class="ntitle">第10课 · Hugging Face 生态入门</div></a></div>
+<nav class="toc"><h3>本模块课程表</h3><ol>
+<li><a href="lesson-01-env-scientific-stack.html"><span class="ln">第1课</span>Python 科学计算栈与环境工程</a></li>
+<li><a href="lesson-02-numpy-vectorization-broadcasting.html"><span class="ln">第2课</span>NumPy 数组、向量化与广播</a></li>
+<li><a href="lesson-03-pytorch-tensors-device-dtype.html"><span class="ln">第3课</span>PyTorch 张量、设备与 dtype</a></li>
+<li><a href="lesson-04-autograd.html"><span class="ln">第4课</span>Autograd 自动微分</a></li>
+<li><a href="lesson-05-nn-module.html"><span class="ln">第5课</span>nn.Module 与模型构建</a></li>
+<li><a href="lesson-06-training-loop-from-scratch.html"><span class="ln">第6课</span>从零写训练循环（核心）</a></li>
+<li><a href="lesson-07-dataset-dataloader.html"><span class="ln">第7课</span>数据加载 Dataset 与 DataLoader</a></li>
+<li><a href="lesson-08-gpu-amp.html"><span class="ln">第8课</span>GPU/CUDA 与混合精度</a></li>
+<li class="cur"><span class="ln">第9课</span>实验管理、可复现与调试方法论</li>
+<li><a href="lesson-10-huggingface.html"><span class="ln">第10课</span>Hugging Face 生态入门</a></li>
+</ol></nav>
+</div>
+<!-- pyrunner-injected -->
+<style>
+.pr-cell{border:1px solid #334155;border-radius:10px;margin:1.2em 0;overflow:hidden;background:#0f172a;}
+.pr-head{display:flex;align-items:center;gap:8px;background:#1e293b;color:#cbd5e1;padding:6px 10px;font-size:13px;font-family:system-ui,-apple-system,sans-serif;}
+.pr-title{flex:1;font-weight:600;}
+.pr-status{font-size:12px;color:#94a3b8;white-space:nowrap;max-width:50%;overflow:hidden;text-overflow:ellipsis;}
+.pr-btn{cursor:pointer;border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:6px;padding:3px 11px;font-size:13px;line-height:1.4;}
+.pr-btn:hover{background:#0b1220;}
+.pr-run{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:600;}
+.pr-run:hover{background:#1d4ed8;}
+.pr-cell.collapsed .pr-body{display:none;}
+.pr-editor{position:relative;background:#0f172a;}
+.pr-code,.pr-edit{display:block;width:100%;min-height:68px;border:none;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.55;padding:12px 14px;box-sizing:border-box;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:4;}
+.pr-code{position:absolute;inset:0;margin:0;overflow:hidden;background:#0f172a;color:#dbeafe;pointer-events:none;}
+.pr-edit{position:relative;background:transparent;color:transparent;caret-color:#e2e8f0;resize:vertical;outline:none;-webkit-text-fill-color:transparent;}
+.pr-edit::selection{background:rgba(96,165,250,.34);}
+.tok-kw{color:#c084fc;font-weight:700;}
+.tok-fn{color:#67e8f9;}
+.tok-num{color:#fbbf24;}
+.tok-str{color:#86efac;}
+.tok-comment{color:#94a3b8;font-style:italic;}
+.pr-out{margin:0;padding:10px 14px;border-top:1px solid #334155;background:#0b1220;color:#cbd5e1;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.5;white-space:pre-wrap;max-height:340px;overflow:auto;}
+.pr-out:empty{display:none;}
+.pr-out.err{color:#fca5a5;}
+.pr-cell.ref-cell{border-color:#475569;}
+.pr-cell.ref-cell .pr-head{background:#172033;color:#cbd5e1;}
+.pr-cell.ref-cell .pr-status{color:#fbbf24;font-style:italic;}
+.pr-code.pr-static{position:static;pointer-events:auto;overflow:auto;min-height:auto;background:#0f172a;color:#dbeafe;}
+#pr-fab{position:fixed;right:18px;bottom:18px;z-index:9998;background:#2563eb;color:#fff;border:none;border-radius:999px;padding:10px 17px;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.22);font-family:system-ui,sans-serif;}
+#pr-fab:hover{background:#1d4ed8;}
+#pr-lab{position:fixed;right:18px;bottom:66px;z-index:9999;width:400px;max-width:92vw;background:#0f172a;border:1px solid #334155;border-radius:12px;display:none;flex-direction:column;box-shadow:0 14px 38px rgba(0,0,0,.4);overflow:hidden;}
+#pr-lab.open{display:flex;}
+#pr-lab .pr-edit,#pr-lab .pr-code{min-height:150px;}
+@media (max-width:640px){
+  .pr-cell{border-radius:9px;margin:1em 0;}
+  .pr-head{flex-wrap:wrap;padding:7px 9px;}
+  .pr-title{min-width:0;}
+  .pr-status{order:3;max-width:100%;flex-basis:100%;}
+  .pr-code,.pr-edit{font-size:13px;line-height:1.55;padding:11px 12px;}
+  .pr-out{font-size:12.5px;padding:9px 12px;}
+  #pr-fab{right:10px;bottom:14px;max-width:calc(100vw - 96px);min-height:38px;padding:9px 13px;font-size:13px;line-height:1.2;}
+  #pr-lab{right:10px;left:10px;bottom:64px;width:auto;max-width:none;max-height:calc(100vh - 88px);}
+  #pr-lab .pr-edit,#pr-lab .pr-code{min-height:132px;}
+}
+</style>
+<script>
+(function(){
+  var PYBASE="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+  var pyReady=null;
+  function loadPy(status){
+    if(pyReady)return pyReady;
+    pyReady=(async function(){
+      status("正在加载 Python 运行时（首次约 10 秒，需联网）…");
+      await new Promise(function(res,rej){
+        var s=document.createElement("script");s.src=PYBASE+"pyodide.js";
+        s.onload=res;s.onerror=function(){rej(new Error("无法加载 Pyodide（首次运行需要联网）"));};
+        document.head.appendChild(s);
+      });
+      var py=await loadPyodide({indexURL:PYBASE});
+      status("正在加载 NumPy …");
+      await py.loadPackage("numpy");
+      status("Python 就绪 ✓");
+      return py;
+    })();
+    return pyReady;
+  }
+  async function run(code,outEl,statusEl){
+    var setS=function(m){if(statusEl)statusEl.textContent=m;};
+    outEl.classList.remove("err");outEl.textContent="";
+    var py;
+    try{py=await loadPy(setS);}
+    catch(e){outEl.classList.add("err");outEl.textContent="加载失败："+e.message;return;}
+    var buf="";
+    py.setStdout({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    py.setStderr({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    try{
+      var result=await py.runPythonAsync(code);
+      if(result!==undefined&&result!==null){
+        var r;try{r=result.toString();}catch(_){r=String(result);}
+        if(r!=="None")buf+=(buf&&!buf.endsWith("\n")?"\n":"")+r;
+        if(result&&result.destroy)result.destroy();
+      }
+      outEl.textContent=buf||"（运行成功，无输出。用 print(...) 查看结果）";
+    }catch(e){
+      outEl.classList.add("err");
+      outEl.textContent=buf+(buf?"\n":"")+String((e&&e.message)||e);
+    }
+  }
+  var KW={False:1,None:1,True:1,and:1,as:1,assert:1,async:1,await:1,break:1,class:1,continue:1,def:1,del:1,elif:1,else:1,except:1,finally:1,for:1,from:1,global:1,if:1,import:1,in:1,is:1,lambda:1,nonlocal:1,not:1,or:1,pass:1,raise:1,return:1,try:1,while:1,with:1,yield:1};
+  var FN={abs:1,all:1,any:1,array:1,bool:1,dict:1,enumerate:1,float:1,int:1,len:1,list:1,max:1,min:1,np:1,numpy:1,print:1,range:1,round:1,set:1,str:1,sum:1,tuple:1,zip:1,torch:1,nn:1,tensor:1,F:1,super:1,isinstance:1,getattr:1,setattr:1,hasattr:1,sorted:1,type:1,object:1,property:1};
+  function esc(s){return s.replace(/[&<>]/g,function(c){return c==="&"?"&amp;":c==="<"?"&lt;":"&gt;";});}
+  function colorLine(line){
+    var out="",i=0;
+    while(i<line.length){
+      var ch=line[i];
+      if(ch==="#"){out+='<span class="tok-comment">'+esc(line.slice(i))+"</span>";break;}
+      if(ch==="'"||ch==='"'){
+        var q=ch,triple=line.slice(i,i+3)===q+q+q,end=i+(triple?3:1),done=false;
+        while(end<line.length){
+          if(!triple&&line[end]==="\\"){end+=2;continue;}
+          if(triple&&line.slice(end,end+3)===q+q+q){end+=3;done=true;break;}
+          if(!triple&&line[end]===q){end+=1;done=true;break;}
+          end+=1;
+        }
+        out+='<span class="tok-str">'+esc(line.slice(i,done?end:line.length))+"</span>";
+        i=done?end:line.length;
+        continue;
+      }
+      if(/[0-9]/.test(ch)||(ch==="."&&/[0-9]/.test(line[i+1]||""))){
+        var m=line.slice(i).match(/^(?:0[xX][0-9a-fA-F]+|\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?/);
+        out+='<span class="tok-num">'+esc(m[0])+"</span>";i+=m[0].length;continue;
+      }
+      if(/[A-Za-z_]/.test(ch)){
+        var id=line.slice(i).match(/^[A-Za-z_][A-Za-z0-9_]*/)[0];
+        if(KW[id])out+='<span class="tok-kw">'+id+"</span>";
+        else if(FN[id])out+='<span class="tok-fn">'+id+"</span>";
+        else out+=id;
+        i+=id.length;continue;
+      }
+      out+=esc(ch);i+=1;
+    }
+    return out;
+  }
+  function paint(ta){
+    var pre=ta.closest(".pr-editor").querySelector(".pr-code");
+    pre.innerHTML=ta.value.split("\n").map(colorLine).join("\n")+(ta.value.endsWith("\n")?"\n":"");
+    pre.style.height=ta.style.height;
+    pre.scrollTop=ta.scrollTop;pre.scrollLeft=ta.scrollLeft;
+  }
+  function autosize(ta){ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight+2,460)+"px";}
+  function tune(ta){autosize(ta);paint(ta);}
+  function tabKey(e){
+    if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();var b=this.closest(".pr-cell,#pr-lab").querySelector(".pr-run");if(b)b.click();return;}
+    if(e.key==="Tab"){
+      e.preventDefault();
+      var s=this.selectionStart,en=this.selectionEnd,v=this.value,lineStart=v.lastIndexOf("\n",s-1)+1,lineEnd=v.indexOf("\n",en);
+      if(lineEnd<0)lineEnd=v.length;
+      if(s!==en||e.shiftKey){
+        var block=v.slice(lineStart,lineEnd),lines=block.split("\n"),delta=0;
+        if(e.shiftKey){
+          lines=lines.map(function(line){
+            if(line.startsWith("    ")){delta-=4;return line.slice(4);}
+            if(line.startsWith("\t")){delta-=1;return line.slice(1);}
+            return line;
+          });
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=Math.max(lineStart,s+(s===lineStart?0:Math.max(delta/Math.max(lines.length,1),-4)));
+          this.selectionEnd=Math.max(this.selectionStart,en+delta);
+        }else{
+          lines=lines.map(function(line){delta+=4;return "    "+line;});
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=s+4;
+          this.selectionEnd=en+delta;
+        }
+      }else{
+        this.value=v.slice(0,s)+"    "+v.slice(en);this.selectionStart=this.selectionEnd=s+4;
+      }
+      tune(this);
+      return;
+    }
+    if(e.key==="Enter"){
+      e.preventDefault();
+      var a=this.selectionStart,b=this.selectionEnd,text=this.value,start=text.lastIndexOf("\n",a-1)+1;
+      var prefix=text.slice(start,a),indent=(prefix.match(/^\s*/)||[""])[0],code=prefix.replace(/#.*$/,"").trimEnd();
+      var add="\n"+indent+(/:\s*$/.test(code)?"    ":"");
+      this.value=text.slice(0,a)+add+text.slice(b);
+      this.selectionStart=this.selectionEnd=a+add.length;
+      tune(this);
+      return;
+    }
+  }
+  function makeCell(code){
+    var cell=document.createElement("div");cell.className="pr-cell";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">可运行 · Python (NumPy)</span><span class="pr-status"></span><button class="pr-btn pr-toggle">收起</button><button class="pr-btn pr-run">▶ 运行</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    var ta=cell.querySelector(".pr-edit");ta.value=code;
+    var out=cell.querySelector(".pr-out"),st=cell.querySelector(".pr-status");
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    cell.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    var tog=cell.querySelector(".pr-toggle");
+    tog.onclick=function(){cell.classList.toggle("collapsed");tog.textContent=cell.classList.contains("collapsed")?"展开":"收起";};
+    setTimeout(function(){tune(ta);},0);
+    return cell;
+  }
+  function makeRef(code,lang){
+    var cell=document.createElement("div");cell.className="pr-cell ref-cell";
+    var L=lang||"参考";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">参考代码 · '+esc(L)+'</span><span class="pr-status">不在浏览器运行</span></div><pre class="pr-code pr-static"></pre>';
+    cell.querySelector(".pr-static").innerHTML=code.split("\n").map(colorLine).join("\n");
+    return cell;
+  }
+  function enhance(){
+    document.querySelectorAll("article pre").forEach(function(pre){
+      if(pre.closest(".pr-cell"))return;
+      var codeEl=pre.querySelector("code")||pre;
+      var code=codeEl.textContent.replace(/\s+$/,"");
+      if(!code)return;
+      if(pre.classList.contains("ref")){
+        pre.replaceWith(makeRef(code,pre.getAttribute("data-lang")));
+      }else{
+        pre.replaceWith(makeCell(code));
+      }
+    });
+  }
+  function lab(){
+    var fab=document.createElement("button");fab.id="pr-fab";fab.textContent="▶ Python 实验台";
+    var panel=document.createElement("div");panel.id="pr-lab";
+    panel.innerHTML='<div class="pr-head"><span class="pr-title">Python 实验台 · NumPy</span><span class="pr-status"></span><button class="pr-btn pr-run">▶ 运行</button><button class="pr-btn pr-min">收起</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    document.body.appendChild(fab);document.body.appendChild(panel);
+    var ta=panel.querySelector(".pr-edit");
+    ta.value="import numpy as np\na = np.array([3, 2])\nb = np.array([1, 4])\nprint(\"a + b =\", a + b)\nprint(\"a . b =\", a @ b)\nprint(\"|a|  =\", np.linalg.norm(a))\ncos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))\nprint(\"cos =\", round(float(cos), 4))";
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    var out=panel.querySelector(".pr-out"),st=panel.querySelector(".pr-status");
+    panel.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    fab.onclick=function(){panel.classList.toggle("open");};
+    panel.querySelector(".pr-min").onclick=function(){panel.classList.remove("open");};
+    setTimeout(function(){tune(ta);},0);
+  }
+  function init(){enhance();lab();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+
+<script src="../assets/page-toc.js"></script>
+<script src="../assets/annotator.js"></script>
+</body>
+</html>

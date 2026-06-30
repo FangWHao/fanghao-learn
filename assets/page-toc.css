@@ -1,7 +1,7 @@
 .page-toc {
   position: fixed;
   top: 92px;
-  right: max(16px, calc((100vw - 840px) / 2 - 282px));
+  right: max(16px, calc((100vw - 1120px) / 2 - 282px));
   z-index: 10020;
   width: 260px;
   max-height: calc(100vh - 132px);
@@ -222,7 +222,7 @@ html[data-theme="dark"] .page-toc-toggle:focus-visible {
   color: #bfdbfe;
 }
 
-@media (max-width: 1359px) {
+@media (max-width: 1679px) {
   .page-toc {
     top: auto;
     right: 10px;
@@ -308,7 +308,7 @@ html[data-theme="dark"] .page-toc-toggle:focus-visible {
   }
 }
 
-@media (min-width: 1360px) {
+@media (min-width: 1680px) {
   .page-toc-toggle {
     display: none !important;
   }

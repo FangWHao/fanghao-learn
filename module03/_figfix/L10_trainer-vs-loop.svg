@@ -1,0 +1,73 @@
+<svg viewBox="0 0 900 560" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, -apple-system, sans-serif" role="img" aria-labelledby="t d">
+<title id="t">Trainer.train() 展开就是第6课手写循环的五步</title>
+<desc id="d">上半部分是 Trainer 内部的五步骨架，下半部分是每个 TrainingArguments 配置项控制哪一步。</desc>
+<defs>
+<marker id="aDark" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+</marker>
+<marker id="aPink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" fill="#db2777"/>
+</marker>
+</defs>
+<text x="450" y="30" text-anchor="middle" font-size="19" font-weight="700" fill="#1f2937">Trainer.train() 展开就是第 6 课手写循环的五步</text>
+<text x="450" y="52" text-anchor="middle" font-size="12.5" fill="#94a3b8">上：Trainer 内部就是这五步骨架　·　下：每个 TrainingArguments 配置项控制哪一步</text>
+
+<!-- 上：五步骨架 strip -->
+<text x="40" y="86" font-size="12.5" fill="#2563eb" font-weight="600">Trainer.train() 内部（双重 for 循环：epochs × batches）</text>
+<g>
+<rect x="30" y="98" width="148" height="58" rx="9" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+<text x="104" y="124" text-anchor="middle" font-size="13" font-weight="700" fill="#065f46">① zero_grad</text>
+<text x="104" y="142" text-anchor="middle" font-size="10.5" fill="#059669">清空梯度</text>
+<rect x="203" y="98" width="148" height="58" rx="9" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+<text x="277" y="124" text-anchor="middle" font-size="13" font-weight="700" fill="#065f46">② forward</text>
+<text x="277" y="142" text-anchor="middle" font-size="10.5" fill="#059669">算预测 logits</text>
+<rect x="376" y="98" width="148" height="58" rx="9" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+<text x="450" y="124" text-anchor="middle" font-size="13" font-weight="700" fill="#065f46">③ loss</text>
+<text x="450" y="142" text-anchor="middle" font-size="10.5" fill="#059669">算损失</text>
+<rect x="549" y="98" width="148" height="58" rx="9" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+<text x="623" y="124" text-anchor="middle" font-size="13" font-weight="700" fill="#065f46">④ backward</text>
+<text x="623" y="142" text-anchor="middle" font-size="10.5" fill="#059669">填每个 .grad</text>
+<rect x="722" y="98" width="148" height="58" rx="9" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+<text x="796" y="124" text-anchor="middle" font-size="13" font-weight="700" fill="#065f46">⑤ step</text>
+<text x="796" y="142" text-anchor="middle" font-size="10.5" fill="#059669">更新参数</text>
+<line x1="181" y1="127" x2="200" y2="127" stroke="#475569" stroke-width="2" marker-end="url(#aDark)"/>
+<line x1="354" y1="127" x2="373" y2="127" stroke="#475569" stroke-width="2" marker-end="url(#aDark)"/>
+<line x1="527" y1="127" x2="546" y2="127" stroke="#475569" stroke-width="2" marker-end="url(#aDark)"/>
+<line x1="700" y1="127" x2="719" y2="127" stroke="#475569" stroke-width="2" marker-end="url(#aDark)"/>
+</g>
+
+<line x1="30" y1="184" x2="870" y2="184" stroke="#e2e8f0" stroke-width="1.5"/>
+
+<!-- 下：配置项 → 哪一步（用圈号引用上方，不连线，避免缠绕） -->
+<text x="40" y="212" font-size="13.5" font-weight="700" fill="#1f2937">每个 TrainingArguments 配置项 → 控制循环的哪一步</text>
+
+<g font-size="13">
+<!-- row1 -->
+<rect x="40" y="232" width="278" height="40" rx="8" fill="#fdf2f8" stroke="#db2777" stroke-width="1.6"/>
+<text x="179" y="257" text-anchor="middle" font-size="13" fill="#9d174d" font-family="ui-monospace, Menlo, monospace">learning_rate</text>
+<line x1="322" y1="252" x2="356" y2="252" stroke="#db2777" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#aPink)"/>
+<text x="366" y="257" fill="#1f2937">⑤ step()：更新步幅 = optimizer 里的 lr</text>
+<!-- row2 -->
+<rect x="40" y="288" width="278" height="40" rx="8" fill="#fdf2f8" stroke="#db2777" stroke-width="1.6"/>
+<text x="179" y="313" text-anchor="middle" font-size="13" fill="#9d174d" font-family="ui-monospace, Menlo, monospace">num_train_epochs</text>
+<line x1="322" y1="308" x2="356" y2="308" stroke="#db2777" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#aPink)"/>
+<text x="366" y="313" fill="#1f2937">外层 for：整个训练集过几遍</text>
+<!-- row3 -->
+<rect x="40" y="344" width="278" height="40" rx="8" fill="#fdf2f8" stroke="#db2777" stroke-width="1.6"/>
+<text x="179" y="369" text-anchor="middle" font-size="13" fill="#9d174d" font-family="ui-monospace, Menlo, monospace">per_device_train_batch_size</text>
+<line x1="322" y1="364" x2="356" y2="364" stroke="#db2777" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#aPink)"/>
+<text x="366" y="369" fill="#1f2937">内层 for：每个 batch 喂多少样本（DataLoader 切）</text>
+<!-- row4 -->
+<rect x="40" y="400" width="278" height="40" rx="8" fill="#fdf2f8" stroke="#db2777" stroke-width="1.6"/>
+<text x="179" y="425" text-anchor="middle" font-size="13" fill="#9d174d" font-family="ui-monospace, Menlo, monospace">lr_scheduler_type</text>
+<line x1="322" y1="420" x2="356" y2="420" stroke="#db2777" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#aPink)"/>
+<text x="366" y="425" fill="#1f2937">⑤ step() 之后 scheduler.step() 调整 lr</text>
+<!-- row5 -->
+<rect x="40" y="456" width="278" height="40" rx="8" fill="#fdf2f8" stroke="#db2777" stroke-width="1.6"/>
+<text x="179" y="481" text-anchor="middle" font-size="12" fill="#9d174d" font-family="ui-monospace, Menlo, monospace">gradient_accumulation_steps</text>
+<line x1="322" y1="476" x2="356" y2="476" stroke="#db2777" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#aPink)"/>
+<text x="366" y="481" fill="#1f2937">攒 N 个 batch 的 ④ backward 梯度，再 ⑤ step 一次</text>
+</g>
+
+<text x="450" y="532" text-anchor="middle" font-size="12.5" fill="#64748b">封装没有魔法：会写第 6 课的五步循环，就看得懂 Trainer 在做什么。</text>
+</svg>

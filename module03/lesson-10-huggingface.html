@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块3 · 第10课 · Hugging Face 生态入门</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<script src="../assets/theme.js"></script>
+<link rel="stylesheet" href="../assets/annotator.css">
+<link rel="stylesheet" href="../assets/theme.css">
+<link rel="stylesheet" href="../assets/page-toc.css">
+
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root{--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue-bg:#eff6ff;
+--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--pink:#db2777;
+--red:#dc2626;--red-bg:#fef2f2;--bg:#ffffff;--soft:#f8fafc;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);
+font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.85;font-size:17px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:840px;margin:0 auto;padding:0 22px 100px;}
+header.top{background:#fff;border-bottom:1px solid var(--line);padding:26px 22px 22px;margin-bottom:14px;}
+header.top .inner{max-width:840px;margin:0 auto;}
+.crumb{color:var(--muted);font-size:14px;letter-spacing:.3px;margin-bottom:6px;}
+h1{font-size:30px;line-height:1.3;margin:.1em 0 .2em;}
+.sub{color:var(--muted);font-size:15px;}
+article{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:30px 34px;margin-top:18px;}
+h2{font-size:23px;margin:1.7em 0 .6em;padding-bottom:.25em;border-bottom:2px solid var(--line);}
+h2:first-child{margin-top:.2em;}
+h3{font-size:19px;margin:1.3em 0 .4em;color:#0f172a;}
+h4{margin:.2em 0 .5em;font-size:16px;}
+p{margin:.7em 0;}
+ul,ol{padding-left:1.3em;margin:.6em 0;}
+li{margin:.32em 0;}
+code{background:#f1f5f9;padding:.12em .4em;border-radius:5px;font-size:.9em;
+font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a;}
+pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 18px;overflow:auto;font-size:14px;line-height:1.6;}
+pre code{background:none;color:inherit;padding:0;}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:15.5px;}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+thead th{background:var(--soft);}
+figure.fig{margin:1.4em 0;text-align:center;}
+figure.fig svg{max-width:100%;height:auto;}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px;}
+.note,.ml,.key,.pitfall,.example{border-radius:10px;padding:14px 18px;margin:1.2em 0;border:1px solid var(--line);}
+.note{background:var(--soft);border-left:4px solid #94a3b8;}
+.example{background:#fff;border-left:4px solid var(--blue);}
+.ml{background:var(--green-bg);border-left:4px solid var(--green);}
+.key{background:var(--amber-bg);border-left:4px solid var(--amber);}
+.pitfall{background:var(--red-bg);border-left:4px solid var(--red);}
+.goals{background:var(--blue-bg);border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:10px;padding:14px 20px;margin:.2em 0 1.5em;}
+.goals h4{margin:.1em 0 .5em;color:#1e3a8a;}
+.goals ul{margin:.3em 0;}
+.skip{background:var(--soft);border:1px solid var(--line);border-left:4px solid #94a3b8;border-radius:10px;padding:14px 20px;margin:1.8em 0 0;color:#475569;}
+.skip h4{margin:.1em 0 .5em;color:#475569;}
+.tag{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:1px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
+.toc{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:22px;}
+.toc h3{margin:.1em 0 .7em;}
+.toc ol{list-style:none;padding:0;}
+.toc li{padding:7px 10px;border-radius:8px;color:#334155;border:1px solid transparent;}
+.toc li a{color:inherit;text-decoration:none;display:block;}
+.toc li .ln{display:inline-block;min-width:54px;color:var(--muted);font-size:13px;}
+.toc li.cur{background:var(--blue-bg);border-color:#bfdbfe;font-weight:600;color:#1e3a8a;}
+.toc li:not(.cur):hover{background:var(--soft);}
+.navbtns{display:flex;justify-content:space-between;margin-top:22px;gap:12px;}
+.navbtns a{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--ink);}
+.navbtns a:hover{border-color:var(--blue);}
+.navbtns .nlabel{color:var(--muted);font-size:13px;}
+.navbtns .ntitle{font-weight:600;margin-top:3px;}
+.navbtns .next{text-align:right;}
+mjx-container{max-width:100%;vertical-align:middle;}mjx-container:not([display="true"]){display:inline-block;max-width:none;overflow:visible;}mjx-container[display="true"]{display:block;width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;}
+.here{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:6px 0 4px;font-size:15px;color:#1e3a8a;line-height:1.7;}
+.here b{font-weight:700;}
+.cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
+.card{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);}
+.card:hover{border-color:var(--blue);}
+.card .num{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;background:var(--blue-bg);color:#1e3a8a;border-radius:8px;font-weight:700;font-size:14px;margin-right:10px;}
+.card .ct{font-size:18px;font-weight:600;}
+.card .cb{color:var(--muted);font-size:14.5px;margin-top:6px;margin-left:40px;}
+.card .cap{margin-left:40px;margin-top:7px;font-size:13px;color:#1e3a8a;}
+.card .cap .lbl{display:inline-block;background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;margin-right:7px;}
+
+.card.soon{opacity:.6;cursor:default;}
+.card.soon:hover{border-color:var(--line);}
+.badge{display:inline-block;background:#e2e8f0;color:#475569;font-size:11px;font-weight:600;padding:1px 8px;border-radius:20px;margin-left:8px;vertical-align:middle;}
+.toc li.soon{color:#94a3b8;}
+.toc li.soon .badge{margin-left:4px;}
+</style>
+</head>
+<body>
+<header class="top"><div class="inner">
+<div class="crumb"><a href="index.html" style="color:inherit">模块 3 · Python、NumPy、PyTorch 与实验工程</a>　/　第 10 课（共 10 课）</div>
+<h1>Hugging Face 生态入门</h1>
+<div class="sub">从零到前沿 ML 自学课程　·　阶段0：数学与工具基础　·　<strong>能力点：</strong>Hugging Face——先会手写循环再用 Trainer，通往阶段5 的工具桥梁</div>
+</div></header>
+<div class="wrap">
+<article>
+<p>前面九课，你已经能从零写出 micrograd、迷你 <code>nn.Module</code>，并在第 6 课亲手敲出完整训练循环的五个步骤：<code>zero_grad → forward → loss → backward → step</code>。这一课是通往阶段 5（真正的大模型）的工具桥梁。我们要做的不是"换一套魔法"，而是把你已经理解的零件，对应到 Hugging Face（简称 HF）生态的封装上：<code>pipeline</code> 是"tokenizer + model + 后处理"的三段流水线，<code>Trainer</code> 就是你第 6 课那个循环穿上了西装。本课的纪律是：先手写跑通机制，再认领真实 API——这样你用 <code>Trainer</code> 时，它对你就不是黑箱。</p>
+
+<div class="goals">
+<h4>读完这一课，你将能够</h4>
+<ul>
+<li>用一句话拆解 <code>pipeline</code> 的三段结构（编码 → 前向 → 后处理），说出每段进出的数据形状。</li>
+<li>手写一个最小 tokenizer：建词表、<code>encode</code>/<code>decode</code>、把一个 batch 的变长句子 pad 到同长。</li>
+<li>用纯 NumPy 串起"嵌入 → 池化 → 线性打分 → softmax → argmax"，复现 <code>pipeline</code> 内部到底在算什么。</li>
+<li>把 <code>TrainingArguments</code> 的每个超参（lr/batch/epochs/scheduler/梯度累积）对应回第 6 课手写循环的具体部件。</li>
+<li>写出 <code>transformers.pipeline</code>、<code>AutoTokenizer/AutoModel.from_pretrained</code>、<code>datasets.load_dataset().map()</code>、<code>Trainer</code> 的最小正确骨架。</li>
+</ul>
+</div>
+
+<h2>一行推理的背后：pipeline 的三段流水线</h2>
+
+<p>HF 最出名的入口是 <code>pipeline</code>——一行代码跑通一个任务。但"一行"只是 API 的薄，不是机制的薄。当你写 <code>clf("这电影真好看")</code> 得到 <code>{'label': 'POSITIVE', 'score': 0.98}</code> 时，内部严格走了三段：</p>
+
+<ul>
+<li><strong>① tokenizer 编码</strong>：把字符串切成 token，再查表换成整数 id，补上特殊 token（如 <code>[CLS]</code>/<code>[SEP]</code>），输出形状 (N, L) 的 id 矩阵（N=句子数，L=对齐后的长度）。</li>
+<li><strong>② model 前向</strong>：id 进入模型，吐出 logits（未过 softmax 的原始分数），分类任务形状 (N, C)（C=类别数），或 (N, L, H) 的隐藏状态（H=隐藏维）。这一步本质就是你前几课的矩阵乘 + 非线性。</li>
+<li><strong>③ 后处理</strong>：对 logits 做 <code>softmax</code> 转概率、<code>argmax</code> 取类别，再把类别 id 映射回人类标签字符串。</li>
+</ul>
+
+<figure class="fig"><svg viewBox="0 0 760 360" xmlns="http://www.w3.org/2000/svg" font-family="system-ui">
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+      <path d="M1,1 L8,4.5 L1,8 Z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <!-- caption -->
+  <text x="380" y="26" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2937">HF 推理三段流水线</text>
+  <text x="380" y="44" text-anchor="middle" font-size="11.5" fill="#475569">文本经 tokenizer 编码成 id，model 前向出 logits，后处理 softmax/argmax 得标签</text>
+
+  <!-- 三段分界 标注 -->
+  <text x="148" y="320" text-anchor="middle" font-size="11.5" font-weight="600" fill="#d97706">① 编码（tokenize）</text>
+  <text x="380" y="320" text-anchor="middle" font-size="11.5" font-weight="600" fill="#2563eb">② 前向（model）</text>
+  <text x="630" y="320" text-anchor="middle" font-size="11.5" font-weight="600" fill="#059669">③ 后处理</text>
+  <line x1="262" y1="76" x2="262" y2="300" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 4"/>
+  <line x1="500" y1="76" x2="500" y2="300" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 4"/>
+
+  <!-- 节点1: 输入文本 (暖橙) -->
+  <rect x="20" y="150" width="120" height="56" rx="8" fill="#fff7ed" stroke="#d97706" stroke-width="1.6"/>
+  <text x="80" y="174" text-anchor="middle" font-size="12" fill="#9a3412">输入文本</text>
+  <text x="80" y="194" text-anchor="middle" font-size="13" font-weight="600" fill="#1f2937">"这电影真好看"</text>
+
+  <!-- arrow 1 -->
+  <line x1="140" y1="178" x2="178" y2="178" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="159" y="168" text-anchor="middle" font-size="11" fill="#475569">tokenizer 编码</text>
+
+  <!-- 节点2: id 序列 (暖橙浅) -->
+  <rect x="180" y="142" width="148" height="72" rx="8" fill="#fffbeb" stroke="#d97706" stroke-width="1.6"/>
+  <text x="254" y="164" text-anchor="middle" font-size="11.5" fill="#1f2937">[CLS] 这 电影 真 好看</text>
+  <text x="254" y="184" text-anchor="middle" font-size="12" font-weight="600" fill="#1f2937">→ [101,2,5,4,3]</text>
+  <text x="254" y="204" text-anchor="middle" font-size="11" fill="#64748b">形状 (N, L)</text>
+
+  <!-- arrow 2 -->
+  <line x1="328" y1="178" x2="364" y2="178" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="346" y="168" text-anchor="middle" font-size="11" fill="#475569">model 前向</text>
+
+  <!-- 节点3: model 堆叠层 (冷蓝) -->
+  <g>
+    <rect x="378" y="156" width="96" height="44" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+    <rect x="372" y="148" width="96" height="44" rx="6" fill="#bfdbfe" stroke="#2563eb" stroke-width="1.4"/>
+    <rect x="366" y="140" width="96" height="44" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+    <text x="414" y="160" text-anchor="middle" font-size="12" font-weight="600" fill="#1e40af">model</text>
+    <text x="414" y="177" text-anchor="middle" font-size="10.5" fill="#1e3a8a">嵌入→若干层→打分</text>
+  </g>
+
+  <!-- arrow 3 -->
+  <line x1="468" y1="178" x2="512" y2="178" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="490" y="168" text-anchor="middle" font-size="11" fill="#475569">输出 logits</text>
+
+  <!-- 节点4: logits (冷蓝浅) -->
+  <rect x="514" y="148" width="100" height="60" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+  <text x="564" y="170" text-anchor="middle" font-size="11.5" fill="#1f2937">logits</text>
+  <text x="564" y="188" text-anchor="middle" font-size="13" font-weight="600" fill="#1f2937">[-1.2, 2.8]</text>
+  <text x="564" y="204" text-anchor="middle" font-size="11" fill="#64748b">形状 (N, C)</text>
+
+  <!-- arrow 4 -->
+  <line x1="614" y1="178" x2="652" y2="178" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="633" y="164" text-anchor="middle" font-size="10.5" fill="#475569">softmax</text>
+  <text x="633" y="196" text-anchor="middle" font-size="10.5" fill="#475569">/argmax</text>
+
+  <!-- 节点5: 标签 (醒目绿) -->
+  <rect x="656" y="150" width="92" height="56" rx="8" fill="#059669" stroke="#047857" stroke-width="1.6"/>
+  <text x="702" y="174" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">正面</text>
+  <text x="702" y="194" text-anchor="middle" font-size="12" font-weight="600" fill="#d1fae5">(0.98)</text>
+</svg><figcaption>HF 推理三段流水线：文本经 tokenizer 编码成 id，model 前向出 logits，后处理 softmax/argmax 得标签。</figcaption></figure>
+
+<p>"魔法感"全部来自这三段被封进了一个 <code>__call__</code>。下面我们把每一段都亲手写出来，你会发现没有一处是你没学过的。</p>
+
+<h2>第一段·手写最小 tokenizer</h2>
+
+<p><strong>机制直觉</strong>：tokenizer 干两件事——把文本切成单元、把单元查表换成 id。真实的子词分词（BPE/WordPiece）只是"怎么切"更聪明，但"查表→id→加特殊 token→pad 对齐"这套骨架是不变的。我们先用最朴素的"按空格切词"实现，把骨架吃透。这里的变长 padding 正是第 7 课 DataLoader 里 <code>collate</code> 要解决的同一个问题。</p>
+
+<p><strong>最小可跑</strong>：下面这段纯 Python（无第三方库）建词表、实现 <code>encode</code>/<code>decode</code>，并把一个 batch pad 到同长。</p>
+
+<pre><code># 1) 建词表：特殊 token 占据小 id，便于辨认
+specials = ["&lt;pad&gt;", "&lt;unk&gt;", "&lt;cls&gt;"]
+corpus = "这 电影 真 好看 但 节奏 有点 慢".split()
+vocab = {tok: i for i, tok in enumerate(specials)}
+for w in corpus:
+    if w not in vocab:
+        vocab[w] = len(vocab)
+inv_vocab = {i: w for w, i in vocab.items()}
+PAD, UNK, CLS = vocab["&lt;pad&gt;"], vocab["&lt;unk&gt;"], vocab["&lt;cls&gt;"]
+
+def encode(sentence):
+    ids = [CLS]                       # 句首加 &lt;cls&gt;
+    for w in sentence.split():
+        ids.append(vocab.get(w, UNK)) # 未登录词 → &lt;unk&gt;
+    return ids
+
+def decode(ids):
+    # 注意：这里只剔除 pad，&lt;cls&gt; 仍保留，所以 decode 出来会带句首的 &lt;cls&gt;
+    return " ".join(inv_vocab[i] for i in ids if i != PAD)
+
+def pad_batch(list_of_ids):
+    L = max(len(x) for x in list_of_ids)         # 对齐到最长
+    return [x + [PAD] * (L - len(x)) for x in list_of_ids]
+
+batch = ["这 电影 真 好看", "节奏 有点 慢", "这 电影 太 难看"]
+ids = [encode(s) for s in batch]
+padded = pad_batch(ids)
+
+print("词表:", vocab)
+print("encode:", ids)                 # 注意第3句"太""难看"未登录 → &lt;unk&gt;(=1)
+print("decode 第0句:", decode(padded[0]))  # 仅剔除 pad，仍带句首 &lt;cls&gt;
+for row in padded:
+    print(row)                        # 三行等长 → 可堆成 (N, L) 矩阵
+</code></pre>
+
+<p>运行后你会看到：第三句里"太""难看"不在词表，被映射成 <code>&lt;unk&gt;</code>(id=1)；三句长度不一，pad 后变成等长的三行，正好能堆成 (3, L) 的整数矩阵喂给模型。<code>decode</code> 这里只剔除了 pad，所以第 0 句还原出来会带着句首的 <code>&lt;cls&gt;</code>（若想还原成纯人类句子，再把特殊 token 一并过滤即可）。<strong>这就是 tokenizer 的全部本质</strong>，真实版只是切词更精细、词表更大。</p>
+
+<p><strong>真实 API 当指针</strong>：HF 用 <code>AutoTokenizer</code> 按 Hub 上的模型名加载已训练好的词表与切词规则。</p>
+
+<pre class="ref" data-lang="HuggingFace"><code>from transformers import AutoTokenizer
+
+tok = AutoTokenizer.from_pretrained("bert-base-chinese")
+out = tok(["这电影真好看", "节奏有点慢"],
+          padding=True,          # 对应我们的 pad_batch
+          truncation=True,       # 超长截断
+          return_tensors="pt")   # 直接返回 PyTorch 张量
+print(out["input_ids"].shape)    # (2, L)，含 [CLS]/[SEP]/[PAD]
+print(out["attention_mask"])     # 1=真实 token, 0=pad，告诉模型忽略 pad
+</code></pre>
+
+<p>注意 <code>attention_mask</code>：它标记哪些位置是 pad，让模型在算注意力时跳过填充位——这是我们玩具版省略、但真实模型必备的一环。</p>
+
+<h2>第二段+第三段·手写最小 pipeline（纯 NumPy）</h2>
+
+<p><strong>机制直觉</strong>：拿到 id 矩阵后，model 要把"整数 id"变成"类别分数"。最简结构是：<em>嵌入</em>（embedding，每个 id 查一个向量）→ <em>池化</em>（把一句话的若干向量聚合成一个句向量）→ <em>线性打分</em>（句向量乘权重得到每类的 logit）→ <em>softmax/argmax</em>。真实 Transformer 在"嵌入"和"打分"之间塞了几十层注意力，但首尾两端就是这个样子。下面我们用<strong>手设权重</strong>（不需要真训练）把三段串起来，重点是结构而非精度。</p>
+
+<pre><code>import numpy as np
+
+# 本段自带一个独立小词表，id 与第一段无关，只用来演示结构。
+vocab = {"&lt;pad&gt;":0, "&lt;unk&gt;":1, "&lt;cls&gt;":2,
+         "好看":3, "真":4, "电影":5, "难看":6, "慢":7, "节奏":8}
+V, D, C = len(vocab), 4, 2      # 词表大小, 嵌入维, 类别数(0=负面,1=正面)
+rng = np.random.default_rng(0)
+
+E = rng.normal(0, 1, size=(V, D))     # 嵌入表 (V, D)
+# 手设倾向：让"好看"偏正面，"难看/慢"偏负面（直接写进嵌入第0维）
+E[vocab["好看"]] = [ 2.0, 0, 0, 0]
+E[vocab["难看"]] = [-2.0, 0, 0, 0]
+E[vocab["慢"]]   = [-1.0, 0, 0, 0]
+W = np.array([[-1.0, 1.0],[0,0],[0,0],[0,0]])  # 线性层 (D, C): 第0维大→正面
+
+def softmax(z):
+    z = z - z.max(-1, keepdims=True)
+    e = np.exp(z); return e / e.sum(-1, keepdims=True)
+
+def toy_model(id_matrix):
+    vec = E[id_matrix]                 # (N, L, D) 查嵌入
+    mask = (id_matrix != vocab["&lt;pad&gt;"])[..., None]  # (N, L, 1) 屏蔽 pad
+    pooled = (vec * mask).sum(1) / mask.sum(1)         # (N, D) 平均池化
+    logits = pooled @ W                # (N, C) 线性打分
+    return logits
+
+# 两句：一正一负，已 pad 对齐
+batch_ids = np.array([[2,5,4,3],       # &lt;cls&gt; 电影 真 好看
+                      [2,8,7,0]])       # &lt;cls&gt; 节奏 慢 &lt;pad&gt;
+logits = toy_model(batch_ids)
+probs  = softmax(logits)               # 后处理①
+pred   = probs.argmax(-1)              # 后处理②
+labels = {0:"负面", 1:"正面"}
+print("logits:\n", np.round(logits,2))
+print("probs:\n", np.round(probs,2))
+for i, p in enumerate(pred):
+    print(f"句{i} → {labels[p]}  (置信 {probs[i,p]:.2f})")
+</code></pre>
+
+<p>跑出来第 0 句判"正面"、第 1 句判"负面"。注意 <code>mask</code> 那行：pad 位被排除在平均池化外，呼应上面 <code>attention_mask</code> 的作用。你也会发现第 0 句的置信只有 0.58 左右——这是因为"电影""真"用的是随机嵌入，把"好看"的正信号稀释了；结论方向对，但置信不高。真实模型靠训练让每个词的向量各就各位，信号才会干脆。<strong>这就是 <code>pipeline</code> 内部的骨架</strong>——id → 嵌入 → 聚合 → 打分 → softmax → argmax → 标签。真实模型只是中间的"聚合"换成了几十层 Transformer，权重是训出来的而非手设的。</p>
+
+<p><strong>真实 API 当指针</strong>：</p>
+
+<pre class="ref" data-lang="HuggingFace"><code>from transformers import pipeline
+
+clf = pipeline("sentiment-analysis")          # 一行：内部三段自动串好
+print(clf("这电影真好看"))
+# [{'label': 'POSITIVE', 'score': 0.98}]
+
+gen = pipeline("text-generation", model="gpt2")
+print(gen("Once upon a time", max_new_tokens=20)[0]["generated_text"])
+</code></pre>
+
+<pre class="ref" data-lang="HuggingFace"><code># 想看清三段，可不用 pipeline，手动拆开：
+import torch
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+
+name = "distilbert-base-uncased-finetuned-sst-2-english"
+tok = AutoTokenizer.from_pretrained(name)
+model = AutoModelForSequenceClassification.from_pretrained(name)
+
+inputs = tok("I love this movie", return_tensors="pt")   # 段①编码
+with torch.no_grad():
+    logits = model(**inputs).logits                       # 段②前向 (1, 2)
+probs = logits.softmax(-1)                                # 段③后处理
+print(model.config.id2label[probs.argmax(-1).item()])     # → 'POSITIVE'
+</code></pre>
+
+<h2>datasets：load_dataset + .map() 批量预处理</h2>
+
+<p><strong>机制直觉</strong>：训练前要把"一堆文本"统一 tokenize 成 id。<code>datasets</code> 库提供 <code>load_dataset</code> 拉取数据集，再用 <code>.map()</code> 把一个函数（通常就是 tokenizer）批量作用到每条样本上——概念上等价于第 7 课你给 <code>Dataset</code> 写的预处理，只是它带缓存、支持多进程、内存映射，能处理超大语料。</p>
+
+<pre class="ref" data-lang="HuggingFace"><code>from datasets import load_dataset
+from transformers import AutoTokenizer
+
+ds = load_dataset("imdb")                  # {'train':..., 'test':...}
+tok = AutoTokenizer.from_pretrained("distilbert-base-uncased")
+
+def preprocess(batch):                     # 对一批样本 tokenize
+    return tok(batch["text"], truncation=True)
+
+ds = ds.map(preprocess, batched=True)      # 批量、可缓存、可多进程
+print(ds["train"][0].keys())               # dict_keys(['text','label','input_ids','attention_mask'])
+</code></pre>
+
+<h2>【重点】Trainer 就是你第 6 课的训练循环</h2>
+
+<p>很多人初学时直接 <code>Trainer().train()</code>，看到 loss 下降就完事，却不知道里面在干嘛。但你不一样——你第 6 课已经亲手写过那个循环。<strong>Trainer 不是新东西，它是你那个循环的封装</strong>：<code>TrainingArguments</code> 里的每个超参，都对应循环里某个你写过的部件。</p>
+
+<figure class="fig"><svg viewBox="0 0 900 560" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, -apple-system, sans-serif" role="img" aria-labelledby="t d">
+<title id="t">Trainer.train() 展开就是第6课手写循环的五步</title>
+<desc id="d">上半部分是 Trainer 内部的五步骨架，下半部分是每个 TrainingArguments 配置项控制哪一步。</desc>
+<defs>
+<marker id="aDark" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+</marker>
+<marker id="aPink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" fill="#db2777"/>
+</marker>
+</defs>
+<text x="450" y="30" text-anchor="middle" font-size="19" font-weight="700" fill="#1f2937">Trainer.train() 展开就是第 6 课手写循环的五步</text>
+<text x="450" y="52" text-anchor="middle" font-size="12.5" fill="#94a3b8">上：Trainer 内部就是这五步骨架　·　下：每个 TrainingArguments 配置项控制哪一步</text>
+
+<!-- 上：五步骨架 strip -->
+<text x="40" y="86" font-size="12.5" fill="#2563eb" font-weight="600">Trainer.train() 内部（双重 for 循环：epochs × batches）</text>
+<g>
+<rect x="30" y="98" width="148" height="58" rx="9" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+<text x="104" y="124" text-anchor="middle" font-size="13" font-weight="700" fill="#065f46">① zero_grad</text>
+<text x="104" y="142" text-anchor="middle" font-size="10.5" fill="#059669">清空梯度</text>
+<rect x="203" y="98" width="148" height="58" rx="9" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+<text x="277" y="124" text-anchor="middle" font-size="13" font-weight="700" fill="#065f46">② forward</text>
+<text x="277" y="142" text-anchor="middle" font-size="10.5" fill="#059669">算预测 logits</text>
+<rect x="376" y="98" width="148" height="58" rx="9" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+<text x="450" y="124" text-anchor="middle" font-size="13" font-weight="700" fill="#065f46">③ loss</text>
+<text x="450" y="142" text-anchor="middle" font-size="10.5" fill="#059669">算损失</text>
+<rect x="549" y="98" width="148" height="58" rx="9" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+<text x="623" y="124" text-anchor="middle" font-size="13" font-weight="700" fill="#065f46">④ backward</text>
+<text x="623" y="142" text-anchor="middle" font-size="10.5" fill="#059669">填每个 .grad</text>
+<rect x="722" y="98" width="148" height="58" rx="9" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+<text x="796" y="124" text-anchor="middle" font-size="13" font-weight="700" fill="#065f46">⑤ step</text>
+<text x="796" y="142" text-anchor="middle" font-size="10.5" fill="#059669">更新参数</text>
+<line x1="181" y1="127" x2="200" y2="127" stroke="#475569" stroke-width="2" marker-end="url(#aDark)"/>
+<line x1="354" y1="127" x2="373" y2="127" stroke="#475569" stroke-width="2" marker-end="url(#aDark)"/>
+<line x1="527" y1="127" x2="546" y2="127" stroke="#475569" stroke-width="2" marker-end="url(#aDark)"/>
+<line x1="700" y1="127" x2="719" y2="127" stroke="#475569" stroke-width="2" marker-end="url(#aDark)"/>
+</g>
+
+<line x1="30" y1="184" x2="870" y2="184" stroke="#e2e8f0" stroke-width="1.5"/>
+
+<!-- 下：配置项 → 哪一步（用圈号引用上方，不连线，避免缠绕） -->
+<text x="40" y="212" font-size="13.5" font-weight="700" fill="#1f2937">每个 TrainingArguments 配置项 → 控制循环的哪一步</text>
+
+<g font-size="13">
+<!-- row1 -->
+<rect x="40" y="232" width="278" height="40" rx="8" fill="#fdf2f8" stroke="#db2777" stroke-width="1.6"/>
+<text x="179" y="257" text-anchor="middle" font-size="13" fill="#9d174d" font-family="ui-monospace, Menlo, monospace">learning_rate</text>
+<line x1="322" y1="252" x2="356" y2="252" stroke="#db2777" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#aPink)"/>
+<text x="366" y="257" fill="#1f2937">⑤ step()：更新步幅 = optimizer 里的 lr</text>
+<!-- row2 -->
+<rect x="40" y="288" width="278" height="40" rx="8" fill="#fdf2f8" stroke="#db2777" stroke-width="1.6"/>
+<text x="179" y="313" text-anchor="middle" font-size="13" fill="#9d174d" font-family="ui-monospace, Menlo, monospace">num_train_epochs</text>
+<line x1="322" y1="308" x2="356" y2="308" stroke="#db2777" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#aPink)"/>
+<text x="366" y="313" fill="#1f2937">外层 for：整个训练集过几遍</text>
+<!-- row3 -->
+<rect x="40" y="344" width="278" height="40" rx="8" fill="#fdf2f8" stroke="#db2777" stroke-width="1.6"/>
+<text x="179" y="369" text-anchor="middle" font-size="13" fill="#9d174d" font-family="ui-monospace, Menlo, monospace">per_device_train_batch_size</text>
+<line x1="322" y1="364" x2="356" y2="364" stroke="#db2777" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#aPink)"/>
+<text x="366" y="369" fill="#1f2937">内层 for：每个 batch 喂多少样本（DataLoader 切）</text>
+<!-- row4 -->
+<rect x="40" y="400" width="278" height="40" rx="8" fill="#fdf2f8" stroke="#db2777" stroke-width="1.6"/>
+<text x="179" y="425" text-anchor="middle" font-size="13" fill="#9d174d" font-family="ui-monospace, Menlo, monospace">lr_scheduler_type</text>
+<line x1="322" y1="420" x2="356" y2="420" stroke="#db2777" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#aPink)"/>
+<text x="366" y="425" fill="#1f2937">⑤ step() 之后 scheduler.step() 调整 lr</text>
+<!-- row5 -->
+<rect x="40" y="456" width="278" height="40" rx="8" fill="#fdf2f8" stroke="#db2777" stroke-width="1.6"/>
+<text x="179" y="481" text-anchor="middle" font-size="12" fill="#9d174d" font-family="ui-monospace, Menlo, monospace">gradient_accumulation_steps</text>
+<line x1="322" y1="476" x2="356" y2="476" stroke="#db2777" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#aPink)"/>
+<text x="366" y="481" fill="#1f2937">攒 N 个 batch 的 ④ backward 梯度，再 ⑤ step 一次</text>
+</g>
+
+<text x="450" y="532" text-anchor="middle" font-size="12.5" fill="#64748b">封装没有魔法：会写第 6 课的五步循环，就看得懂 Trainer 在做什么。</text>
+</svg>
+<figcaption>Trainer.train() 展开就是第 6 课手写循环的五步：zero_grad/forward/loss/backward/step，箭头指明配置项对应到哪一步。</figcaption></figure>
+
+<p>下面这张对照表把它们一一钉死。左边是 <code>Trainer</code> 的配置/调用，右边是你第 6 课手写循环里的对应代码或步骤：</p>
+
+<table>
+<thead><tr><th>Trainer / TrainingArguments</th><th>第 6 课手写循环里的对应</th></tr></thead>
+<tbody>
+<tr><td><code>learning_rate=5e-5</code></td><td>你创建 <code>optimizer = AdamW(params, lr=5e-5)</code> 时的 <code>lr</code>（Trainer 默认就用 AdamW）</td></tr>
+<tr><td><code>per_device_train_batch_size=16</code></td><td>DataLoader 每次取出的 batch 大小（一次 forward 喂多少样本）</td></tr>
+<tr><td><code>num_train_epochs=3</code></td><td>外层 <code>for epoch in range(3)</code> 的循环次数</td></tr>
+<tr><td><code>lr_scheduler_type="linear"</code></td><td>每个 step 后 <code>scheduler.step()</code> 调整学习率（第 6 课提到的 warmup/衰减）</td></tr>
+<tr><td><code>gradient_accumulation_steps=4</code></td><td>累积 4 个 batch 的梯度再 <code>step()</code>+<code>zero_grad()</code>，等效更大 batch</td></tr>
+<tr><td><code>weight_decay=0.01</code></td><td>权重衰减项（AdamW 用的是解耦式衰减，近似 L2 正则；仅朴素 SGD 上二者严格等价）</td></tr>
+<tr><td>Trainer 内部 <code>loss = model(**batch).loss</code></td><td>你的 <code>logits = model(x); loss = criterion(logits, y)</code></td></tr>
+<tr><td>Trainer 内部 <code>loss.backward()</code></td><td>一模一样的 <code>loss.backward()</code>（autograd 反传）</td></tr>
+<tr><td>Trainer 内部 <code>optimizer.step()</code></td><td>一模一样的 <code>optimizer.step()</code></td></tr>
+<tr><td>Trainer 内部 <code>optimizer.zero_grad()</code></td><td>一模一样的 <code>optimizer.zero_grad()</code></td></tr>
+<tr><td><code>eval_strategy="epoch"</code> + <code>compute_metrics</code></td><td>你的 <code>model.eval()</code> + <code>with torch.no_grad()</code> 验证段</td></tr>
+</tbody>
+</table>
+
+<p>换句话说，<code>Trainer.train()</code> 展开后，就是你第 6 课写的那五步在一个双重 for 循环里转。它额外帮你做的是：日志、checkpoint、多卡分发、混合精度（这些是第 8、9 课的内容，Trainer 把它们也包了）。下面是最小微调骨架：</p>
+
+<pre class="ref" data-lang="HuggingFace"><code>from transformers import (AutoModelForSequenceClassification,
+                          TrainingArguments, Trainer)
+
+model = AutoModelForSequenceClassification.from_pretrained(
+    "distilbert-base-uncased", num_labels=2)
+
+args = TrainingArguments(
+    output_dir="out",
+    learning_rate=5e-5,                # ↔ optimizer 的 lr（默认 AdamW）
+    per_device_train_batch_size=16,    # ↔ batch 大小
+    num_train_epochs=3,                # ↔ 外层 epoch 循环
+    lr_scheduler_type="linear",        # ↔ scheduler.step()
+    gradient_accumulation_steps=1,     # ↔ 梯度累积
+    eval_strategy="epoch",             # ↔ 每 epoch 跑验证（旧版叫 evaluation_strategy，4.46+ 重命名为 eval_strategy）
+)
+
+trainer = Trainer(
+    model=model, args=args,
+    train_dataset=ds["train"], eval_dataset=ds["test"],
+    processing_class=tok,              # 新版用 processing_class；旧版用 tokenizer=tok
+)
+trainer.train()    # ← 内部就是 L6 的 zero_grad/forward/loss/backward/step
+</code></pre>
+
+<p><strong>哲学</strong>：别因为 <code>Trainer</code> 好用就跳过手写循环。理解了第 6 课，<code>Trainer</code> 对你才是"已知零件的组装"，调参时你知道每个旋钮拧的是哪根筋；否则它永远是黑箱，loss 不降你也无从下手。至于 <strong>Hub</strong>（模型/数据集托管，<code>from_pretrained</code> 按名字下载）和 <strong>accelerate</strong>（一套代码自动适配单卡/多卡/混合精度），这一课只需知道有它们存在，遇到时再深入。</p>
+
+<h2>调一调，观察现象</h2>
+
+<p><strong>① 改 pad 长度，看 pad 是否被正确忽略。</strong></p>
+
+<pre><code>import numpy as np
+vocab = {"&lt;pad&gt;":0, "好看":3}
+E = np.zeros((9,4)); E[3] = [2.0,0,0,0]   # 只有"好看"有正面信号
+def pooled(ids):
+    vec = E[np.array(ids)]
+    mask = (np.array(ids) != 0)[:,None]
+    return (vec*mask).sum(0)/mask.sum(0)
+print("不加pad :", pooled([3]))           # [2,0,0,0]
+print("加3个pad:", pooled([3,0,0,0]))     # 仍是 [2,0,0,0]
+</code></pre>
+<p><em>预期现象</em>：两次池化结果完全相同。<em>为什么</em>：mask 把 pad 位的贡献剔除、分母也只数真实 token，所以 pad 多少都不影响句向量——这正是 <code>attention_mask</code> 存在的意义。若你删掉 mask，pad 会把句向量稀释，预测随长度漂移。</p>
+
+<p><strong>② 改 softmax 输入的尺度（温度），看置信度。</strong></p>
+
+<pre><code>import numpy as np
+def softmax(z):
+    z=z-z.max(); e=np.exp(z); return e/e.sum()
+logit = np.array([1.0, 2.0])
+for T in [0.5, 1.0, 4.0]:
+    print(f"T={T}: {np.round(softmax(logit/T),3)}")
+</code></pre>
+<p><em>预期现象</em>：T 越小，概率越极端（接近 0/1）；T 越大，越平（接近 0.5/0.5）。<em>为什么</em>：除以温度 T 等价于缩放 logits 间距，argmax 选出的类别不变，但"置信度"被拉伸或压平——文本生成里的 <code>temperature</code> 参数就是这个旋钮。</p>
+
+<p><strong>③ 改梯度累积步数，看等效 batch。</strong>（概念演示，纯计数）</p>
+
+<pre><code>accum_steps = 4          # 改成 1 / 4 / 8 看 step 次数
+micro_batch = 8
+n_micro = 32             # 一共喂 32 个 micro-batch
+updates = n_micro // accum_steps
+print(f"每次实际 forward 样本数: {micro_batch}")
+print(f"等效 batch 大小: {micro_batch*accum_steps}")
+print(f"参数更新(step)次数: {updates}")
+</code></pre>
+<p><em>预期现象</em>：<code>accum_steps</code> 翻倍，等效 batch 翻倍、step 次数减半。<em>为什么</em>：梯度累积把多个小 batch 的梯度加起来再更新一次，用小显存模拟大 batch——对应表里的 <code>gradient_accumulation_steps</code>，机制就是"多攒几次 backward 再 step+zero_grad"。</p>
+
+<h2>动手练习</h2>
+
+<ol>
+<li><strong>给玩具 tokenizer 加 <code>&lt;sep&gt;</code> 和 <code>attention_mask</code>。</strong> 在第一段代码基础上：encode 句对时在两句间插 <code>&lt;sep&gt;</code>；pad_batch 同时返回一个同形状的 mask 矩阵（真实 token=1，pad=0）。打印验证 mask 与 padded 形状一致。</li>
+<li><strong>把玩具 model 改成"三分类"。</strong> 在第二段代码里把 <code>C</code> 改成 3（负面/中性/正面），调整 <code>W</code> 的形状为 (D, 3)，手设权重让"慢"这类词落到"中性"。验证 argmax 能输出三类。</li>
+<li><strong>对照表反向填空。</strong> 不看上文，给定手写循环代码 <code>opt.zero_grad(); loss=crit(model(x),y); loss.backward(); opt.step()</code>，写出每一行分别对应 <code>Trainer</code> 的哪个配置项或内部步骤。</li>
+</ol>
+
+<h2>掌握自检</h2>
+
+<ul>
+<li>我能不看笔记说出 pipeline 三段的名字，以及每段进/出的张量形状（(N,L) → (N,C) → 标签）。</li>
+<li>我能解释 tokenizer 里 <code>&lt;pad&gt;</code>/<code>&lt;unk&gt;</code>/<code>&lt;cls&gt;</code> 各自的用途，以及为什么需要把 batch pad 到同长。</li>
+<li>我能说出 <code>attention_mask</code> 解决什么问题，并在玩具池化里指出哪行代码实现了它。</li>
+<li>我能把 <code>learning_rate</code>/<code>batch_size</code>/<code>epochs</code>/<code>scheduler</code>/<code>gradient_accumulation_steps</code> 一一对应回第 6 课循环的具体部件。</li>
+<li>我能写出 <code>AutoTokenizer.from_pretrained</code> + <code>AutoModelForSequenceClassification.from_pretrained</code> + 手动 softmax 的三段推理骨架，API 不出错。</li>
+<li>我能解释"为什么不该跳过手写循环直接用 Trainer"。</li>
+</ul>
+
+<div class="skip">
+<h4>可以先放过的点</h4>
+<ul>
+<li><strong>BPE/WordPiece 子词分词的具体算法</strong>：现在按空格切词理解骨架就够了。等你进入阶段 5 真正读 Transformer 论文时再回来看"为什么要子词"。</li>
+<li><strong>accelerate / 多卡分布式 / DeepSpeed</strong>：这是规模化的工程，单卡跑通后、确实遇到显存或速度瓶颈时再学（也呼应第 8 课）。</li>
+<li><strong>Trainer 的高级回调、自定义 <code>compute_metrics</code>、混合精度细节</strong>：先用默认配置把一次微调跑通，看到 loss 下降、验证指标上升，再去拆这些旋钮。</li>
+<li><strong>Hub 上传/版本管理/模型卡</strong>：等你真有一个想分享的模型时再学，不影响本课的"理解封装"目标。</li>
+</ul>
+</div>
+</article>
+<div class="navbtns"><a class="prev" href="lesson-09-experiment-repro-debugging.html"><div class="nlabel">← 上一课</div><div class="ntitle">第9课 · 实验管理、可复现与调试方法论</div></a><a class="next" href="index.html"><div class="nlabel">→</div><div class="ntitle">已是当前最后一课 · 回目录</div></a></div>
+<nav class="toc"><h3>本模块课程表</h3><ol>
+<li><a href="lesson-01-env-scientific-stack.html"><span class="ln">第1课</span>Python 科学计算栈与环境工程</a></li>
+<li><a href="lesson-02-numpy-vectorization-broadcasting.html"><span class="ln">第2课</span>NumPy 数组、向量化与广播</a></li>
+<li><a href="lesson-03-pytorch-tensors-device-dtype.html"><span class="ln">第3课</span>PyTorch 张量、设备与 dtype</a></li>
+<li><a href="lesson-04-autograd.html"><span class="ln">第4课</span>Autograd 自动微分</a></li>
+<li><a href="lesson-05-nn-module.html"><span class="ln">第5课</span>nn.Module 与模型构建</a></li>
+<li><a href="lesson-06-training-loop-from-scratch.html"><span class="ln">第6课</span>从零写训练循环（核心）</a></li>
+<li><a href="lesson-07-dataset-dataloader.html"><span class="ln">第7课</span>数据加载 Dataset 与 DataLoader</a></li>
+<li><a href="lesson-08-gpu-amp.html"><span class="ln">第8课</span>GPU/CUDA 与混合精度</a></li>
+<li><a href="lesson-09-experiment-repro-debugging.html"><span class="ln">第9课</span>实验管理、可复现与调试方法论</a></li>
+<li class="cur"><span class="ln">第10课</span>Hugging Face 生态入门</li>
+</ol></nav>
+</div>
+<!-- pyrunner-injected -->
+<style>
+.pr-cell{border:1px solid #334155;border-radius:10px;margin:1.2em 0;overflow:hidden;background:#0f172a;}
+.pr-head{display:flex;align-items:center;gap:8px;background:#1e293b;color:#cbd5e1;padding:6px 10px;font-size:13px;font-family:system-ui,-apple-system,sans-serif;}
+.pr-title{flex:1;font-weight:600;}
+.pr-status{font-size:12px;color:#94a3b8;white-space:nowrap;max-width:50%;overflow:hidden;text-overflow:ellipsis;}
+.pr-btn{cursor:pointer;border:1px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:6px;padding:3px 11px;font-size:13px;line-height:1.4;}
+.pr-btn:hover{background:#0b1220;}
+.pr-run{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:600;}
+.pr-run:hover{background:#1d4ed8;}
+.pr-cell.collapsed .pr-body{display:none;}
+.pr-editor{position:relative;background:#0f172a;}
+.pr-code,.pr-edit{display:block;width:100%;min-height:68px;border:none;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.55;padding:12px 14px;box-sizing:border-box;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:4;}
+.pr-code{position:absolute;inset:0;margin:0;overflow:hidden;background:#0f172a;color:#dbeafe;pointer-events:none;}
+.pr-edit{position:relative;background:transparent;color:transparent;caret-color:#e2e8f0;resize:vertical;outline:none;-webkit-text-fill-color:transparent;}
+.pr-edit::selection{background:rgba(96,165,250,.34);}
+.tok-kw{color:#c084fc;font-weight:700;}
+.tok-fn{color:#67e8f9;}
+.tok-num{color:#fbbf24;}
+.tok-str{color:#86efac;}
+.tok-comment{color:#94a3b8;font-style:italic;}
+.pr-out{margin:0;padding:10px 14px;border-top:1px solid #334155;background:#0b1220;color:#cbd5e1;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.5;white-space:pre-wrap;max-height:340px;overflow:auto;}
+.pr-out:empty{display:none;}
+.pr-out.err{color:#fca5a5;}
+.pr-cell.ref-cell{border-color:#475569;}
+.pr-cell.ref-cell .pr-head{background:#172033;color:#cbd5e1;}
+.pr-cell.ref-cell .pr-status{color:#fbbf24;font-style:italic;}
+.pr-code.pr-static{position:static;pointer-events:auto;overflow:auto;min-height:auto;background:#0f172a;color:#dbeafe;}
+#pr-fab{position:fixed;right:18px;bottom:18px;z-index:9998;background:#2563eb;color:#fff;border:none;border-radius:999px;padding:10px 17px;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.22);font-family:system-ui,sans-serif;}
+#pr-fab:hover{background:#1d4ed8;}
+#pr-lab{position:fixed;right:18px;bottom:66px;z-index:9999;width:400px;max-width:92vw;background:#0f172a;border:1px solid #334155;border-radius:12px;display:none;flex-direction:column;box-shadow:0 14px 38px rgba(0,0,0,.4);overflow:hidden;}
+#pr-lab.open{display:flex;}
+#pr-lab .pr-edit,#pr-lab .pr-code{min-height:150px;}
+@media (max-width:640px){
+  .pr-cell{border-radius:9px;margin:1em 0;}
+  .pr-head{flex-wrap:wrap;padding:7px 9px;}
+  .pr-title{min-width:0;}
+  .pr-status{order:3;max-width:100%;flex-basis:100%;}
+  .pr-code,.pr-edit{font-size:13px;line-height:1.55;padding:11px 12px;}
+  .pr-out{font-size:12.5px;padding:9px 12px;}
+  #pr-fab{right:10px;bottom:14px;max-width:calc(100vw - 96px);min-height:38px;padding:9px 13px;font-size:13px;line-height:1.2;}
+  #pr-lab{right:10px;left:10px;bottom:64px;width:auto;max-width:none;max-height:calc(100vh - 88px);}
+  #pr-lab .pr-edit,#pr-lab .pr-code{min-height:132px;}
+}
+</style>
+<script>
+(function(){
+  var PYBASE="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+  var pyReady=null;
+  function loadPy(status){
+    if(pyReady)return pyReady;
+    pyReady=(async function(){
+      status("正在加载 Python 运行时（首次约 10 秒，需联网）…");
+      await new Promise(function(res,rej){
+        var s=document.createElement("script");s.src=PYBASE+"pyodide.js";
+        s.onload=res;s.onerror=function(){rej(new Error("无法加载 Pyodide（首次运行需要联网）"));};
+        document.head.appendChild(s);
+      });
+      var py=await loadPyodide({indexURL:PYBASE});
+      status("正在加载 NumPy …");
+      await py.loadPackage("numpy");
+      status("Python 就绪 ✓");
+      return py;
+    })();
+    return pyReady;
+  }
+  async function run(code,outEl,statusEl){
+    var setS=function(m){if(statusEl)statusEl.textContent=m;};
+    outEl.classList.remove("err");outEl.textContent="";
+    var py;
+    try{py=await loadPy(setS);}
+    catch(e){outEl.classList.add("err");outEl.textContent="加载失败："+e.message;return;}
+    var buf="";
+    py.setStdout({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    py.setStderr({batched:function(s){buf+=s+(s.endsWith("\n")?"":"\n");}});
+    try{
+      var result=await py.runPythonAsync(code);
+      if(result!==undefined&&result!==null){
+        var r;try{r=result.toString();}catch(_){r=String(result);}
+        if(r!=="None")buf+=(buf&&!buf.endsWith("\n")?"\n":"")+r;
+        if(result&&result.destroy)result.destroy();
+      }
+      outEl.textContent=buf||"（运行成功，无输出。用 print(...) 查看结果）";
+    }catch(e){
+      outEl.classList.add("err");
+      outEl.textContent=buf+(buf?"\n":"")+String((e&&e.message)||e);
+    }
+  }
+  var KW={False:1,None:1,True:1,and:1,as:1,assert:1,async:1,await:1,break:1,class:1,continue:1,def:1,del:1,elif:1,else:1,except:1,finally:1,for:1,from:1,global:1,if:1,import:1,in:1,is:1,lambda:1,nonlocal:1,not:1,or:1,pass:1,raise:1,return:1,try:1,while:1,with:1,yield:1};
+  var FN={abs:1,all:1,any:1,array:1,bool:1,dict:1,enumerate:1,float:1,int:1,len:1,list:1,max:1,min:1,np:1,numpy:1,print:1,range:1,round:1,set:1,str:1,sum:1,tuple:1,zip:1,torch:1,nn:1,tensor:1,F:1,super:1,isinstance:1,getattr:1,setattr:1,hasattr:1,sorted:1,type:1,object:1,property:1};
+  function esc(s){return s.replace(/[&<>]/g,function(c){return c==="&"?"&amp;":c==="<"?"&lt;":"&gt;";});}
+  function colorLine(line){
+    var out="",i=0;
+    while(i<line.length){
+      var ch=line[i];
+      if(ch==="#"){out+='<span class="tok-comment">'+esc(line.slice(i))+"</span>";break;}
+      if(ch==="'"||ch==='"'){
+        var q=ch,triple=line.slice(i,i+3)===q+q+q,end=i+(triple?3:1),done=false;
+        while(end<line.length){
+          if(!triple&&line[end]==="\\"){end+=2;continue;}
+          if(triple&&line.slice(end,end+3)===q+q+q){end+=3;done=true;break;}
+          if(!triple&&line[end]===q){end+=1;done=true;break;}
+          end+=1;
+        }
+        out+='<span class="tok-str">'+esc(line.slice(i,done?end:line.length))+"</span>";
+        i=done?end:line.length;
+        continue;
+      }
+      if(/[0-9]/.test(ch)||(ch==="."&&/[0-9]/.test(line[i+1]||""))){
+        var m=line.slice(i).match(/^(?:0[xX][0-9a-fA-F]+|\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?/);
+        out+='<span class="tok-num">'+esc(m[0])+"</span>";i+=m[0].length;continue;
+      }
+      if(/[A-Za-z_]/.test(ch)){
+        var id=line.slice(i).match(/^[A-Za-z_][A-Za-z0-9_]*/)[0];
+        if(KW[id])out+='<span class="tok-kw">'+id+"</span>";
+        else if(FN[id])out+='<span class="tok-fn">'+id+"</span>";
+        else out+=id;
+        i+=id.length;continue;
+      }
+      out+=esc(ch);i+=1;
+    }
+    return out;
+  }
+  function paint(ta){
+    var pre=ta.closest(".pr-editor").querySelector(".pr-code");
+    pre.innerHTML=ta.value.split("\n").map(colorLine).join("\n")+(ta.value.endsWith("\n")?"\n":"");
+    pre.style.height=ta.style.height;
+    pre.scrollTop=ta.scrollTop;pre.scrollLeft=ta.scrollLeft;
+  }
+  function autosize(ta){ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight+2,460)+"px";}
+  function tune(ta){autosize(ta);paint(ta);}
+  function tabKey(e){
+    if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();var b=this.closest(".pr-cell,#pr-lab").querySelector(".pr-run");if(b)b.click();return;}
+    if(e.key==="Tab"){
+      e.preventDefault();
+      var s=this.selectionStart,en=this.selectionEnd,v=this.value,lineStart=v.lastIndexOf("\n",s-1)+1,lineEnd=v.indexOf("\n",en);
+      if(lineEnd<0)lineEnd=v.length;
+      if(s!==en||e.shiftKey){
+        var block=v.slice(lineStart,lineEnd),lines=block.split("\n"),delta=0;
+        if(e.shiftKey){
+          lines=lines.map(function(line){
+            if(line.startsWith("    ")){delta-=4;return line.slice(4);}
+            if(line.startsWith("\t")){delta-=1;return line.slice(1);}
+            return line;
+          });
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=Math.max(lineStart,s+(s===lineStart?0:Math.max(delta/Math.max(lines.length,1),-4)));
+          this.selectionEnd=Math.max(this.selectionStart,en+delta);
+        }else{
+          lines=lines.map(function(line){delta+=4;return "    "+line;});
+          this.value=v.slice(0,lineStart)+lines.join("\n")+v.slice(lineEnd);
+          this.selectionStart=s+4;
+          this.selectionEnd=en+delta;
+        }
+      }else{
+        this.value=v.slice(0,s)+"    "+v.slice(en);this.selectionStart=this.selectionEnd=s+4;
+      }
+      tune(this);
+      return;
+    }
+    if(e.key==="Enter"){
+      e.preventDefault();
+      var a=this.selectionStart,b=this.selectionEnd,text=this.value,start=text.lastIndexOf("\n",a-1)+1;
+      var prefix=text.slice(start,a),indent=(prefix.match(/^\s*/)||[""])[0],code=prefix.replace(/#.*$/,"").trimEnd();
+      var add="\n"+indent+(/:\s*$/.test(code)?"    ":"");
+      this.value=text.slice(0,a)+add+text.slice(b);
+      this.selectionStart=this.selectionEnd=a+add.length;
+      tune(this);
+      return;
+    }
+  }
+  function makeCell(code){
+    var cell=document.createElement("div");cell.className="pr-cell";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">可运行 · Python (NumPy)</span><span class="pr-status"></span><button class="pr-btn pr-toggle">收起</button><button class="pr-btn pr-run">▶ 运行</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    var ta=cell.querySelector(".pr-edit");ta.value=code;
+    var out=cell.querySelector(".pr-out"),st=cell.querySelector(".pr-status");
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    cell.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    var tog=cell.querySelector(".pr-toggle");
+    tog.onclick=function(){cell.classList.toggle("collapsed");tog.textContent=cell.classList.contains("collapsed")?"展开":"收起";};
+    setTimeout(function(){tune(ta);},0);
+    return cell;
+  }
+  function makeRef(code,lang){
+    var cell=document.createElement("div");cell.className="pr-cell ref-cell";
+    var L=lang||"参考";
+    cell.innerHTML='<div class="pr-head"><span class="pr-title">参考代码 · '+esc(L)+'</span><span class="pr-status">不在浏览器运行</span></div><pre class="pr-code pr-static"></pre>';
+    cell.querySelector(".pr-static").innerHTML=code.split("\n").map(colorLine).join("\n");
+    return cell;
+  }
+  function enhance(){
+    document.querySelectorAll("article pre").forEach(function(pre){
+      if(pre.closest(".pr-cell"))return;
+      var codeEl=pre.querySelector("code")||pre;
+      var code=codeEl.textContent.replace(/\s+$/,"");
+      if(!code)return;
+      if(pre.classList.contains("ref")){
+        pre.replaceWith(makeRef(code,pre.getAttribute("data-lang")));
+      }else{
+        pre.replaceWith(makeCell(code));
+      }
+    });
+  }
+  function lab(){
+    var fab=document.createElement("button");fab.id="pr-fab";fab.textContent="▶ Python 实验台";
+    var panel=document.createElement("div");panel.id="pr-lab";
+    panel.innerHTML='<div class="pr-head"><span class="pr-title">Python 实验台 · NumPy</span><span class="pr-status"></span><button class="pr-btn pr-run">▶ 运行</button><button class="pr-btn pr-min">收起</button></div><div class="pr-body"><div class="pr-editor"><pre class="pr-code" aria-hidden="true"></pre><textarea class="pr-edit" spellcheck="false"></textarea></div><pre class="pr-out"></pre></div>';
+    document.body.appendChild(fab);document.body.appendChild(panel);
+    var ta=panel.querySelector(".pr-edit");
+    ta.value="import numpy as np\na = np.array([3, 2])\nb = np.array([1, 4])\nprint(\"a + b =\", a + b)\nprint(\"a . b =\", a @ b)\nprint(\"|a|  =\", np.linalg.norm(a))\ncos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))\nprint(\"cos =\", round(float(cos), 4))";
+    ta.addEventListener("input",function(){tune(ta);});
+    ta.addEventListener("scroll",function(){paint(ta);});
+    ta.addEventListener("keydown",tabKey);
+    var out=panel.querySelector(".pr-out"),st=panel.querySelector(".pr-status");
+    panel.querySelector(".pr-run").onclick=function(){run(ta.value,out,st);};
+    fab.onclick=function(){panel.classList.toggle("open");};
+    panel.querySelector(".pr-min").onclick=function(){panel.classList.remove("open");};
+    setTimeout(function(){tune(ta);},0);
+  }
+  function init(){enhance();lab();}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+
+<script src="../assets/page-toc.js"></script>
+<script src="../assets/annotator.js"></script>
+</body>
+</html>
