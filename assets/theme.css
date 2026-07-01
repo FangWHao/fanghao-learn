@@ -359,6 +359,170 @@ html {
   overflow-x: hidden;
 }
 
+.fh-readmap-rail {
+  position: fixed;
+  left: 10px;
+  top: 96px;
+  bottom: 118px;
+  z-index: 10006;
+  display: flex;
+  width: 8px;
+  min-width: 8px;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.fh-readmap-rail span {
+  display: block;
+  flex: 1;
+  min-height: 2px;
+  border-radius: 999px;
+  background: #2563eb;
+  opacity: 0.13;
+}
+
+.fh-readmap-rail span.active {
+  outline: 2px solid rgba(15, 23, 42, 0.32);
+  outline-offset: 1px;
+}
+
+.fh-readmap-panel {
+  position: fixed;
+  left: 26px;
+  top: 96px;
+  z-index: 10036;
+  display: none;
+  width: min(320px, calc(100vw - 42px));
+  overflow: hidden;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 18px 46px rgba(15, 23, 42, 0.22);
+  backdrop-filter: blur(12px);
+}
+
+.fh-readmap-panel.open {
+  display: block;
+}
+
+.fh-readmap-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid #e2e8f0;
+  color: #0f172a;
+  font-size: 14px;
+}
+
+.fh-readmap-close {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  background: #fff;
+  color: #334155;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.fh-readmap-panel-body {
+  padding: 12px 14px 14px;
+}
+
+.fh-readmap-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.fh-readmap-row b {
+  color: #1f2937;
+  font-weight: 800;
+}
+
+.fh-readmap-mini {
+  display: grid;
+  grid-template-columns: repeat(24, 1fr);
+  gap: 3px;
+  margin: 12px 0;
+}
+
+.fh-readmap-mini span {
+  height: 12px;
+  border-radius: 4px;
+  background: #2563eb;
+}
+
+.fh-readmap-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.fh-readmap-actions button {
+  flex: 1;
+  min-height: 34px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  color: #1f2937;
+  cursor: pointer;
+  font: 700 13px/1.2 system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.fh-readmap-actions button:hover,
+.fh-readmap-close:hover {
+  border-color: #2563eb;
+  color: #1d4ed8;
+}
+
+html[data-theme="dark"] .fh-readmap-rail span {
+  background: #93c5fd;
+}
+
+html[data-theme="dark"] .fh-readmap-rail span.active {
+  outline-color: rgba(229, 237, 248, 0.42);
+}
+
+html[data-theme="dark"] .fh-readmap-panel {
+  border-color: #334155;
+  background: rgba(17, 24, 39, 0.96);
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.34);
+}
+
+html[data-theme="dark"] .fh-readmap-panel-head {
+  border-color: #334155;
+  color: #e5edf8;
+}
+
+html[data-theme="dark"] .fh-readmap-close,
+html[data-theme="dark"] .fh-readmap-actions button {
+  border-color: #475569;
+  background: #111827;
+  color: #e5edf8;
+}
+
+html[data-theme="dark"] .fh-readmap-row {
+  color: #9aa8bd;
+}
+
+html[data-theme="dark"] .fh-readmap-row b {
+  color: #e5edf8;
+}
+
+html[data-theme="dark"] .fh-readmap-mini span {
+  background: #93c5fd;
+}
+
 @media (min-width: 761px) {
   html body header.top .inner,
   html body .wrap {
@@ -639,6 +803,23 @@ mjx-container[display="true"] > svg {
   html body #pr-lab .pr-edit,
   html body #pr-lab .pr-code {
     min-height: 132px !important;
+  }
+
+  html body .fh-readmap-rail {
+    left: 3px;
+    top: 148px;
+    bottom: 148px;
+    width: 5px;
+    min-width: 5px;
+    gap: 1px;
+  }
+
+  html body .fh-readmap-panel {
+    right: 10px;
+    left: 10px;
+    top: auto;
+    bottom: 110px;
+    width: auto;
   }
 }
 
